@@ -2,9 +2,12 @@
   "name": "kisholens-monorepo",
   "version": "0.1.0",
   "private": true,
+  "engines": { "node": ">=22.12.0" },
   "scripts": {
     "dev:frontend": "npm --prefix frontend run dev",
-    "dev:backend": "uv run uvicorn kisholens.api:app --reload",
+    "dev:backend": "uv run uvicorn kisholens.api.main:app --reload",
+    "dev:pipeline": "uv run python -m kisholens.pipeline.main",
+    "dev:ml": "uv run python -m kisholens.ml.main",
     "dev": "concurrently \"npm:dev:frontend\" \"npm:dev:backend\""
   },
   "devDependencies": {

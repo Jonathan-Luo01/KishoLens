@@ -9,6 +9,7 @@ build/
 __pycache__/
 *.py[cod]
 *.class
+.venv/
 venv/
 env/
 .pytest_cache/
@@ -16,3 +17,7 @@ env/
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Data — raw scraped text must never be committed (copyright)
+data/raw_cache/
+data/*.db

@@ -1,8 +1,3 @@
-from fastapi import FastAPI
+from kisholens.api.main import app
 
-app = FastAPI(title="KishoLens API")
-
-
-@app.get("/health")
-def health_check():
-    return {"status": "ok", "service": "kisholens"}
+__all__ = ["app"]

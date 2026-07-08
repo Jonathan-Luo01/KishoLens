@@ -4,6 +4,11 @@ version = "0.1.0"
 description = "Stylistic pacing and prose archetype analysis for web novels and light fiction"
 readme = "README.md"
 requires-python = ">=3.10"
+
+# KishoLens uses a single flat uv package (not a workspace).
+# All services (api, ml, pipeline) are submodules of the `kisholens` package.
+# Run with: uv run uvicorn kisholens.api.main:app --reload
+# NLP extras (spacy, sudachipy) require Python <=3.13: uv sync --extra nlp
 dependencies = [
     # API
     "fastapi>=0.100.0",
