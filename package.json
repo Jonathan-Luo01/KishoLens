@@ -1,0 +1,14 @@
+{
+  "name": "kisholens-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "uv run --package backend uvicorn src.main:app --reload",
+    "dev:pipeline": "uv run --package data_pipeline python -m src.main",
+    "dev": "concurrently \"npm:dev:frontend\" \"npm:dev:backend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
