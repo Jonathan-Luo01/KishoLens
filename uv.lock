@@ -1623,10 +1623,10 @@ name = "kisholens"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "aiohttp" },
     { name = "beautifulsoup4" },
     { name = "datasets" },
     { name = "fastapi" },
-    { name = "httpx" },
     { name = "lxml" },
     { name = "nltk" },
     { name = "pydantic" },
@@ -1649,10 +1649,10 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "aiohttp", specifier = ">=3.8.0" },
     { name = "beautifulsoup4", specifier = ">=4.12.0" },
     { name = "datasets", specifier = ">=2.12.0" },
     { name = "fastapi", specifier = ">=0.100.0" },
-    { name = "httpx", specifier = ">=0.24.0" },
     { name = "lxml", specifier = ">=4.9.0" },
     { name = "nltk", specifier = ">=3.8.1" },
     { name = "pydantic", specifier = ">=2.0" },

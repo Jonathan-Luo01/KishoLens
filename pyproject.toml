@@ -16,7 +16,7 @@ dependencies = [
     # Data layer
     "sqlmodel>=0.0.8",
     # HTTP client
-    "httpx>=0.24.0",
+    "aiohttp>=3.8.0",
     # HTML parsing
     "lxml>=4.9.0",
     "beautifulsoup4>=4.12.0",
