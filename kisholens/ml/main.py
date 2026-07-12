@@ -79,7 +79,7 @@ def main():
     en_cols = [c for c in df.columns if c.startswith("en_")]
     if en_cols:
         print("\nEnglish Style Aggregates by Novel:")
-        novel_en = df.groupby(["novel_title", "source"])[en_cols].mean()
+        novel_en = df.groupby(["novel_title", "source"])[en_cols].mean().dropna(how='all')
         print(novel_en.to_string())
     else:
         print("\nNo English style columns available.")
@@ -88,7 +88,7 @@ def main():
     ja_cols = [c for c in df.columns if c.startswith("ja_")]
     if ja_cols:
         print("\nJapanese Style Aggregates by Novel:")
-        novel_ja = df.groupby(["novel_title", "source"])[ja_cols].mean()
+        novel_ja = df.groupby(["novel_title", "source"])[ja_cols].mean().dropna(how='all')
         print(novel_ja.to_string())
     else:
         print("\nNo Japanese style columns available.")
@@ -97,7 +97,7 @@ def main():
     zh_cols = [c for c in df.columns if c.startswith("zh_")]
     if zh_cols:
         print("\nChinese Style Aggregates by Novel:")
-        novel_zh = df.groupby(["novel_title", "source"])[zh_cols].mean()
+        novel_zh = df.groupby(["novel_title", "source"])[zh_cols].mean().dropna(how='all')
         print(novel_zh.to_string())
     else:
         print("\nNo Chinese style columns available.")
