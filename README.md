@@ -12,7 +12,7 @@ KishoLens is a dashboard for analyzing the structural and stylistic DNA of web n
 | **API** | FastAPI + Uvicorn |
 | **NLP / ML** | spaCy, SudachiPy (Japanese), NLTK (English) |
 | **HTML Parsing** | lxml + BeautifulSoup4 |
-| **HTTP** | httpx (async) |
+| **HTTP Client** | urllib.request (standard library) |
 | **Data layer** | SQLModel + SQLite |
 | **Python tooling** | Astral uv |
 | **Node tooling** | npm + concurrently |
