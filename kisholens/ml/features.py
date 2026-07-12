@@ -69,7 +69,7 @@ def _init_nlp_resources():
         import spacy
         try:
             return spacy.load(model_name)
-        except OSError:
+        except Exception:
             try:
                 print(f"Downloading spaCy model {model_name}...")
                 spacy.cli.download(model_name)
