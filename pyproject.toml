@@ -25,6 +25,7 @@ dependencies = [
     # NLP - English (pinned to last version with py3.13 wheels)
     "nltk>=3.8.1",
     "datasets>=2.12.0",
+    "pandas>=2.0.0",
 ]
 
 [project.optional-dependencies]
