@@ -35,6 +35,7 @@ nlp = [
     "sudachipy>=0.6.7",
     "sudachidict-core>=20230110",
     "hanlp>=2.1.0",
+    "transformers>=4.0.0,<5.0.0",
     "en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0.tar.gz",
     "ja-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/ja_core_news_sm-3.8.0/ja_core_news_sm-3.8.0.tar.gz",
 ]
