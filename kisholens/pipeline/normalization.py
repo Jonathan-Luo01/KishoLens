@@ -24,7 +24,7 @@ def clean_english(text: str) -> str:
     if not text:
         return ""
     # Match bracketed or parenthesized translator notes spanning multiple lines, preventing cross-bracket overmatching
-    pattern = r"(?s)(?:\\[(?:TL\s*note|T/N|Editor's\s*note|EN|TN):.*?\\]|\\((?:TL\\s*note|T/N|Editor's\\s*note|EN|TN):.*?\\))"
+    pattern = r"(?s)(?:\[(?:TL\s*note|T/N|Editor's\s*note|EN|TN):.*?\]|\((?:TL\s*note|T/N|Editor's\s*note|EN|TN):.*?\))"
     text = re.sub(pattern, '', text, flags=re.IGNORECASE)
     return text.strip()
 
@@ -38,7 +38,7 @@ def parse_chapter_number(title: str) -> Optional[int]:
         return int(match_num.group(1))
     return None
 
-def extract_chapter_info(src: str, trg: str, index: int) -> Tuple[Optional[int], str, str, str, str]:
+def extract_chapter_info(src: str, trg: str) -> Tuple[Optional[int], str, str, str, str]:
     """
     Extracts chapter number and titles from the first line of raw text.
     If the first line represents a title, it strips it from the returned body text.
@@ -70,8 +70,8 @@ def extract_chapter_info(src: str, trg: str, index: int) -> Tuple[Optional[int],
             title_en = trg_first_line[match_en_start_num.end():].strip()
             
     if not is_header:
-        title_ja = f"Chapter {chapter_number if chapter_number is not None else ''}"
-        title_en = f"Chapter {chapter_number if chapter_number is not None else ''}"
+        title_ja = "Chapter "
+        title_en = "Chapter "
         
     body_ja = src
     body_en = trg

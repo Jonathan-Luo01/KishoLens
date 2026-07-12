@@ -19,7 +19,7 @@ def parse_parallel_fiction(item: Dict[str, Any], idx: int) -> Dict[str, Any]:
     writer = meta.get('syosetu', {}).get('writer', 'Unknown')
     source = "syosetu"
     
-    chapter_number, title_ja, title_en, body_ja, body_en = extract_chapter_info(item['src'], item['trg'], idx)
+    chapter_number, title_ja, title_en, body_ja, body_en = extract_chapter_info(item['src'], item['trg'])
     cleaned_ja = clean_japanese(clean_html(body_ja))
     cleaned_en = clean_english(clean_html(body_en))
     
@@ -39,13 +39,8 @@ def parse_scribblehub(item: Dict[str, Any], idx: int) -> Dict[str, Any]:
     meta = item.get('meta', {})
     title_str = meta.get('title', 'Unknown')
     
-    if " - " in title_str:
-        parts = title_str.split(" - ", 1)
-        series_title = parts[0].strip()
-        chapter_title = parts[1].strip()
-    else:
-        series_title = title_str
-        chapter_title = title_str
+    parts = title_str.split(" - ", 1)
+    series_title, chapter_title = (parts[0].strip(), parts[1].strip()) if len(parts) > 1 else (title_str, title_str)
         
     author = meta.get('author', 'Unknown')
     source = "scribblehub"
@@ -88,13 +83,8 @@ def parse_cnnovel(item: Dict[str, Any], idx: int) -> Dict[str, Any]:
     meta = item.get('meta', {})
     title_str = meta.get('title', 'Unknown')
     
-    if " - " in title_str:
-        parts = title_str.split(" - ", 1)
-        series_title = parts[0].strip()
-        chapter_title = parts[1].strip()
-    else:
-        series_title = title_str
-        chapter_title = title_str
+    parts = title_str.split(" - ", 1)
+    series_title, chapter_title = (parts[0].strip(), parts[1].strip()) if len(parts) > 1 else (title_str, title_str)
         
     author = meta.get('author', 'Unknown')
     source = "cnnovel"

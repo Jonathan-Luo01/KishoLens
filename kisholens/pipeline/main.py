@@ -14,42 +14,29 @@ def extract_features(text: str, lang: str = "en"):
     if not text:
         return {"token_count": 0, "sentence_count": 0, "punctuation_density": 0.0, "dialogue_ratio": 0.0}
         
+    lines = [line.strip() for line in text.split('\n') if line.strip()]
+    char_count = len(text)
+    
     if lang == "en":
         tokens = re.findall(r'\b\w+\b', text)
-        token_count = len(tokens)
-        sentences = [s for s in re.split(r'[.!?]+', text) if s.strip()]
-        sentence_count = len(sentences)
+        sentences = re.split(r'[.!?]+', text)
         punctuations = re.findall(r'[.,\/#!$%\^&\*;:{}=\-_`~()?\"\']', text)
-        punc_count = len(punctuations)
-        char_count = len(text)
-        punc_density = punc_count / char_count if char_count > 0 else 0.0
-        lines = [line.strip() for line in text.split('\n') if line.strip()]
-        dialogue_lines = [line for line in lines if line.startswith('"') or line.startswith("'") or line.startswith('“') or line.startswith('”')]
-        dialogue_ratio = len(dialogue_lines) / len(lines) if lines else 0.0
-    else: # ja or zh
+        dialogue_start = ('"', "'", '“', '”')
+    else:  # ja or zh
         tokens = [c for c in text if not c.isspace()]
-        token_count = len(tokens)
-        sentences = [s for s in re.split(r'[。！？\n]+', text) if s.strip()]
-        sentence_count = len(sentences)
-        if lang == "zh":
-            punctuations = re.findall(r'[，、。！？；：\"\"‘’（）《》【】『』「」——……]', text)
-        else: # ja
-            punctuations = re.findall(r'[...、。！？「」『』（）―…ー・]', text)
-        punc_count = len(punctuations)
-        char_count = len(text)
-        punc_density = punc_count / char_count if char_count > 0 else 0.0
-        lines = [line.strip() for line in text.split('\n') if line.strip()]
-        if lang == "zh":
-            dialogue_lines = [line for line in lines if line.startswith('“') or line.startswith('「') or line.startswith('『')]
-        else: # ja
-            dialogue_lines = [line for line in lines if line.startswith('「') or line.startswith('『')]
-        dialogue_ratio = len(dialogue_lines) / len(lines) if lines else 0.0
+        sentences = re.split(r'[。！？\n]+', text)
+        punc_pat = r'[，、。！？；：\"\"‘’（）《》【】『』「」——……]' if lang == "zh" else r'[、。！？「」『』（）―…ー・]'
+        punctuations = re.findall(punc_pat, text)
+        dialogue_start = ('“', '「', '『') if lang == "zh" else ('「', '『')
         
+    sentence_count = len([s for s in sentences if s.strip()])
+    dialogue_lines = [l for l in lines if l.startswith(dialogue_start)]
+    
     return {
-        "token_count": token_count,
+        "token_count": len(tokens),
         "sentence_count": sentence_count,
-        "punctuation_density": punc_density,
-        "dialogue_ratio": dialogue_ratio
+        "punctuation_density": len(punctuations) / char_count if char_count > 0 else 0.0,
+        "dialogue_ratio": len(dialogue_lines) / len(lines) if lines else 0.0
     }
 
 def run_etl(dataset_name: str, num_records: int = 20):
@@ -165,7 +152,7 @@ def run_etl(dataset_name: str, num_records: int = 20):
                         max_ch = session.exec(select(func.max(Chapter.chapter_number)).where(Chapter.novel_id == novel_id)).one()
                         chapter_number = (max_ch or 0) + 1
                     
-                    if chapter_title == "Chapter " or chapter_title == "Chapter":
+                    if chapter_title in ("Chapter", "Chapter "):
                         chapter_title = f"Chapter {chapter_number}"
                     
                     statement_ch = select(Chapter).where(Chapter.novel_id == novel_id, Chapter.chapter_number == chapter_number)
@@ -232,7 +219,7 @@ def verify_pipeline():
                         print(f"    EN text (first 100 chars): {c.text_en[:100]}...")
                         feat_en = extract_features(c.text_en, lang="en")
                         print(f"    EN Metrics: Tokens={feat_en['token_count']}, Sentences={feat_en['sentence_count']}, PuncDensity={feat_en['punctuation_density']:.3f}, DialogueRatio={feat_en['dialogue_ratio']:.3f}")
-                    if hasattr(c, 'text_zh') and c.text_zh:
+                    if c.text_zh:
                         print(f"    ZH text (first 100 chars): {c.text_zh[:100]}...")
                         feat_zh = extract_features(c.text_zh, lang="zh")
                         print(f"    ZH Metrics: Tokens={feat_zh['token_count']}, Sentences={feat_zh['sentence_count']}, PuncDensity={feat_zh['punctuation_density']:.3f}, DialogueRatio={feat_zh['dialogue_ratio']:.3f}")
