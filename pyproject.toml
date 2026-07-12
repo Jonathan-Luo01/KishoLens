@@ -29,11 +29,14 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# NLP extras require Python <=3.13 until spaCy publishes 3.14 wheels
+# NLP extras (spacy, sudachipy, hanlp)
 nlp = [
-    "spacy>=3.5.0",
+    "spacy>=3.5.0,<3.8.14",
     "sudachipy>=0.6.7",
     "sudachidict-core>=20230110",
+    "hanlp>=2.1.0",
+    "en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0.tar.gz",
+    "ja-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/ja_core_news_sm-3.8.0/ja_core_news_sm-3.8.0.tar.gz",
 ]
 
 [build-system]
@@ -42,6 +45,9 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["kisholens"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [dependency-groups]
 dev = [

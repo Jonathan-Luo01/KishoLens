@@ -69,14 +69,9 @@ def _init_nlp_resources():
         import spacy
         try:
             return spacy.load(model_name)
-        except Exception:
-            try:
-                print(f"Downloading spaCy model {model_name}...")
-                spacy.cli.download(model_name)
-                return spacy.load(model_name)
-            except Exception as e:
-                print(f"Could not load spaCy model {model_name}: {e}")
-                return None
+        except Exception as e:
+            print(f"Could not load spaCy model {model_name}: {e}")
+            return None
 
     if HAS_SPACY:
         _nlp_en = load_spacy_model("en_core_web_sm")
