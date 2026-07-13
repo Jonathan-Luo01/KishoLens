@@ -1,4 +1,3 @@
-import os
 import sys
 from sqlmodel import Session, select
 import pandas as pd

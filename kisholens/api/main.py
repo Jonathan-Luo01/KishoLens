@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session, select, func
-import pandas as pd
 
 from kisholens.models import Novel, Chapter, get_engine
 from kisholens.ml.features import (
@@ -89,9 +88,9 @@ def get_novel(novel_id: int):
                     for ch in chapters
                 ]
             }
-    except HTTPException:
-        raise
     except Exception as e:
+        if isinstance(e, HTTPException):
+            raise e
         raise HTTPException(
             status_code=500,
             detail=f"Database connection error: {str(e)}"
@@ -129,18 +128,29 @@ def get_stats_sources():
             if not features_list:
                 return []
 
-            df = pd.DataFrame(features_list)
-            num_cols = [
-                c for c in df.columns
-                if c.startswith("en_") or c.startswith("ja_") or c.startswith("zh_")
-            ]
+            # Group rows by source platform
+            grouped = {}
+            for row in features_list:
+                src = row["source"]
+                if src not in grouped:
+                    grouped[src] = []
+                grouped[src].append(row)
 
-            if not num_cols:
-                return []
+            # Calculate average for each numeric metric key per source
+            agg_records = []
+            for src, rows in grouped.items():
+                agg = {"source": src}
+                # Gather all keys present in the rows for this source
+                keys = set()
+                for r in rows:
+                    keys.update(k for k in r.keys() if k != "source")
 
-            agg_df = df.groupby(["source"])[num_cols].mean().reset_index()
-            clean_records = agg_df.replace({float("nan"): None}).to_dict(orient="records")
-            return clean_records
+                for k in sorted(keys):
+                    vals = [r[k] for r in rows if k in r and r[k] is not None]
+                    agg[k] = sum(vals) / len(vals) if vals else None
+                agg_records.append(agg)
+
+            return agg_records
     except Exception as e:
         raise HTTPException(
             status_code=500,

@@ -76,7 +76,9 @@ def extract_chapter_info(src: str, trg: str) -> Tuple[Optional[int], str, str, s
     body_ja = src
     body_en = trg
     if is_header:
-        body_ja = "\n".join(src.strip().split('\n')[1:])
-        body_en = "\n".join(trg.strip().split('\n')[1:])
+        parts_ja = src.strip().split('\n', 1)
+        body_ja = parts_ja[1].strip() if len(parts_ja) > 1 else ""
+        parts_en = trg.strip().split('\n', 1)
+        body_en = parts_en[1].strip() if len(parts_en) > 1 else ""
         
     return chapter_number, title_ja, title_en, body_ja, body_en
