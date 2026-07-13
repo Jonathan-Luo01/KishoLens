@@ -5,9 +5,9 @@
   "engines": { "node": ">=22.12.0" },
   "scripts": {
     "dev:frontend": "npm --prefix frontend run dev",
-    "dev:backend": "uv run uvicorn kisholens.api.main:app --reload",
-    "dev:pipeline": "uv run python -m kisholens.pipeline.main",
-    "dev:ml": "uv run python -m kisholens.ml.main",
+    "dev:backend": ".venv\\Scripts\\uvicorn kisholens.api.main:app --reload",
+    "dev:pipeline": ".venv\\Scripts\\python -m kisholens.pipeline.main",
+    "dev:ml": ".venv\\Scripts\\python -m kisholens.ml.main",
     "dev": "concurrently \"npm:dev:frontend\" \"npm:dev:backend\""
   },
   "devDependencies": {
