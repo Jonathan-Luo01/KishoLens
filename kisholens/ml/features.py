@@ -58,6 +58,7 @@ def _init_nlp_resources():
             nltk.download('punkt_tab', quiet=True)
             nltk.download('averaged_perceptron_tagger', quiet=True)
             nltk.download('averaged_perceptron_tagger_eng', quiet=True)
+            nltk.download('vader_lexicon', quiet=True)
         except Exception as e:
             print(f"Could not download NLTK resources: {e}")
 
@@ -129,6 +130,20 @@ def extract_english_features(text: str) -> Dict[str, Any]:
     avg_sentence_len = word_count / sentence_count if sentence_count > 0 else 0.0
     dialogue_ratio = len(dialogue_lines) / len(lines) if lines else 0.0
     punc_density = punc_count / len(text) if len(text) > 0 else 0.0
+
+    # New features: avg_sentences_per_paragraph and compound_sentiment
+    para_sentence_counts = [len([s.strip() for s in re.split(r'[.!?]+', p) if s.strip()]) for p in lines]
+    avg_sentences_per_paragraph = sum(para_sentence_counts) / len(lines) if lines else 0.0
+
+    compound_sentiment = 0.0
+    if HAS_NLTK:
+        try:
+            import nltk
+            from nltk.sentiment.vader import SentimentIntensityAnalyzer
+            sia = SentimentIntensityAnalyzer()
+            compound_sentiment = sia.polarity_scores(text)["compound"]
+        except Exception:
+            pass
     
     # Fallback/default metrics
     dep_tree_depth = 0.0
@@ -193,7 +208,9 @@ def extract_english_features(text: str) -> Dict[str, Any]:
         "adj_ratio": adj_ratio,
         "verb_ratio": verb_ratio,
         "pron_ratio": pron_ratio,
-        "entity_density": entity_density
+        "entity_density": entity_density,
+        "avg_sentences_per_paragraph": avg_sentences_per_paragraph,
+        "compound_sentiment": compound_sentiment
     }
 
 
@@ -221,6 +238,16 @@ def extract_japanese_features(text: str) -> Dict[str, Any]:
     
     kanji_chars = re.findall(r'[\u4e00-\u9fff]', text)
     kanji_ratio = len(kanji_chars) / char_count if char_count > 0 else 0.0
+
+    # New features: avg_sentences_per_paragraph and compound_sentiment
+    para_sentence_counts = [len([s.strip() for s in re.split(r'[。！？]+', p) if s.strip()]) for p in lines]
+    avg_sentences_per_paragraph = sum(para_sentence_counts) / len(lines) if lines else 0.0
+
+    pos_words = ["嬉しい", "楽しい", "美しい", "素晴らしい", "愛する", "成功", "幸せ", "感謝", "満足"]
+    neg_words = ["悲しい", "苦しい", "怒る", "嫌い", "失敗", "痛い", "最悪", "残念", "孤独"]
+    pos_count = sum(text.count(w) for w in pos_words)
+    neg_count = sum(text.count(w) for w in neg_words)
+    compound_sentiment = (pos_count - neg_count) / (pos_count + neg_count + 1)
     
     # Defaults
     dep_tree_depth = 0.0
@@ -258,7 +285,9 @@ def extract_japanese_features(text: str) -> Dict[str, Any]:
         "dep_tree_depth": dep_tree_depth,
         "particle_ratio": particle_ratio,
         "verb_ratio": verb_ratio,
-        "kanji_ratio": kanji_ratio
+        "kanji_ratio": kanji_ratio,
+        "avg_sentences_per_paragraph": avg_sentences_per_paragraph,
+        "compound_sentiment": compound_sentiment
     }
 
 
@@ -283,6 +312,16 @@ def extract_chinese_features(text: str) -> Dict[str, Any]:
     dialogue_ratio = len(dialogue_lines) / len(lines) if lines else 0.0
     
     ttr = compute_type_token_ratio(chars)
+
+    # New features: avg_sentences_per_paragraph and compound_sentiment
+    para_sentence_counts = [len([s.strip() for s in re.split(r'[。！？]+', p) if s.strip()]) for p in lines]
+    avg_sentences_per_paragraph = sum(para_sentence_counts) / len(lines) if lines else 0.0
+
+    pos_words = ["高兴", "开心", "美丽", "棒", "爱", "成功", "幸福", "感谢", "满意", "喜欢"]
+    neg_words = ["悲伤", "痛苦", "生气", "讨厌", "失败", "疼", "差", "可惜", "孤独", "难过"]
+    pos_count = sum(text.count(w) for w in pos_words)
+    neg_count = sum(text.count(w) for w in neg_words)
+    compound_sentiment = (pos_count - neg_count) / (pos_count + neg_count + 1)
     punc_count = len(re.findall(r'[，、。！？；：""‘’（）《》【】『』「」——……]', text))
     punc_density = punc_count / len(text) if len(text) > 0 else 0.0
     
@@ -353,5 +392,7 @@ def extract_chinese_features(text: str) -> Dict[str, Any]:
         "punc_density": punc_density,
         "dep_tree_depth": dep_tree_depth,
         "particle_ratio": particle_ratio,
-        "verb_ratio": verb_ratio
+        "verb_ratio": verb_ratio,
+        "avg_sentences_per_paragraph": avg_sentences_per_paragraph,
+        "compound_sentiment": compound_sentiment
     }
