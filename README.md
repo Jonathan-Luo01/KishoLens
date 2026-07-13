@@ -90,10 +90,11 @@ Raw chapter text from modern web fiction platforms is **copyrighted by their aut
 
 | Source | Language | Access method |
 |---|---|---|
-| Shousetsuka ni Narou (Syosetu) | Japanese | Official JSON API + HTML scraping |
-| Royal Road | English | HTML scraping (rate-limited) |
-| Aozora Bunko | Japanese | Public domain archive |
-| Project Gutenberg | English | Public domain archive |
+| **Syosetu (Shousetsuka ni Narou)** | Japanese / Parallel English | HTML scraping / Hugging Face `ParallelFiction` (streaming) |
+| **ScribbleHub** | English | Hugging Face `ScribbleHub17K` (streaming) |
+| **Royal Road** | English | HTML scraping / Hugging Face `RoyalRoad-1.61M` (streaming) |
+| **Project Gutenberg** | English / Chinese | Gutenberg text down-loader (by book ID) |
+| **CNNovel** | Chinese | Hugging Face `CNNovel125K` (streaming) |
 
 ## Architecture
 
