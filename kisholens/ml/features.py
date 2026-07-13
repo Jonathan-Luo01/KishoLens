@@ -1,5 +1,5 @@
 import re
-from typing import Optional, List, Dict, Any
+from typing import List, Dict, Any
 
 # Dynamic library availability flags
 HAS_SPACY = False

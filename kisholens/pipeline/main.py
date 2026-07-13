@@ -1,6 +1,5 @@
 import re
 import sys
-from typing import Optional
 from datasets import load_dataset
 from sqlmodel import SQLModel, Session, select, func
 
