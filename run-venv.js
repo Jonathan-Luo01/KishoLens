@@ -28,8 +28,7 @@ if (!fs.existsSync(cmdPath)) {
 }
 
 const child = spawn(spawnCmd, spawnArgs, {
-  stdio: 'inherit',
-  shell: true
+  stdio: 'inherit'
 });
 
 child.on('close', (code) => {
