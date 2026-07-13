@@ -13,7 +13,7 @@ KishoLens is a dashboard for analyzing the structural and stylistic DNA of web n
 | **NLP / ML** | spaCy, SudachiPy (Japanese), NLTK (English), HanLP (Chinese) |
 | **HTML Parsing** | lxml + BeautifulSoup4 |
 | **HTTP Client** | aiohttp (async) |
-| **Data layer** | SQLModel + SQLite |
+| **Data layer** | SQLModel + SQLite, Hugging Face Datasets (streaming) |
 | **Python tooling** | Astral uv |
 | **Node tooling** | npm + concurrently |
 

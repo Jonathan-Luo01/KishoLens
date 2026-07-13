@@ -323,21 +323,10 @@ def extract_chinese_features(text: str) -> Dict[str, Any]:
                     memo = {}
                     depths = [get_node_depth(i, memo) for i in range(len(heads))]
                     dep_tree_depth = max(depths) if depths else 0.0
-            return {
-                "char_count": char_count,
-                "sentence_count": sentence_count,
-                "avg_sentence_len": avg_sentence_len,
-                "dialogue_ratio": dialogue_ratio,
-                "ttr": ttr,
-                "punc_density": punc_density,
-                "dep_tree_depth": dep_tree_depth,
-                "particle_ratio": particle_ratio,
-                "verb_ratio": verb_ratio
-            }
         except Exception:
             pass
             
-    if HAS_SPACY and _nlp_zh is not None:
+    elif HAS_SPACY and _nlp_zh is not None:
         try:
             sample_text = text[:10000]
             doc = _nlp_zh(sample_text)
@@ -353,18 +342,6 @@ def extract_chinese_features(text: str) -> Dict[str, Any]:
                 
                 particle_ratio = particle_count / word_count
                 verb_ratio = verb_count / word_count
-                
-            return {
-                "char_count": char_count,
-                "sentence_count": sentence_count,
-                "avg_sentence_len": avg_sentence_len,
-                "dialogue_ratio": dialogue_ratio,
-                "ttr": ttr,
-                "punc_density": punc_density,
-                "dep_tree_depth": dep_tree_depth,
-                "particle_ratio": particle_ratio,
-                "verb_ratio": verb_ratio
-            }
         except Exception:
             pass
             
