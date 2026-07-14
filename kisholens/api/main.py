@@ -1,6 +1,9 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from sqlmodel import Session, select, func
+
+from kisholens.pipeline.main import run_etl
 
 from kisholens.models import Novel, Chapter, get_engine
 from kisholens.ml.features import (
@@ -156,3 +159,72 @@ def get_stats_sources():
             status_code=500,
             detail=f"Database connection error: {str(e)}"
         )
+
+
+class IngestRequest(BaseModel):
+    dataset_name: str
+    num_records: int
+
+
+@app.get("/api/novels/{novel_id}/stats")
+def get_novel_stats(novel_id: int):
+    try:
+        with Session(engine) as session:
+            novel = session.get(Novel, novel_id)
+            if not novel:
+                raise HTTPException(status_code=404, detail="Novel not found")
+
+            chapters = session.exec(
+                select(Chapter)
+                .where(Chapter.novel_id == novel_id)
+            ).all()
+
+            features_list = []
+            for ch in chapters:
+                row = {}
+                if ch.text_en:
+                    en_feat = extract_english_features(ch.text_en)
+                    row.update({f"en_{k}": v for k, v in en_feat.items()})
+                if ch.text_ja:
+                    ja_feat = extract_japanese_features(ch.text_ja)
+                    row.update({f"ja_{k}": v for k, v in ja_feat.items()})
+                text_zh = getattr(ch, "text_zh", "")
+                if text_zh:
+                    zh_feat = extract_chinese_features(text_zh)
+                    row.update({f"zh_{k}": v for k, v in zh_feat.items()})
+                if row:
+                    features_list.append(row)
+
+            if not features_list:
+                return {}
+
+            keys = set()
+            for r in features_list:
+                keys.update(r.keys())
+
+            agg = {}
+            for k in sorted(keys):
+                vals = [r[k] for r in features_list if k in r and r[k] is not None]
+                agg[k] = sum(vals) / len(vals) if vals else None
+
+            return agg
+    except Exception as e:
+        if isinstance(e, HTTPException):
+            raise e
+        raise HTTPException(
+            status_code=500,
+            detail=f"Database connection error: {str(e)}"
+        )
+
+
+@app.post("/api/pipeline/ingest")
+def post_pipeline_ingest(request: IngestRequest, background_tasks: BackgroundTasks):
+    try:
+        background_tasks.add_task(run_etl, request.dataset_name, request.num_records)
+        return {"status": "ingest_scheduled", "dataset_name": request.dataset_name}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to schedule ingestion: {str(e)}"
+        )
+
