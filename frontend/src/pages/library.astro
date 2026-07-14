@@ -1,0 +1,441 @@
+---
+import "../styles/global.css";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Explore web novels in KishoLens with pacing metrics, dialogue ratios, and prose sentiment analysis."
+    />
+    <title>Library — KishoLens Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .app-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem 4rem 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+      
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: 1.5rem;
+      }
+      
+      .brand-title {
+        font-family: var(--font-display);
+        font-size: 1.8rem;
+        font-weight: 700;
+        text-decoration: none;
+        color: var(--color-text);
+      }
+      
+      .brand-title span {
+        background: linear-gradient(135deg, var(--color-accent), var(--color-accent-2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .dashboard-layout {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 2rem;
+      }
+
+      @media (max-width: 900px) {
+        .dashboard-layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Card styling */
+      .card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        transition: transform var(--transition), border-color var(--transition), background var(--transition);
+        backdrop-filter: blur(12px);
+      }
+
+      .card:hover {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(124, 106, 255, 0.3);
+      }
+
+      .card-novel {
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .card-novel.active {
+        background: rgba(124, 106, 255, 0.06);
+        border-color: var(--color-accent);
+        box-shadow: 0 0 20px rgba(124, 106, 255, 0.15);
+      }
+
+      .card__title {
+        font-family: var(--font-display);
+        font-size: 1.15rem;
+        font-weight: 600;
+        line-height: 1.3;
+      }
+
+      .card__meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        color: var(--color-muted);
+      }
+
+      .novel-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      /* Stats styling */
+      .stats-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        position: sticky;
+        top: 2rem;
+      }
+
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+
+      .stat-item {
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      .stat-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-muted);
+      }
+
+      .stat-value {
+        font-family: var(--font-display);
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--color-accent-2);
+      }
+
+      /* Form inputs */
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+
+      label {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--color-text);
+      }
+
+      input[type="text"], input[type="number"] {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        padding: 0.65rem;
+        color: var(--color-text);
+        font-family: var(--font-sans);
+        font-size: 0.9rem;
+        outline: none;
+        transition: border-color var(--transition);
+      }
+
+      input[type="text"]:focus, input[type="number"]:focus {
+        border-color: var(--color-accent);
+      }
+
+      .form-actions {
+        margin-top: 1rem;
+      }
+
+      .alert {
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        display: none;
+      }
+      
+      .alert--success {
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        color: rgb(52, 211, 153);
+      }
+
+      .alert--error {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: rgb(248, 113, 113);
+      }
+      
+      .placeholder-text {
+        color: var(--color-muted);
+        text-align: center;
+        padding: 3rem 1rem;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="hero__glow" aria-hidden="true"></div>
+    <div class="app-container">
+      <header>
+        <a href="/" class="brand-title">Kish<span>o</span>Lens</a>
+        <a href="/" class="btn btn--ghost">← Back</a>
+      </header>
+
+      <div class="dashboard-layout">
+        <!-- Left Side: Novels List -->
+        <div>
+          <h2 style="font-family: var(--font-display); margin-bottom: 1.5rem;">Library Novels</h2>
+          <div class="novel-list" id="novels-container">
+            <div class="placeholder-text">Loading library novels...</div>
+          </div>
+        </div>
+
+        <!-- Right Side: Stats & Ingest Control -->
+        <div class="stats-panel">
+          <!-- Stats Viewer -->
+          <div class="card" id="stats-container">
+            <h3 style="font-family: var(--font-display); margin-bottom: 1rem;" id="novel-details-title">Stylistic Analysis</h3>
+            <div id="stats-content">
+              <p class="placeholder-text">Select a novel from the library to view detailed stylistic pacing and sentiment metrics.</p>
+            </div>
+          </div>
+
+          <!-- Ingestion Form -->
+          <div class="card">
+            <h3 style="font-family: var(--font-display); margin-bottom: 1rem;">Ingest Dataset</h3>
+            <form id="ingest-form">
+              <div class="form-group">
+                <label for="dataset_name">HuggingFace Dataset / Gutenberg ID</label>
+                <input
+                  type="text"
+                  id="dataset_name"
+                  placeholder="e.g. gutenberg/1342 or botp/RyokoAI_CNNovel125K"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="num_records">Record Ingestion Limit</label>
+                <input
+                  type="number"
+                  id="num_records"
+                  value="2"
+                  min="1"
+                  max="100"
+                  required
+                />
+              </div>
+              <div class="alert alert--success" id="alert-success">Ingestion task successfully scheduled!</div>
+              <div class="alert alert--error" id="alert-error">Failed to schedule ingestion.</div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn--primary" id="ingest-submit" style="width: 100%;">Schedule Ingest</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Client-side logic -->
+    <script is:inline>
+      const API_URL = "http://127.0.0.1:8000";
+
+      // 1. Fetch and render novels on load
+      async function loadNovels() {
+        const container = document.getElementById("novels-container");
+        try {
+          const res = await fetch(`${API_URL}/api/novels`);
+          if (!res.ok) throw new Error("API request failed");
+          const novels = await res.json();
+
+          if (novels.length === 0) {
+            container.innerHTML = `<div class="placeholder-text">No novels found in the database. Ingest a dataset below to populate.</div>`;
+            return;
+          }
+
+          container.innerHTML = novels
+            .map(
+              (n) => `
+            <div class="card card-novel" onclick="selectNovel(${n.id}, this)">
+              <div class="card__title">${escapeHtml(n.title)}</div>
+              <div class="card__meta">
+                <span>By ${escapeHtml(n.author)}</span>
+                <span>Source: <strong style="color: var(--color-accent-2);">${escapeHtml(n.source)}</strong></span>
+                <span>${n.chapter_count} chs</span>
+              </div>
+            </div>
+          `
+            )
+            .join("");
+        } catch (err) {
+          container.innerHTML = `<div class="placeholder-text" style="color: rgb(248, 113, 113);">Error fetching novels from backend API. Make sure the FastAPI server is running.</div>`;
+        }
+      }
+
+      // 2. Click handler to select novel and fetch statistics
+      async function selectNovel(id, element) {
+        // Highlight selected card
+        document.querySelectorAll(".card-novel").forEach((c) => c.classList.remove("active"));
+        element.classList.add("active");
+
+        const statsContent = document.getElementById("stats-content");
+        const titleElement = document.getElementById("novel-details-title");
+        statsContent.innerHTML = `<p class="placeholder-text">Fetching stylistic stats...</p>`;
+
+        try {
+          const res = await fetch(`${API_URL}/api/novels/${id}/stats`);
+          if (!res.ok) throw new Error("Stats request failed");
+          const stats = await res.json();
+
+          // Get the novel title from clicked card
+          const title = element.querySelector(".card__title").innerText;
+          titleElement.innerText = `${title} Metrics`;
+
+          if (Object.keys(stats).length === 0) {
+            statsContent.innerHTML = `<p class="placeholder-text">No text metrics found. Chapter files might be empty.</p>`;
+            return;
+          }
+
+          // Build a clean metrics grid
+          let gridHtml = `<div class="stat-grid">`;
+          
+          // Determine language from prefix
+          const keys = Object.keys(stats);
+          const isEn = keys.some(k => k.startsWith("en_"));
+          const isJa = keys.some(k => k.startsWith("ja_"));
+          const isZh = keys.some(k => k.startsWith("zh_"));
+
+          if (isEn) {
+            gridHtml += buildStatItem("Word Count", stats.en_word_count?.toFixed(0));
+            gridHtml += buildStatItem("Sentence Count", stats.en_sentence_count?.toFixed(0));
+            gridHtml += buildStatItem("Avg Sentence Length", stats.en_avg_sentence_len?.toFixed(1));
+            gridHtml += buildStatItem("Dialogue Ratio", `${(stats.en_dialogue_ratio * 100)?.toFixed(1)}%`);
+            gridHtml += buildStatItem("Lexical Density (TTR)", stats.en_ttr?.toFixed(3));
+            gridHtml += buildStatItem("Dep Tree Depth", stats.en_dep_tree_depth?.toFixed(2));
+            gridHtml += buildStatItem("Adjective Ratio", `${(stats.en_adj_ratio * 100)?.toFixed(1)}%`);
+            gridHtml += buildStatItem("Verb Ratio", `${(stats.en_verb_ratio * 100)?.toFixed(1)}%`);
+            gridHtml += buildStatItem("Sentences/Paragraph", stats.en_avg_sentences_per_paragraph?.toFixed(2));
+            gridHtml += buildStatItem("Sentiment (VADER)", stats.en_compound_sentiment?.toFixed(3));
+          } else if (isJa) {
+            gridHtml += buildStatItem("Character Count", stats.ja_char_count?.toFixed(0));
+            gridHtml += buildStatItem("Sentence Count", stats.ja_sentence_count?.toFixed(0));
+            gridHtml += buildStatItem("Avg Sentence Length", stats.ja_avg_sentence_len?.toFixed(1));
+            gridHtml += buildStatItem("Dialogue Ratio", `${(stats.ja_dialogue_ratio * 100)?.toFixed(1)}%`);
+            gridHtml += buildStatItem("Lexical Density (TTR)", stats.ja_ttr?.toFixed(3));
+            gridHtml += buildStatItem("Dep Tree Depth", stats.ja_dep_tree_depth?.toFixed(2));
+            gridHtml += buildStatItem("Particle Ratio", `${(stats.ja_particle_ratio * 100)?.toFixed(1)}%`);
+            gridHtml += buildStatItem("Kanji Density", `${(stats.ja_kanji_ratio * 100)?.toFixed(1)}%`);
+            gridHtml += buildStatItem("Sentences/Paragraph", stats.ja_avg_sentences_per_paragraph?.toFixed(2));
+            gridHtml += buildStatItem("Sentiment (Lexicon)", stats.ja_compound_sentiment?.toFixed(3));
+          } else if (isZh) {
+            gridHtml += buildStatItem("Character Count", stats.zh_char_count?.toFixed(0));
+            gridHtml += buildStatItem("Sentence Count", stats.zh_sentence_count?.toFixed(0));
+            gridHtml += buildStatItem("Avg Sentence Length", stats.zh_avg_sentence_len?.toFixed(1));
+            gridHtml += buildStatItem("Dialogue Ratio", `${(stats.zh_dialogue_ratio * 100)?.toFixed(1)}%`);
+            gridHtml += buildStatItem("Lexical Density (TTR)", stats.zh_ttr?.toFixed(3));
+            gridHtml += buildStatItem("Dep Tree Depth", stats.zh_dep_tree_depth?.toFixed(2));
+            gridHtml += buildStatItem("Particle Ratio", `${(stats.zh_particle_ratio * 100)?.toFixed(1)}%`);
+            gridHtml += buildStatItem("Verb Ratio", `${(stats.zh_verb_ratio * 100)?.toFixed(1)}%`);
+            gridHtml += buildStatItem("Sentences/Paragraph", stats.zh_avg_sentences_per_paragraph?.toFixed(2));
+            gridHtml += buildStatItem("Sentiment (Lexicon)", stats.zh_compound_sentiment?.toFixed(3));
+          }
+          gridHtml += `</div>`;
+          statsContent.innerHTML = gridHtml;
+        } catch (err) {
+          statsContent.innerHTML = `<p class="placeholder-text" style="color: rgb(248, 113, 113);">Error fetching stats: ${err.message}</p>`;
+        }
+      }
+
+      function buildStatItem(label, val) {
+        return `
+          <div class="stat-item">
+            <span class="stat-label">${label}</span>
+            <span class="stat-value">${val !== undefined && val !== null ? val : 'N/A'}</span>
+          </div>
+        `;
+      }
+
+      // 3. Handle Ingest Form Submit
+      const ingestForm = document.getElementById("ingest-form");
+      ingestForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const successAlert = document.getElementById("alert-success");
+        const errorAlert = document.getElementById("alert-error");
+        
+        successAlert.style.display = "none";
+        errorAlert.style.display = "none";
+
+        const dataset_name = document.getElementById("dataset_name").value.trim();
+        const num_records = parseInt(document.getElementById("num_records").value, 10);
+
+        try {
+          const res = await fetch(`${API_URL}/api/pipeline/ingest`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ dataset_name, num_records })
+          });
+
+          if (!res.ok) throw new Error("Submission failed");
+          successAlert.style.display = "block";
+          
+          // Reload novels after a short delay to see if background ingestion started populating
+          setTimeout(loadNovels, 3000);
+        } catch (err) {
+          errorAlert.style.display = "block";
+        }
+      });
+
+      // Escape helpers
+      function escapeHtml(str) {
+        if (!str) return '';
+        return str
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      // Boot
+      loadNovels();
+    </script>
+  </body>
+</html>
