@@ -45,6 +45,9 @@ def _init_nlp_resources():
 
     # Check hanlp
     try:
+        import os
+        if os.environ.get("DISABLE_HANLP") == "1":
+            raise ImportError("HanLP disabled via environment variable")
         import hanlp
         HAS_HANLP = True
     except ImportError:
