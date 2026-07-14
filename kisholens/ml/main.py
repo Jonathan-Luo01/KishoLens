@@ -7,6 +7,7 @@ from kisholens.ml.features import (
     extract_english_features,
     extract_japanese_features,
     extract_chinese_features,
+    match_archetype,
 )
 
 # Ensure UTF-8 output encoding for console prints on Windows
@@ -100,6 +101,78 @@ def main():
         print(novel_zh.to_string())
     else:
         print("\nNo Chinese style columns available.")
+
+    # Archetype analysis print statements
+    print("\n==================================================")
+    print("PROSE ARCHETYPE ANALYSIS REPORT")
+    print("==================================================")
+    for (title, src), sub_df in df.groupby(["novel_title", "source"]):
+        prefix = ""
+        for col in sub_df.columns:
+            if col.startswith("en_"):
+                prefix = "en_"
+                break
+            elif col.startswith("ja_"):
+                prefix = "ja_"
+                break
+            elif col.startswith("zh_"):
+                prefix = "zh_"
+                break
+        
+        agnostic_avgs = {}
+        for col in sub_df.columns:
+            if prefix and col.startswith(prefix):
+                key = col[len(prefix):]
+                agnostic_avgs[key] = sub_df[col].mean()
+            elif not col.startswith("en_") and not col.startswith("ja_") and not col.startswith("zh_") and pd.api.types.is_numeric_dtype(sub_df[col]):
+                agnostic_avgs[col] = sub_df[col].mean()
+        
+        if agnostic_avgs:
+            match = match_archetype(agnostic_avgs)
+            print(f"Novel: {title} ({src})")
+            print(f"  Matched Territory: {match['territory']}")
+            print(f"  Closest Trope:     {match['closest_trope']}")
+            print(f"  Confidence:        {match['confidence']:.4f}")
+            print(f"  Similarities:")
+            for trope, sim in sorted(match['similarities'].items(), key=lambda x: x[1], reverse=True):
+                print(f"    - {trope}: {sim:.4f}")
+            print()
+
+    # Archetype analysis print statements
+    print("\n==================================================")
+    print("PROSE ARCHETYPE ANALYSIS REPORT")
+    print("==================================================")
+    for (title, src), sub_df in df.groupby(["novel_title", "source"]):
+        prefix = ""
+        for col in sub_df.columns:
+            if col.startswith("en_"):
+                prefix = "en_"
+                break
+            elif col.startswith("ja_"):
+                prefix = "ja_"
+                break
+            elif col.startswith("zh_"):
+                prefix = "zh_"
+                break
+        
+        agnostic_avgs = {}
+        for col in sub_df.columns:
+            if prefix and col.startswith(prefix):
+                key = col[len(prefix):]
+                agnostic_avgs[key] = sub_df[col].mean()
+            elif not col.startswith("en_") and not col.startswith("ja_") and not col.startswith("zh_") and pd.api.types.is_numeric_dtype(sub_df[col]):
+                agnostic_avgs[col] = sub_df[col].mean()
+        
+        if agnostic_avgs:
+            match = match_archetype(agnostic_avgs)
+            print(f"Novel: {title} ({src})")
+            print(f"  Matched Territory: {match['territory']}")
+            print(f"  Closest Trope:     {match['closest_trope']}")
+            print(f"  Confidence:        {match['confidence']:.4f}")
+            print(f"  Similarities:")
+            for trope, sim in sorted(match['similarities'].items(), key=lambda x: x[1], reverse=True):
+                print(f"    - {trope}: {sim:.4f}")
+            print()
 
 if __name__ == "__main__":
     main()

@@ -10,6 +10,7 @@ from kisholens.ml.features import (
     extract_english_features,
     extract_japanese_features,
     extract_chinese_features,
+    match_archetype,
 )
 
 app = FastAPI(title="KishoLens API")
@@ -151,6 +152,7 @@ def get_stats_sources():
                 for k in sorted(keys):
                     vals = [r[k] for r in rows if k in r and r[k] is not None]
                     agg[k] = sum(vals) / len(vals) if vals else None
+                agg["archetype_match"] = match_archetype(agg)
                 agg_records.append(agg)
 
             return agg_records
@@ -206,6 +208,9 @@ def get_novel_stats(novel_id: int):
             for k in sorted(keys):
                 vals = [r[k] for r in features_list if k in r and r[k] is not None]
                 agg[k] = sum(vals) / len(vals) if vals else None
+
+            if agg:
+                agg["archetype_match"] = match_archetype(agg)
 
             return agg
     except Exception as e:

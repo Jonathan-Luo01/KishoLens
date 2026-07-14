@@ -352,6 +352,16 @@ import "../styles/global.css";
             gridHtml += buildStatItem("Verb Ratio", `${(stats.en_verb_ratio * 100)?.toFixed(1)}%`);
             gridHtml += buildStatItem("Sentences/Paragraph", stats.en_avg_sentences_per_paragraph?.toFixed(2));
             gridHtml += buildStatItem("Sentiment (VADER)", stats.en_compound_sentiment?.toFixed(3));
+            gridHtml += buildStatItem("Theme Explication Ratio", `${(stats.en_theme_explication_ratio * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Linearity Subversion", stats.en_linearity_subversion_score?.toFixed(3));
+            gridHtml += buildStatItem("Sensory Body Density", `${(stats.en_sensory_body_density * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Outside World Engagement", `${(stats.en_outside_world_engagement * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Narrative Diversity", stats.en_narrative_feature_diversity?.toFixed(3));
+            gridHtml += buildStatItem("Theme Explication Ratio", `${(stats.en_theme_explication_ratio * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Linearity Subversion", stats.en_linearity_subversion_score?.toFixed(3));
+            gridHtml += buildStatItem("Sensory Body Density", `${(stats.en_sensory_body_density * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Outside World Engagement", `${(stats.en_outside_world_engagement * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Narrative Diversity", stats.en_narrative_feature_diversity?.toFixed(3));
           } else if (isJa) {
             gridHtml += buildStatItem("Character Count", stats.ja_char_count?.toFixed(0));
             gridHtml += buildStatItem("Sentence Count", stats.ja_sentence_count?.toFixed(0));
@@ -363,6 +373,16 @@ import "../styles/global.css";
             gridHtml += buildStatItem("Kanji Density", `${(stats.ja_kanji_ratio * 100)?.toFixed(1)}%`);
             gridHtml += buildStatItem("Sentences/Paragraph", stats.ja_avg_sentences_per_paragraph?.toFixed(2));
             gridHtml += buildStatItem("Sentiment (Lexicon)", stats.ja_compound_sentiment?.toFixed(3));
+            gridHtml += buildStatItem("Theme Explication Ratio", `${(stats.ja_theme_explication_ratio * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Linearity Subversion", stats.ja_linearity_subversion_score?.toFixed(3));
+            gridHtml += buildStatItem("Sensory Body Density", `${(stats.ja_sensory_body_density * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Outside World Engagement", `${(stats.ja_outside_world_engagement * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Narrative Diversity", stats.ja_narrative_feature_diversity?.toFixed(3));
+            gridHtml += buildStatItem("Theme Explication Ratio", `${(stats.ja_theme_explication_ratio * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Linearity Subversion", stats.ja_linearity_subversion_score?.toFixed(3));
+            gridHtml += buildStatItem("Sensory Body Density", `${(stats.ja_sensory_body_density * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Outside World Engagement", `${(stats.ja_outside_world_engagement * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Narrative Diversity", stats.ja_narrative_feature_diversity?.toFixed(3));
           } else if (isZh) {
             gridHtml += buildStatItem("Character Count", stats.zh_char_count?.toFixed(0));
             gridHtml += buildStatItem("Sentence Count", stats.zh_sentence_count?.toFixed(0));
@@ -374,8 +394,42 @@ import "../styles/global.css";
             gridHtml += buildStatItem("Verb Ratio", `${(stats.zh_verb_ratio * 100)?.toFixed(1)}%`);
             gridHtml += buildStatItem("Sentences/Paragraph", stats.zh_avg_sentences_per_paragraph?.toFixed(2));
             gridHtml += buildStatItem("Sentiment (Lexicon)", stats.zh_compound_sentiment?.toFixed(3));
+            gridHtml += buildStatItem("Theme Explication Ratio", `${(stats.zh_theme_explication_ratio * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Linearity Subversion", stats.zh_linearity_subversion_score?.toFixed(3));
+            gridHtml += buildStatItem("Sensory Body Density", `${(stats.zh_sensory_body_density * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Outside World Engagement", `${(stats.zh_outside_world_engagement * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Narrative Diversity", stats.zh_narrative_feature_diversity?.toFixed(3));
+            gridHtml += buildStatItem("Theme Explication Ratio", `${(stats.zh_theme_explication_ratio * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Linearity Subversion", stats.zh_linearity_subversion_score?.toFixed(3));
+            gridHtml += buildStatItem("Sensory Body Density", `${(stats.zh_sensory_body_density * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Outside World Engagement", `${(stats.zh_outside_world_engagement * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Narrative Diversity", stats.zh_narrative_feature_diversity?.toFixed(3));
           }
           gridHtml += `</div>`;
+          
+          // Append Archetype Match section
+          if (stats.archetype_match) {
+            gridHtml += `
+              <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--color-border);">
+                <h4 style="font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 0.75rem; color: var(--color-accent);">Archetype Match</h4>
+                <div style="background: rgba(124, 106, 255, 0.04); border: 1px solid rgba(124, 106, 255, 0.15); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.85rem; color: var(--color-muted);">Territory</span>
+                    <span style="font-weight: 600; color: var(--color-text);">${escapeHtml(stats.archetype_match.territory)}</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.85rem; color: var(--color-muted);">Closest Trope</span>
+                    <span style="font-weight: 600; color: var(--color-accent-2);">${escapeHtml(stats.archetype_match.closest_trope)}</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.85rem; color: var(--color-muted);">Confidence Score</span>
+                    <span style="font-weight: 700; background: linear-gradient(135deg, #ff7b00, #ffae00); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${(stats.archetype_match.confidence * 100)?.toFixed(1)}%</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+          
           statsContent.innerHTML = gridHtml;
         } catch (err) {
           statsContent.innerHTML = `<p class="placeholder-text" style="color: rgb(248, 113, 113);">Error fetching stats: ${err.message}</p>`;
