@@ -19,7 +19,7 @@ app = FastAPI(title="KishoLens API")
 # Add CORS middleware so the Astro frontend can fetch data
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4321"],
+    allow_origins=["http://localhost:4321", "http://127.0.0.1:4321"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -275,6 +275,10 @@ def post_analyze(request: AnalysisRequest):
         "status": "success",
         "detected_lang": lang,
         "features": features,
-        "archetype": archetype,
+        "archetype": {
+            "archetype": archetype["closest_trope"],
+            "confidence": archetype["confidence"],
+            "description": f"Classification: {archetype['territory']}. Closest matched writing archetype based on stylistic features."
+        },
     }
 

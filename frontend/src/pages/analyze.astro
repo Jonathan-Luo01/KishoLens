@@ -325,9 +325,9 @@ import "../styles/global.css";
                 <span class="metric-value" id="metric-sent-count">0</span>
               </div>
               <div class="metric-card">
-                <span class="metric-label">Pacing Score</span>
-                <span class="metric-value" id="metric-pacing">0.00</span>
-                <span style="font-size: 0.75rem; color: var(--color-muted);">High value = slower pacing</span>
+                <span class="metric-label">Word Count</span>
+                <span class="metric-value" id="metric-word-count">0</span>
+                <span style="font-size: 0.75rem; color: var(--color-muted);">Parsed by NLP engine</span>
               </div>
             </div>
           </div>
@@ -386,7 +386,6 @@ import "../styles/global.css";
           loadingState.style.display = "none";
           errorBox.textContent = `Analysis error: ${err.message}`;
           errorBox.style.display = "block";
-          readyState.style.display = "block";
         }
       });
 
@@ -407,7 +406,7 @@ import "../styles/global.css";
         const feats = data.features;
         
         // TTR (vocabulary richness)
-        const ttr = (feats.type_token_ratio || 0) * 100;
+        const ttr = (feats.ttr || 0) * 100;
         document.getElementById("metric-ttr").textContent = `${ttr.toFixed(1)}%`;
         document.getElementById("ttr-progress").style.width = `${ttr}%`;
 
@@ -419,13 +418,12 @@ import "../styles/global.css";
         // Sentence metrics
         document.getElementById("metric-sent-count").textContent = feats.sentence_count || 0;
         
-        const avgSentLen = feats.avg_sentence_length || 0;
+        const avgSentLen = feats.avg_sentence_len || 0;
         const unit = data.detected_lang === "en" ? "words" : "chars";
         document.getElementById("metric-sent-len").textContent = `${avgSentLen.toFixed(1)} ${unit}`;
 
-        // Pacing score
-        const pacing = feats.pacing_score || 0;
-        document.getElementById("metric-pacing").textContent = pacing.toFixed(2);
+        // Word Count
+        document.getElementById("metric-word-count").textContent = feats.word_count || 0;
 
         resultsContainer.style.display = "flex";
       }
