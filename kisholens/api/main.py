@@ -249,17 +249,64 @@ def detect_language(text: str) -> str:
     return "en"
 
 
-_cached_baselines = None
+_cached_baselines = {}
+
+FALLBACK_BASELINES = {
+    "en": {
+        "gutenberg": {
+            "ttr": 0.339,
+            "dialogue_ratio": 0.349,
+            "avg_sentence_len": 11.4
+        },
+        "webnovel": {
+            "ttr": 0.361,
+            "dialogue_ratio": 0.223,
+            "avg_sentence_len": 10.8
+        }
+    },
+    "ja": {
+        "gutenberg": {
+            "ttr": 0.220,
+            "dialogue_ratio": 0.150,
+            "avg_sentence_len": 25.0
+        },
+        "webnovel": {
+            "ttr": 0.288,
+            "dialogue_ratio": 0.402,
+            "avg_sentence_len": 35.7
+        }
+    },
+    "zh": {
+        "gutenberg": {
+            "ttr": 0.007,
+            "dialogue_ratio": 0.015,
+            "avg_sentence_len": 13.5
+        },
+        "webnovel": {
+            "ttr": 0.031,
+            "dialogue_ratio": 0.294,
+            "avg_sentence_len": 22.1
+        }
+    }
+}
 
 
-def get_baseline_stats():
+def get_baseline_stats(lang: str = "en"):
     global _cached_baselines
-    if _cached_baselines is not None:
-        return _cached_baselines
+    if lang in _cached_baselines:
+        return _cached_baselines[lang]
+
+    fallbacks = FALLBACK_BASELINES.get(lang, FALLBACK_BASELINES["en"])
 
     try:
         with Session(engine) as session:
             chapters = session.exec(select(Chapter)).all()
+            
+            # Severe Performance Bottleneck scale check:
+            if len(chapters) > 30:
+                _cached_baselines[lang] = fallbacks
+                return _cached_baselines[lang]
+
             novels = session.exec(select(Novel)).all()
             novels_map = {n.id: n for n in novels}
 
@@ -271,11 +318,11 @@ def get_baseline_stats():
                 if not novel:
                     continue
 
-                if ch.text_en:
+                if lang == "en" and ch.text_en:
                     f = extract_english_features(ch.text_en)
-                elif ch.text_ja:
+                elif lang == "ja" and ch.text_ja:
                     f = extract_japanese_features(ch.text_ja)
-                elif ch.text_zh:
+                elif lang == "zh" and ch.text_zh:
                     f = extract_chinese_features(ch.text_zh)
                 else:
                     continue
@@ -291,28 +338,25 @@ def get_baseline_stats():
                 keys = lst[0].keys()
                 return {k: sum(d.get(k, 0) for d in lst) / len(lst) for k in keys}
 
-            _cached_baselines = {
-                "gutenberg": avg_dict(gutenberg_feats),
-                "webnovel": avg_dict(webnovel_feats)
+            gutenberg_stats = avg_dict(gutenberg_feats)
+            if not gutenberg_stats:
+                gutenberg_stats = fallbacks["gutenberg"]
+
+            webnovel_stats = avg_dict(webnovel_feats)
+            if not webnovel_stats:
+                webnovel_stats = fallbacks["webnovel"]
+
+            _cached_baselines[lang] = {
+                "gutenberg": gutenberg_stats,
+                "webnovel": webnovel_stats
             }
     except Exception as e:
         print(f"Error computing baselines from DB: {e}")
 
-    # Fallback defaults in case DB query is empty/fails
-    if not _cached_baselines or not _cached_baselines["gutenberg"] or not _cached_baselines["webnovel"]:
-        _cached_baselines = {
-            "gutenberg": {
-                "ttr": 0.173,
-                "dialogue_ratio": 0.182,
-                "avg_sentence_len": 12.464
-            },
-            "webnovel": {
-                "ttr": 0.306,
-                "dialogue_ratio": 0.235,
-                "avg_sentence_len": 12.699
-            }
-        }
-    return _cached_baselines
+    if lang not in _cached_baselines:
+        _cached_baselines[lang] = fallbacks
+
+    return _cached_baselines[lang]
 
 
 @app.post("/api/analyze")
@@ -333,7 +377,7 @@ def post_analyze(request: AnalysisRequest):
     else:
         raise HTTPException(status_code=400, detail=f"Unsupported language: {lang}")
 
-    baselines = get_baseline_stats()
+    baselines = get_baseline_stats(lang)
 
     # format features for matcher
     agg = {f"{lang}_{k}": v for k, v in features.items()}
@@ -350,14 +394,14 @@ def post_analyze(request: AnalysisRequest):
         },
         "baselines": {
             "gutenberg": {
-                "ttr": baselines["gutenberg"].get("ttr", 0.173) if baselines["gutenberg"] else 0.173,
-                "dialogue_ratio": baselines["gutenberg"].get("dialogue_ratio", 0.182) if baselines["gutenberg"] else 0.182,
-                "avg_sentence_len": baselines["gutenberg"].get("avg_sentence_len", 12.464) if baselines["gutenberg"] else 12.464
+                "ttr": baselines["gutenberg"]["ttr"],
+                "dialogue_ratio": baselines["gutenberg"]["dialogue_ratio"],
+                "avg_sentence_len": baselines["gutenberg"]["avg_sentence_len"]
             },
             "webnovel": {
-                "ttr": baselines["webnovel"].get("ttr", 0.306) if baselines["webnovel"] else 0.306,
-                "dialogue_ratio": baselines["webnovel"].get("dialogue_ratio", 0.235) if baselines["webnovel"] else 0.235,
-                "avg_sentence_len": baselines["webnovel"].get("avg_sentence_len", 12.699) if baselines["webnovel"] else 12.699
+                "ttr": baselines["webnovel"]["ttr"],
+                "dialogue_ratio": baselines["webnovel"]["dialogue_ratio"],
+                "avg_sentence_len": baselines["webnovel"]["avg_sentence_len"]
             }
         }
     }

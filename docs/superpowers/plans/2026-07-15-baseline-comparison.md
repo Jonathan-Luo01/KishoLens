@@ -72,19 +72,39 @@
   Expected: FAIL with `AssertionError` (since `"baselines"` key is missing from response).
 
 - [ ] **Step 3: Implement cached baseline logic and update endpoint in main.py**
-  Add the module global `_cached_baselines`, the `get_baseline_stats()` helper, and update `post_analyze()` response payload in [main.py](file:///Users/jonathan/Documents/KishoLens/kisholens/api/main.py):
+  Add the module global `_cached_baselines`, the `get_baseline_stats(lang)` helper, and update `post_analyze()` response payload in [main.py](file:///Users/jonathan/Documents/KishoLens/kisholens/api/main.py):
   
   ```python
-  _cached_baselines = None
+  _cached_baselines = {}
   
-  def get_baseline_stats():
+  def get_baseline_stats(lang: str):
       global _cached_baselines
-      if _cached_baselines is not None:
-          return _cached_baselines
+      if lang in _cached_baselines:
+          return _cached_baselines[lang]
           
+      fallbacks = {
+          "en": {
+              "gutenberg": {"ttr": 0.339, "dialogue_ratio": 0.349, "avg_sentence_len": 11.4},
+              "webnovel": {"ttr": 0.361, "dialogue_ratio": 0.223, "avg_sentence_len": 10.8}
+          },
+          "ja": {
+              "gutenberg": {"ttr": 0.220, "dialogue_ratio": 0.150, "avg_sentence_len": 25.0},
+              "webnovel": {"ttr": 0.288, "dialogue_ratio": 0.402, "avg_sentence_len": 35.7}
+          },
+          "zh": {
+              "gutenberg": {"ttr": 0.007, "dialogue_ratio": 0.015, "avg_sentence_len": 13.5},
+              "webnovel": {"ttr": 0.031, "dialogue_ratio": 0.294, "avg_sentence_len": 22.1}
+          }
+      }
+      
       try:
           with Session(engine) as session:
               chapters = session.exec(select(Chapter)).all()
+              
+              if len(chapters) > 30:
+                  _cached_baselines[lang] = fallbacks[lang]
+                  return _cached_baselines[lang]
+                  
               novels = session.exec(select(Novel)).all()
               novels_map = {n.id: n for n in novels}
               
@@ -96,11 +116,11 @@
                   if not novel:
                       continue
                   
-                  if ch.text_en:
+                  if lang == 'en' and ch.text_en:
                       f = extract_english_features(ch.text_en)
-                  elif ch.text_ja:
+                  elif lang == 'ja' and ch.text_ja:
                       f = extract_japanese_features(ch.text_ja)
-                  elif ch.text_zh:
+                  elif lang == 'zh' and getattr(ch, "text_zh", ""):
                       f = extract_chinese_features(ch.text_zh)
                   else:
                       continue
@@ -116,33 +136,23 @@
                   keys = lst[0].keys()
                   return {k: sum(d.get(k, 0) for d in lst) / len(lst) for k in keys}
                   
-              _cached_baselines = {
-                  "gutenberg": avg_dict(gutenberg_feats),
-                  "webnovel": avg_dict(webnovel_feats)
+              g_avg = avg_dict(gutenberg_feats)
+              w_avg = avg_dict(webnovel_feats)
+              
+              _cached_baselines[lang] = {
+                  "gutenberg": g_avg if g_avg else fallbacks[lang]["gutenberg"],
+                  "webnovel": w_avg if w_avg else fallbacks[lang]["webnovel"]
               }
       except Exception as e:
           print(f"Error computing baselines from DB: {e}")
+          _cached_baselines[lang] = fallbacks[lang]
           
-      # Fallback defaults in case DB query is empty/fails
-      if not _cached_baselines or not _cached_baselines["gutenberg"] or not _cached_baselines["webnovel"]:
-          _cached_baselines = {
-              "gutenberg": {
-                  "ttr": 0.173,
-                  "dialogue_ratio": 0.182,
-                  "avg_sentence_len": 12.464
-              },
-              "webnovel": {
-                  "ttr": 0.306,
-                  "dialogue_ratio": 0.235,
-                  "avg_sentence_len": 12.699
-              }
-          }
-      return _cached_baselines
+      return _cached_baselines[lang]
   ```
   
   And update `@app.post("/api/analyze")` response payload:
   ```python
-      baselines = get_baseline_stats()
+      baselines = get_baseline_stats(lang)
       
       # format features for matcher
       agg = {f"{lang}_{k}": v for k, v in features.items()}
