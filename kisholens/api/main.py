@@ -339,11 +339,11 @@ def get_baseline_stats(lang: str = "en"):
                 return {k: sum(d.get(k, 0) for d in lst) / len(lst) for k in keys}
 
             gutenberg_stats = avg_dict(gutenberg_feats)
-            if not gutenberg_stats:
+            if not gutenberg_stats or "ttr" not in gutenberg_stats:
                 gutenberg_stats = fallbacks["gutenberg"]
 
             webnovel_stats = avg_dict(webnovel_feats)
-            if not webnovel_stats:
+            if not webnovel_stats or "ttr" not in webnovel_stats:
                 webnovel_stats = fallbacks["webnovel"]
 
             _cached_baselines[lang] = {

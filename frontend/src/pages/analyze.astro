@@ -450,7 +450,10 @@ import "../styles/global.css";
         // Word Count
         document.getElementById("metric-word-count").textContent = feats.word_count || 0;
 
-        const base = data.baselines;
+        const base = data.baselines || {
+          gutenberg: { ttr: 0.173, dialogue_ratio: 0.182, avg_sentence_len: 12.464 },
+          webnovel: { ttr: 0.306, dialogue_ratio: 0.235, avg_sentence_len: 12.699 }
+        };
         const unitBaseline = data.detected_lang === "en" ? "w" : "c";
 
         // Vocabulary Richness Baselines
