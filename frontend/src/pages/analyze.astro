@@ -224,6 +224,19 @@ import "../styles/global.css";
         width: 0%;
         transition: width 0.5s ease-out;
       }
+      .baseline-comparison {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.72rem;
+        color: var(--color-muted);
+        margin-top: 0.4rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.03);
+        padding-top: 0.3rem;
+      }
+      .baseline-comparison strong {
+        color: var(--color-text);
+        font-weight: 500;
+      }
     </style>
   </head>
   <body>
@@ -307,6 +320,10 @@ import "../styles/global.css";
                 <div class="progress-bar-container">
                   <div class="progress-bar-fill" id="ttr-progress"></div>
                 </div>
+                <div class="baseline-comparison">
+                  <span>Classic Lit: <strong id="ttr-gutenberg-val">0.0%</strong></span>
+                  <span>Web Novel: <strong id="ttr-webnovel-val">0.0%</strong></span>
+                </div>
               </div>
               <div class="metric-card">
                 <span class="metric-label">Dialogue Ratio</span>
@@ -315,10 +332,18 @@ import "../styles/global.css";
                 <div class="progress-bar-container">
                   <div class="progress-bar-fill" id="dialogue-progress"></div>
                 </div>
+                <div class="baseline-comparison">
+                  <span>Classic Lit: <strong id="dialogue-gutenberg-val">0.0%</strong></span>
+                  <span>Web Novel: <strong id="dialogue-webnovel-val">0.0%</strong></span>
+                </div>
               </div>
               <div class="metric-card">
                 <span class="metric-label">Avg Sentence Length</span>
                 <span class="metric-value" id="metric-sent-len">0.0 words</span>
+                <div class="baseline-comparison" style="margin-top: 0.5rem; border-top: 1px solid rgba(255, 255, 255, 0.03); padding-top: 0.3rem;">
+                  <span>Classic Lit: <strong id="sent-gutenberg-val">0.0w</strong></span>
+                  <span>Web Novel: <strong id="sent-webnovel-val">0.0w</strong></span>
+                </div>
               </div>
               <div class="metric-card">
                 <span class="metric-label">Sentence Count</span>
@@ -424,6 +449,21 @@ import "../styles/global.css";
 
         // Word Count
         document.getElementById("metric-word-count").textContent = feats.word_count || 0;
+
+        const base = data.baselines;
+        const unitBaseline = data.detected_lang === "en" ? "w" : "c";
+
+        // Vocabulary Richness Baselines
+        document.getElementById("ttr-gutenberg-val").textContent = `${((base.gutenberg.ttr || 0) * 100).toFixed(1)}%`;
+        document.getElementById("ttr-webnovel-val").textContent = `${((base.webnovel.ttr || 0) * 100).toFixed(1)}%`;
+
+        // Dialogue Ratio Baselines
+        document.getElementById("dialogue-gutenberg-val").textContent = `${((base.gutenberg.dialogue_ratio || 0) * 100).toFixed(1)}%`;
+        document.getElementById("dialogue-webnovel-val").textContent = `${((base.webnovel.dialogue_ratio || 0) * 100).toFixed(1)}%`;
+
+        // Avg Sentence Length Baselines
+        document.getElementById("sent-gutenberg-val").textContent = `${(base.gutenberg.avg_sentence_len || 0).toFixed(1)}${unitBaseline}`;
+        document.getElementById("sent-webnovel-val").textContent = `${(base.webnovel.avg_sentence_len || 0).toFixed(1)}${unitBaseline}`;
 
         resultsContainer.style.display = "flex";
       }
