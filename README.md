@@ -2,7 +2,7 @@
 
 > Stylistic pacing and prose archetype analysis for web novels and light fiction.
 
-KishoLens is a dashboard for analyzing the structural and stylistic DNA of web novels — sentence pacing, vocabulary density, dialogue rhythm, and prose archetypes — across various sources of modern light/web novels and public domain corpora.
+KishoLens is a dashboard for analyzing the structural and stylistic DNA of web novels — sentence pacing, vocabulary density, dialogue rhythm, and prose archetypes — across various sources of modern light/web novels and public domain corpora. 
 
 ## Stack
 
