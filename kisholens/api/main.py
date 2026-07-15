@@ -300,12 +300,12 @@ def get_baseline_stats(lang: str = "en"):
 
     try:
         with Session(engine) as session:
-            chapters = session.exec(select(Chapter)).all()
-            
-            # Severe Performance Bottleneck scale check:
-            if len(chapters) > 30:
+            count = session.exec(select(func.count(Chapter.id))).one()
+            if count > 30:
                 _cached_baselines[lang] = fallbacks
                 return _cached_baselines[lang]
+
+            chapters = session.exec(select(Chapter)).all()
 
             novels = session.exec(select(Novel)).all()
             novels_map = {n.id: n for n in novels}

@@ -4,14 +4,20 @@ Resolved issues in the backend baseline data endpoint (`kisholens/api/main.py`).
 
 ## Summary of Changes
 
-1. **Severe Performance Bottleneck (Scale/DB Load & NLP)**
-   - Added a scale check at the start of `get_baseline_stats(lang)` that counts the total number of chapters:
+1. **Severe Performance Bottleneck (Scale/DB Load & NLP) & DB Query Optimization**
+   - Optimized the scale check to avoid fetching all chapters from the database before checking the count.
+   - Now, a rapid SQL COUNT query is run first:
      ```python
-     if len(chapters) > 30:
+     count = session.exec(select(func.count(Chapter.id))).one()
+     if count > 30:
          _cached_baselines[lang] = fallbacks
          return _cached_baselines[lang]
      ```
-   - This bypasses dynamic NLP feature extraction at runtime if the database grows large, ensuring stable response times.
+   - Only when the count is 30 or less do we fetch all chapters from the database:
+     ```python
+     chapters = session.exec(select(Chapter)).all()
+     ```
+   - This prevents loading all chapters into memory when there are many chapters, resolving the high database load/scale bottleneck.
 
 2. **Language-Specific Baseline Segregation**
    - Updated `get_baseline_stats(lang)` to accept the target language string `lang` (defaulting to `"en"`).
