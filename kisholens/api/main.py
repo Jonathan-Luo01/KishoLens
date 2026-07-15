@@ -1,3 +1,4 @@
+import re
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -232,4 +233,48 @@ def post_pipeline_ingest(request: IngestRequest, background_tasks: BackgroundTas
             status_code=500,
             detail=f"Failed to schedule ingestion: {str(e)}"
         )
+
+
+class AnalysisRequest(BaseModel):
+    text: str
+    lang: str = "auto"
+    title: str = "Untitled"
+
+
+def detect_language(text: str) -> str:
+    if re.search(r"[\u3040-\u309f\u30a0-\u30ff]", text):
+        return "ja"
+    if re.search(r"[\u4e00-\u9fff]", text):
+        return "zh"
+    return "en"
+
+
+@app.post("/api/analyze")
+def post_analyze(request: AnalysisRequest):
+    if not request.text.strip():
+        raise HTTPException(status_code=400, detail="Text content cannot be empty")
+
+    lang = request.lang
+    if lang == "auto":
+        lang = detect_language(request.text)
+
+    if lang == "en":
+        features = extract_english_features(request.text)
+    elif lang == "ja":
+        features = extract_japanese_features(request.text)
+    elif lang == "zh":
+        features = extract_chinese_features(request.text)
+    else:
+        raise HTTPException(status_code=400, detail=f"Unsupported language: {lang}")
+
+    # format features for matcher
+    agg = {f"{lang}_{k}": v for k, v in features.items()}
+    archetype = match_archetype(agg)
+
+    return {
+        "status": "success",
+        "detected_lang": lang,
+        "features": features,
+        "archetype": archetype,
+    }
 
