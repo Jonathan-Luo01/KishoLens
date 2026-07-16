@@ -655,7 +655,7 @@ def match_archetype(features: dict) -> dict:
     normalized = {}
     for key, bounds in MIN_MAX_BOUNDS.items():
         val = agnostic.get(key, None)
-        if val is None:
+        if val is None or val != val:
             val = 0.0
         min_v, max_v = bounds
         norm_val = (val - min_v) / max(1e-9, max_v - min_v)

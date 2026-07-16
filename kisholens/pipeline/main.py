@@ -6,36 +6,55 @@ from sqlmodel import SQLModel, Session, select, func
 from kisholens.models import Novel, Chapter, get_engine
 from kisholens.pipeline.normalization import clean_html, clean_japanese, clean_english
 from kisholens.pipeline.scraping import DATASET_REGISTRY, download_gutenberg, parse_gutenberg
+from kisholens.ml.features import (
+    extract_english_features,
+    extract_japanese_features,
+    extract_chinese_features
+)
 
 def extract_features(text: str, lang: str = "en"):
-    """Computes baseline preview features: token counts, sentence counts, punctuation density, and dialogue ratios."""
-    if not text:
-        return {"token_count": 0, "sentence_count": 0, "punctuation_density": 0.0, "dialogue_ratio": 0.0}
-        
-    lines = [line.strip() for line in text.split('\n') if line.strip()]
-    char_count = len(text)
-    
+    """Computes baseline preview features by delegating to the unified extractors in ml.features."""
     if lang == "en":
-        tokens = re.findall(r'\b\w+\b', text)
-        sentences = re.split(r'[.!?]+', text)
-        punctuations = re.findall(r'[.,\/#!$%\^&\*;:{}=\-_`~()?\"\']', text)
-        dialogue_start = ('"', "'", '“', '”')
-    else:  # ja or zh
-        tokens = [c for c in text if not c.isspace()]
-        sentences = re.split(r'[。！？\n]+', text)
-        punc_pat = r'[，、。！？；：\"\"‘’（）《》【】『』「」——……]' if lang == "zh" else r'[、。！？「」『』（）―…ー・]'
-        punctuations = re.findall(punc_pat, text)
-        dialogue_start = ('“', '「', '『') if lang == "zh" else ('「', '『')
-        
-    sentence_count = len([s for s in sentences if s.strip()])
-    dialogue_lines = [l for l in lines if l.startswith(dialogue_start)]
-    
-    return {
-        "token_count": len(tokens),
-        "sentence_count": sentence_count,
-        "punctuation_density": len(punctuations) / char_count if char_count > 0 else 0.0,
-        "dialogue_ratio": len(dialogue_lines) / len(lines) if lines else 0.0
-    }
+        f = extract_english_features(text)
+        return {
+            "token_count": f.get("word_count", 0),
+            "sentence_count": f.get("sentence_count", 0),
+            "punctuation_density": f.get("punc_density", 0.0),
+            "dialogue_ratio": f.get("dialogue_ratio", 0.0)
+        }
+    elif lang == "ja":
+        f = extract_japanese_features(text)
+        return {
+            "token_count": f.get("char_count", 0),
+            "sentence_count": f.get("sentence_count", 0),
+            "punctuation_density": f.get("punc_density", 0.0),
+            "dialogue_ratio": f.get("dialogue_ratio", 0.0)
+        }
+    else:  # zh
+        f = extract_chinese_features(text)
+        return {
+            "token_count": f.get("char_count", 0),
+            "sentence_count": f.get("sentence_count", 0),
+            "punctuation_density": f.get("punc_density", 0.0),
+            "dialogue_ratio": f.get("dialogue_ratio", 0.0)
+        }
+
+
+def _get_or_create_novel(session: Session, title: str, author: str, source: str, cache: dict) -> int:
+    novel_key = (title, author)
+    if novel_key not in cache:
+        statement = select(Novel).where(Novel.title == title, Novel.author == author)
+        existing_novel = session.exec(statement).first()
+        if existing_novel:
+            cache[novel_key] = existing_novel.id
+        else:
+            novel = Novel(title=title, author=author, source=source)
+            session.add(novel)
+            session.commit()
+            session.refresh(novel)
+            cache[novel_key] = novel.id
+            print(f"Added Novel: '{title}' by {author} (ID: {novel.id})")
+    return cache[novel_key]
 
 def run_etl(dataset_name: str, num_records: int = 20):
     """Orchestrates ingestion of a dataset/book into SQLite."""
@@ -56,21 +75,7 @@ def run_etl(dataset_name: str, num_records: int = 20):
             chapters_to_ingest = chapters[:num_records]
             
             with Session(engine) as session:
-                novel_key = (series_title, author)
-                if novel_key not in novels_cache:
-                    statement = select(Novel).where(Novel.title == series_title, Novel.author == author)
-                    existing_novel = session.exec(statement).first()
-                    if existing_novel:
-                        novels_cache[novel_key] = existing_novel.id
-                    else:
-                        novel = Novel(title=series_title, author=author, source=source)
-                        session.add(novel)
-                        session.commit()
-                        session.refresh(novel)
-                        novels_cache[novel_key] = novel.id
-                        print(f"Added Novel: '{series_title}' by {author} (ID: {novel.id})")
-                
-                novel_id = novels_cache[novel_key]
+                novel_id = _get_or_create_novel(session, series_title, author, source, novels_cache)
                 for ch_item in chapters_to_ingest:
                     chapter_number = ch_item["chapter_number"]
                     chapter_title = ch_item["chapter_title"]
@@ -130,21 +135,7 @@ def run_etl(dataset_name: str, num_records: int = 20):
                     cleaned_en = parsed.get("text_en", "")
                     cleaned_zh = parsed.get("text_zh", "")
                     
-                    novel_key = (series_title, author)
-                    if novel_key not in novels_cache:
-                        statement = select(Novel).where(Novel.title == series_title, Novel.author == author)
-                        existing_novel = session.exec(statement).first()
-                        if existing_novel:
-                            novels_cache[novel_key] = existing_novel.id
-                        else:
-                            novel = Novel(title=series_title, author=author, source=source)
-                            session.add(novel)
-                            session.commit()
-                            session.refresh(novel)
-                            novels_cache[novel_key] = novel.id
-                            print(f"Added Novel: '{series_title}' by {author} (ID: {novel.id})")
-                        
-                    novel_id = novels_cache[novel_key]
+                    novel_id = _get_or_create_novel(session, series_title, author, source, novels_cache)
                     
                     if chapter_number is None:
                         max_ch = session.exec(select(func.max(Chapter.chapter_number)).where(Chapter.novel_id == novel_id)).one()
