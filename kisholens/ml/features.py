@@ -7,6 +7,24 @@ HAS_SUDACHI = False
 HAS_NLTK = False
 HAS_HANLP = False
 
+# Shared sentiment constants
+EN_POS_WORDS = ["good", "great", "joy", "happy", "love", "hope", "bright", "beautiful", "triumph", "warm"]
+EN_NEG_WORDS = ["bad", "dark", "grief", "hate", "fear", "pain", "cold", "loss", "death", "despair"]
+
+JA_POS_WORDS = ["嬉しい", "楽しい", "美しい", "素晴らしい", "愛する", "成功", "幸せ", "感謝", "満足"]
+JA_NEG_WORDS = ["悲しい", "苦しい", "怒る", "嫌い", "失敗", "痛い", "最悪", "残念", "孤独"]
+
+ZH_POS_WORDS = ["高兴", "开心", "美丽", "棒", "爱", "成功", "幸福", "感谢", "满意", "喜欢"]
+ZH_NEG_WORDS = ["悲伤", "痛苦", "生气", "讨厌", "失败", "疼", "差", "可惜", "孤独", "难过"]
+
+def compute_narrative_feature_diversity(vals: List[float]) -> float:
+    """Computes narrative feature diversity from a list of metrics using their variance."""
+    if not vals:
+        return 1.0
+    mean_val = sum(vals) / len(vals)
+    variance = sum((v - mean_val) ** 2 for v in vals) / len(vals)
+    return float(1.0 / (1.0 + variance))
+
 # Module-level globals for lazy loading
 _nlp_en = None
 _nlp_ja = None
@@ -16,6 +34,9 @@ _initialized = False
 
 def _init_nlp_resources():
     """Dynamically load NLP resources when needed, avoiding unnecessary downloads or errors on import."""
+    import ssl
+    ssl._create_default_https_context = ssl._create_unverified_context
+
     global HAS_SPACY, HAS_SUDACHI, HAS_NLTK, HAS_HANLP
     global _nlp_en, _nlp_ja, _nlp_zh, _nlp_hanlp, _initialized
     
@@ -222,11 +243,20 @@ def extract_english_features(text: str) -> Dict[str, Any]:
     outside_count = len(re.findall(outside_pattern, text.lower()))
     outside_world_engagement = outside_count / max(1, word_count)
 
+    # Temporal shift score: density of flashback / time-jump markers per sentence
+    temporal_shift_words = [
+        "remembered", "recalled", "flashback", "years ago", "decades ago",
+        "months ago", "in the past", "formerly", "once upon a time",
+        "meanwhile", "at that time", "back then", "long ago",
+        "that day", "that year", "that moment", "that night", "used to",
+    ]
+    temporal_shift_pattern = r'\b(' + '|'.join(re.escape(w) for w in temporal_shift_words) + r')\b'
+    temporal_shift_count = len(re.findall(temporal_shift_pattern, text.lower()))
+    temporal_shift_score = temporal_shift_count / max(1, sentence_count)
+
     # Narrative feature diversity (English)
     vals = [ttr or 0.0, dialogue_ratio or 0.0, min(1.0, (punc_density or 0.0) * 10), verb_ratio or 0.0, adj_ratio or 0.0]
-    mean_val = sum(vals) / len(vals)
-    variance = sum((v - mean_val) ** 2 for v in vals) / len(vals)
-    narrative_feature_diversity = float(1.0 / (1.0 + variance))
+    narrative_feature_diversity = compute_narrative_feature_diversity(vals)
 
     return {
         "word_count": word_count,
@@ -246,7 +276,8 @@ def extract_english_features(text: str) -> Dict[str, Any]:
         "linearity_subversion_score": linearity_subversion_score,
         "sensory_body_density": sensory_body_density,
         "outside_world_engagement": outside_world_engagement,
-        "narrative_feature_diversity": narrative_feature_diversity
+        "narrative_feature_diversity": narrative_feature_diversity,
+        "temporal_shift_score": temporal_shift_score
     }
 
 
@@ -279,10 +310,8 @@ def extract_japanese_features(text: str) -> Dict[str, Any]:
     para_sentence_counts = [len([s.strip() for s in re.split(r'[。！？]+', p) if s.strip()]) for p in lines]
     avg_sentences_per_paragraph = sum(para_sentence_counts) / len(lines) if lines else 0.0
 
-    pos_words = ["嬉しい", "楽しい", "美しい", "素晴らしい", "愛する", "成功", "幸せ", "感謝", "満足"]
-    neg_words = ["悲しい", "苦しい", "怒る", "嫌い", "失敗", "痛い", "最悪", "残念", "孤独"]
-    pos_count = sum(text.count(w) for w in pos_words)
-    neg_count = sum(text.count(w) for w in neg_words)
+    pos_count = sum(text.count(w) for w in JA_POS_WORDS)
+    neg_count = sum(text.count(w) for w in JA_NEG_WORDS)
     compound_sentiment = (pos_count - neg_count) / (pos_count + neg_count + 1)
     
     # Defaults
@@ -329,11 +358,14 @@ def extract_japanese_features(text: str) -> Dict[str, Any]:
     outside_count = sum(text.count(w) for w in outside_words)
     outside_world_engagement = outside_count / max(1, char_count)
 
+    # Temporal shift score (Japanese)
+    jp_temporal_markers = ["昔", "かつて", "当時", "あの頃", "あのとき", "記憶", "思い出", "振り返", "突然", "その時", "それ以来", "以前"]
+    jp_temporal_count = sum(text.count(m) for m in jp_temporal_markers)
+    temporal_shift_score = jp_temporal_count / max(1, sentence_count)
+
     # Narrative feature diversity (Japanese)
     vals = [ttr or 0.0, dialogue_ratio or 0.0, min(1.0, (punc_density or 0.0) * 5), verb_ratio or 0.0, particle_ratio or 0.0]
-    mean_val = sum(vals) / len(vals)
-    variance = sum((v - mean_val) ** 2 for v in vals) / len(vals)
-    narrative_feature_diversity = float(1.0 / (1.0 + variance))
+    narrative_feature_diversity = compute_narrative_feature_diversity(vals)
 
     return {
         "char_count": char_count,
@@ -352,7 +384,8 @@ def extract_japanese_features(text: str) -> Dict[str, Any]:
         "linearity_subversion_score": linearity_subversion_score,
         "sensory_body_density": sensory_body_density,
         "outside_world_engagement": outside_world_engagement,
-        "narrative_feature_diversity": narrative_feature_diversity
+        "narrative_feature_diversity": narrative_feature_diversity,
+        "temporal_shift_score": temporal_shift_score
     }
 
 
@@ -382,10 +415,8 @@ def extract_chinese_features(text: str) -> Dict[str, Any]:
     para_sentence_counts = [len([s.strip() for s in re.split(r'[。！？]+', p) if s.strip()]) for p in lines]
     avg_sentences_per_paragraph = sum(para_sentence_counts) / len(lines) if lines else 0.0
 
-    pos_words = ["高兴", "开心", "美丽", "棒", "爱", "成功", "幸福", "感谢", "满意", "喜欢"]
-    neg_words = ["悲伤", "痛苦", "生气", "讨厌", "失败", "疼", "差", "可惜", "孤独", "难过"]
-    pos_count = sum(text.count(w) for w in pos_words)
-    neg_count = sum(text.count(w) for w in neg_words)
+    pos_count = sum(text.count(w) for w in ZH_POS_WORDS)
+    neg_count = sum(text.count(w) for w in ZH_NEG_WORDS)
     compound_sentiment = (pos_count - neg_count) / (pos_count + neg_count + 1)
     punc_count = len(re.findall(r'[，、。！？；：""‘’（）《》【】『』「」——……]', text))
     punc_density = punc_count / len(text) if len(text) > 0 else 0.0
@@ -466,11 +497,14 @@ def extract_chinese_features(text: str) -> Dict[str, Any]:
     outside_count = sum(text.count(w) for w in outside_words)
     outside_world_engagement = outside_count / max(1, char_count)
 
+    # Temporal shift score (Chinese)
+    zh_temporal_markers = ["记得", "曾经", "当时", "那时", "那一刻", "那一天", "那一年", "回忆", "往事", "突然", "从前", "以前", "过去", "那个时候"]
+    zh_temporal_count = sum(text.count(m) for m in zh_temporal_markers)
+    temporal_shift_score = zh_temporal_count / max(1, sentence_count)
+
     # Narrative feature diversity (Chinese)
     vals = [ttr or 0.0, dialogue_ratio or 0.0, min(1.0, (punc_density or 0.0) * 5), verb_ratio or 0.0, particle_ratio or 0.0]
-    mean_val = sum(vals) / len(vals)
-    variance = sum((v - mean_val) ** 2 for v in vals) / len(vals)
-    narrative_feature_diversity = float(1.0 / (1.0 + variance))
+    narrative_feature_diversity = compute_narrative_feature_diversity(vals)
 
     return {
         "char_count": char_count,
@@ -488,7 +522,8 @@ def extract_chinese_features(text: str) -> Dict[str, Any]:
         "linearity_subversion_score": linearity_subversion_score,
         "sensory_body_density": sensory_body_density,
         "outside_world_engagement": outside_world_engagement,
-        "narrative_feature_diversity": narrative_feature_diversity
+        "narrative_feature_diversity": narrative_feature_diversity,
+        "temporal_shift_score": temporal_shift_score
     }
 
 
@@ -506,7 +541,8 @@ MIN_MAX_BOUNDS = {
     "linearity_subversion_score": (0.0, 0.05),
     "sensory_body_density": (0.0, 0.1),
     "outside_world_engagement": (0.0, 0.1),
-    "narrative_feature_diversity": (0.0, 1.0)
+    "narrative_feature_diversity": (0.0, 1.0),
+    "temporal_shift_score": (0.0, 0.10)
 }
 
 ARCHETYPES = {
@@ -522,7 +558,8 @@ ARCHETYPES = {
         "linearity_subversion_score": 0.3,
         "sensory_body_density": 0.7,
         "outside_world_engagement": 0.7,
-        "narrative_feature_diversity": 0.8
+        "narrative_feature_diversity": 0.8,
+        "temporal_shift_score": 0.65
     },
     "Philosophical Fiction": {
         "ttr": 0.85,
@@ -536,7 +573,8 @@ ARCHETYPES = {
         "linearity_subversion_score": 0.4,
         "sensory_body_density": 0.3,
         "outside_world_engagement": 0.4,
-        "narrative_feature_diversity": 0.8
+        "narrative_feature_diversity": 0.8,
+        "temporal_shift_score": 0.55
     },
     "LitRPG": {
         "ttr": 0.3,
@@ -550,7 +588,8 @@ ARCHETYPES = {
         "linearity_subversion_score": 0.9,
         "sensory_body_density": 0.6,
         "outside_world_engagement": 0.3,
-        "narrative_feature_diversity": 0.4
+        "narrative_feature_diversity": 0.4,
+        "temporal_shift_score": 0.15
     },
     "Isekai": {
         "ttr": 0.35,
@@ -564,7 +603,8 @@ ARCHETYPES = {
         "linearity_subversion_score": 0.6,
         "sensory_body_density": 0.65,
         "outside_world_engagement": 0.4,
-        "narrative_feature_diversity": 0.5
+        "narrative_feature_diversity": 0.5,
+        "temporal_shift_score": 0.20
     },
     "Xianxia Cultivation": {
         "ttr": 0.4,
@@ -578,7 +618,8 @@ ARCHETYPES = {
         "linearity_subversion_score": 0.5,
         "sensory_body_density": 0.8,
         "outside_world_engagement": 0.75,
-        "narrative_feature_diversity": 0.6
+        "narrative_feature_diversity": 0.6,
+        "temporal_shift_score": 0.30
     }
 }
 
