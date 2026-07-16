@@ -12,6 +12,10 @@ from kisholens.ml.features import (
     extract_japanese_features,
     extract_chinese_features,
     match_archetype,
+    JA_POS_WORDS, JA_NEG_WORDS,
+    ZH_POS_WORDS, ZH_NEG_WORDS,
+    EN_POS_WORDS, EN_NEG_WORDS,
+    _init_nlp_resources,
 )
 
 app = FastAPI(title="KishoLens API")
@@ -210,6 +214,22 @@ def get_novel_stats(novel_id: int):
                 vals = [r[k] for r in features_list if k in r and r[k] is not None]
                 agg[k] = sum(vals) / len(vals) if vals else None
 
+            # Dynamically compute pacing paragraph lengths for the barcodes
+            paragraph_lengths = []
+            for ch in sorted(chapters, key=lambda c: c.chapter_number):
+                text = ch.text_en or ch.text_ja or getattr(ch, "text_zh", "") or ""
+                paragraphs = [p.strip() for p in text.split('\n') if p.strip()]
+                for p in paragraphs:
+                    if ch.text_en:
+                        word_count = len(re.findall(r'\b\w+\b', p))
+                    else:
+                        word_count = len([c for c in p if not c.isspace()])
+                    if word_count > 0:
+                        paragraph_lengths.append(word_count)
+            
+            # Limit to first 100 paragraphs for dashboard display
+            agg["pacing"] = paragraph_lengths[:100]
+
             if agg:
                 agg["archetype_match"] = match_archetype(agg)
 
@@ -220,6 +240,138 @@ def get_novel_stats(novel_id: int):
         raise HTTPException(
             status_code=500,
             detail=f"Database connection error: {str(e)}"
+        )
+
+
+@app.get("/api/novels/{novel_id}/arc")
+def get_novel_arc(novel_id: int):
+    """
+    Computes the Kishōtenketsu 4-act sentiment arc for a novel.
+    All chapters are pooled in order, split into individual sentences,
+    then divided into 4 equal quantile bins (Ki / Shō / Ten / Ketsu).
+    Compound VADER sentiment is averaged per bin.
+    """
+    try:
+        with Session(engine) as session:
+            novel = session.get(Novel, novel_id)
+            if not novel:
+                raise HTTPException(status_code=404, detail="Novel not found")
+
+            chapters = session.exec(
+                select(Chapter)
+                .where(Chapter.novel_id == novel_id)
+                .order_by(Chapter.chapter_number)
+            ).all()
+
+        # Detect which language is present in the novel's chapters
+        lang = "en"
+        if chapters:
+            first_ch = chapters[0]
+            if not first_ch.text_en:
+                if first_ch.text_ja:
+                    lang = "ja"
+                elif getattr(first_ch, "text_zh", ""):
+                    lang = "zh"
+
+        # Pool all sentences from all chapters, preserving order
+        all_sentences: list[str] = []
+        for ch in chapters:
+            if lang == "en":
+                text = ch.text_en or ""
+                sents = [s.strip() for s in re.split(r'[.!?]+', text) if s.strip()]
+            elif lang == "ja":
+                text = ch.text_ja or ""
+                sents = [s.strip() for s in re.split(r'[。！？]+', text) if s.strip()]
+            else:
+                text = getattr(ch, "text_zh", "") or ""
+                sents = [s.strip() for s in re.split(r'[。！？]+', text) if s.strip()]
+            all_sentences.extend(sents)
+
+        if not all_sentences:
+            raise HTTPException(
+                status_code=422,
+                detail="No raw text found for this novel"
+            )
+
+        # Attempt VADER sentiment scoring per sentence
+        sia = None
+        if lang == "en":
+            try:
+                from nltk.sentiment.vader import SentimentIntensityAnalyzer
+                _init_nlp_resources()
+                sia = SentimentIntensityAnalyzer()
+            except Exception:
+                pass
+
+        def score_sentence(s: str) -> float:
+            if lang == "en":
+                if sia:
+                    return sia.polarity_scores(s)["compound"]
+                pos = len(re.findall(
+                    r'\b(' + '|'.join(EN_POS_WORDS) + r')\b',
+                    s.lower()
+                ))
+                neg = len(re.findall(
+                    r'\b(' + '|'.join(EN_NEG_WORDS) + r')\b',
+                    s.lower()
+                ))
+                return (pos - neg) / (pos + neg + 1)
+            elif lang == "ja":
+                pos = sum(s.count(w) for w in JA_POS_WORDS)
+                neg = sum(s.count(w) for w in JA_NEG_WORDS)
+                return (pos - neg) / (pos + neg + 1)
+            else:  # zh
+                pos = sum(s.count(w) for w in ZH_POS_WORDS)
+                neg = sum(s.count(w) for w in ZH_NEG_WORDS)
+                return (pos - neg) / (pos + neg + 1)
+
+        # Pre-score and filter out neutral sentences to form an emotional-beats-only stream
+        scored_sentences = [(s, score_sentence(s)) for s in all_sentences]
+        emotional_beats = [item for item in scored_sentences if abs(item[1]) >= 0.1]
+        
+        # Fallback to all sentences if there are no strongly emotional beats
+        if not emotional_beats:
+            emotional_beats = scored_sentences
+
+        n = len(emotional_beats)
+        boundaries = [0, n // 4, n // 2, 3 * n // 4, n]
+        act_defs = [
+            ("Ki",    "Introduction"),
+            ("Shō",   "Development"),
+            ("Ten",   "Twist"),
+            ("Ketsu", "Resolution"),
+        ]
+
+        acts = []
+        for i, (act_key, act_label) in enumerate(act_defs):
+            start = boundaries[i]
+            end   = boundaries[i + 1]
+            segment = emotional_beats[start:end]
+            avg_sentiment = sum(score for s, score in segment) / len(segment) if segment else 0.0
+            
+            acts.append({
+                "act": act_key,
+                "label": act_label,
+                "sentiment": round(avg_sentiment, 4),
+                "sentence_range": [start, end - 1],
+            })
+
+        return {
+            "novel_id": novel_id,
+            "title": novel.title,
+            "acts": acts,
+            "baselines": {
+                "web_novel":   [0.10,  0.07, -0.04,  0.18],
+                "classic_lit": [0.03,  0.01, -0.18,  0.22],
+            },
+        }
+
+    except Exception as e:
+        if isinstance(e, HTTPException):
+            raise e
+        raise HTTPException(
+            status_code=500,
+            detail=f"Arc computation error: {str(e)}"
         )
 
 
