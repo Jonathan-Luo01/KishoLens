@@ -28,7 +28,6 @@ dependencies = [
     "pandas>=2.0.0",
     # Semantic similarity (genre matching)
     "sentence-transformers>=2.6.0",
-    "scikit-learn>=1.3.0",
 ]
 
 [project.optional-dependencies]

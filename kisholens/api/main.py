@@ -552,7 +552,8 @@ def post_analyze(request: AnalysisRequest):
     agg["pacing"] = pacing
     archetype = match_archetype(agg)
     agg["archetype_match"] = archetype
-    semantic = match_semantic(request.text)
+    # Semantic genre matching is currently optimized for English text (all-MiniLM-L6-v2)
+    semantic = match_semantic(request.text) if lang == "en" else None
 
     # 3. Compute Kishōtenketsu 4-act sentiment arc
     if lang == "en":

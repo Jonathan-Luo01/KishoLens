@@ -213,7 +213,10 @@ def _stream_hf_genre_texts(
         print(f"[WARN] Could not load {dataset_name}: {e}", file=sys.stderr)
         return genre_texts
 
-    for row in ds:
+    max_scan = max(5000, samples_per_genre * 50)
+    for idx, row in enumerate(ds):
+        if idx >= max_scan:
+            break
         if all(len(genre_texts[g]) >= samples_per_genre for g in hf_genres):
             break
         raw_tags = row.get(tags_field, []) or []

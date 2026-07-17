@@ -17,7 +17,6 @@ import numpy as np
 from kisholens.ml.build_centroids import (
     embed_texts,
     load_centroids_from_disk,
-    GENRE_TERRITORIES,
 )
 
 # Module-level centroid cache: (data_dir -> (centroids, meta))
@@ -75,19 +74,32 @@ def match_semantic(
     # Embed the input text
     embedding = embed_texts([text], model_name=model_name)  # (1, 384)
 
-    # Cosine similarity: (1, 384) @ (384, G) → (1, G)
-    from sklearn.metrics.pairwise import cosine_similarity
-    sims = cosine_similarity(embedding, centroids)[0]  # (G,)
+    # Cosine similarity using pure numpy:
+    # sims = (embedding . centroids_i) / (||embedding|| * ||centroids_i||)
+    emb_norm = np.linalg.norm(embedding)
+    if emb_norm == 0:
+        sims = np.zeros(centroids.shape[0])
+    else:
+        norm_emb = embedding / emb_norm
+        centroids_norms = np.linalg.norm(centroids, axis=1, keepdims=True)
+        # Prevent division by zero for zero vectors
+        safe_norms = np.where(centroids_norms == 0, 1.0, centroids_norms)
+        norm_centroids = centroids / safe_norms
+        sims = np.dot(norm_emb, norm_centroids.T)[0]
 
     # Build sorted scores list
-    scores = [
-        {
+    scores = []
+    for i in range(len(genres)):
+        val = float(sims[i])
+        # Clean up NaNs or out of bounds values
+        if val != val:
+            val = 0.0
+        val = max(-1.0, min(1.0, val))
+        scores.append({
             "genre": genres[i],
             "territory": territories[i],
-            "score": float(sims[i]),
-        }
-        for i in range(len(genres))
-    ]
+            "score": val,
+        })
     scores.sort(key=lambda x: x["score"], reverse=True)
 
     best = scores[0]
