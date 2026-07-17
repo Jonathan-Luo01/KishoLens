@@ -35,14 +35,8 @@ def test_consolidate_genre_no_match():
     assert consolidate_genre(["unknown-tag-xyz"]) is None
 
 
-def test_consolidate_genre_context_traditional():
-    assert consolidate_genre(["mystery"], source_type="traditional") == "Mystery"
-    assert consolidate_genre(["litrpg"], source_type="traditional") is None
-
-
-def test_consolidate_genre_context_classic():
-    assert consolidate_genre(["mystery"], source_type="classic") == "Classic Mystery"
-    assert consolidate_genre(["litrpg"], source_type="classic") is None
+def test_consolidate_genre_known_mystery():
+    assert consolidate_genre(["mystery"]) == "Mystery"
 
 
 def test_consolidate_genre_empty():
@@ -61,19 +55,10 @@ def test_genre_tag_map_has_all_genres():
         "Kingdom Building / Strategy", "Monster Protagonist / Evolution",
         "Dungeon Core / Dungeon MC", "Urban Fantasy / Dungeons",
         "Harem", "Girls Love / Boys Love",
-        # Web Novel Common Genres
-        "Web Novel Mystery", "Web Novel Horror", "Web Novel Romance",
-        "Web Novel Fantasy", "Web Novel Sci-Fi", "Web Novel Action / Adventure",
-        "Web Novel Comedy",
-        # Traditional Specific & Common Genres
         "High Fantasy", "Hard Sci-Fi", "Modern Thriller",
-        "Mystery", "Horror", "Romance", "Fantasy",
-        "Sci-Fi", "Action / Adventure", "Comedy",
-        # Classic Specific & Common Genres
         "Victorian Novel", "Philosophical Fiction",
-        "Classic Mystery", "Classic Horror", "Classic Romance",
-        "Classic Fantasy", "Classic Sci-Fi", "Classic Action / Adventure",
-        "Classic Comedy"
+        "Mystery", "Horror", "Romance", "Fantasy",
+        "Sci-Fi", "Action / Adventure", "Comedy"
     }
     assert expected == set(GENRE_TAG_MAP.keys())
 
@@ -124,15 +109,15 @@ def test_save_load_roundtrip():
         "samples_used": {"LitRPG": 10, "Isekai": 10, "High Fantasy": 10}
     }
     with tempfile.TemporaryDirectory() as tmpdir:
-        save_centroids(centroids, meta, data_dir=tmpdir)
+        save_centroids(centroids, meta, filename_prefix="genre", data_dir=tmpdir)
         assert os.path.exists(os.path.join(tmpdir, "genre_centroids.npy"))
         assert os.path.exists(os.path.join(tmpdir, "genre_centroids_meta.json"))
-        loaded_centroids, loaded_meta = load_centroids_from_disk(data_dir=tmpdir)
+        loaded_centroids, loaded_meta = load_centroids_from_disk(filename_prefix="genre", data_dir=tmpdir)
         np.testing.assert_array_equal(centroids, loaded_centroids)
         assert loaded_meta["genres"] == meta["genres"]
 
 
 def test_load_centroids_missing_files():
     with tempfile.TemporaryDirectory() as tmpdir:
-        result = load_centroids_from_disk(data_dir=tmpdir)
+        result = load_centroids_from_disk(filename_prefix="genre", data_dir=tmpdir)
         assert result == (None, None)

@@ -98,15 +98,6 @@ GENRE_TAG_MAP: dict[str, list[str]] = {
         "shounen-ai", "shoujo-ai", "danmei", "gl", "bl",
     ],
 
-    # --- Web Novel Common Genres ---
-    "Web Novel Mystery":            COMMON_GENRES["Mystery"],
-    "Web Novel Horror":             COMMON_GENRES["Horror"],
-    "Web Novel Romance":            COMMON_GENRES["Romance"],
-    "Web Novel Fantasy":            COMMON_GENRES["Fantasy"],
-    "Web Novel Sci-Fi":             COMMON_GENRES["Sci-Fi"],
-    "Web Novel Action / Adventure": COMMON_GENRES["Action / Adventure"],
-    "Web Novel Comedy":             COMMON_GENRES["Comedy"],
-
     # --- Specific Traditional Fiction Genres ---
     "High Fantasy": [
         "high-fantasy", "high fantasy", "epic-fantasy", "epic fantasy",
@@ -120,15 +111,6 @@ GENRE_TAG_MAP: dict[str, list[str]] = {
         "thriller", "suspense", "psychological", "noir",
     ],
 
-    # --- Traditional Common Genres ---
-    "Mystery":            COMMON_GENRES["Mystery"],
-    "Horror":             COMMON_GENRES["Horror"],
-    "Romance":            COMMON_GENRES["Romance"],
-    "Fantasy":            COMMON_GENRES["Fantasy"],
-    "Sci-Fi":             COMMON_GENRES["Sci-Fi"],
-    "Action / Adventure": COMMON_GENRES["Action / Adventure"],
-    "Comedy":             COMMON_GENRES["Comedy"],
-
     # --- Specific Classic Literature Genres ---
     "Victorian Novel": [
         "victorian", "gothic", "19th-century", "19th century",
@@ -137,14 +119,14 @@ GENRE_TAG_MAP: dict[str, list[str]] = {
         "philosophy", "philosophical", "existential",
     ],
 
-    # --- Classic Common Genres ---
-    "Classic Mystery":            COMMON_GENRES["Mystery"],
-    "Classic Horror":             COMMON_GENRES["Horror"],
-    "Classic Romance":            COMMON_GENRES["Romance"],
-    "Classic Fantasy":            COMMON_GENRES["Fantasy"],
-    "Classic Sci-Fi":             COMMON_GENRES["Sci-Fi"],
-    "Classic Action / Adventure": COMMON_GENRES["Action / Adventure"],
-    "Classic Comedy":             COMMON_GENRES["Comedy"],
+    # --- General / Common Genres ---
+    "Mystery":            COMMON_GENRES["Mystery"],
+    "Horror":             COMMON_GENRES["Horror"],
+    "Romance":            COMMON_GENRES["Romance"],
+    "Fantasy":            COMMON_GENRES["Fantasy"],
+    "Sci-Fi":             COMMON_GENRES["Sci-Fi"],
+    "Action / Adventure": COMMON_GENRES["Action / Adventure"],
+    "Comedy":             COMMON_GENRES["Comedy"],
 }
 
 GENRE_TERRITORIES: dict[str, str] = {
@@ -161,13 +143,6 @@ GENRE_TERRITORIES: dict[str, str] = {
     "Urban Fantasy / Dungeons":        "Web Novel Territory",
     "Harem":                           "Web Novel Territory",
     "Girls Love / Boys Love":          "Web Novel Territory",
-    "Web Novel Mystery":               "Web Novel Territory",
-    "Web Novel Horror":                "Web Novel Territory",
-    "Web Novel Romance":               "Web Novel Territory",
-    "Web Novel Fantasy":               "Web Novel Territory",
-    "Web Novel Sci-Fi":                "Web Novel Territory",
-    "Web Novel Action / Adventure":    "Web Novel Territory",
-    "Web Novel Comedy":                "Web Novel Territory",
 
     # Traditional Fiction Territory
     "High Fantasy":                    "Traditional Fiction Territory",
@@ -184,43 +159,22 @@ GENRE_TERRITORIES: dict[str, str] = {
     # Classic Literature Territory
     "Victorian Novel":                 "Classic Literature Territory",
     "Philosophical Fiction":           "Classic Literature Territory",
-    "Classic Mystery":                 "Classic Literature Territory",
-    "Classic Horror":                  "Classic Literature Territory",
-    "Classic Romance":                 "Classic Literature Territory",
-    "Classic Fantasy":                 "Classic Literature Territory",
-    "Classic Sci-Fi":                  "Classic Literature Territory",
-    "Classic Action / Adventure":      "Classic Literature Territory",
-    "Classic Comedy":                  "Classic Literature Territory",
 }
 
 # ---------------------------------------------------------------------------
 # Tag consolidation
 # ---------------------------------------------------------------------------
 
-def consolidate_genre(tags: list[str], source_type: str = "web") -> Optional[str]:
+def consolidate_genre(tags: list[str]) -> Optional[str]:
     """
     Map a list of raw source tags to a canonical genre name.
     Returns the first canonical genre whose tag set intersects with `tags`,
     or None if no match.
 
-    Comparison is case-insensitive, filtered by source_type context.
+    Comparison is case-insensitive.
     """
     normalised = {t.lower() for t in tags}
     for genre, genre_tags in GENRE_TAG_MAP.items():
-        t = GENRE_TERRITORIES[genre]
-        if source_type == "web":
-            # Web context maps to Web Novel genres, and specific Traditional genres
-            if t != "Web Novel Territory" and genre not in {"High Fantasy", "Hard Sci-Fi", "Modern Thriller"}:
-                continue
-        elif source_type == "classic":
-            # Classic context maps only to Classic genres
-            if t != "Classic Literature Territory":
-                continue
-        else:
-            # Traditional context maps only to Traditional genres
-            if t != "Traditional Fiction Territory":
-                continue
-
         if normalised & {gt.lower() for gt in genre_tags}:
             return genre
     return None
@@ -281,34 +235,36 @@ def compute_centroid(embeddings: np.ndarray) -> np.ndarray:
 def save_centroids(
     centroids: np.ndarray,
     meta: dict,
+    filename_prefix: str = "genre",
     data_dir: str = "data",
 ) -> None:
     """
     Save centroid matrix and metadata to disk.
 
     Files written:
-        {data_dir}/genre_centroids.npy
-        {data_dir}/genre_centroids_meta.json
+        {data_dir}/{filename_prefix}_centroids.npy
+        {data_dir}/{filename_prefix}_centroids_meta.json
     """
     os.makedirs(data_dir, exist_ok=True)
-    npy_path = os.path.join(data_dir, "genre_centroids.npy")
-    meta_path = os.path.join(data_dir, "genre_centroids_meta.json")
+    npy_path = os.path.join(data_dir, f"{filename_prefix}_centroids.npy")
+    meta_path = os.path.join(data_dir, f"{filename_prefix}_centroids_meta.json")
     np.save(npy_path, centroids)
     with open(meta_path, "w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2, ensure_ascii=False)
-    print(f"Saved centroids to {npy_path}")
-    print(f"Saved metadata to {meta_path}")
+    print(f"Saved {filename_prefix} centroids to {npy_path}")
+    print(f"Saved {filename_prefix} metadata to {meta_path}")
 
 
 def load_centroids_from_disk(
+    filename_prefix: str = "genre",
     data_dir: str = "data",
 ) -> tuple[Optional[np.ndarray], Optional[dict]]:
     """
     Load pre-built centroids from disk.
     Returns (None, None) if either file is missing.
     """
-    npy_path = os.path.join(data_dir, "genre_centroids.npy")
-    meta_path = os.path.join(data_dir, "genre_centroids_meta.json")
+    npy_path = os.path.join(data_dir, f"{filename_prefix}_centroids.npy")
+    meta_path = os.path.join(data_dir, f"{filename_prefix}_centroids_meta.json")
     if not os.path.exists(npy_path) or not os.path.exists(meta_path):
         return None, None
     centroids = np.load(npy_path)
@@ -326,7 +282,6 @@ def _stream_hf_genre_texts(
     text_field: str,
     tags_field: str,
     samples_per_genre: int,
-    source_type: str = "web",
 ) -> dict[str, list[str]]:
     """
     Stream a HuggingFace dataset and collect up to `samples_per_genre` texts
@@ -354,7 +309,7 @@ def _stream_hf_genre_texts(
             raw_tags = row["meta"].get(tags_field, []) or []
         if isinstance(raw_tags, str):
             raw_tags = [t.strip() for t in raw_tags.split(",")]
-        genre = consolidate_genre(raw_tags, source_type=source_type)
+        genre = consolidate_genre(raw_tags)
         if genre is None or len(genre_texts[genre]) >= samples_per_genre:
             continue
         text = row.get(text_field, "") or ""
@@ -393,8 +348,12 @@ def _fetch_gutenberg_texts_by_topic(
             "page": page,
         })
         url = f"{base_url}?{params}"
+        req = urllib.request.Request(
+            url,
+            headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
+        )
         try:
-            with urllib.request.urlopen(url, timeout=15) as resp:
+            with urllib.request.urlopen(req, timeout=15) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
         except Exception as e:
             print(f"[WARN] Gutenberg API error for topic={topic}: {e}", file=sys.stderr)
@@ -417,7 +376,11 @@ def _fetch_gutenberg_texts_by_topic(
             if not txt_url:
                 continue
             try:
-                with urllib.request.urlopen(txt_url, timeout=20) as r:
+                txt_req = urllib.request.Request(
+                    txt_url,
+                    headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
+                )
+                with urllib.request.urlopen(txt_req, timeout=20) as r:
                     raw = r.read().decode("utf-8", errors="ignore")
                 # Strip Gutenberg header/footer
                 start = raw.find("*** START OF")
@@ -446,20 +409,15 @@ def _fetch_gutenberg_texts_by_topic(
 
 def build_genre_centroids(
     samples_per_genre: int = 200,
-) -> tuple[np.ndarray, dict]:
+) -> tuple[np.ndarray, dict, np.ndarray, dict]:
     """
-    Build genre centroids from HuggingFace + Gutenberg data.
-
-    Steps:
-    1. Stream ScribbleHub17K for web/traditional fiction genres
-    2. Cross-check with RoyalRoad-1.61M for High Fantasy, Hard Sci-Fi, Modern Thriller
-    3. Fetch Gutenberg texts for Victorian Novel and Philosophical Fiction
-    4. Embed first 1000 words of each text per genre
-    5. Average embeddings per genre → centroid vector
+    Build genre and territory centroids from HuggingFace + Gutenberg data.
 
     Returns:
-        centroids: (G, 384) float32 array
-        meta: {"genres": [...], "territories": [...], "samples_used": {...}}
+        genre_centroids: (G, 384) float32 array
+        genre_meta: {"genres": [...], "samples_used": {...}}
+        territory_centroids: (T, 384) float32 array
+        territory_meta: {"territories": [...], "samples_used": {...}}
     """
     import ssl
     try:
@@ -476,7 +434,7 @@ def build_genre_centroids(
         samples_per_genre=samples_per_genre,
     )
 
-    # 2. HuggingFace: RoyalRoad-1.61M (cross-check for traditional fiction)
+    # 2. HuggingFace: RoyalRoad-1.61M
     print("Streaming RoyalRoad-1.61M...")
     rr_texts = _stream_hf_genre_texts(
         dataset_name="OmniAICreator/RoyalRoad-1.61M",
@@ -485,42 +443,92 @@ def build_genre_centroids(
         samples_per_genre=samples_per_genre,
     )
 
-    # Merge HF results (union, capped at samples_per_genre)
-    combined: dict[str, list[str]] = {}
+    # Merge HF results
+    hf_pool: dict[str, list[str]] = {}
     for genre in GENRE_TAG_MAP:
-        pool = sh_texts.get(genre, []) + rr_texts.get(genre, [])
-        combined[genre] = pool[:samples_per_genre]
+        hf_pool[genre] = sh_texts.get(genre, []) + rr_texts.get(genre, [])
 
-    # 3. Gutenberg for Classic Literature genres
+    # Gutenberg classic topics mapping
     gutenberg_topics = {
         "Victorian Novel": ["gothic fiction", "fiction"],
         "Philosophical Fiction": ["philosophy", "fiction"],
-        "Classic Mystery": ["detective", "mystery", "crime"],
-        "Classic Horror": ["horror", "gothic"],
-        "Classic Romance": ["romance", "love"],
-        "Classic Fantasy": ["fantasy", "fairy tales"],
-        "Classic Sci-Fi": ["science fiction", "sci-fi"],
-        "Classic Action / Adventure": ["adventure", "action"],
-        "Classic Comedy": ["humor", "comedy", "satire"],
+        "Mystery": ["detective", "mystery", "crime"],
+        "Horror": ["horror", "gothic"],
+        "Romance": ["romance", "love"],
+        "Fantasy": ["fantasy", "fairy tales"],
+        "Sci-Fi": ["science fiction", "sci-fi"],
+        "Action / Adventure": ["adventure", "action"],
+        "Comedy": ["humor", "comedy", "satire"],
     }
-    for genre, topics in gutenberg_topics.items():
-        needed = samples_per_genre - len(combined.get(genre, []))
-        if needed <= 0:
-            continue
-        print(f"Fetching Gutenberg texts for {genre}...")
-        for topic in topics:
-            if needed <= 0:
-                break
-            fetched = _fetch_gutenberg_texts_by_topic(topic, genre, needed)
-            combined.setdefault(genre, []).extend(fetched)
-            needed -= len(fetched)
-        combined[genre] = combined.get(genre, [])[:samples_per_genre]
 
-    # 4. Embed + compute centroids
+    # Lists for territory centroids
+    web_texts = []
+    trad_texts = []
+    classic_texts = []
+
+    # Combined dictionary of texts per canonical genre
+    combined: dict[str, list[str]] = {}
+
+    web_genres = {
+        "LitRPG", "Isekai", "Xianxia / Wuxia", "Urban Romance",
+        "Cozy Fantasy / Slice of Life", "Villainess / Otome Game",
+        "Kingdom Building / Strategy", "Monster Protagonist / Evolution",
+        "Dungeon Core / Dungeon MC", "Urban Fantasy / Dungeons",
+        "Harem", "Girls Love / Boys Love"
+    }
+    trad_specific_genres = {"High Fantasy", "Hard Sci-Fi", "Modern Thriller"}
+    classic_specific_genres = {"Victorian Novel", "Philosophical Fiction"}
+    common_genres = {"Mystery", "Horror", "Romance", "Fantasy", "Sci-Fi", "Action / Adventure", "Comedy"}
+
+    for genre in GENRE_TAG_MAP:
+        if genre in web_genres:
+            texts = hf_pool.get(genre, [])[:samples_per_genre]
+            combined[genre] = texts
+            web_texts.extend(texts)
+        elif genre in trad_specific_genres:
+            texts = hf_pool.get(genre, [])[:samples_per_genre]
+            combined[genre] = texts
+            trad_texts.extend(texts)
+        elif genre in classic_specific_genres:
+            needed = samples_per_genre
+            print(f"Fetching Gutenberg texts for {genre}...")
+            fetched = []
+            for topic in gutenberg_topics[genre]:
+                if needed <= 0:
+                    break
+                f = _fetch_gutenberg_texts_by_topic(topic, genre, needed)
+                fetched.extend(f)
+                needed -= len(f)
+            texts = fetched[:samples_per_genre]
+            combined[genre] = texts
+            classic_texts.extend(texts)
+        elif genre in common_genres:
+            # Half from HF (traditional), half from Gutenberg (classic)
+            half = max(1, samples_per_genre // 2)
+
+            # HF portion (traditional)
+            hf_texts = hf_pool.get(genre, [])[:half]
+            trad_texts.extend(hf_texts)
+
+            # Gutenberg portion (classic)
+            needed = half
+            print(f"Fetching Gutenberg texts for Classic {genre}...")
+            fetched = []
+            for topic in gutenberg_topics[genre]:
+                if needed <= 0:
+                    break
+                f = _fetch_gutenberg_texts_by_topic(topic, genre, needed)
+                fetched.extend(f)
+                needed -= len(f)
+            g_texts = fetched[:half]
+            classic_texts.extend(g_texts)
+
+            combined[genre] = hf_texts + g_texts
+
+    # 4. Embed + compute genre centroids
     all_genres = list(GENRE_TAG_MAP.keys())
-    centroid_list = []
-    territories = []
-    samples_used = {}
+    genre_centroid_list = []
+    genre_samples_used = {}
 
     for genre in all_genres:
         texts = combined.get(genre, [])
@@ -531,19 +539,40 @@ def build_genre_centroids(
         else:
             embeddings = embed_texts(texts)
             centroid = compute_centroid(embeddings)
+        genre_centroid_list.append(centroid)
+        genre_samples_used[genre] = len(texts)
 
-        centroid_list.append(centroid)
-        territories.append(GENRE_TERRITORIES[genre])
-        samples_used[genre] = len(texts)
-
-    centroids = np.stack(centroid_list, axis=0)  # (G, 384)
-
-    meta = {
+    genre_centroids = np.stack(genre_centroid_list, axis=0)
+    genre_meta = {
         "genres": all_genres,
-        "territories": territories,
-        "samples_used": samples_used,
+        "samples_used": genre_samples_used,
     }
-    return centroids, meta
+
+    # 5. Embed + compute territory centroids
+    territory_centroids_list = []
+    territory_samples_used = {}
+    territory_names = ["Web Novel Territory", "Traditional Fiction Territory", "Classic Literature Territory"]
+
+    for name, texts in [("Web Novel Territory", web_texts),
+                        ("Traditional Fiction Territory", trad_texts),
+                        ("Classic Literature Territory", classic_texts)]:
+        print(f"Embedding {len(texts)} texts for territory '{name}'...")
+        if not texts:
+            print(f"[WARN] No texts for territory '{name}' — using zero vector.", file=sys.stderr)
+            centroid = np.zeros(384, dtype=np.float32)
+        else:
+            embeddings = embed_texts(texts)
+            centroid = compute_centroid(embeddings)
+        territory_centroids_list.append(centroid)
+        territory_samples_used[name] = len(texts)
+
+    territory_centroids = np.stack(territory_centroids_list, axis=0)
+    territory_meta = {
+        "territories": territory_names,
+        "samples_used": territory_samples_used,
+    }
+
+    return genre_centroids, genre_meta, territory_centroids, territory_meta
 
 
 # ---------------------------------------------------------------------------
@@ -552,7 +581,7 @@ def build_genre_centroids(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Build semantic genre centroids for KishoLens."
+        description="Build semantic genre and territory centroids for KishoLens."
     )
     parser.add_argument(
         "--samples", type=int, default=200,
@@ -564,15 +593,17 @@ def main():
     )
     args = parser.parse_args()
 
-    print(f"Building genre centroids (up to {args.samples} samples/genre)...")
-    centroids, meta = build_genre_centroids(
+    print(f"Building centroids (up to {args.samples} samples/genre)...")
+    g_centroids, g_meta, t_centroids, t_meta = build_genre_centroids(
         samples_per_genre=args.samples,
     )
-    save_centroids(centroids, meta, data_dir=args.data_dir)
+
+    save_centroids(g_centroids, g_meta, filename_prefix="genre", data_dir=args.data_dir)
+    save_centroids(t_centroids, t_meta, filename_prefix="territory", data_dir=args.data_dir)
 
     print("\nCentroid build complete.")
-    print(f"  Genres: {meta['genres']}")
-    print(f"  Samples used: {meta['samples_used']}")
+    print(f"  Genres: {g_meta['genres']}")
+    print(f"  Territories: {t_meta['territories']}")
 
     # Explicitly exit to prevent hanging from non-daemon background threads in datasets/huggingface
     sys.stdout.flush()

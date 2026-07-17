@@ -30,11 +30,15 @@ def test_api_analyze_with_centroids():
 
     dummy_response = {
         "genre": "LitRPG",
+        "genre_confidence": 0.95,
+        "genre_scores": [
+            {"genre": "LitRPG", "score": 0.95},
+            {"genre": "Isekai", "score": 0.80}
+        ],
         "territory": "Web Novel Territory",
-        "confidence": 0.95,
-        "scores": [
-            {"genre": "LitRPG", "territory": "Web Novel Territory", "score": 0.95},
-            {"genre": "Isekai", "territory": "Web Novel Territory", "score": 0.80}
+        "territory_confidence": 0.90,
+        "territory_scores": [
+            {"territory": "Web Novel Territory", "score": 0.90}
         ]
     }
     api_main.match_semantic = lambda text: dummy_response
@@ -51,7 +55,9 @@ def test_api_analyze_with_centroids():
         assert "archetype" in data
         assert "semantic" in data
         assert data["semantic"]["genre"] == "LitRPG"
-        assert data["semantic"]["confidence"] == 0.95
-        assert len(data["semantic"]["scores"]) == 2
+        assert data["semantic"]["genre_confidence"] == 0.95
+        assert len(data["semantic"]["genre_scores"]) == 2
+        assert data["semantic"]["territory"] == "Web Novel Territory"
+        assert data["semantic"]["territory_confidence"] == 0.90
     finally:
         api_main.match_semantic = original_match_semantic
