@@ -39,8 +39,39 @@ GENRE_TAG_MAP: dict[str, list[str]] = {
         "xuanhuan", "martial-arts", "martial arts", "daoist", "dao",
     ],
     "Urban Romance": [
-        "contemporary-romance", "contemporary romance", "slice-of-life", "slice of life",
+        "contemporary-romance", "contemporary romance",
         "school-life", "school life", "modern-day", "modern day",
+    ],
+    "Cozy Fantasy / Slice of Life": [
+        "cozy", "cozy-fantasy", "cozy fantasy", "slice-of-life", "slice of life",
+        "farming", "shopkeeper", "crafting", "alchemy", "cooking",
+    ],
+    "Villainess / Otome Game": [
+        "villainess", "otome", "otome-game", "otome game", "noble",
+        "aristocracy", "engagement-broken", "broken-engagement",
+    ],
+    "Kingdom Building / Strategy": [
+        "kingdom-building", "kingdom building", "lord", "territory-development",
+        "technology-uplift", "strategy", "managerial", "fief", "town-building",
+    ],
+    "Monster Protagonist / Evolution": [
+        "monster-protagonist", "monster protagonist", "non-human-mc", "non-human mc",
+        "beast-mc", "evolution", "evolving", "reincarnated-as-a",
+    ],
+    "Dungeon Core / Dungeon MC": [
+        "dungeon-core", "dungeon core", "dungeon-mc", "dungeon mc",
+        "dungeon-building", "dungeon building",
+    ],
+    "Urban Fantasy / Dungeons": [
+        "urban-fantasy", "urban fantasy", "modern-fantasy", "modern fantasy",
+        "hunters", "gates", "dungeons-appearing", "modern-magic", "hunter", "gate",
+    ],
+    "Harem": [
+        "harem", "reverse-harem", "reverse harem", "polyamory", "multiple-partners",
+    ],
+    "Girls Love / Boys Love": [
+        "yuri", "girls-love", "girls love", "yaoi", "boys-love", "boys love",
+        "shounen-ai", "shoujo-ai", "danmei", "gl", "bl",
     ],
     "High Fantasy": [
         "high-fantasy", "high fantasy", "epic-fantasy", "epic fantasy",
@@ -84,23 +115,31 @@ GENRE_TAG_MAP: dict[str, list[str]] = {
 }
 
 GENRE_TERRITORIES: dict[str, str] = {
-    "LitRPG":                "Web Novel Territory",
-    "Isekai":                "Web Novel Territory",
-    "Xianxia / Wuxia":      "Web Novel Territory",
-    "Urban Romance":         "Web Novel Territory",
-    "High Fantasy":          "Traditional Fiction Territory",
-    "Hard Sci-Fi":           "Traditional Fiction Territory",
-    "Modern Thriller":       "Traditional Fiction Territory",
-    "Victorian Novel":       "Classic Literature Territory",
-    "Philosophical Fiction": "Classic Literature Territory",
+    "LitRPG":                          "Web Novel Territory",
+    "Isekai":                          "Web Novel Territory",
+    "Xianxia / Wuxia":                "Web Novel Territory",
+    "Urban Romance":                   "Web Novel Territory",
+    "Cozy Fantasy / Slice of Life":    "Web Novel Territory",
+    "Villainess / Otome Game":        "Web Novel Territory",
+    "Kingdom Building / Strategy":     "Web Novel Territory",
+    "Monster Protagonist / Evolution": "Web Novel Territory",
+    "Dungeon Core / Dungeon MC":       "Web Novel Territory",
+    "Urban Fantasy / Dungeons":        "Web Novel Territory",
+    "Harem":                           "Web Novel Territory",
+    "Girls Love / Boys Love":          "Web Novel Territory",
+    "High Fantasy":                    "Traditional Fiction Territory",
+    "Hard Sci-Fi":                     "Traditional Fiction Territory",
+    "Modern Thriller":                 "Traditional Fiction Territory",
+    "Victorian Novel":                 "Classic Literature Territory",
+    "Philosophical Fiction":           "Classic Literature Territory",
     # General / Common Genres
-    "Mystery":               "Traditional Fiction Territory",
-    "Horror":                "Traditional Fiction Territory",
-    "Romance":               "Traditional Fiction Territory",
-    "Fantasy":               "Traditional Fiction Territory",
-    "Sci-Fi":                "Traditional Fiction Territory",
-    "Action / Adventure":    "Traditional Fiction Territory",
-    "Comedy":                "Traditional Fiction Territory",
+    "Mystery":                         "Traditional Fiction Territory",
+    "Horror":                          "Traditional Fiction Territory",
+    "Romance":                         "Traditional Fiction Territory",
+    "Fantasy":                         "Traditional Fiction Territory",
+    "Sci-Fi":                          "Traditional Fiction Territory",
+    "Action / Adventure":              "Traditional Fiction Territory",
+    "Comedy":                          "Traditional Fiction Territory",
 }
 
 # ---------------------------------------------------------------------------
