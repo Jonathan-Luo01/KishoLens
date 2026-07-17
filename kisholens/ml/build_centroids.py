@@ -208,7 +208,7 @@ def _stream_hf_genre_texts(
     hf_genres = {g for g in GENRE_TAG_MAP if g not in {"Victorian Novel", "Philosophical Fiction"}}
 
     try:
-        ds = load_dataset(dataset_name, split="train", streaming=True, trust_remote_code=True)
+        ds = load_dataset(dataset_name, split="train", streaming=True)
     except Exception as e:
         print(f"[WARN] Could not load {dataset_name}: {e}", file=sys.stderr)
         return genre_texts
@@ -217,6 +217,8 @@ def _stream_hf_genre_texts(
         if all(len(genre_texts[g]) >= samples_per_genre for g in hf_genres):
             break
         raw_tags = row.get(tags_field, []) or []
+        if not raw_tags and "meta" in row and isinstance(row["meta"], dict):
+            raw_tags = row["meta"].get(tags_field, []) or []
         if isinstance(raw_tags, str):
             raw_tags = [t.strip() for t in raw_tags.split(",")]
         genre = consolidate_genre(raw_tags)
@@ -326,10 +328,16 @@ def build_genre_centroids(
         centroids: (G, 384) float32 array
         meta: {"genres": [...], "territories": [...], "samples_used": {...}}
     """
+    import ssl
+    try:
+        ssl._create_default_https_context = ssl._create_unverified_context
+    except AttributeError:
+        pass
+
     # 1. HuggingFace: ScribbleHub17K
     print("Streaming ScribbleHub17K...")
     sh_texts = _stream_hf_genre_texts(
-        dataset_name="ScribbleHub17K",
+        dataset_name="botp/RyokoAI_ScribbleHub17K",
         text_field="text",
         tags_field="tags",
         samples_per_genre=samples_per_genre,
@@ -338,7 +346,7 @@ def build_genre_centroids(
     # 2. HuggingFace: RoyalRoad-1.61M (cross-check for traditional fiction)
     print("Streaming RoyalRoad-1.61M...")
     rr_texts = _stream_hf_genre_texts(
-        dataset_name="RoyalRoad-1.61M",
+        dataset_name="OmniAICreator/RoyalRoad-1.61M",
         text_field="text",
         tags_field="tags",
         samples_per_genre=samples_per_genre,

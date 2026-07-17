@@ -8,6 +8,7 @@
     "dev:backend": "node run-venv.js uvicorn kisholens.api.main:app --reload",
     "dev:pipeline": "node run-venv.js python -m kisholens.pipeline.main",
     "dev:ml": "node run-venv.js python -m kisholens.ml.main",
+    "dev:build-centroids": "node run-venv.js python -m kisholens.ml.build_centroids",
     "dev": "concurrently \"npm:dev:frontend\" \"npm:dev:backend\""
   },
   "devDependencies": {
