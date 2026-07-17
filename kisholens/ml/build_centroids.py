@@ -25,6 +25,7 @@ import numpy as np
 # ---------------------------------------------------------------------------
 
 GENRE_TAG_MAP: dict[str, list[str]] = {
+    # --- Specific Genres (checked first) ---
     "LitRPG": [
         "litrpg", "system", "vrmmo", "leveling", "game", "game-elements",
         "game elements", "stat", "stats", "gamelit",
@@ -38,9 +39,8 @@ GENRE_TAG_MAP: dict[str, list[str]] = {
         "xuanhuan", "martial-arts", "martial arts", "daoist", "dao",
     ],
     "Urban Romance": [
-        "romance", "contemporary-romance", "contemporary romance",
-        "urban", "slice-of-life", "slice of life", "school-life", "school life",
-        "modern-day", "modern day",
+        "contemporary-romance", "contemporary romance", "slice-of-life", "slice of life",
+        "school-life", "school life", "modern-day", "modern day",
     ],
     "High Fantasy": [
         "high-fantasy", "high fantasy", "epic-fantasy", "epic fantasy",
@@ -48,21 +48,38 @@ GENRE_TAG_MAP: dict[str, list[str]] = {
         "medieval fantasy",
     ],
     "Hard Sci-Fi": [
-        "science-fiction", "science fiction", "hard-sci-fi", "hard sci-fi",
-        "sci-fi", "sci fi", "space-opera", "space opera", "cyberpunk",
-        "post-apocalyptic", "post apocalyptic",
+        "hard-sci-fi", "hard sci-fi", "space-opera", "space opera", "cyberpunk",
     ],
     "Modern Thriller": [
-        "thriller", "mystery", "crime", "detective", "suspense",
-        "horror", "psychological", "noir",
+        "thriller", "suspense", "psychological", "noir",
     ],
     "Victorian Novel": [
         "victorian", "gothic", "19th-century", "19th century",
-        "historical", "classical",
     ],
     "Philosophical Fiction": [
-        "philosophy", "philosophical", "literary-fiction", "literary fiction",
-        "existential", "literary", "classic",
+        "philosophy", "philosophical", "existential",
+    ],
+    # --- General / Common Genres (checked last) ---
+    "Mystery": [
+        "mystery", "detective", "crime", "cozy mystery", "investigation", "mystery-thriller",
+    ],
+    "Horror": [
+        "horror", "ghosts", "paranormal", "dark-fantasy", "dark fantasy",
+    ],
+    "Romance": [
+        "romance", "romantic", "love", "romantic comedy", "rom-com",
+    ],
+    "Fantasy": [
+        "fantasy", "magic", "mythology", "myth", "supernatural",
+    ],
+    "Sci-Fi": [
+        "science-fiction", "science fiction", "sci-fi", "sci fi", "aliens", "mecha",
+    ],
+    "Action / Adventure": [
+        "action", "adventure", "quest", "journey",
+    ],
+    "Comedy": [
+        "comedy", "humor", "satire", "parody", "funny",
     ],
 }
 
@@ -76,6 +93,14 @@ GENRE_TERRITORIES: dict[str, str] = {
     "Modern Thriller":       "Traditional Fiction Territory",
     "Victorian Novel":       "Classic Literature Territory",
     "Philosophical Fiction": "Classic Literature Territory",
+    # General / Common Genres
+    "Mystery":               "Traditional Fiction Territory",
+    "Horror":                "Traditional Fiction Territory",
+    "Romance":               "Traditional Fiction Territory",
+    "Fantasy":               "Traditional Fiction Territory",
+    "Sci-Fi":                "Traditional Fiction Territory",
+    "Action / Adventure":    "Traditional Fiction Territory",
+    "Comedy":                "Traditional Fiction Territory",
 }
 
 # ---------------------------------------------------------------------------

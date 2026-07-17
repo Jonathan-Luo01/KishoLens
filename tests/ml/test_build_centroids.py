@@ -47,7 +47,9 @@ def test_consolidate_genre_case_insensitive():
 def test_genre_tag_map_has_all_genres():
     expected = {"LitRPG", "Isekai", "Xianxia / Wuxia", "Urban Romance",
                 "High Fantasy", "Hard Sci-Fi", "Modern Thriller",
-                "Victorian Novel", "Philosophical Fiction"}
+                "Victorian Novel", "Philosophical Fiction",
+                "Mystery", "Horror", "Romance", "Fantasy",
+                "Sci-Fi", "Action / Adventure", "Comedy"}
     assert expected == set(GENRE_TAG_MAP.keys())
 
 
