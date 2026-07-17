@@ -35,6 +35,16 @@ def test_consolidate_genre_no_match():
     assert consolidate_genre(["unknown-tag-xyz"]) is None
 
 
+def test_consolidate_genre_context_traditional():
+    assert consolidate_genre(["mystery"], source_type="traditional") == "Mystery"
+    assert consolidate_genre(["litrpg"], source_type="traditional") is None
+
+
+def test_consolidate_genre_context_classic():
+    assert consolidate_genre(["mystery"], source_type="classic") == "Classic Mystery"
+    assert consolidate_genre(["litrpg"], source_type="classic") is None
+
+
 def test_consolidate_genre_empty():
     assert consolidate_genre([]) is None
 
@@ -51,10 +61,19 @@ def test_genre_tag_map_has_all_genres():
         "Kingdom Building / Strategy", "Monster Protagonist / Evolution",
         "Dungeon Core / Dungeon MC", "Urban Fantasy / Dungeons",
         "Harem", "Girls Love / Boys Love",
+        # Web Novel Common Genres
+        "Web Novel Mystery", "Web Novel Horror", "Web Novel Romance",
+        "Web Novel Fantasy", "Web Novel Sci-Fi", "Web Novel Action / Adventure",
+        "Web Novel Comedy",
+        # Traditional Specific & Common Genres
         "High Fantasy", "Hard Sci-Fi", "Modern Thriller",
-        "Victorian Novel", "Philosophical Fiction",
         "Mystery", "Horror", "Romance", "Fantasy",
-        "Sci-Fi", "Action / Adventure", "Comedy"
+        "Sci-Fi", "Action / Adventure", "Comedy",
+        # Classic Specific & Common Genres
+        "Victorian Novel", "Philosophical Fiction",
+        "Classic Mystery", "Classic Horror", "Classic Romance",
+        "Classic Fantasy", "Classic Sci-Fi", "Classic Action / Adventure",
+        "Classic Comedy"
     }
     assert expected == set(GENRE_TAG_MAP.keys())
 

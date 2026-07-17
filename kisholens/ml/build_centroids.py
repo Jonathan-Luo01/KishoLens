@@ -24,8 +24,32 @@ import numpy as np
 # Genre taxonomy
 # ---------------------------------------------------------------------------
 
+COMMON_GENRES = {
+    "Mystery": [
+        "mystery", "detective", "crime", "cozy mystery", "investigation", "mystery-thriller",
+    ],
+    "Horror": [
+        "horror", "ghosts", "paranormal", "dark-fantasy", "dark fantasy",
+    ],
+    "Romance": [
+        "romance", "romantic", "love", "romantic comedy", "rom-com",
+    ],
+    "Fantasy": [
+        "fantasy", "magic", "mythology", "myth", "supernatural",
+    ],
+    "Sci-Fi": [
+        "science-fiction", "science fiction", "sci-fi", "sci fi", "aliens", "mecha",
+    ],
+    "Action / Adventure": [
+        "action", "adventure", "quest", "journey",
+    ],
+    "Comedy": [
+        "comedy", "humor", "satire", "parody", "funny",
+    ],
+}
+
 GENRE_TAG_MAP: dict[str, list[str]] = {
-    # --- Specific Genres (checked first) ---
+    # --- Specific Web Novel Genres ---
     "LitRPG": [
         "litrpg", "system", "vrmmo", "leveling", "game", "game-elements",
         "game elements", "stat", "stats", "gamelit",
@@ -73,6 +97,17 @@ GENRE_TAG_MAP: dict[str, list[str]] = {
         "yuri", "girls-love", "girls love", "yaoi", "boys-love", "boys love",
         "shounen-ai", "shoujo-ai", "danmei", "gl", "bl",
     ],
+
+    # --- Web Novel Common Genres ---
+    "Web Novel Mystery":            COMMON_GENRES["Mystery"],
+    "Web Novel Horror":             COMMON_GENRES["Horror"],
+    "Web Novel Romance":            COMMON_GENRES["Romance"],
+    "Web Novel Fantasy":            COMMON_GENRES["Fantasy"],
+    "Web Novel Sci-Fi":             COMMON_GENRES["Sci-Fi"],
+    "Web Novel Action / Adventure": COMMON_GENRES["Action / Adventure"],
+    "Web Novel Comedy":             COMMON_GENRES["Comedy"],
+
+    # --- Specific Traditional Fiction Genres ---
     "High Fantasy": [
         "high-fantasy", "high fantasy", "epic-fantasy", "epic fantasy",
         "sword-and-sorcery", "sword and sorcery", "tolkienesque", "medieval-fantasy",
@@ -84,37 +119,36 @@ GENRE_TAG_MAP: dict[str, list[str]] = {
     "Modern Thriller": [
         "thriller", "suspense", "psychological", "noir",
     ],
+
+    # --- Traditional Common Genres ---
+    "Mystery":            COMMON_GENRES["Mystery"],
+    "Horror":             COMMON_GENRES["Horror"],
+    "Romance":            COMMON_GENRES["Romance"],
+    "Fantasy":            COMMON_GENRES["Fantasy"],
+    "Sci-Fi":             COMMON_GENRES["Sci-Fi"],
+    "Action / Adventure": COMMON_GENRES["Action / Adventure"],
+    "Comedy":             COMMON_GENRES["Comedy"],
+
+    # --- Specific Classic Literature Genres ---
     "Victorian Novel": [
         "victorian", "gothic", "19th-century", "19th century",
     ],
     "Philosophical Fiction": [
         "philosophy", "philosophical", "existential",
     ],
-    # --- General / Common Genres (checked last) ---
-    "Mystery": [
-        "mystery", "detective", "crime", "cozy mystery", "investigation", "mystery-thriller",
-    ],
-    "Horror": [
-        "horror", "ghosts", "paranormal", "dark-fantasy", "dark fantasy",
-    ],
-    "Romance": [
-        "romance", "romantic", "love", "romantic comedy", "rom-com",
-    ],
-    "Fantasy": [
-        "fantasy", "magic", "mythology", "myth", "supernatural",
-    ],
-    "Sci-Fi": [
-        "science-fiction", "science fiction", "sci-fi", "sci fi", "aliens", "mecha",
-    ],
-    "Action / Adventure": [
-        "action", "adventure", "quest", "journey",
-    ],
-    "Comedy": [
-        "comedy", "humor", "satire", "parody", "funny",
-    ],
+
+    # --- Classic Common Genres ---
+    "Classic Mystery":            COMMON_GENRES["Mystery"],
+    "Classic Horror":             COMMON_GENRES["Horror"],
+    "Classic Romance":            COMMON_GENRES["Romance"],
+    "Classic Fantasy":            COMMON_GENRES["Fantasy"],
+    "Classic Sci-Fi":             COMMON_GENRES["Sci-Fi"],
+    "Classic Action / Adventure": COMMON_GENRES["Action / Adventure"],
+    "Classic Comedy":             COMMON_GENRES["Comedy"],
 }
 
 GENRE_TERRITORIES: dict[str, str] = {
+    # Web Novel Territory
     "LitRPG":                          "Web Novel Territory",
     "Isekai":                          "Web Novel Territory",
     "Xianxia / Wuxia":                "Web Novel Territory",
@@ -127,12 +161,18 @@ GENRE_TERRITORIES: dict[str, str] = {
     "Urban Fantasy / Dungeons":        "Web Novel Territory",
     "Harem":                           "Web Novel Territory",
     "Girls Love / Boys Love":          "Web Novel Territory",
+    "Web Novel Mystery":               "Web Novel Territory",
+    "Web Novel Horror":                "Web Novel Territory",
+    "Web Novel Romance":               "Web Novel Territory",
+    "Web Novel Fantasy":               "Web Novel Territory",
+    "Web Novel Sci-Fi":                "Web Novel Territory",
+    "Web Novel Action / Adventure":    "Web Novel Territory",
+    "Web Novel Comedy":                "Web Novel Territory",
+
+    # Traditional Fiction Territory
     "High Fantasy":                    "Traditional Fiction Territory",
     "Hard Sci-Fi":                     "Traditional Fiction Territory",
     "Modern Thriller":                 "Traditional Fiction Territory",
-    "Victorian Novel":                 "Classic Literature Territory",
-    "Philosophical Fiction":           "Classic Literature Territory",
-    # General / Common Genres
     "Mystery":                         "Traditional Fiction Territory",
     "Horror":                          "Traditional Fiction Territory",
     "Romance":                         "Traditional Fiction Territory",
@@ -140,22 +180,47 @@ GENRE_TERRITORIES: dict[str, str] = {
     "Sci-Fi":                          "Traditional Fiction Territory",
     "Action / Adventure":              "Traditional Fiction Territory",
     "Comedy":                          "Traditional Fiction Territory",
+
+    # Classic Literature Territory
+    "Victorian Novel":                 "Classic Literature Territory",
+    "Philosophical Fiction":           "Classic Literature Territory",
+    "Classic Mystery":                 "Classic Literature Territory",
+    "Classic Horror":                  "Classic Literature Territory",
+    "Classic Romance":                 "Classic Literature Territory",
+    "Classic Fantasy":                 "Classic Literature Territory",
+    "Classic Sci-Fi":                  "Classic Literature Territory",
+    "Classic Action / Adventure":      "Classic Literature Territory",
+    "Classic Comedy":                  "Classic Literature Territory",
 }
 
 # ---------------------------------------------------------------------------
 # Tag consolidation
 # ---------------------------------------------------------------------------
 
-def consolidate_genre(tags: list[str]) -> Optional[str]:
+def consolidate_genre(tags: list[str], source_type: str = "web") -> Optional[str]:
     """
     Map a list of raw source tags to a canonical genre name.
     Returns the first canonical genre whose tag set intersects with `tags`,
     or None if no match.
 
-    Comparison is case-insensitive.
+    Comparison is case-insensitive, filtered by source_type context.
     """
     normalised = {t.lower() for t in tags}
     for genre, genre_tags in GENRE_TAG_MAP.items():
+        t = GENRE_TERRITORIES[genre]
+        if source_type == "web":
+            # Web context maps to Web Novel genres, and specific Traditional genres
+            if t != "Web Novel Territory" and genre not in {"High Fantasy", "Hard Sci-Fi", "Modern Thriller"}:
+                continue
+        elif source_type == "classic":
+            # Classic context maps only to Classic genres
+            if t != "Classic Literature Territory":
+                continue
+        else:
+            # Traditional context maps only to Traditional genres
+            if t != "Traditional Fiction Territory":
+                continue
+
         if normalised & {gt.lower() for gt in genre_tags}:
             return genre
     return None
@@ -261,6 +326,7 @@ def _stream_hf_genre_texts(
     text_field: str,
     tags_field: str,
     samples_per_genre: int,
+    source_type: str = "web",
 ) -> dict[str, list[str]]:
     """
     Stream a HuggingFace dataset and collect up to `samples_per_genre` texts
@@ -269,7 +335,7 @@ def _stream_hf_genre_texts(
     from datasets import load_dataset
 
     genre_texts: dict[str, list[str]] = {g: [] for g in GENRE_TAG_MAP}
-    hf_genres = {g for g in GENRE_TAG_MAP if g not in {"Victorian Novel", "Philosophical Fiction"}}
+    hf_genres = {g for g in GENRE_TAG_MAP if GENRE_TERRITORIES[g] != "Classic Literature Territory"}
 
     try:
         ds = load_dataset(dataset_name, split="train", streaming=True)
@@ -288,7 +354,7 @@ def _stream_hf_genre_texts(
             raw_tags = row["meta"].get(tags_field, []) or []
         if isinstance(raw_tags, str):
             raw_tags = [t.strip() for t in raw_tags.split(",")]
-        genre = consolidate_genre(raw_tags)
+        genre = consolidate_genre(raw_tags, source_type=source_type)
         if genre is None or len(genre_texts[genre]) >= samples_per_genre:
             continue
         text = row.get(text_field, "") or ""
@@ -429,6 +495,13 @@ def build_genre_centroids(
     gutenberg_topics = {
         "Victorian Novel": ["gothic fiction", "fiction"],
         "Philosophical Fiction": ["philosophy", "fiction"],
+        "Classic Mystery": ["detective", "mystery", "crime"],
+        "Classic Horror": ["horror", "gothic"],
+        "Classic Romance": ["romance", "love"],
+        "Classic Fantasy": ["fantasy", "fairy tales"],
+        "Classic Sci-Fi": ["science fiction", "sci-fi"],
+        "Classic Action / Adventure": ["adventure", "action"],
+        "Classic Comedy": ["humor", "comedy", "satire"],
     }
     for genre, topics in gutenberg_topics.items():
         needed = samples_per_genre - len(combined.get(genre, []))
