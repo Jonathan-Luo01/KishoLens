@@ -67,8 +67,9 @@ def _init_nlp_resources():
     # Check hanlp
     try:
         import os
-        if os.environ.get("DISABLE_HANLP") == "1":
-            raise ImportError("HanLP disabled via environment variable")
+        # Disable HanLP by default to avoid huge latency/download lag on CPU, unless DISABLE_HANLP is explicitly set to "0"
+        if os.environ.get("DISABLE_HANLP") != "0":
+            raise ImportError("HanLP disabled by default for performance. Set DISABLE_HANLP=0 to enable.")
         import hanlp
         HAS_HANLP = True
     except ImportError:
@@ -106,12 +107,7 @@ def _init_nlp_resources():
         if spacy.util.is_package("zh_core_web_sm"):
             _nlp_zh = load_spacy_model("zh_core_web_sm")
 
-    if HAS_HANLP:
-        try:
-            import hanlp
-            _nlp_hanlp = hanlp.load(hanlp.pretrained.mtl.CLOSE_TOK_POS_NER_SRL_DEP_SDP_CON_ELECTRA_SMALL_ZH)
-        except Exception as e:
-            print(f"Could not initialize HanLP model: {e}")
+    # HanLP loading is deferred to extract_chinese_features to avoid blocking on initial start/requests of non-Chinese documents
 
     _initialized = True
 
@@ -426,6 +422,14 @@ def extract_chinese_features(text: str) -> Dict[str, Any]:
     verb_ratio = 0.0
     
     # Advanced features on a sample limit of 10,000 characters
+    global _nlp_hanlp
+    if HAS_HANLP and _nlp_hanlp is None:
+        try:
+            import hanlp
+            _nlp_hanlp = hanlp.load(hanlp.pretrained.mtl.CLOSE_TOK_POS_NER_SRL_DEP_SDP_CON_ELECTRA_SMALL_ZH)
+        except Exception as e:
+            print(f"Could not initialize HanLP model: {e}")
+
     if HAS_HANLP and _nlp_hanlp is not None:
         try:
             sample_text = text[:10000]
@@ -620,6 +624,81 @@ ARCHETYPES = {
         "outside_world_engagement": 0.75,
         "narrative_feature_diversity": 0.6,
         "temporal_shift_score": 0.30
+    },
+    "Modern Thriller": {
+        "ttr": 0.45,
+        "dialogue_ratio": 0.75,
+        "punc_density": 0.35,
+        "dep_tree_depth": 0.35,
+        "verb_ratio": 0.65,
+        "avg_sentences_per_paragraph": 0.25,
+        "compound_sentiment": 0.40,
+        "theme_explication_ratio": 0.25,
+        "linearity_subversion_score": 0.50,
+        "sensory_body_density": 0.55,
+        "outside_world_engagement": 0.40,
+        "narrative_feature_diversity": 0.50,
+        "temporal_shift_score": 0.50
+    },
+    "Hard Sci-Fi": {
+        "ttr": 0.75,
+        "dialogue_ratio": 0.25,
+        "punc_density": 0.40,
+        "dep_tree_depth": 0.75,
+        "verb_ratio": 0.40,
+        "avg_sentences_per_paragraph": 0.55,
+        "compound_sentiment": 0.50,
+        "theme_explication_ratio": 0.85,
+        "linearity_subversion_score": 0.45,
+        "sensory_body_density": 0.40,
+        "outside_world_engagement": 0.95,
+        "narrative_feature_diversity": 0.75,
+        "temporal_shift_score": 0.40
+    },
+    "High Fantasy": {
+        "ttr": 0.80,
+        "dialogue_ratio": 0.35,
+        "punc_density": 0.45,
+        "dep_tree_depth": 0.70,
+        "verb_ratio": 0.45,
+        "avg_sentences_per_paragraph": 0.65,
+        "compound_sentiment": 0.50,
+        "theme_explication_ratio": 0.70,
+        "linearity_subversion_score": 0.35,
+        "sensory_body_density": 0.75,
+        "outside_world_engagement": 0.85,
+        "narrative_feature_diversity": 0.80,
+        "temporal_shift_score": 0.55
+    },
+    "Wuxia Martial Arts": {
+        "ttr": 0.55,
+        "dialogue_ratio": 0.40,
+        "punc_density": 0.40,
+        "dep_tree_depth": 0.50,
+        "verb_ratio": 0.65,
+        "avg_sentences_per_paragraph": 0.40,
+        "compound_sentiment": 0.45,
+        "theme_explication_ratio": 0.50,
+        "linearity_subversion_score": 0.40,
+        "sensory_body_density": 0.95,
+        "outside_world_engagement": 0.55,
+        "narrative_feature_diversity": 0.60,
+        "temporal_shift_score": 0.35
+    },
+    "Urban Romance": {
+        "ttr": 0.40,
+        "dialogue_ratio": 0.80,
+        "punc_density": 0.40,
+        "dep_tree_depth": 0.40,
+        "verb_ratio": 0.50,
+        "avg_sentences_per_paragraph": 0.30,
+        "compound_sentiment": 0.65,
+        "theme_explication_ratio": 0.30,
+        "linearity_subversion_score": 0.40,
+        "sensory_body_density": 0.60,
+        "outside_world_engagement": 0.30,
+        "narrative_feature_diversity": 0.45,
+        "temporal_shift_score": 0.30
     }
 }
 
@@ -628,7 +707,12 @@ ARCHETYPE_TERRITORIES = {
     "Philosophical Fiction": "Classic Literature Territory",
     "LitRPG": "Web Novel Territory",
     "Isekai": "Web Novel Territory",
-    "Xianxia Cultivation": "Web Novel Territory"
+    "Xianxia Cultivation": "Web Novel Territory",
+    "Modern Thriller": "Traditional Fiction Territory",
+    "Hard Sci-Fi": "Traditional Fiction Territory",
+    "High Fantasy": "Traditional Fiction Territory",
+    "Wuxia Martial Arts": "Web Novel Territory",
+    "Urban Romance": "Web Novel Territory"
 }
 
 def match_archetype(features: dict) -> dict:

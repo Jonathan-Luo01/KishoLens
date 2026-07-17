@@ -127,7 +127,7 @@ async def download_gutenberg_async(book_id: str) -> str:
         f"https://www.gutenberg.org/files/{book_id}/{book_id}.txt"
     ]
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-    connector = aiohttp.TCPConnector(limit=30)
+    connector = aiohttp.TCPConnector(limit=30, ssl=False)
     async with aiohttp.ClientSession(connector=connector) as session:
         for url in urls:
             try:
@@ -185,9 +185,17 @@ def parse_gutenberg(text: str) -> Tuple[str, str, List[Dict[str, Any]]]:
 
     body = text[start_idx:end_idx].strip()
 
-    # Split by chapter headers
-    chapter_pattern = r"(?mi)^(?:\s*(?:CHAPTER|Chapter|Ch\.)\s+(?:[0-9]+|[IVXLCDM]+)\.?\s*|(?:\s*[IVXLCDM]+\.?\s*\n))"
-    matches = list(re.finditer(chapter_pattern, body))
+    # Split by chapter headers (supports standard English, Roman stories, and Chinese 回/章)
+    chapter_pattern = r"(?mi)^(?:\s*(?:CHAPTER|Chapter|Ch\.|CHAP|Chap|Story|Adventure|ADVENTURE|STORY)\s+(?:[0-9]+|[IVXLCDM]+)\.?.*|(?:\s*[IVXLCDM]+\.\s+[A-Z].*)|(?:\s*[IVXLCDM]+\.?\s*\n)|(?:\s*第[一二三四五六七八九十百千零0-9]+[回章].*))"
+    all_matches = list(re.finditer(chapter_pattern, body))
+
+    # Filter out Table of Contents matches (where chapter body would be too short)
+    matches = []
+    for idx, match in enumerate(all_matches):
+        start = match.start()
+        end = all_matches[idx + 1].start() if idx + 1 < len(all_matches) else len(body)
+        if (end - start) >= 400:
+            matches.append(match)
 
     chapters = []
     if not matches:

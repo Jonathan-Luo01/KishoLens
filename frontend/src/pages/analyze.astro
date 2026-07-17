@@ -237,6 +237,184 @@ import "../styles/global.css";
         color: var(--color-text);
         font-weight: 500;
       }
+
+      /* ── Visualizer Chart Styles ── */
+      .controls-bar {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-top: 2rem;
+        margin-bottom: -0.75rem;
+      }
+      .baseline-group {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+      }
+      .baseline-group span {
+        font-size: 0.8rem;
+        color: rgba(255,255,255,0.4);
+        white-space: nowrap;
+      }
+      .baseline-btn {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 2rem;
+        color: rgba(255,255,255,0.55);
+        font-family: inherit;
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.35rem 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .baseline-btn:hover { border-color: #a78bfa; color: #a78bfa; }
+      .baseline-btn.active {
+        background: rgba(167,139,250,0.15);
+        border-color: #a78bfa;
+        color: #a78bfa;
+      }
+
+      .charts-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.75rem;
+      }
+      @media (max-width: 860px) {
+        .charts-grid { grid-template-columns: 1fr; }
+      }
+
+      .chart-card {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 1.25rem;
+        padding: 1.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        transition: border-color 0.3s;
+      }
+      .chart-card:hover { border-color: rgba(167,139,250,0.25); }
+
+      .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .chart-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #e2e2f0;
+      }
+
+      .chart-legend {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.75rem;
+        color: rgba(255,255,255,0.5);
+      }
+      .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .legend-dot.user     { background: #7dd3fc; }
+      .legend-dot.wn       { background: #a78bfa; }
+      .legend-dot.cl       { background: #fbbf24; }
+      .legend-dot.baseline { background: #a78bfa; border: 1.5px dashed rgba(255,255,255,0.4); }
+
+      canvas#radarChart {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        max-width: 480px;
+        margin: 0 auto;
+        display: block;
+        image-rendering: crisp-edges;
+      }
+
+      .archetype-label {
+        text-align: center;
+        font-size: 0.8rem;
+        color: rgba(167,139,250,0.8);
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        min-height: 1.2em;
+      }
+
+      svg#arcChart {
+        width: 100%;
+        height: auto;
+        min-height: 180px;
+        display: block;
+      }
+
+      .act-labels {
+        display: flex;
+        justify-content: space-around;
+      }
+      .act-chip {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.15rem;
+      }
+      .act-key {
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #a78bfa;
+      }
+      .act-name {
+        font-size: 0.7rem;
+        color: rgba(255,255,255,0.35);
+        letter-spacing: 0.03em;
+      }
+
+      /* Tooltip for Radar Chart */
+      .radar-tooltip {
+        background: rgba(10, 10, 20, 0.95);
+        border: 1px solid rgba(167, 139, 250, 0.35);
+        backdrop-filter: blur(8px);
+        border-radius: 8px;
+        padding: 0.65rem 0.9rem;
+        font-family: 'Inter', sans-serif;
+        color: #fff;
+        pointer-events: none;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+        font-size: 0.8rem;
+        line-height: 1.45;
+        transition: opacity 0.1s ease;
+      }
+      .radar-tooltip-title {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: #7dd3fc;
+        margin-bottom: 0.25rem;
+      }
+      .radar-tooltip-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 1.5rem;
+        margin-top: 0.15rem;
+      }
+      .radar-tooltip-val {
+        font-weight: 600;
+      }
     </style>
   </head>
   <body>
@@ -244,7 +422,11 @@ import "../styles/global.css";
     <div class="app-container">
       <header>
         <a href="/" class="brand-title">Kish<span>o</span>Lens</a>
-        <a href="/" class="btn btn--ghost" id="back-btn">← Back</a>
+        <nav style="display:flex;gap:1.5rem;align-items:center;">
+          <a href="/analyze" style="color:var(--color-accent);text-decoration:none;font-size:0.9rem;font-weight:500;">Analyze</a>
+          <a href="/library" style="color:rgba(255,255,255,0.45);text-decoration:none;font-size:0.9rem;font-weight:500;">Library</a>
+          <a href="/visualize" style="color:rgba(255,255,255,0.45);text-decoration:none;font-size:0.9rem;font-weight:500;">Visualize</a>
+        </nav>
       </header>
 
       <div class="analyze-layout">
@@ -252,6 +434,7 @@ import "../styles/global.css";
         <div class="card">
           <h2 style="font-family: var(--font-display); margin-bottom: 1.5rem;">Input Passage</h2>
           <form id="analyze-form">
+
             <div class="form-group">
               <label for="passage-title">Passage Title (Optional)</label>
               <input type="text" id="passage-title" placeholder="e.g. Chapter 1, Draft 2" />
@@ -355,6 +538,78 @@ import "../styles/global.css";
                 <span style="font-size: 0.75rem; color: var(--color-muted);">Parsed by NLP engine</span>
               </div>
             </div>
+
+            <!-- Dashboard Link Action -->
+            <div id="visualize-link-container" style="margin-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 1.5rem; text-align: center; display: none;">
+              <a id="btn-visualize-link" href="#" class="btn btn--primary" style="display: inline-block; width: 100%; text-decoration: none; text-align: center;">
+                Visualize Stylistic & Pacing Signatures →
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Visualizations Section (Full Width) -->
+      <div id="visualizations-container" style="display: none; flex-direction: column; gap: 1.75rem; width: 100%; margin-top: 2rem;">
+        <div class="controls-bar" style="margin-top: 1rem; margin-bottom: 0px;">
+          <div class="baseline-group">
+            <span>Compare Visualizations to:</span>
+            <button id="btnWebNovel" class="baseline-btn active" data-baseline="web_novel">Web Novel</button>
+            <button id="btnClassic"  class="baseline-btn"        data-baseline="classic_lit">Classic Lit</button>
+          </div>
+        </div>
+
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h2 class="chart-title">Archetype Radar</h2>
+              <div class="chart-legend">
+                <span class="legend-item"><span class="legend-dot user"></span>Your Novel</span>
+                <span class="legend-item"><span class="legend-dot wn" id="radarBaselineLegendDot"></span><span id="radarBaselineLegendLabel">Web Novel</span></span>
+              </div>
+            </div>
+            <canvas id="radarChart"></canvas>
+            <p id="archetypeLabel" class="archetype-label"></p>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-header">
+              <h2 class="chart-title">Kishōtenketsu Sentiment Arc</h2>
+              <div class="chart-legend">
+                <span class="legend-item"><span class="legend-dot user"></span>Novel</span>
+                <span class="legend-item"><span class="legend-dot baseline" id="arcBaselineLegendDot"></span><span id="baselineLegendLabel">Web Novel</span></span>
+              </div>
+            </div>
+            <p style="color: rgba(255,255,255,0.4); font-size: 0.8rem; line-height: 1.4; margin-top: -0.25rem;">
+              Tracks emotional polarity across the 4 acts (Ki, Shō, Ten, Ketsu). Notice the "Tidy Resolution" spike.
+            </p>
+            <svg id="arcChart" viewBox="0 0 600 420" preserveAspectRatio="xMidYMid meet"></svg>
+            <div class="act-labels" id="actLabels" style="display: none;"></div>
+          </div>
+
+          <!-- Pacing Barcode (Full Width) -->
+          <div class="chart-card" style="grid-column: 1 / -1;">
+            <div class="chart-header">
+              <h2 class="chart-title">Rhythmic Pacing (Paragraph Density)</h2>
+              <div class="chart-legend">
+                <span class="legend-item"><span class="legend-dot user"></span>Your Novel</span>
+                <span class="legend-item"><span class="legend-dot baseline" id="pacingBaselineLegendDot"></span><span id="pacingBaselineLegendLabel">Web Novel</span></span>
+              </div>
+            </div>
+            <p style="color: rgba(255,255,255,0.45); font-size: 0.8rem; line-height: 1.45;">
+              Each block represents a paragraph. Height/opacity represents word or character count. Web Novels rely on rapid, fragmented lines for mobile scrolling, while classics use dense text blocks.
+            </p>
+            
+            <div style="margin-top: 1rem;">
+              <h4 style="color: rgba(255,255,255,0.5); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;" id="pacingDraftLabel">Your Draft (Highly Fragmented)</h4>
+              <div id="pacingBarcodeUser" style="display: flex; height: 60px; align-items: stretch; gap: 2px; background: rgba(0,0,0,0.25); padding: 4px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);"></div>
+            </div>
+            
+            <div style="margin-top: 1.25rem;">
+              <h4 style="color: rgba(255,255,255,0.5); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;" id="pacingBaselineLabel">Web Novel Baseline</h4>
+              <div id="pacingBarcodeBaseline" style="display: flex; height: 60px; align-items: stretch; gap: 2px; background: rgba(0,0,0,0.25); padding: 4px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -371,6 +626,11 @@ import "../styles/global.css";
       const readyState = document.getElementById("ready-state");
       const loadingState = document.getElementById("loading-state");
       const resultsContainer = document.getElementById("results-container");
+      let currentStats = null;
+      let currentArc   = null;
+      let activeBaseline = "web_novel";
+      let hoveredIndex = -1;
+      let hoveredArcIndex = -1;
 
       // 1. Text Area character and word counter
       textarea.addEventListener("input", () => {
@@ -387,13 +647,16 @@ import "../styles/global.css";
         errorBox.style.display = "none";
         readyState.style.display = "none";
         resultsContainer.style.display = "none";
+        document.getElementById("visualizations-container").style.display = "none";
+        document.getElementById("visualize-link-container").style.display = "none";
         loadingState.style.display = "flex";
 
-        const title = document.getElementById("passage-title").value || "Untitled";
+        const title = document.getElementById("passage-title").value.trim() || "Untitled";
         const lang = document.getElementById("passage-lang").value;
         const text = textarea.value;
 
         try {
+          // Perform stylistic analysis
           const res = await fetch(`${API_URL}/api/analyze`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -406,7 +669,16 @@ import "../styles/global.css";
           }
 
           const data = await res.json();
+          currentStats = data.stats;
+          currentArc   = data.arc;
           renderResults(data);
+          renderAll();
+          document.getElementById("visualizations-container").style.display = "flex";
+
+          sessionStorage.setItem("custom_analysis", JSON.stringify(data));
+          const linkBtn = document.getElementById("btn-visualize-link");
+          linkBtn.href = `/visualize?novelId=custom`;
+          document.getElementById("visualize-link-container").style.display = "block";
         } catch (err) {
           loadingState.style.display = "none";
           errorBox.textContent = `Analysis error: ${err.message}`;
@@ -470,6 +742,664 @@ import "../styles/global.css";
 
         resultsContainer.style.display = "flex";
       }
+
+      /* ── Charts Baseline Configuration ── */
+      const RADAR_DIMS = [
+        { key: "en_theme_explication_ratio",     label: "Theme Depth",         min: 0,    max: 0.05  },
+        { key: "en_linearity_subversion_score",  label: "Temporal Complexity", min: 0,    max: 0.10  },
+        { key: "en_sensory_body_density",        label: "Visceral Emotion",    min: 0,    max: 0.08  },
+        { key: "en_outside_world_engagement",    label: "World Grounding",     min: 0,    max: 0.06  },
+        { key: "en_narrative_feature_diversity", label: "Narrative Diversity",  min: 0,    max: 1.0   },
+        { key: "en_dialogue_ratio",              label: "Dialogue Density",    min: 0,    max: 0.5   },
+        { key: "en_ttr",                         label: "Lexical Richness",    min: 0.3,  max: 0.9   },
+        { key: "en_compound_sentiment",          label: "Emotional Tone",      min: -1.0, max: 1.0   },
+        { key: "en_temporal_shift_score",        label: "Time Shifts",         min: 0,    max: 0.10  },
+      ];
+
+      const RADAR_BASELINES = {
+        web_novel:   [0.40, 0.35, 0.55, 0.50, 0.52, 0.42, 0.38, 0.30, 0.22],
+        classic_lit: [0.65, 0.60, 0.40, 0.45, 0.70, 0.20, 0.72, 0.15, 0.60],
+      };
+
+      const PACING_BASELINES = {
+        web_novel: [15, 8, 22, 5, 12, 30, 9, 14, 6, 18, 11, 25, 7, 16, 13, 8, 20, 10, 15, 6, 24, 9, 12, 17, 8, 14, 5, 21, 7, 13, 11, 28, 6, 15, 9, 19, 12, 10, 16, 8, 23, 7, 11, 14, 5, 17, 12, 9, 21, 6],
+        classic_lit: [85, 112, 64, 140, 95, 130, 78, 105, 88, 120, 90, 115, 130, 80, 125, 95, 110, 140, 75, 100, 105, 120, 85, 135, 95, 110, 130, 90, 115, 100, 112, 88, 98, 125, 70, 118, 132, 92, 104, 115]
+      };
+
+      function norm(val, min, max) {
+        return Math.max(0, Math.min(1, (val - min) / Math.max(1e-9, max - min)));
+      }
+
+      function renderAll() {
+        drawRadar(currentStats, activeBaseline);
+        drawArc(currentArc, activeBaseline);
+        drawPacing(currentStats, activeBaseline);
+      }
+
+      /* ── Baseline Switch Click Handlers ── */
+      document.querySelectorAll(".baseline-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".baseline-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          activeBaseline = btn.dataset.baseline;
+          
+          // Update legends dynamically
+          const isWeb = activeBaseline === "web_novel";
+          const labelText = isWeb ? "Web Novel" : "Classic Lit";
+          const dotColor = isWeb ? "#a78bfa" : "#fbbf24";
+          
+          document.getElementById("radarBaselineLegendLabel").textContent = labelText;
+          document.getElementById("baselineLegendLabel").textContent = labelText;
+          document.getElementById("pacingBaselineLegendLabel").textContent = labelText;
+          
+          document.getElementById("radarBaselineLegendDot").style.backgroundColor = dotColor;
+          document.getElementById("arcBaselineLegendDot").style.backgroundColor = dotColor;
+          document.getElementById("pacingBaselineLegendDot").style.backgroundColor = dotColor;
+          
+          if (currentStats && currentArc) renderAll();
+        });
+      });
+
+      /* ── Radar chart (Canvas) ── */
+      function drawRadar(stats, baseline) {
+        const canvas = document.getElementById("radarChart");
+        const dpr = window.devicePixelRatio || 1;
+
+        const cssW = canvas.clientWidth  || 480;
+        const cssH = canvas.clientHeight || 480;
+        if (canvas.width !== Math.round(cssW * dpr) || canvas.height !== Math.round(cssH * dpr)) {
+          canvas.width  = Math.round(cssW * dpr);
+          canvas.height = Math.round(cssH * dpr);
+        }
+
+        const ctx = canvas.getContext("2d");
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        const W = cssW, H = cssH;
+        const cx = W / 2, cy = H / 2;
+        const labelPad = 80;
+        const R  = Math.min(W, H) / 2 - labelPad;
+        const n  = RADAR_DIMS.length;
+        ctx.clearRect(0, 0, W, H);
+
+        /* Grid rings */
+        for (let ring = 1; ring <= 5; ring++) {
+          ctx.beginPath();
+          for (let i = 0; i < n; i++) {
+            const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+            const r = R * ring / 5;
+            const x = cx + r * Math.cos(angle);
+            const y = cy + r * Math.sin(angle);
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          }
+          ctx.closePath();
+          ctx.strokeStyle = "rgba(255,255,255,0.07)";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          ctx.fillStyle = "rgba(255,255,255,0.18)";
+          ctx.font = "10px Inter, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(`${ring * 20}%`, cx + 4, cy - R * ring / 5 - 7);
+        }
+
+        /* Spokes + axis labels */
+        RADAR_DIMS.forEach((dim, i) => {
+          const isHovered = hoveredIndex === i;
+          const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(cx + R * Math.cos(angle), cy + R * Math.sin(angle));
+          
+          ctx.strokeStyle = isHovered ? "rgba(255,255,255,0.38)" : "rgba(255,255,255,0.10)";
+          ctx.lineWidth = isHovered ? 2.5 : 1;
+          ctx.stroke();
+
+          const labelR = R + 38;
+          const lx = cx + labelR * Math.cos(angle);
+          const ly = cy + labelR * Math.sin(angle);
+
+          const words = dim.label.split(" ");
+          ctx.fillStyle = isHovered ? "#7dd3fc" : "rgba(255,255,255,0.58)";
+          ctx.font = isHovered ? "bold 11px Inter, sans-serif" : "bold 10px Inter, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          if (words.length === 2) {
+            ctx.fillText(words[0], lx, ly - 6);
+            ctx.fillText(words[1], lx, ly + 6);
+          } else {
+            ctx.fillText(dim.label, lx, ly);
+          }
+        });
+
+        function plotPolygon(values, strokeColor, fillColor) {
+          ctx.beginPath();
+          values.forEach((v, i) => {
+            const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+            const r = R * v;
+            i === 0 ? ctx.moveTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle))
+                    : ctx.lineTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
+          });
+          ctx.closePath();
+          ctx.fillStyle = fillColor;
+          ctx.fill();
+          ctx.strokeStyle = strokeColor;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+
+        const hasHover = hoveredIndex !== -1;
+        const blOpacityStroke = hasHover ? 0.35 : 0.8;
+        const blOpacityFill   = hasHover ? 0.04 : 0.12;
+        const userOpacityStroke = hasHover ? 0.40 : 0.85;
+        const userOpacityFill   = hasHover ? 0.03 : 0.10;
+
+        const blColor = baseline === "web_novel" ? "#a78bfa" : "#fbbf24";
+        const blRgb = baseline === "web_novel" ? "167,139,250" : "251,191,36";
+        plotPolygon(
+          RADAR_BASELINES[baseline],
+          `rgba(${blRgb}, ${blOpacityStroke})`,
+          `rgba(${blRgb}, ${blOpacityFill})`
+        );
+
+        const prefix = Object.keys(stats).find(k => k.startsWith("zh_")) ? "zh_" :
+                       Object.keys(stats).find(k => k.startsWith("ja_")) ? "ja_" : "en_";
+        const userVals = RADAR_DIMS.map(d => {
+          const statsKey = d.key.replace("en_", prefix);
+          return norm(stats[statsKey] ?? 0, d.min, d.max);
+        });
+        plotPolygon(
+          userVals,
+          `rgba(125,211,252, ${userOpacityStroke})`,
+          `rgba(125,211,252, ${userOpacityFill})`
+        );
+
+        /* Dot on each axis */
+        userVals.forEach((v, i) => {
+          const isHovered = hoveredIndex === i;
+          const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+          const r = R * v;
+          ctx.beginPath();
+          
+          if (isHovered) {
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = "#7dd3fc";
+            ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 6, 0, 2 * Math.PI);
+            ctx.fillStyle = "#7dd3fc";
+            ctx.fill();
+            ctx.strokeStyle = "rgba(255,255,255,0.95)";
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+          } else {
+            ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 3.5, 0, 2 * Math.PI);
+            ctx.fillStyle = hasHover ? "rgba(125,211,252,0.4)" : "#7dd3fc";
+            ctx.fill();
+          }
+        });
+
+        if (hasHover) {
+          const blVal = RADAR_BASELINES[baseline][hoveredIndex];
+          const angle = (2 * Math.PI * hoveredIndex / n) - Math.PI / 2;
+          const r = R * blVal;
+          ctx.beginPath();
+          ctx.shadowBlur = 8;
+          ctx.shadowColor = blColor;
+          ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 6, 0, 2 * Math.PI);
+          ctx.fillStyle = blColor;
+          ctx.fill();
+          ctx.strokeStyle = "rgba(255,255,255,0.95)";
+          ctx.lineWidth = 2.5;
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        }
+
+        const am = stats["archetype_match"];
+        if (am) {
+          document.getElementById("archetypeLabel").textContent =
+            `${am.closest_trope} · ${am.territory} · ${(am.confidence * 100).toFixed(0)}% match`;
+        }
+      }
+
+      /* ── Kishōtenketsu arc (SVG) ── */
+      function drawArc(arcData, baseline) {
+        const svg = document.getElementById("arcChart");
+        svg.innerHTML = "";
+        const W = 600, H = 420;
+        const PAD = { top: 30, bottom: 48, left: 48, right: 16 };
+        const plotW = W - PAD.left - PAD.right;
+        const plotH = H - PAD.top - PAD.bottom;
+        const ns = "http://www.w3.org/2000/svg";
+
+        const acts    = arcData.acts;
+        const blVals  = arcData.baselines[baseline];
+        const blColor = baseline === "web_novel" ? "#a78bfa" : "#fbbf24";
+        const blRgb   = baseline === "web_novel" ? "167,139,250" : "251,191,36";
+
+        const sentY = s => PAD.top + plotH * (1 - (s + 1) / 2);
+        const actX  = i => PAD.left + i * plotW / (acts.length - 1);
+        const axisX  = actX(0);
+        const endX   = actX(acts.length - 1);
+        const bottomY = PAD.top + plotH;
+        const zeroY   = sentY(0);
+
+        /* ── Paths ── */
+        function smoothPath(pts_x, pts_y) {
+          const pts = pts_x.map((x, i) => [x, pts_y[i]]);
+          let d = `M ${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
+          for (let i = 0; i < pts.length - 1; i++) {
+            const cpx = ((pts[i][0] + pts[i+1][0]) / 2).toFixed(1);
+            d += ` C ${cpx},${pts[i][1].toFixed(1)} ${cpx},${pts[i+1][1].toFixed(1)} ${pts[i+1][0].toFixed(1)},${pts[i+1][1].toFixed(1)}`;
+          }
+          return d;
+        }
+
+        const xs      = acts.map((_, i) => actX(i));
+        const userYs  = acts.map(a => sentY(a.sentiment));
+        const blYs    = blVals.map(v => sentY(v));
+        const pathD   = smoothPath(xs, userYs);
+        const blPathD = smoothPath(xs, blYs);
+
+        const areaClose = (path, xArr) =>
+          `${path} L ${xArr[xArr.length-1].toFixed(1)},${zeroY.toFixed(1)} L ${xArr[0].toFixed(1)},${zeroY.toFixed(1)} Z`;
+
+        const userAvgAbs = acts.reduce((s, a) => s + Math.abs(a.sentiment), 0) / acts.length;
+        const blAvgAbs   = blVals.reduce((s, v) => s + Math.abs(v), 0) / blVals.length;
+        const userIsInner = userAvgAbs <= blAvgAbs;
+        const [innerPathD, outerPathD] = userIsInner ? [pathD, blPathD] : [blPathD, pathD];
+        const [innerGrad,  outerGrad]  = userIsInner ? ["arcUserGrad", "arcBaselineGrad"] : ["arcBaselineGrad", "arcUserGrad"];
+
+        /* ── Gradients Defs ── */
+        const defs = document.createElementNS(ns, "defs");
+        const zf = (zeroY - PAD.top) / plotH;
+
+        const makeGrad = (id, rgb, alpha) => {
+          const g = document.createElementNS(ns, "linearGradient");
+          g.setAttribute("id", id);
+          g.setAttribute("gradientUnits", "userSpaceOnUse");
+          g.setAttribute("x1", "0"); g.setAttribute("y1", String(PAD.top));
+          g.setAttribute("x2", "0"); g.setAttribute("y2", String(bottomY));
+          const pct = p => `${(Math.max(0, Math.min(1, p)) * 100).toFixed(1)}%`;
+          const minA = (alpha * 0.40).toFixed(3);
+          [
+            [0,   `rgba(${rgb},${alpha})`],
+            [zf,  `rgba(${rgb},${minA})`],
+            [1,   `rgba(${rgb},${alpha})`],
+          ].forEach(([offset, color]) => {
+            const s = document.createElementNS(ns, "stop");
+            s.setAttribute("offset", pct(offset));
+            s.setAttribute("stop-color", color);
+            g.appendChild(s);
+          });
+          return g;
+        };
+
+        defs.appendChild(makeGrad("arcUserGrad",     "125,211,252", 0.80));
+        defs.appendChild(makeGrad("arcBaselineGrad", blRgb,         0.75));
+
+        const clipPath = document.createElementNS(ns, "clipPath");
+        clipPath.setAttribute("id", "outerFillClip");
+        const clipShape = document.createElementNS(ns, "path");
+        const boundingRect =
+          `M ${axisX.toFixed(1)},${PAD.top} L ${endX.toFixed(1)},${PAD.top}` +
+          ` L ${endX.toFixed(1)},${bottomY} L ${axisX.toFixed(1)},${bottomY} Z`;
+        clipShape.setAttribute("d", `${boundingRect} ${areaClose(innerPathD, xs)}`);
+        clipShape.setAttribute("clip-rule", "evenodd");
+        clipPath.appendChild(clipShape);
+        defs.appendChild(clipPath);
+        svg.appendChild(defs);
+
+        /* ── Grid lines ── */
+        [-1, -0.5, 0, 0.5, 1].forEach(val => {
+          const y = sentY(val);
+          const isZero = val === 0;
+
+          const line = document.createElementNS(ns, "line");
+          line.setAttribute("x1", String(axisX));
+          line.setAttribute("y1", y);
+          line.setAttribute("x2", String(endX));
+          line.setAttribute("y2", y);
+          line.setAttribute("stroke", isZero ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.055)");
+          if (!isZero) line.setAttribute("stroke-dasharray", "4 5");
+          svg.appendChild(line);
+
+          const lbl = document.createElementNS(ns, "text");
+          lbl.setAttribute("x", String(axisX - 8));
+          lbl.setAttribute("y", y + 3.5);
+          lbl.setAttribute("fill", "rgba(255,255,255,0.3)");
+          lbl.setAttribute("font-size", "9");
+          lbl.setAttribute("font-family", "Inter, sans-serif");
+          lbl.setAttribute("text-anchor", "end");
+          lbl.textContent = val > 0 ? `+${val.toFixed(1)}` : val.toFixed(1);
+          svg.appendChild(lbl);
+        });
+
+        const yAxis = document.createElementNS(ns, "line");
+        yAxis.setAttribute("x1", String(axisX)); yAxis.setAttribute("y1", String(PAD.top));
+        yAxis.setAttribute("x2", String(axisX)); yAxis.setAttribute("y2", String(bottomY));
+        yAxis.setAttribute("stroke", "rgba(255,255,255,0.22)");
+        svg.appendChild(yAxis);
+
+        const xAxis = document.createElementNS(ns, "line");
+        xAxis.setAttribute("x1", String(axisX)); xAxis.setAttribute("y1", String(bottomY));
+        xAxis.setAttribute("x2", String(endX));  xAxis.setAttribute("y2", String(bottomY));
+        xAxis.setAttribute("stroke", "rgba(255,255,255,0.22)");
+        svg.appendChild(xAxis);
+
+        ["Ki (Intro)", "Shō (Dev)", "Ten (Twist)", "Ketsu (Res)"].forEach((label, i) => {
+          const lx = actX(i);
+          const tick = document.createElementNS(ns, "line");
+          tick.setAttribute("x1", lx); tick.setAttribute("y1", bottomY);
+          tick.setAttribute("x2", lx); tick.setAttribute("y2", bottomY + 4);
+          tick.setAttribute("stroke", "rgba(255,255,255,0.2)");
+          svg.appendChild(tick);
+
+          const txt = document.createElementNS(ns, "text");
+          txt.setAttribute("x", lx); txt.setAttribute("y", bottomY + 16);
+          txt.setAttribute("fill", "rgba(255,255,255,0.45)");
+          txt.setAttribute("font-size", "10"); txt.setAttribute("font-weight", "600");
+          txt.setAttribute("font-family", "Inter, sans-serif");
+          txt.setAttribute("text-anchor", "middle");
+          txt.textContent = label;
+          svg.appendChild(txt);
+        });
+
+        /* ── Fills ── */
+        const outerArea = document.createElementNS(ns, "path");
+        outerArea.setAttribute("d", areaClose(outerPathD, xs));
+        outerArea.setAttribute("fill", `url(#${outerGrad})`);
+        outerArea.setAttribute("clip-path", "url(#outerFillClip)");
+        svg.appendChild(outerArea);
+
+        const innerArea = document.createElementNS(ns, "path");
+        innerArea.setAttribute("d", areaClose(innerPathD, xs));
+        innerArea.setAttribute("fill", `url(#${innerGrad})`);
+        svg.appendChild(innerArea);
+
+        /* ── Strokes ── */
+        const blPath = document.createElementNS(ns, "path");
+        blPath.setAttribute("d", blPathD);
+        blPath.setAttribute("fill", "none");
+        blPath.setAttribute("stroke", blColor);
+        blPath.setAttribute("stroke-width", "1.5");
+        blPath.setAttribute("stroke-dasharray", "5 3");
+        svg.appendChild(blPath);
+
+        const userPath = document.createElementNS(ns, "path");
+        userPath.setAttribute("d", pathD);
+        userPath.setAttribute("fill", "none");
+        userPath.setAttribute("stroke", "#7dd3fc");
+        userPath.setAttribute("stroke-width", "2.5");
+        svg.appendChild(userPath);
+
+        /* ── Hover Vertical Guide ── */
+        if (hoveredArcIndex !== -1) {
+          const hx = xs[hoveredArcIndex];
+          const hoverLine = document.createElementNS(ns, "line");
+          hoverLine.setAttribute("x1", hx.toFixed(1));
+          hoverLine.setAttribute("y1", String(PAD.top));
+          hoverLine.setAttribute("x2", hx.toFixed(1));
+          hoverLine.setAttribute("y2", String(bottomY));
+          hoverLine.setAttribute("stroke", "rgba(255,255,255,0.22)");
+          hoverLine.setAttribute("stroke-width", "1.5");
+          svg.appendChild(hoverLine);
+        }
+
+        /* ── Dots ── */
+        acts.forEach((a, i) => {
+          const px = xs[i], py = userYs[i];
+          const isHovered = hoveredArcIndex === i;
+
+          const circle = document.createElementNS(ns, "circle");
+          circle.setAttribute("cx", px); circle.setAttribute("cy", py);
+          circle.setAttribute("r", isHovered ? "6.5" : "4.5");
+          circle.setAttribute("fill", "#7dd3fc");
+          circle.setAttribute("stroke", "#0a0a12");
+          circle.setAttribute("stroke-width", isHovered ? "2.5" : "1.5");
+          svg.appendChild(circle);
+
+          if (isHovered) {
+            const blPy = blYs[i];
+            const blCircle = document.createElementNS(ns, "circle");
+            blCircle.setAttribute("cx", px); blCircle.setAttribute("cy", blPy);
+            blCircle.setAttribute("r", "6.5");
+            blCircle.setAttribute("fill", blColor);
+            blCircle.setAttribute("stroke", "#0a0a12");
+            blCircle.setAttribute("stroke-width", "2.5");
+            svg.appendChild(blCircle);
+          }
+
+          const lbl = document.createElementNS(ns, "text");
+          lbl.setAttribute("x", px); lbl.setAttribute("y", py - 11);
+          lbl.setAttribute("text-anchor", "middle");
+          lbl.setAttribute("fill", isHovered ? "#fff" : "rgba(255,255,255,0.7)");
+          lbl.setAttribute("font-size", isHovered ? "11" : "10");
+          lbl.setAttribute("font-family", "Inter, sans-serif");
+          lbl.setAttribute("font-weight", isHovered ? "bold" : "normal");
+          lbl.textContent = a.sentiment >= 0 ? `+${a.sentiment.toFixed(2)}` : a.sentiment.toFixed(2);
+          svg.appendChild(lbl);
+        });
+
+        const actLabels = document.getElementById("actLabels");
+        actLabels.innerHTML = "";
+        acts.forEach(a => {
+          const chip = document.createElement("div");
+          chip.className = "act-chip";
+          chip.innerHTML = `<span class="act-key">${a.act}</span><span class="act-name">${a.label}</span>`;
+          actLabels.appendChild(chip);
+        });
+      }
+
+      /* ── Rhythmic Pacing (Paragraph Barcode) ── */
+      function drawPacing(stats, baseline) {
+        const userPacing = stats.pacing || [];
+        const isWeb = baseline === "web_novel";
+        const baselineColor = isWeb ? "#a78bfa" : "#fbbf24";
+        const baselineData = PACING_BASELINES[baseline];
+
+        const userAvg = userPacing.length > 0 ? (userPacing.reduce((a,b)=>a+b,0)/userPacing.length).toFixed(1) : 0;
+        const baseAvg = baselineData.reduce((a,b)=>a+b,0)/baselineData.length;
+        
+        document.getElementById("pacingDraftLabel").textContent = `Your Draft (Average Paragraph Length: ${userAvg} words/chars)`;
+        document.getElementById("pacingBaselineLabel").textContent = `${isWeb ? "Web Novel" : "Classic Lit"} Baseline (Average Paragraph Length: ${baseAvg.toFixed(1)} words/chars)`;
+
+        renderBarcode("pacingBarcodeUser", userPacing, "#7dd3fc");
+        renderBarcode("pacingBarcodeBaseline", baselineData, baselineColor);
+      }
+
+      function renderBarcode(containerId, data, color) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = "";
+        
+        if (!data || data.length === 0) {
+          container.innerHTML = "<div style='color:rgba(255,255,255,0.3); font-size:0.8rem; padding: 1rem; width:100%; text-align:center;'>No paragraph pacing data available</div>";
+          return;
+        }
+
+        const maxVal = Math.max(...data);
+        data.forEach(val => {
+          const intensity = val / maxVal;
+          const bar = document.createElement("div");
+          bar.style.flex = "1";
+          bar.style.backgroundColor = color;
+          bar.style.opacity = Math.max(0.18, intensity);
+          bar.style.borderRadius = "2px";
+          bar.style.transition = "all 0.3s ease";
+          bar.title = `${val} words/characters`;
+          container.appendChild(bar);
+        });
+      }
+
+      /* ── Radar Chart Mouse Hover & Tooltip Events ── */
+      const canvasNode = document.getElementById("radarChart");
+      const tooltipNode = document.getElementById("radarTooltip");
+
+      canvasNode.addEventListener("mousemove", (e) => {
+        if (!currentStats) return;
+        const rect = canvasNode.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+        const cx = rect.width / 2;
+        const cy = rect.height / 2;
+        const dx = mx - cx;
+        const dy = my - cy;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        let angle = Math.atan2(dy, dx);
+
+        const R_css = Math.min(rect.width, rect.height) / 2 - 80;
+        const n = RADAR_DIMS.length;
+        let bestIndex = -1;
+        let minDiff = Infinity;
+
+        if (d <= R_css + 45 && d >= 12) {
+          for (let i = 0; i < n; i++) {
+            const spokeAngle = (2 * Math.PI * i / n) - Math.PI / 2;
+            let diff = Math.abs(angle - spokeAngle);
+            while (diff > Math.PI) {
+              diff = Math.abs(diff - 2 * Math.PI);
+            }
+            if (diff < minDiff) {
+              minDiff = diff;
+              bestIndex = i;
+            }
+          }
+          if (minDiff > 0.35) {
+            bestIndex = -1;
+          }
+        }
+
+        if (bestIndex !== hoveredIndex) {
+          hoveredIndex = bestIndex;
+          renderAll();
+        }
+
+        if (hoveredIndex !== -1) {
+          const dim = RADAR_DIMS[hoveredIndex];
+          const prefix = Object.keys(currentStats).find(k => k.startsWith("zh_")) ? "zh_" :
+                         Object.keys(currentStats).find(k => k.startsWith("ja_")) ? "ja_" : "en_";
+          const statsKey = dim.key.replace("en_", prefix);
+          
+          const rawVal   = currentStats[statsKey] ?? 0;
+          const userVal  = norm(rawVal, dim.min, dim.max);
+          const blVal    = RADAR_BASELINES[activeBaseline][hoveredIndex];
+
+          const userPct  = (userVal * 100).toFixed(0) + "%";
+          const blPct    = (blVal * 100).toFixed(0) + "%";
+          const baseName = activeBaseline === "web_novel" ? "Web Novel Baseline" : "Classic Lit Baseline";
+
+          tooltipNode.innerHTML = `
+            <div class="radar-tooltip-title">${dim.label}</div>
+            <div class="radar-tooltip-row">
+              <span style="color: rgba(255,255,255,0.7)">Your Draft:</span>
+              <span class="radar-tooltip-val" style="color: #7dd3fc">${userPct}</span>
+            </div>
+            <div class="radar-tooltip-row">
+              <span style="color: rgba(255,255,255,0.7)">${baseName}:</span>
+              <span class="radar-tooltip-val" style="color: ${activeBaseline === 'web_novel' ? '#a78bfa' : '#fbbf24'}">${blPct}</span>
+            </div>
+          `;
+          tooltipNode.style.display = "block";
+          tooltipNode.style.left = (e.clientX + 15) + "px";
+          tooltipNode.style.top = (e.clientY + 15) + "px";
+        } else {
+          tooltipNode.style.display = "none";
+        }
+      });
+
+      canvasNode.addEventListener("mouseleave", () => {
+        if (hoveredIndex !== -1) {
+          hoveredIndex = -1;
+          renderAll();
+        }
+        tooltipNode.style.display = "none";
+      });
+
+      /* ── Kishōtenketsu Sentiment Arc Mouse Hover & Tooltip Events ── */
+      const svgNode = document.getElementById("arcChart");
+      const arcTooltipNode = document.getElementById("arcTooltip");
+
+      svgNode.addEventListener("mousemove", (e) => {
+        try {
+          if (!currentArc) return;
+          const rect = svgNode.getBoundingClientRect();
+          if (rect.width === 0 || rect.height === 0) return;
+          
+          const svgX = (e.clientX - rect.left) * (600 / rect.width);
+          
+          const W = 600;
+          const PAD = { top: 30, bottom: 48, left: 48, right: 16 };
+          const plotW = W - PAD.left - PAD.right;
+          const acts = currentArc.acts;
+          
+          const actX = i => PAD.left + i * plotW / (acts.length - 1);
+          
+          let closestIdx = -1;
+          let minDiff = Infinity;
+          
+          for (let i = 0; i < acts.length; i++) {
+            const diff = Math.abs(svgX - actX(i));
+            if (diff < minDiff) {
+              minDiff = diff;
+              closestIdx = i;
+            }
+          }
+          
+          if (svgX < PAD.left - 25 || svgX > W - PAD.right + 25) {
+            closestIdx = -1;
+          }
+
+          if (closestIdx !== hoveredArcIndex) {
+            hoveredArcIndex = closestIdx;
+            drawArc(currentArc, activeBaseline);
+          }
+
+          if (hoveredArcIndex !== -1) {
+            const act = acts[hoveredArcIndex];
+            const userVal = act.sentiment;
+            const blVal = currentArc.baselines[activeBaseline][hoveredArcIndex];
+            
+            const labelMap = { "Introduction": "Intro", "Development": "Dev", "Twist": "Twist", "Resolution": "Res" };
+            const labelTxt = labelMap[act.label] || act.label;
+            const titleFmt = `${act.act} (${labelTxt})`;
+
+            const userFmt = userVal >= 0 ? `+${userVal.toFixed(2)}` : userVal.toFixed(2);
+            const blFmt = blVal >= 0 ? `+${blVal.toFixed(2)}` : blVal.toFixed(2);
+            const baseName = activeBaseline === "web_novel" ? "Web Novel Baseline" : "Classic Baseline";
+            const blColor = activeBaseline === "web_novel" ? "#a78bfa" : "#fbbf24";
+
+            arcTooltipNode.innerHTML = `
+              <div class="radar-tooltip-title">${titleFmt}</div>
+              <div class="radar-tooltip-row">
+                <span style="color: rgba(255,255,255,0.7)">Your Draft:</span>
+                <span class="radar-tooltip-val" style="color: #7dd3fc">${userFmt}</span>
+              </div>
+              <div class="radar-tooltip-row">
+                <span style="color: rgba(255,255,255,0.7)">${baseName}:</span>
+                <span class="radar-tooltip-val" style="color: ${blColor}">${blFmt}</span>
+              </div>
+            `;
+            
+            arcTooltipNode.style.display = "block";
+            arcTooltipNode.style.left = (e.clientX + 15) + "px";
+            arcTooltipNode.style.top = (e.clientY + 15) + "px";
+          } else {
+            arcTooltipNode.style.display = "none";
+          }
+        } catch (err) {
+          console.error("Arc hover error:", err);
+        }
+      });
+
+      svgNode.addEventListener("mouseleave", () => {
+        if (hoveredArcIndex !== -1) {
+          hoveredArcIndex = -1;
+          drawArc(currentArc, activeBaseline);
+        }
+        arcTooltipNode.style.display = "none";
+      });
     </script>
+    <div id="radarTooltip" class="radar-tooltip" style="display: none; position: fixed; pointer-events: none; z-index: 9999;"></div>
+    <div id="arcTooltip" class="radar-tooltip" style="display: none; position: fixed; pointer-events: none; z-index: 9999;"></div>
   </body>
 </html>

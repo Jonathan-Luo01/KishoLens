@@ -205,7 +205,7 @@ def _stream_hf_genre_texts(
     from datasets import load_dataset
 
     genre_texts: dict[str, list[str]] = {g: [] for g in GENRE_TAG_MAP}
-    needed = set(GENRE_TAG_MAP.keys())
+    hf_genres = {g for g in GENRE_TAG_MAP if g not in {"Victorian Novel", "Philosophical Fiction"}}
 
     try:
         ds = load_dataset(dataset_name, split="train", streaming=True, trust_remote_code=True)
@@ -214,7 +214,7 @@ def _stream_hf_genre_texts(
         return genre_texts
 
     for row in ds:
-        if not needed:
+        if all(len(genre_texts[g]) >= samples_per_genre for g in hf_genres):
             break
         raw_tags = row.get(tags_field, []) or []
         if isinstance(raw_tags, str):
@@ -226,8 +226,6 @@ def _stream_hf_genre_texts(
         if len(text.strip()) < 100:
             continue
         genre_texts[genre].append(text)
-        if all(len(genre_texts[g]) >= samples_per_genre for g in needed if g not in {"Victorian Novel", "Philosophical Fiction"}):
-            needed -= {g for g in needed if len(genre_texts[g]) >= samples_per_genre}
 
     return genre_texts
 
@@ -313,7 +311,6 @@ def _fetch_gutenberg_texts_by_topic(
 
 def build_genre_centroids(
     samples_per_genre: int = 200,
-    data_dir: str = "data",
 ) -> tuple[np.ndarray, dict]:
     """
     Build genre centroids from HuggingFace + Gutenberg data.
@@ -422,7 +419,6 @@ def main():
     print(f"Building genre centroids (up to {args.samples} samples/genre)...")
     centroids, meta = build_genre_centroids(
         samples_per_genre=args.samples,
-        data_dir=args.data_dir,
     )
     save_centroids(centroids, meta, data_dir=args.data_dir)
 

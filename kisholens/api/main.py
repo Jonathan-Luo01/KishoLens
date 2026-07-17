@@ -1,4 +1,5 @@
 import re
+from typing import Optional
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -63,6 +64,8 @@ def get_novels():
             status_code=500,
             detail=f"Database connection error: {str(e)}"
         )
+
+
 
 
 @app.get("/api/novels/{novel_id}")
@@ -531,9 +534,92 @@ def post_analyze(request: AnalysisRequest):
 
     baselines = get_baseline_stats(lang)
 
-    # format features for matcher
+    # 1. Compute paragraph pacing lengths for input text
+    paragraphs = [p.strip() for p in request.text.split('\n') if p.strip()]
+    paragraph_lengths = []
+    for p in paragraphs:
+        if lang == "en":
+            word_count = len(re.findall(r'\b\w+\b', p))
+        else:
+            word_count = len([c for c in p if not c.isspace()])
+        if word_count > 0:
+            paragraph_lengths.append(word_count)
+    pacing = paragraph_lengths[:100]
+
+    # 2. Format features for matcher and add pacing array
     agg = {f"{lang}_{k}": v for k, v in features.items()}
+    agg["pacing"] = pacing
     archetype = match_archetype(agg)
+    agg["archetype_match"] = archetype
+
+    # 3. Compute Kishōtenketsu 4-act sentiment arc
+    if lang == "en":
+        sents = [s.strip() for s in re.split(r'[.!?]+', request.text) if s.strip()]
+    else:
+        sents = [s.strip() for s in re.split(r'[。！？]+', request.text) if s.strip()]
+
+    # Score sentences using vocabulary mapping / VADER
+    sia = None
+    if lang == "en":
+        try:
+            from nltk.sentiment.vader import SentimentIntensityAnalyzer
+            _init_nlp_resources()
+            sia = SentimentIntensityAnalyzer()
+        except Exception:
+            pass
+
+    def score_sentence(s: str) -> float:
+        if lang == "en":
+            if sia:
+                return sia.polarity_scores(s)["compound"]
+            pos = len(re.findall(r'\b(' + '|'.join(EN_POS_WORDS) + r')\b', s.lower()))
+            neg = len(re.findall(r'\b(' + '|'.join(EN_NEG_WORDS) + r')\b', s.lower()))
+            return (pos - neg) / (pos + neg + 1)
+        elif lang == "ja":
+            pos = sum(s.count(w) for w in JA_POS_WORDS)
+            neg = sum(s.count(w) for w in JA_NEG_WORDS)
+            return (pos - neg) / (pos + neg + 1)
+        else:  # zh
+            pos = sum(s.count(w) for w in ZH_POS_WORDS)
+            neg = sum(s.count(w) for w in ZH_NEG_WORDS)
+            return (pos - neg) / (pos + neg + 1)
+
+    scored_sentences = [(s, score_sentence(s)) for s in sents]
+    emotional_beats = [item for item in scored_sentences if abs(item[1]) >= 0.1]
+    if not emotional_beats:
+        emotional_beats = scored_sentences
+
+    n_beats = len(emotional_beats)
+    boundaries = [0, n_beats // 4, n_beats // 2, 3 * n_beats // 4, n_beats]
+    act_defs = [
+        ("Ki",    "Introduction"),
+        ("Shō",   "Development"),
+        ("Ten",   "Twist"),
+        ("Ketsu", "Resolution"),
+    ]
+
+    acts = []
+    for i, (act_key, act_label) in enumerate(act_defs):
+        start = boundaries[i]
+        end   = boundaries[i + 1]
+        segment = emotional_beats[start:end]
+        avg_sentiment = sum(score for s, score in segment) / len(segment) if segment else 0.0
+        
+        acts.append({
+            "act": act_key,
+            "label": act_label,
+            "sentiment": round(avg_sentiment, 4),
+            "sentence_range": [start, end - 1],
+        })
+
+    arc = {
+        "title": request.title or "Untitled",
+        "acts": acts,
+        "baselines": {
+            "web_novel":   [0.10,  0.07, -0.04,  0.18],
+            "classic_lit": [0.03,  0.01, -0.18,  0.22],
+        }
+    }
 
     return {
         "status": "success",
@@ -555,6 +641,8 @@ def post_analyze(request: AnalysisRequest):
                 "dialogue_ratio": baselines["webnovel"]["dialogue_ratio"],
                 "avg_sentence_len": baselines["webnovel"]["avg_sentence_len"]
             }
-        }
+        },
+        "stats": agg,
+        "arc": arc
     }
 
