@@ -574,6 +574,11 @@ def main():
     print(f"  Genres: {meta['genres']}")
     print(f"  Samples used: {meta['samples_used']}")
 
+    # Explicitly exit to prevent hanging from non-daemon background threads in datasets/huggingface
+    sys.stdout.flush()
+    sys.stderr.flush()
+    os._exit(0)
+
 
 if __name__ == "__main__":
     main()
