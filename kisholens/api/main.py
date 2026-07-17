@@ -18,6 +18,7 @@ from kisholens.ml.features import (
     EN_POS_WORDS, EN_NEG_WORDS,
     _init_nlp_resources,
 )
+from kisholens.ml.semantic_match import match_semantic
 
 app = FastAPI(title="KishoLens API")
 
@@ -551,6 +552,7 @@ def post_analyze(request: AnalysisRequest):
     agg["pacing"] = pacing
     archetype = match_archetype(agg)
     agg["archetype_match"] = archetype
+    semantic = match_semantic(request.text)
 
     # 3. Compute Kishōtenketsu 4-act sentiment arc
     if lang == "en":
@@ -621,7 +623,7 @@ def post_analyze(request: AnalysisRequest):
         }
     }
 
-    return {
+    response = {
         "status": "success",
         "detected_lang": lang,
         "features": features,
@@ -645,4 +647,7 @@ def post_analyze(request: AnalysisRequest):
         "stats": agg,
         "arc": arc
     }
+    if semantic is not None:
+        response["semantic"] = semantic
+    return response
 
