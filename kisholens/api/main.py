@@ -235,7 +235,11 @@ def get_novel_stats(novel_id: int):
             agg["pacing"] = paragraph_lengths[:100]
 
             if agg:
-                agg["archetype_match"] = match_archetype(agg)
+                agg["archetype_match"] = {
+                    "closest_trope": novel.genre or "Unknown",
+                    "territory": novel.territory or "Unknown",
+                    "confidence": 1.0
+                }
 
             return agg
     except Exception as e:
@@ -551,9 +555,17 @@ def post_analyze(request: AnalysisRequest):
     agg = {f"{lang}_{k}": v for k, v in features.items()}
     agg["pacing"] = pacing
     archetype = match_archetype(agg)
-    agg["archetype_match"] = archetype
     # Semantic genre matching is currently optimized for English text (all-MiniLM-L6-v2)
     semantic = match_semantic(request.text) if lang == "en" else None
+    
+    if semantic:
+        agg["archetype_match"] = {
+            "closest_trope": semantic["genre"],
+            "territory": semantic["territory"],
+            "confidence": semantic["genre_confidence"]
+        }
+    else:
+        agg["archetype_match"] = archetype
 
     # 3. Compute Kishōtenketsu 4-act sentiment arc
     if lang == "en":
@@ -629,9 +641,9 @@ def post_analyze(request: AnalysisRequest):
         "detected_lang": lang,
         "features": features,
         "archetype": {
-            "archetype": archetype["closest_trope"],
-            "confidence": archetype["confidence"],
-            "description": f"Classification: {archetype['territory']}. Closest matched writing archetype based on stylistic features."
+            "archetype": semantic["genre"] if semantic else archetype["closest_trope"],
+            "confidence": semantic["genre_confidence"] if semantic else archetype["confidence"],
+            "description": f"Classification: {semantic['territory'] if semantic else archetype['territory']}. Semantically matched genre and territory."
         },
         "baselines": {
             "gutenberg": {
