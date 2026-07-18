@@ -51,7 +51,7 @@ def test_consolidate_genre_case_insensitive():
 def test_genre_tag_map_has_all_genres():
     expected = {
         "LitRPG", "Isekai", "Xianxia / Wuxia", "Urban Romance",
-        "Cozy Fantasy / Slice of Life", "Villainess / Otome Game",
+        "Cozy Fantasy", "Slice of Life / Contemporary", "Villainess / Otome Game",
         "Kingdom Building / Strategy", "Monster Protagonist / Evolution",
         "Dungeon Core / Dungeon MC", "Urban Fantasy / Dungeons",
         "Harem", "Girls Love / Boys Love",

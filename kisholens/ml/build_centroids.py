@@ -63,12 +63,13 @@ GENRE_TAG_MAP: dict[str, list[str]] = {
         "xuanhuan", "martial-arts", "martial arts", "daoist", "dao",
     ],
     "Urban Romance": [
-        "contemporary-romance", "contemporary romance",
-        "school-life", "school life", "modern-day", "modern day",
+        "ceo", "modern romance", "urban romance", "office romance", "contemporary-romance", "contemporary romance",
     ],
-    "Cozy Fantasy / Slice of Life": [
-        "cozy", "cozy-fantasy", "cozy fantasy", "slice-of-life", "slice of life",
-        "farming", "shopkeeper", "crafting", "alchemy", "cooking",
+    "Cozy Fantasy": [
+        "cozy", "cozy-fantasy", "cozy fantasy", "farming", "shopkeeper", "crafting", "alchemy", "cooking",
+    ],
+    "Slice of Life / Contemporary": [
+        "slice-of-life", "slice of life", "school-life", "school life", "modern-day", "modern day", "contemporary", "ordinary life", "daily life", "school",
     ],
     "Villainess / Otome Game": [
         "villainess", "otome", "otome-game", "otome game", "noble",
@@ -135,7 +136,7 @@ GENRE_TERRITORIES: dict[str, str] = {
     "Isekai":                          "Web Novel Territory",
     "Xianxia / Wuxia":                "Web Novel Territory",
     "Urban Romance":                   "Web Novel Territory",
-    "Cozy Fantasy / Slice of Life":    "Web Novel Territory",
+    "Cozy Fantasy":                    "Web Novel Territory",
     "Villainess / Otome Game":        "Web Novel Territory",
     "Kingdom Building / Strategy":     "Web Novel Territory",
     "Monster Protagonist / Evolution": "Web Novel Territory",
@@ -148,6 +149,7 @@ GENRE_TERRITORIES: dict[str, str] = {
     "High Fantasy":                    "Traditional Fiction Territory",
     "Hard Sci-Fi":                     "Traditional Fiction Territory",
     "Modern Thriller":                 "Traditional Fiction Territory",
+    "Slice of Life / Contemporary":    "Traditional Fiction Territory",
     "Mystery":                         "Traditional Fiction Territory",
     "Horror":                          "Traditional Fiction Territory",
     "Romance":                         "Traditional Fiction Territory",
@@ -471,12 +473,12 @@ def build_genre_centroids(
 
     web_genres = {
         "LitRPG", "Isekai", "Xianxia / Wuxia", "Urban Romance",
-        "Cozy Fantasy / Slice of Life", "Villainess / Otome Game",
+        "Cozy Fantasy", "Villainess / Otome Game",
         "Kingdom Building / Strategy", "Monster Protagonist / Evolution",
         "Dungeon Core / Dungeon MC", "Urban Fantasy / Dungeons",
         "Harem", "Girls Love / Boys Love"
     }
-    trad_specific_genres = {"High Fantasy", "Hard Sci-Fi", "Modern Thriller"}
+    trad_specific_genres = {"High Fantasy", "Hard Sci-Fi", "Modern Thriller", "Slice of Life / Contemporary"}
     classic_specific_genres = {"Victorian Novel", "Philosophical Fiction"}
     common_genres = {"Mystery", "Horror", "Romance", "Fantasy", "Sci-Fi", "Action / Adventure", "Comedy"}
 
