@@ -197,10 +197,41 @@ def _get_model(model_name: str = "all-MiniLM-L6-v2"):
     return _model_cache[model_name]
 
 
-def _truncate_to_words(text: str, max_words: int = 1000) -> str:
-    """Return the first `max_words` whitespace-separated tokens of `text`."""
-    words = text.split()
-    return " ".join(words[:max_words])
+def get_representative_sample(text: str, target_words: int = 1000) -> str:
+    """
+    Extracts a representative chunk of text from the middle of a book,
+    bypassing all front matter (TOCs, Prefaces, Introductions).
+    """
+    import re
+    # If the text is surprisingly short (e.g., a short story or web novel chapter), 
+    # jumping 20% might skip too much. Fall back to the beginning.
+    if not text or len(text) < 10000:
+        words = text.split()
+        return " ".join(words[:target_words])
+
+    # 1. The 20% Rule: Jump past the first 20% of the book.
+    # This safely bypasses even the longest Victorian prefaces.
+    start_index = int(len(text) * 0.20)
+
+    # 2. Prevent mid-word or mid-sentence slicing.
+    # We search forward from our 20% mark for the very next paragraph break (double newline).
+    # This ensures our sample starts cleanly at the beginning of a new thought.
+    match = re.search(r'\n\s*\n', text[start_index:])
+    
+    if match:
+        # Shift our start index to immediately after that double newline
+        start_index = start_index + match.end()
+
+    # 3. Grab a large enough character chunk to guarantee we hit our word limit.
+    # (Assuming average English word length is 5 chars + space, grabbing 10x the target is safe)
+    buffer_length = target_words * 10
+    raw_chunk = text[start_index : start_index + buffer_length]
+
+    # 4. Tokenize cleanly by whitespace and enforce the exact word count
+    words = raw_chunk.split()
+    sampled_words = words[:target_words]
+
+    return " ".join(sampled_words)
 
 
 def embed_texts(
@@ -209,10 +240,10 @@ def embed_texts(
     max_words: int = 1000,
 ) -> np.ndarray:
     """
-    Embed a list of texts (each truncated to `max_words` words).
+    Embed a list of texts (each truncated to a representative `max_words` words).
     Returns a (N, 384) float32 numpy array.
     """
-    truncated = [_truncate_to_words(t, max_words) for t in texts]
+    truncated = [get_representative_sample(t, max_words) for t in texts]
     model = _get_model(model_name)
     embeddings = model.encode(truncated, convert_to_numpy=True, show_progress_bar=False)
     return embeddings.astype(np.float32)

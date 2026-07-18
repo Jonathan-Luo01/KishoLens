@@ -12,6 +12,7 @@ from kisholens.ml.build_centroids import (
     load_centroids_from_disk,
     GENRE_TAG_MAP,
     GENRE_TERRITORIES,
+    get_representative_sample,
 )
 
 
@@ -121,3 +122,23 @@ def test_load_centroids_missing_files():
     with tempfile.TemporaryDirectory() as tmpdir:
         result = load_centroids_from_disk(filename_prefix="genre", data_dir=tmpdir)
         assert result == (None, None)
+
+
+def test_get_representative_sample_short_text():
+    text = "word " * 500
+    sample = get_representative_sample(text, target_words=10)
+    assert sample == "word word word word word word word word word word"
+
+
+def test_get_representative_sample_long_text_toc():
+    # Long text (> 10000 chars) with table of contents/preface
+    preface = "TOC line 1\nTOC line 2\nPreface line 3\n\n" * 50
+    story = "This is the real story content that should be sampled cleanly.\n\n" * 150
+    text = preface + story
+    assert len(text) > 10000
+    
+    sample = get_representative_sample(text, target_words=10)
+    # The first 20% is skipped, so it should start cleanly inside the story section
+    assert "TOC" not in sample
+    assert "Preface" not in sample
+    assert "story" in sample
