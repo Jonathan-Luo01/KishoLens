@@ -415,33 +415,27 @@ import "../styles/global.css";
           if (stats.archetype_match) {
             let matchBody = '';
             const am = stats.archetype_match;
-            if (am.top_genres && am.top_territories) {
-              const genresListHtml = am.top_genres.map(g => `
-                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
-                  <span style="color: var(--color-text); font-weight: 500;">${escapeHtml(g.genre)}</span>
-                  <span style="font-weight: 700; color: #7dd3fc;">${(g.confidence * 100).toFixed(0)}%</span>
-                </div>
-              `).join('');
-              
-              const territoriesListHtml = am.top_territories.map(t => `
-                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
-                  <span style="color: var(--color-text); font-weight: 500;">${escapeHtml(t.territory)}</span>
-                  <span style="font-weight: 700; color: #fbbf24;">${(t.confidence * 100).toFixed(0)}%</span>
-                </div>
-              `).join('');
-
-              matchBody = `
-                <div style="display: flex; flex-direction: column; gap: 1rem;">
-                  <div>
-                    <h5 style="font-size: 0.75rem; text-transform: uppercase; color: var(--color-muted); margin-bottom: 0.4rem; letter-spacing: 0.05em; font-weight: 600;">Top Genres</h5>
-                    <div style="display: flex; flex-direction: column; gap: 0.38rem;">${genresListHtml}</div>
-                  </div>
-                  <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.75rem;">
-                    <h5 style="font-size: 0.75rem; text-transform: uppercase; color: var(--color-muted); margin-bottom: 0.4rem; letter-spacing: 0.05em; font-weight: 600;">Territories</h5>
-                    <div style="display: flex; flex-direction: column; gap: 0.38rem;">${territoriesListHtml}</div>
-                  </div>
-                </div>
-              `;
+             if (am.top_genres && am.top_territories) {
+               const genresStr = am.top_genres.slice(0, 3).map(g => `${escapeHtml(g.genre)} (${(g.confidence * 100).toFixed(0)}%)`).join(", ");
+               const territoryStr = am.top_territories[0].territory;
+               const maxConf = (am.confidence * 100).toFixed(1);
+               
+               matchBody = `
+                 <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                   <div style="display: flex; justify-content: space-between; align-items: center;">
+                     <span style="font-size: 0.85rem; color: var(--color-muted);">Territory</span>
+                     <span style="font-weight: 600; color: var(--color-text);">${escapeHtml(territoryStr)}</span>
+                   </div>
+                   <div style="display: flex; justify-content: space-between; align-items: center;">
+                     <span style="font-size: 0.85rem; color: var(--color-muted);">Top Genres</span>
+                     <span style="font-weight: 600; color: var(--color-accent-2); text-align: right;">${genresStr}</span>
+                   </div>
+                   <div style="display: flex; justify-content: space-between; align-items: center;">
+                     <span style="font-size: 0.85rem; color: var(--color-muted);">Confidence Score</span>
+                     <span style="font-weight: 700; background: linear-gradient(135deg, #ff7b00, #ffae00); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${maxConf}%</span>
+                   </div>
+                 </div>
+               `;
             } else {
               matchBody = `
                 <div style="display: flex; flex-direction: column; gap: 0.5rem;">

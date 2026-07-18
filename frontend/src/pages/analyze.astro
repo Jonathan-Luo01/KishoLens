@@ -958,13 +958,11 @@ import "../styles/global.css";
         const am = stats["archetype_match"];
         if (am) {
           if (am.top_genres && am.top_territories) {
-            const genresStr = am.top_genres.map(g => `${g.genre} (${(g.confidence * 100).toFixed(0)}%)`).join(", ");
-            const territoriesStr = am.top_territories.map(t => `${t.territory} (${(t.confidence * 100).toFixed(0)}%)`).join(", ");
-            document.getElementById("archetypeLabel").innerHTML =
-              `<div style="display: flex; flex-direction: column; gap: 0.4rem; align-items: center; text-align: center; width: 100%;">
-                <div style="font-size: 0.85rem;"><span style="color: rgba(255,255,255,0.4); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-right: 0.35rem;">Top Genres:</span><span style="color: #7dd3fc; font-weight: 600;">${genresStr}</span></div>
-                <div style="font-size: 0.85rem;"><span style="color: rgba(255,255,255,0.4); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-right: 0.35rem;">Territories:</span><span style="color: #fbbf24; font-weight: 600;">${territoriesStr}</span></div>
-              </div>`;
+            const genresStr = am.top_genres.slice(0, 3).map(g => `${g.genre} (${(g.confidence * 100).toFixed(0)}%)`).join(", ");
+            const territoryStr = am.top_territories[0].territory;
+            const maxConf = (am.confidence * 100).toFixed(0);
+            document.getElementById("archetypeLabel").textContent =
+              `${genresStr} · ${territoryStr} · ${maxConf}% match`;
           } else {
             document.getElementById("archetypeLabel").textContent =
               `${am.closest_trope} · ${am.territory} · ${(am.confidence * 100).toFixed(0)}% match`;
