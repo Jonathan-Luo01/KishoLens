@@ -21,6 +21,6 @@ Thumbs.db
 # Data — raw scraped text must never be committed (copyright)
 data/raw_cache/
 data/*.db
-data/genre_centroids.npy
-data/genre_centroids_meta.json
+data/*.npy
+data/*_meta.json
 

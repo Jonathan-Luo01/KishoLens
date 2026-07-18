@@ -11,6 +11,7 @@ from kisholens.ml.features import (
     extract_japanese_features,
     extract_chinese_features
 )
+from kisholens.ml.build_centroids import consolidate_genre, GENRE_TERRITORIES
 
 def extract_features(text: str, lang: str = "en"):
     """Computes baseline preview features by delegating to the unified extractors in ml.features."""
@@ -40,23 +41,33 @@ def extract_features(text: str, lang: str = "en"):
         }
 
 
-def _get_or_create_novel(session: Session, title: str, author: str, source: str, cache: dict) -> int:
+def _get_or_create_novel(session: Session, title: str, author: str, source: str, cache: dict, genre: Optional[str] = None, territory: Optional[str] = None) -> int:
     novel_key = (title, author)
     if novel_key not in cache:
         statement = select(Novel).where(Novel.title == title, Novel.author == author)
         existing_novel = session.exec(statement).first()
         if existing_novel:
+            updated = False
+            if genre and not existing_novel.genre:
+                existing_novel.genre = genre
+                updated = True
+            if territory and not existing_novel.territory:
+                existing_novel.territory = territory
+                updated = True
+            if updated:
+                session.add(existing_novel)
+                session.commit()
             cache[novel_key] = existing_novel.id
         else:
-            novel = Novel(title=title, author=author, source=source)
+            novel = Novel(title=title, author=author, source=source, genre=genre, territory=territory)
             session.add(novel)
             session.commit()
             session.refresh(novel)
             cache[novel_key] = novel.id
-            print(f"Added Novel: '{title}' by {author} (ID: {novel.id})")
+            print(f"Added Novel: '{title}' by {author} (ID: {novel.id}, Genre: {genre}, Territory: {territory})")
     return cache[novel_key]
 
-def run_etl(dataset_name: str, num_records: int = 20, max_chapters: int = 12, only_existing: bool = False):
+def run_etl(dataset_name: str, num_records: int = 20, max_chapters: int = 12, only_existing: bool = False, genre: Optional[str] = None, territory: Optional[str] = None):
     """Orchestrates ingestion of a dataset/book into SQLite with chapter limits and optional existing-novel filters."""
     engine = get_engine()
     
@@ -81,7 +92,10 @@ def run_etl(dataset_name: str, num_records: int = 20, max_chapters: int = 12, on
                         print(f"Skipping new Gutenberg novel: '{series_title}'")
                         return
 
-                novel_id = _get_or_create_novel(session, series_title, author, source, novels_cache)
+                novel_id = _get_or_create_novel(
+                    session, series_title, author, source, novels_cache,
+                    genre=genre, territory=territory
+                )
                 
                 ch_count = session.exec(select(func.count(Chapter.id)).where(Chapter.novel_id == novel_id)).one()
                 chapters_to_ingest = []
@@ -162,7 +176,10 @@ def run_etl(dataset_name: str, num_records: int = 20, max_chapters: int = 12, on
                     if only_existing and not existing_novel:
                         continue
                         
-                    novel_id = _get_or_create_novel(session, series_title, author, source, novels_cache)
+                    novel_id = _get_or_create_novel(
+                        session, series_title, author, source, novels_cache,
+                        genre=genre, territory=territory
+                    )
                     
                     # Check chapter count
                     ch_count = session.exec(select(func.count(Chapter.id)).where(Chapter.novel_id == novel_id)).one()
@@ -207,24 +224,65 @@ def run_etl(dataset_name: str, num_records: int = 20, max_chapters: int = 12, on
         engine.dispose()
         print(f"ETL run for {dataset_name} completed.")
 
+def fetch_gutenberg_book_ids_by_topic(topic: str, limit: int = 20) -> list[str]:
+    """Fetch up to limit Project Gutenberg book IDs from gutendex for a topic."""
+    import urllib.request
+    import urllib.parse
+    import json
+    import time
+    import ssl
+
+    try:
+        ssl._create_default_https_context = ssl._create_unverified_context
+    except AttributeError:
+        pass
+    
+    book_ids = []
+    base_url = "https://gutendex.com/books"
+    params = urllib.parse.urlencode({
+        "topic": topic,
+        "languages": "en",
+    })
+    url = f"{base_url}?{params}"
+    req = urllib.request.Request(
+        url,
+        headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
+    )
+    
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(req, timeout=25) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                results = data.get("results", [])
+                for book in results:
+                    if len(book_ids) >= limit:
+                        break
+                    book_ids.append(str(book["id"]))
+                break
+        except Exception as e:
+            print(f"[WARN] Gutenberg ID fetch attempt {attempt+1} failed for topic {topic}: {e}", file=sys.stderr)
+            time.sleep(2 * (attempt + 1))
+            
+    return book_ids
+
 def verify_pipeline():
     """Runs a database verification check and prints active records and sample metrics."""
     engine = get_engine()
     with Session(engine) as session:
         novels = session.exec(select(Novel)).all()
         print(f"\nTotal novels in database: {len(novels)}")
-        for n in novels:
-            ch_count = session.exec(select(func.count(Chapter.id)).where(Chapter.novel_id == n.id)).one()
-            print(f"  - [{n.id}] {n.title} (by {n.author}) [Source: {n.source}] - Chapters: {ch_count}")
+        
+        # Source Distribution
+        print("\nSource Distribution:")
+        res_source = session.execute(select(Novel.source, func.count(Novel.id)).group_by(Novel.source)).all()
+        for source, count in res_source:
+            print(f"  - {source}: {count} novels")
             
-        expected_sources = ["syosetu", "scribblehub", "royalroad", "gutenberg", "cnnovel"]
-        actual_sources = set(n.source for n in novels)
-        print("\nSource Verification Check:")
-        for source in expected_sources:
-            if source in actual_sources:
-                print(f"  [OK] Successfully retrieved novels and chapters from source: '{source}'")
-            else:
-                print(f"  [FAIL] No data found in database for source: '{source}'")
+        # Genre Distribution
+        print("\nGenre Distribution:")
+        res_genre = session.execute(select(Novel.genre, func.count(Novel.id)).group_by(Novel.genre)).all()
+        for genre, count in sorted(res_genre, key=lambda x: x[1], reverse=True):
+            print(f"  - {genre or 'Unclassified'}: {count} novels")
 
 def main():
     if hasattr(sys.stdout, 'reconfigure'):
@@ -232,45 +290,145 @@ def main():
     if hasattr(sys.stderr, 'reconfigure'):
         sys.stderr.reconfigure(encoding='utf-8')
         
-    print("Ingesting more chapters for current novels (minimum 20 chapters per novel)...")
+    engine = get_engine()
     
-    # 1. Web Novels: scan a large window (1500 records) to find and ingest up to 20 chapters for all existing novels
-    print("\n--- Ingesting up to 20 chapters for existing Web Novels ---")
-    run_etl("NilanE/ParallelFiction-Ja_En-100k", 1500, max_chapters=20, only_existing=True)
-    run_etl("botp/RyokoAI_ScribbleHub17K", 1500, max_chapters=20, only_existing=True)
-    run_etl("OmniAICreator/RoyalRoad-1.61M", 1500, max_chapters=20, only_existing=True)
-    run_etl("botp/RyokoAI_CNNovel125K", 1500, max_chapters=20, only_existing=True)
+    # 1. Ingest Gutenberg Books for Classic Literature Territory
+    print("\n--- Ingesting Gutenberg Books for Classic Literature Territory (Stratified Sampling) ---")
+    classic_genres_topics = {
+        "Victorian Novel": "gothic fiction",
+        "Philosophical Fiction": "philosophy",
+        "Mystery": "detective",
+        "Horror": "horror",
+        "Romance": "romance",
+        "Sci-Fi": "science fiction",
+        "Action / Adventure": "adventure",
+        "Comedy": "humor"
+    }
     
-    # 2. Gutenberg Novels: run each Gutenberg novel with max_chapters=20 (to bring those under 20 up to 20 or their max)
-    print("\n--- Ingesting up to 20 chapters for existing Gutenberg Novels ---")
-    gutenberg_books = [
-        "1342",  # Pride and Prejudice
-        "23950", # 三國志演義
-        "11",    # Alice's Adventures in Wonderland
-        "84",    # Frankenstein
-        "345",   # Dracula
-        "1661",  # The Adventures of Sherlock Holmes
-        "98",    # A Tale of Two Cities
-        "174",   # The Picture of Dorian Gray
-        "2701",  # Moby Dick
-        "526",   # Heart of Darkness
-        "35",    # The Time Machine
-        "120",   # Treasure Island
-        "1400",  # Great Expectations
-        "121",   # Jane Eyre
-        "768",   # Wuthering Heights
-        "20",    # Twenty Thousand Leagues Under the Sea
-        "113",   # The Secret Garden
-        "158",   # Emma
-        "153",   # The Tales of Mother Goose
-        "209"    # The Turn of the Screw
-    ]
-    
-    for book_id in gutenberg_books:
-        run_etl(f"gutenberg/{book_id}", 20, max_chapters=20, only_existing=False)
+    for genre, topic in classic_genres_topics.items():
+        # Check current count of Gutenberg books for this genre
+        with Session(engine) as s:
+            current_count = s.exec(select(func.count(Novel.id)).where(Novel.source == "gutenberg", Novel.genre == genre)).one()
         
+        needed = 20 - current_count
+        if needed <= 0:
+            print(f"Already have {current_count} books in database for classic genre: '{genre}'")
+            continue
+            
+        print(f"Fetching {needed} book IDs from Project Gutenberg for topic: '{topic}'...")
+        book_ids = fetch_gutenberg_book_ids_by_topic(topic, limit=needed)
+        print(f"Found IDs: {book_ids}")
+        for book_id in book_ids:
+            run_etl(f"gutenberg/{book_id}", num_records=5, max_chapters=5, only_existing=False, genre=genre, territory="Classic Literature Territory")
+
+    # 2. Ingest Web Novels for Web/Traditional Territories
+    print("\n--- Ingesting Web Novels for Web/Traditional Territories (Stratified Sampling) ---")
+    web_and_trad_genres = {
+        "LitRPG", "Isekai", "Xianxia / Wuxia", "Urban Romance", "Cozy Fantasy",
+        "Slice of Life / Contemporary", "Villainess / Otome Game", "Kingdom Building / Strategy",
+        "Monster Protagonist / Evolution", "Dungeon Core / Dungeon MC", "Urban Fantasy / Dungeons",
+        "Harem", "Girls Love / Boys Love", "High Fantasy", "Hard Sci-Fi", "Modern Thriller"
+    }
+    
+    # Count current books per genre in database
+    genre_counts = {g: 0 for g in web_and_trad_genres}
+    with Session(engine) as s:
+        res = s.execute(select(Novel.genre, func.count(Novel.id)).group_by(Novel.genre)).all()
+        for g, count in res:
+            if g in genre_counts:
+                genre_counts[g] = count
+                
+    print(f"Current web/traditional database counts: {genre_counts}")
+    
+    # Check if we need more
+    needed_genres = {g for g in web_and_trad_genres if genre_counts[g] < 20}
+    if not needed_genres:
+        print("All web/traditional genres already have at least 20 novels in the database.")
+    else:
+        print(f"Genres needing more novels (under 20): {needed_genres}")
+        
+        # Stream ScribbleHub and RoyalRoad to fill in under-represented genres
+        datasets_to_stream = [
+            ("botp/RyokoAI_ScribbleHub17K", "scribblehub"),
+            ("OmniAICreator/RoyalRoad-1.61M", "royalroad")
+        ]
+        
+        for dataset_name, source_type in datasets_to_stream:
+            if not needed_genres:
+                break
+                
+            print(f"\nStreaming {dataset_name} to satisfy stratified sampling...")
+            dataset = load_dataset(dataset_name, split="train", streaming=True)
+            extractor = DATASET_REGISTRY[dataset_name]["extractor"]
+            
+            with Session(engine) as session:
+                scan_limit = 100000
+                for idx, item in enumerate(dataset):
+                    if idx >= scan_limit:
+                        print("Scan limit reached for dataset stream.")
+                        break
+                    if not needed_genres:
+                        break
+                        
+                    parsed = extractor(item, idx)
+                    series_title = parsed["series_title"]
+                    author = parsed["author"]
+                    
+                    # Extract tags to consolidate genre
+                    raw_tags = item.get("tags", []) or []
+                    if not raw_tags and "meta" in item and isinstance(item["meta"], dict):
+                        raw_tags = item["meta"].get("tags", []) or []
+                    if isinstance(raw_tags, str):
+                        raw_tags = [t.strip() for t in raw_tags.split(",")]
+                        
+                    genre = consolidate_genre(raw_tags)
+                    if genre in needed_genres:
+                        # Double check we don't already have this novel
+                        statement = select(Novel).where(Novel.title == series_title, Novel.author == author)
+                        existing_novel = session.exec(statement).first()
+                        if not existing_novel:
+                            # Ingest this novel!
+                            novel = Novel(
+                                title=series_title,
+                                author=author,
+                                source=source_type,
+                                genre=genre,
+                                territory=GENRE_TERRITORIES.get(genre, "Web Novel Territory")
+                            )
+                            session.add(novel)
+                            session.commit()
+                            session.refresh(novel)
+                            print(f"Added Novel: '{series_title}' by {author} (Genre: {genre})")
+                            
+                            # Ingest first 5 chapters
+                            cleaned_en = parsed.get("text_en", "")
+                            if cleaned_en:
+                                chapter = Chapter(
+                                    novel_id=novel.id,
+                                    chapter_number=1,
+                                    title=parsed.get("chapter_title", "Chapter 1"),
+                                    text_en=cleaned_en,
+                                    text_ja="",
+                                    text_zh=""
+                                )
+                                session.add(chapter)
+                                session.commit()
+                                print(f"  Ingested Chapter 1 for Novel ID: {novel.id}")
+                                
+                            # Increment count and update needed
+                            genre_counts[genre] += 1
+                            if genre_counts[genre] >= 20:
+                                needed_genres.remove(genre)
+                                print(f"Genre '{genre}' has successfully reached 20 novels.")
+                                
     # Run database verification
     verify_pipeline()
+
+    # Explicitly exit to prevent hanging from non-daemon background threads in datasets/huggingface
+    import os
+    sys.stdout.flush()
+    sys.stderr.flush()
+    os._exit(0)
 
 if __name__ == "__main__":
     main()

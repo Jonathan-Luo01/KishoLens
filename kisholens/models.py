@@ -15,6 +15,8 @@ class Novel(SQLModel, table=True):
     title: str
     author: str
     source: str
+    genre: Optional[str] = Field(default=None)
+    territory: Optional[str] = Field(default=None)
 
 class Chapter(SQLModel, table=True):
     __table_args__ = {"extend_existing": True}
