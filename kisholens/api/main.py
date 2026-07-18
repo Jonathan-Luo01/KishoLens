@@ -244,7 +244,9 @@ def get_novel_stats(novel_id: int):
                     agg["archetype_match"] = {
                         "closest_trope": semantic["genre"],
                         "territory": semantic["territory"],
-                        "confidence": semantic["genre_confidence"]
+                        "confidence": semantic["genre_confidence"],
+                        "top_genres": [{"genre": x["genre"], "confidence": x["score"]} for x in semantic["genre_scores"][:3]],
+                        "top_territories": [{"territory": x["territory"], "confidence": x["score"]} for x in semantic["territory_scores"][:3]]
                     }
                 else:
                     agg["archetype_match"] = {
@@ -574,7 +576,9 @@ def post_analyze(request: AnalysisRequest):
         agg["archetype_match"] = {
             "closest_trope": semantic["genre"],
             "territory": semantic["territory"],
-            "confidence": semantic["genre_confidence"]
+            "confidence": semantic["genre_confidence"],
+            "top_genres": [{"genre": x["genre"], "confidence": x["score"]} for x in semantic["genre_scores"][:3]],
+            "top_territories": [{"territory": x["territory"], "confidence": x["score"]} for x in semantic["territory_scores"][:3]]
         }
     else:
         agg["archetype_match"] = archetype
@@ -655,7 +659,9 @@ def post_analyze(request: AnalysisRequest):
         "archetype": {
             "archetype": semantic["genre"] if semantic else archetype["closest_trope"],
             "confidence": semantic["genre_confidence"] if semantic else archetype["confidence"],
-            "description": f"Classification: {semantic['territory'] if semantic else archetype['territory']}. Semantically matched genre and territory."
+            "description": f"Classification: {semantic['territory'] if semantic else archetype['territory']}. Semantically matched genre and territory.",
+            "top_genres": [{"genre": x["genre"], "confidence": x["score"]} for x in semantic["genre_scores"][:3]] if semantic else [],
+            "top_territories": [{"territory": x["territory"], "confidence": x["score"]} for x in semantic["territory_scores"][:3]] if semantic else []
         },
         "baselines": {
             "gutenberg": {
