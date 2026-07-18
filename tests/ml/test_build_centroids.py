@@ -52,7 +52,7 @@ def test_consolidate_genre_case_insensitive():
 def test_genre_tag_map_has_all_genres():
     expected = {
         "LitRPG", "Isekai", "Xianxia / Wuxia", "Urban Romance",
-        "Cozy Fantasy", "Slice of Life / Contemporary", "Villainess / Otome Game",
+        "Cozy Fantasy", "Slice of Life", "Contemporary", "Villainess / Otome Game",
         "Kingdom Building / Strategy", "Monster Protagonist / Evolution",
         "Dungeon Core / Dungeon MC", "Urban Fantasy / Dungeons",
         "Harem", "Girls Love / Boys Love",
@@ -131,13 +131,13 @@ def test_get_representative_sample_short_text():
 
 
 def test_get_representative_sample_long_text_toc():
-    # Long text (> 10000 chars) with table of contents/preface
-    preface = "TOC line 1\nTOC line 2\nPreface line 3\n\n" * 50
-    story = "This is the real story content that should be sampled cleanly.\n\n" * 150
+    # Long text (> 15000 chars) with table of contents/preface
+    preface = "TOC line 1\nTOC line 2\nPreface line 3\n\n" * 100
+    story = "This is the real story content that should be sampled cleanly.\n\n" * 300
     text = preface + story
-    assert len(text) > 10000
+    assert len(text) > 15000
     
-    sample = get_representative_sample(text, target_words=10)
+    sample = get_representative_sample(text, target_words=30)
     # The first 20% is skipped, so it should start cleanly inside the story section
     assert "TOC" not in sample
     assert "Preface" not in sample

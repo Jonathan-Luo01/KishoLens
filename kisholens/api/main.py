@@ -234,9 +234,25 @@ def get_novel_stats(novel_id: int):
             # Limit to first 100 paragraphs for dashboard display
             agg["pacing"] = paragraph_lengths[:100]
 
-            # Compute semantic genre and territory on-the-fly using the first chapter
-            first_ch = sorted(chapters, key=lambda c: c.chapter_number)[0] if chapters else None
-            text = (first_ch.text_en or first_ch.text_ja or getattr(first_ch, "text_zh", "")) if first_ch else ""
+            # Compute semantic genre and territory on-the-fly using first, middle, and last chapters
+            sorted_chs = sorted(chapters, key=lambda c: c.chapter_number)
+            if not sorted_chs:
+                text = ""
+            elif len(sorted_chs) == 1:
+                text = sorted_chs[0].text_en or sorted_chs[0].text_ja or getattr(sorted_chs[0], "text_zh", "") or ""
+            elif len(sorted_chs) == 2:
+                text1 = sorted_chs[0].text_en or sorted_chs[0].text_ja or getattr(sorted_chs[0], "text_zh", "") or ""
+                text2 = sorted_chs[1].text_en or sorted_chs[1].text_ja or getattr(sorted_chs[1], "text_zh", "") or ""
+                text = text1 + "\n\n" + text2
+            else:
+                ch_beg = sorted_chs[0]
+                ch_mid = sorted_chs[len(sorted_chs) // 2]
+                ch_end = sorted_chs[-1]
+                text_beg = ch_beg.text_en or ch_beg.text_ja or getattr(ch_beg, "text_zh", "") or ""
+                text_mid = ch_mid.text_en or ch_mid.text_ja or getattr(ch_mid, "text_zh", "") or ""
+                text_end = ch_end.text_en or ch_end.text_ja or getattr(ch_end, "text_zh", "") or ""
+                text = text_beg + "\n\n" + text_mid + "\n\n" + text_end
+
             semantic = match_semantic(text) if text else None
 
             if agg:

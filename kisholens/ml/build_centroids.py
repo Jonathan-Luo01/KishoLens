@@ -68,8 +68,11 @@ GENRE_TAG_MAP: dict[str, list[str]] = {
     "Cozy Fantasy": [
         "cozy", "cozy-fantasy", "cozy fantasy", "farming", "shopkeeper", "crafting", "alchemy", "cooking",
     ],
-    "Slice of Life / Contemporary": [
-        "slice-of-life", "slice of life", "school-life", "school life", "modern-day", "modern day", "contemporary", "ordinary life", "daily life", "school",
+    "Slice of Life": [
+        "slice-of-life", "slice of life", "ordinary life", "daily life",
+    ],
+    "Contemporary": [
+        "contemporary", "school-life", "school life", "modern-day", "modern day", "school",
     ],
     "Villainess / Otome Game": [
         "villainess", "otome", "otome-game", "otome game", "noble",
@@ -149,7 +152,8 @@ GENRE_TERRITORIES: dict[str, str] = {
     "High Fantasy":                    "Traditional Fiction Territory",
     "Hard Sci-Fi":                     "Traditional Fiction Territory",
     "Modern Thriller":                 "Traditional Fiction Territory",
-    "Slice of Life / Contemporary":    "Traditional Fiction Territory",
+    "Slice of Life":                   "Traditional Fiction Territory",
+    "Contemporary":                    "Traditional Fiction Territory",
     "Mystery":                         "Traditional Fiction Territory",
     "Horror":                          "Traditional Fiction Territory",
     "Romance":                         "Traditional Fiction Territory",
@@ -199,39 +203,40 @@ def _get_model(model_name: str = "all-MiniLM-L6-v2"):
 
 def get_representative_sample(text: str, target_words: int = 1000) -> str:
     """
-    Extracts a representative chunk of text from the middle of a book,
-    bypassing all front matter (TOCs, Prefaces, Introductions).
+    Extracts a representative sample of text by combining chunks from the
+    beginning, middle, and end of the book/draft, bypassing local topic bias.
     """
     import re
-    # If the text is surprisingly short (e.g., a short story or web novel chapter), 
-    # jumping 20% might skip too much. Fall back to the beginning.
-    if not text or len(text) < 10000:
+    # If the text is short (e.g., short story, web novel chapter < 15000 characters),
+    # just return the first target_words.
+    if not text or len(text) < 15000:
         words = text.split()
         return " ".join(words[:target_words])
 
-    # 1. The 20% Rule: Jump past the first 20% of the book.
-    # This safely bypasses even the longest Victorian prefaces.
-    start_index = int(len(text) * 0.20)
-
-    # 2. Prevent mid-word or mid-sentence slicing.
-    # We search forward from our 20% mark for the very next paragraph break (double newline).
-    # This ensures our sample starts cleanly at the beginning of a new thought.
-    match = re.search(r'\n\s*\n', text[start_index:])
+    # We want to sample from three regions:
+    # 1. Beginning (at 20% mark, to bypass TOC/preface)
+    # 2. Middle (at 50% mark)
+    # 3. End (at 80% mark)
+    words_per_segment = target_words // 3
     
-    if match:
-        # Shift our start index to immediately after that double newline
-        start_index = start_index + match.end()
+    def get_chunk(start_pct: float) -> str:
+        start_idx = int(len(text) * start_pct)
+        # Align to next paragraph break (double newline) to keep clean boundaries
+        match = re.search(r'\n\s*\n', text[start_idx:])
+        if match:
+            start_idx = start_idx + match.end()
+        
+        # Grab a character buffer large enough for the target words
+        buffer_len = words_per_segment * 12
+        raw_chunk = text[start_idx : start_idx + buffer_len]
+        chunk_words = raw_chunk.split()
+        return " ".join(chunk_words[:words_per_segment])
 
-    # 3. Grab a large enough character chunk to guarantee we hit our word limit.
-    # (Assuming average English word length is 5 chars + space, grabbing 10x the target is safe)
-    buffer_length = target_words * 10
-    raw_chunk = text[start_index : start_index + buffer_length]
-
-    # 4. Tokenize cleanly by whitespace and enforce the exact word count
-    words = raw_chunk.split()
-    sampled_words = words[:target_words]
-
-    return " ".join(sampled_words)
+    chunk_beg = get_chunk(0.20)
+    chunk_mid = get_chunk(0.50)
+    chunk_end = get_chunk(0.80)
+    
+    return f"{chunk_beg}\n\n{chunk_mid}\n\n{chunk_end}"
 
 
 def embed_texts(
