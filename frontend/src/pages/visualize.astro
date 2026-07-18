@@ -709,7 +709,7 @@ import "../styles/global.css";
         const svg = document.getElementById("arcChart");
         svg.innerHTML = "";
         const W = 600, H = 420;
-        const PAD = { top: 30, bottom: 48, left: 48, right: 16 };
+        const PAD = { top: 30, bottom: 48, left: 48, right: 48 };
         const plotW = W - PAD.left - PAD.right;
         const plotH = H - PAD.top - PAD.bottom;
         const ns = "http://www.w3.org/2000/svg";
@@ -1098,7 +1098,7 @@ import "../styles/global.css";
           const svgX = (e.clientX - rect.left) * (600 / rect.width);
           
           const W = 600;
-          const PAD = { top: 30, bottom: 48, left: 48, right: 16 };
+          const PAD = { top: 30, bottom: 48, left: 48, right: 48 };
           const plotW = W - PAD.left - PAD.right;
           const acts = currentArc.acts;
           
