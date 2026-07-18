@@ -234,12 +234,24 @@ def get_novel_stats(novel_id: int):
             # Limit to first 100 paragraphs for dashboard display
             agg["pacing"] = paragraph_lengths[:100]
 
+            # Compute semantic genre and territory on-the-fly using the first chapter
+            first_ch = sorted(chapters, key=lambda c: c.chapter_number)[0] if chapters else None
+            text = (first_ch.text_en or first_ch.text_ja or getattr(first_ch, "text_zh", "")) if first_ch else ""
+            semantic = match_semantic(text) if text else None
+
             if agg:
-                agg["archetype_match"] = {
-                    "closest_trope": novel.genre or "Unknown",
-                    "territory": novel.territory or "Unknown",
-                    "confidence": 1.0
-                }
+                if semantic:
+                    agg["archetype_match"] = {
+                        "closest_trope": semantic["genre"],
+                        "territory": semantic["territory"],
+                        "confidence": semantic["genre_confidence"]
+                    }
+                else:
+                    agg["archetype_match"] = {
+                        "closest_trope": novel.genre or "Unknown",
+                        "territory": novel.territory or "Unknown",
+                        "confidence": 0.85
+                    }
 
             return agg
     except Exception as e:
