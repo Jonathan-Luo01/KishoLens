@@ -8,9 +8,10 @@ import "../styles/global.css";
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Explore web novels in KishoLens with pacing metrics, dialogue ratios, and prose sentiment analysis."
+      content="KishoLens Library & Visualizations — Explore prose archetypes, pacing metrics, dialogue ratios, and Kishōtenketsu sentiment arcs for web novels and classic literature."
     />
-    <title>Library — KishoLens Dashboard</title>
+    <title>Library</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -18,81 +19,292 @@ import "../styles/global.css";
       rel="stylesheet"
     />
     <style>
+      *, *::before, *::after { box-sizing: border-box; }
+
+      body {
+        background: #0a0a12;
+        color: #e2e2f0;
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+      }
+
       .app-container {
-        max-width: 1200px;
+        max-width: 1280px;
         margin: 0 auto;
-        padding: 2rem 1.5rem 4rem 1.5rem;
+        padding: 2rem 1.5rem 5rem;
         display: flex;
         flex-direction: column;
-        gap: 2rem;
+        gap: 1.75rem;
       }
-      
+
       header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid var(--color-border);
-        padding-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding-bottom: 1.25rem;
       }
-      
+
       .brand-title {
-        font-family: var(--font-display);
+        font-family: 'Outfit', sans-serif;
         font-size: 1.8rem;
         font-weight: 700;
         text-decoration: none;
-        color: var(--color-text);
+        color: #e2e2f0;
       }
-      
+
       .brand-title span {
-        background: linear-gradient(135deg, var(--color-accent), var(--color-accent-2));
+        background: linear-gradient(135deg, #a78bfa, #f472b6);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
       }
 
+      nav {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+      }
+
+      nav a {
+        color: rgba(255, 255, 255, 0.45);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: color 0.2s;
+        display: inline-block;
+      }
+
+      nav a + a {
+        margin-left: 1.5rem;
+      }
+
+      nav a:hover, nav a.active { color: #a78bfa; }
+
       .dashboard-layout {
         display: grid;
         grid-template-columns: 1.2fr 1fr;
-        gap: 2rem;
+        gap: 1.75rem;
+        align-items: start;
       }
 
-      @media (max-width: 900px) {
+      @media (max-width: 950px) {
         .dashboard-layout {
           grid-template-columns: 1fr;
         }
       }
 
-      /* Card styling */
+      /* Territory Tabs Selector */
+      .territory-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 0.85rem;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        padding: 0.35rem;
+      }
+
+      .t-tab {
+        flex: 1;
+        background: transparent;
+        border: none;
+        border-radius: 8px;
+        padding: 0.6rem 0.75rem;
+        color: var(--color-muted);
+        font-family: var(--font-sans);
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: background var(--transition), color var(--transition);
+        text-align: center;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+      }
+
+      .t-tab:hover { color: var(--color-text); }
+      .t-tab.active {
+        background: var(--color-accent);
+        color: #ffffff;
+      }
+
+      /* Explorer Cards & Sections */
+      .explorer-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius);
+        padding: 1.25rem;
+        backdrop-filter: blur(12px);
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+      }
+
+      .explorer-section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .explorer-section:last-child {
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+
+      .explorer-section-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: var(--font-display);
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--color-text);
+        letter-spacing: 0.02em;
+      }
+
+      .count-badge {
+        background: rgba(124, 106, 255, 0.15);
+        color: var(--color-accent);
+        border: 1px solid rgba(124, 106, 255, 0.3);
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 0.18rem 0.6rem;
+        border-radius: 999px;
+      }
+
+      .search-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .search-input-wrapper svg {
+        position: absolute;
+        left: 0.85rem;
+        width: 16px;
+        height: 16px;
+        color: var(--color-muted);
+        pointer-events: none;
+      }
+
+      .search-input-wrapper input {
+        width: 100%;
+        padding-left: 2.35rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--color-border);
+        border-radius: 10px;
+        height: 40px;
+        font-size: 0.85rem;
+        color: var(--color-text);
+        outline: none;
+        transition: border-color var(--transition), box-shadow var(--transition);
+      }
+
+      .search-input-wrapper input:focus {
+        border-color: var(--color-accent);
+        box-shadow: 0 0 12px rgba(124, 106, 255, 0.15);
+      }
+
+      .territory-desc-card {
+        background: rgba(124, 106, 255, 0.03);
+        border: 1px dashed rgba(124, 106, 255, 0.25);
+        border-radius: var(--radius);
+        padding: 0.85rem 1rem;
+        margin-bottom: 0;
+        font-size: 0.82rem;
+        line-height: 1.45;
+        color: var(--color-muted);
+      }
+
+      .section-title {
+        font-family: var(--font-display);
+        font-size: 1.05rem;
+        margin: 1rem 0 0.6rem 0;
+        color: var(--color-text);
+      }
+
+      /* Genre Checkboxes Grid */
+      .genre-checkbox-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .genre-check-box {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        padding: 0.45rem 0.75rem;
+        font-size: 0.82rem;
+        color: var(--color-muted);
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s;
+      }
+
+      .genre-check-box:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--color-text);
+        border-color: rgba(124, 106, 255, 0.3);
+      }
+
+      .genre-check-box.active {
+        background: rgba(124, 106, 255, 0.14);
+        border-color: var(--color-accent);
+        color: #ffffff;
+      }
+
+      .genre-check-box input[type="checkbox"] {
+        accent-color: var(--color-accent);
+        width: 14px;
+        height: 14px;
+        cursor: pointer;
+      }
+
+      /* Card novel styling */
       .card {
         background: rgba(255, 255, 255, 0.02);
         border: 1px solid var(--color-border);
         border-radius: var(--radius);
-        padding: 1.5rem;
-        transition: transform var(--transition), border-color var(--transition), background var(--transition);
+        padding: 1.25rem;
         backdrop-filter: blur(12px);
-      }
-
-      .card:hover {
-        background: rgba(255, 255, 255, 0.04);
-        border-color: rgba(124, 106, 255, 0.3);
       }
 
       .card-novel {
         cursor: pointer;
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        gap: 0.4rem;
+        background: rgba(255, 255, 255, 0.015);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius);
+        padding: 0.85rem 1rem;
+        transition: transform var(--transition), border-color var(--transition), background var(--transition);
+      }
+
+      .card-novel:hover {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(124, 106, 255, 0.3);
       }
 
       .card-novel.active {
-        background: rgba(124, 106, 255, 0.06);
+        background: rgba(124, 106, 255, 0.08);
         border-color: var(--color-accent);
-        box-shadow: 0 0 20px rgba(124, 106, 255, 0.15);
+        box-shadow: 0 0 15px rgba(124, 106, 255, 0.15);
       }
 
       .card__title {
         font-family: var(--font-display);
-        font-size: 1.15rem;
+        font-size: 1rem;
         font-weight: 600;
         line-height: 1.3;
       }
@@ -100,43 +312,59 @@ import "../styles/global.css";
       .card__meta {
         display: flex;
         justify-content: space-between;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         color: var(--color-muted);
       }
 
       .novel-list {
         display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap: 0.65rem;
+        max-height: 280px;
+        overflow-y: auto;
+        padding-right: 0.35rem;
       }
 
-      /* Stats styling */
+      /* Scrollbar styling */
+      .novel-list::-webkit-scrollbar, .stats-content-scroll::-webkit-scrollbar {
+        width: 6px;
+      }
+      .novel-list::-webkit-scrollbar-thumb, .stats-content-scroll::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 4px;
+      }
+
+      /* Stats panel styling */
       .stats-panel {
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
-        position: sticky;
-        top: 2rem;
+        gap: 1.25rem;
+      }
+
+      .stats-content-scroll {
+        max-height: 260px;
+        overflow-y: auto;
+        padding-right: 0.35rem;
       }
 
       .stat-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
+        gap: 0.65rem;
       }
 
       .stat-item {
-        background: rgba(255, 255, 255, 0.01);
+        background: rgba(255, 255, 255, 0.015);
         border: 1px solid var(--color-border);
         border-radius: 8px;
-        padding: 1rem;
+        padding: 0.65rem 0.8rem;
         display: flex;
         flex-direction: column;
-        gap: 0.25rem;
+        gap: 0.2rem;
       }
 
       .stat-label {
-        font-size: 0.75rem;
+        font-size: 0.68rem;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         color: var(--color-muted);
@@ -144,7 +372,7 @@ import "../styles/global.css";
 
       .stat-value {
         font-family: var(--font-display);
-        font-size: 1.3rem;
+        font-size: 1.1rem;
         font-weight: 600;
         color: var(--color-accent-2);
       }
@@ -153,12 +381,12 @@ import "../styles/global.css";
       .form-group {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
+        gap: 0.4rem;
+        margin-bottom: 0.85rem;
       }
 
       label {
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         font-weight: 500;
         color: var(--color-text);
       }
@@ -167,10 +395,10 @@ import "../styles/global.css";
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid var(--color-border);
         border-radius: 8px;
-        padding: 0.65rem;
+        padding: 0.55rem 0.75rem;
         color: var(--color-text);
         font-family: var(--font-sans);
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         outline: none;
         transition: border-color var(--transition);
       }
@@ -179,34 +407,276 @@ import "../styles/global.css";
         border-color: var(--color-accent);
       }
 
-      .form-actions {
-        margin-top: 1rem;
-      }
-
-      .alert {
-        padding: 0.75rem 1rem;
-        border-radius: 8px;
-        font-size: 0.85rem;
-        display: none;
-      }
-      
-      .alert--success {
-        background: rgba(16, 185, 129, 0.1);
-        border: 1px solid rgba(16, 185, 129, 0.3);
-        color: rgb(52, 211, 153);
-      }
-
-      .alert--error {
-        background: rgba(239, 68, 68, 0.1);
-        border: 1px solid rgba(239, 68, 68, 0.3);
-        color: rgb(248, 113, 113);
-      }
-      
       .placeholder-text {
         color: var(--color-muted);
         text-align: center;
-        padding: 3rem 1rem;
+        padding: 2.5rem 1rem;
         font-style: italic;
+        font-size: 0.88rem;
+      }
+
+      /* Controls Bar & Charts */
+      .controls-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.25rem;
+        align-items: center;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 1rem;
+        padding: 1rem 1.25rem;
+      }
+
+      .selector-group {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        flex: 1;
+        min-width: 220px;
+      }
+
+      .selector-group label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: rgba(255,255,255,0.4);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+      }
+
+      select#novelSelect {
+        flex: 1;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 0.5rem;
+        color: #e2e2f0;
+        font-family: inherit;
+        font-size: 0.9rem;
+        padding: 0.45rem 0.75rem;
+        cursor: pointer;
+        outline: none;
+        transition: border-color 0.2s;
+        min-width: 0;
+        width: 100%;
+      }
+
+      select#novelSelect:focus { border-color: #a78bfa; }
+
+      .baseline-group {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        flex-shrink: 0;
+      }
+
+      .baseline-group span {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: rgba(255,255,255,0.4);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .baseline-btn {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 0.5rem;
+        color: rgba(255,255,255,0.6);
+        font-family: inherit;
+        font-size: 0.82rem;
+        font-weight: 600;
+        padding: 0.45rem 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .baseline-btn:hover { color: #e2e2f0; border-color: rgba(255,255,255,0.25); }
+      .baseline-btn.active[data-baseline="web_novel"] {
+        background: rgba(167,139,250,0.18);
+        border-color: #a78bfa;
+        color: #c4b5fd;
+      }
+      .baseline-btn.active[data-baseline="classic_lit"] {
+        background: rgba(251,191,36,0.18);
+        border-color: #fbbf24;
+        color: #fde68a;
+      }
+
+      .charts-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+      }
+
+      @media (max-width: 900px) {
+        .charts-grid { grid-template-columns: 1fr; }
+      }
+
+      .chart-card {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        position: relative;
+      }
+
+      .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .chart-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.15rem;
+        font-weight: 600;
+      }
+
+      .chart-legend {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        font-size: 0.78rem;
+        color: rgba(255,255,255,0.5);
+      }
+
+      .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+      .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+      .legend-dot.user { background: #7dd3fc; }
+      .legend-dot.wn { background: #a78bfa; }
+      .legend-dot.baseline { background: #a78bfa; }
+
+      #radarChart {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        max-width: 480px;
+        margin: 0 auto;
+        display: block;
+        cursor: crosshair;
+        image-rendering: crisp-edges;
+      }
+
+      svg#arcChart {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 600 / 420;
+        display: block;
+        cursor: crosshair;
+      }
+
+      .archetype-label {
+        text-align: center;
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.5);
+        font-style: italic;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      .status-spinner {
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(124, 106, 255, 0.2);
+        border-top-color: var(--color-accent);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+
+      .status-icon--success {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: rgba(16, 185, 129, 0.2);
+        color: rgb(52, 211, 153);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.8rem;
+        flex-shrink: 0;
+      }
+
+      .status-icon--error {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: rgba(239, 68, 68, 0.2);
+        color: rgb(248, 113, 113);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.8rem;
+        flex-shrink: 0;
+      }
+
+      .status-pill {
+        font-size: 0.68rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.18rem 0.5rem;
+        border-radius: 999px;
+      }
+
+      .status-pill--running {
+        background: rgba(124, 106, 255, 0.15);
+        color: var(--color-accent);
+        border: 1px solid rgba(124, 106, 255, 0.3);
+      }
+
+      .status-pill--completed {
+        background: rgba(16, 185, 129, 0.15);
+        color: rgb(52, 211, 153);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+      }
+
+      .status-pill--failed {
+        background: rgba(239, 68, 68, 0.15);
+        color: rgb(248, 113, 113);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+      }
+
+      /* Hover Tooltips for Charts */
+      .radar-tooltip {
+        position: fixed;
+        pointer-events: none;
+        background: rgba(10, 10, 18, 0.95);
+        border: 1px solid rgba(124, 106, 255, 0.35);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(8px);
+        border-radius: 8px;
+        padding: 0.65rem 0.85rem;
+        font-size: 0.8rem;
+        z-index: 1000;
+        display: none;
+      }
+      .radar-tooltip-title {
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 0.35rem;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        padding-bottom: 0.25rem;
+      }
+      .radar-tooltip-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 0.2rem;
+      }
+      .radar-tooltip-val {
+        font-family: var(--font-display);
+        font-weight: 600;
       }
     </style>
   </head>
@@ -215,19 +685,71 @@ import "../styles/global.css";
     <div class="app-container">
       <header>
         <a href="/" class="brand-title">Kish<span>o</span>Lens</a>
-        <nav style="display:flex;gap:1.5rem;align-items:center;">
-          <a href="/analyze" style="color:rgba(255,255,255,0.45);text-decoration:none;font-size:0.9rem;font-weight:500;">Analyze</a>
-          <a href="/library" style="color:var(--color-accent);text-decoration:none;font-size:0.9rem;font-weight:500;">Library</a>
-          <a href="/visualize" style="color:rgba(255,255,255,0.45);text-decoration:none;font-size:0.9rem;font-weight:500;">Visualize</a>
+        <nav>
+          <a href="/analyze">Analyze Prose</a>
+          <a href="/library" class="active">Library</a>
         </nav>
       </header>
 
+      <!-- 1. Top Section: Library Explorer (Left) + Stylistic Stats & Ingest Form (Right) -->
       <div class="dashboard-layout">
-        <!-- Left Side: Novels List -->
-        <div>
-          <h2 style="font-family: var(--font-display); margin-bottom: 1.5rem;">Library Novels</h2>
-          <div class="novel-list" id="novels-container">
-            <div class="placeholder-text">Loading library novels...</div>
+        <!-- Left Side: Clean Card for Search, Filters, and Novel Explorer -->
+        <div class="card explorer-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; margin: 0;">Library & Prose Explorer</h2>
+            <span class="count-badge" id="novel-count-badge">Loading...</span>
+          </div>
+
+          <!-- Section 1: Search & Territory Selection -->
+          <div class="explorer-section">
+            <div class="explorer-section-title">
+              <span>🔍 Search & Territory</span>
+            </div>
+
+            <!-- Search Input with Icon -->
+            <div class="search-input-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                id="novel-search-input"
+                placeholder="Search by novel title, author, or dataset..."
+              />
+            </div>
+
+            <!-- Territory Selector Tabs -->
+            <div class="territory-tabs" id="territory-selector" style="margin-top: 0.4rem; margin-bottom: 0;">
+              <button class="t-tab active" data-territory="All" onclick="selectTerritory('All')">🌐 All Genres</button>
+              <button class="t-tab" data-territory="Classic Literature Territory" onclick="selectTerritory('Classic Literature Territory')">📜 Classics</button>
+              <button class="t-tab" data-territory="Traditional Fiction Territory" onclick="selectTerritory('Traditional Fiction Territory')">📚 Traditional</button>
+              <button class="t-tab" data-territory="Web Novel Territory" onclick="selectTerritory('Web Novel Territory')">⚡ Web Novels</button>
+            </div>
+
+            <!-- Active Territory Description -->
+            <div class="territory-desc-card" id="territory-description" style="margin-bottom: 0;">
+              Explore prose archetypes, pacing metrics, and structural profiles across all ingested literature.
+            </div>
+          </div>
+
+          <!-- Section 2: Prose Genre Filters -->
+          <div class="explorer-section">
+            <div class="explorer-section-title">
+              <span>🏷️ Filter by Prose Genre</span>
+            </div>
+            <div class="genre-checkbox-grid" id="genre-checkboxes-container">
+              <div class="placeholder-text" style="padding: 0.5rem 0; grid-column: 1 / -1;">Loading genres...</div>
+            </div>
+          </div>
+
+          <!-- Section 3: Ingested Novels List -->
+          <div class="explorer-section">
+            <div class="explorer-section-title">
+              <span id="novels-list-title">📚 Ingested Novels</span>
+            </div>
+            <div class="novel-list" id="novels-container">
+              <div class="placeholder-text">Loading library novels...</div>
+            </div>
           </div>
         </div>
 
@@ -235,111 +757,412 @@ import "../styles/global.css";
         <div class="stats-panel">
           <!-- Stats Viewer -->
           <div class="card" id="stats-container">
-            <h3 style="font-family: var(--font-display); margin-bottom: 1rem;" id="novel-details-title">Stylistic Analysis</h3>
-            <div id="stats-content">
-              <p class="placeholder-text">Select a novel from the library to view detailed stylistic pacing and sentiment metrics.</p>
+            <h3 style="font-family: var(--font-display); font-size: 1.15rem; margin-bottom: 0.75rem;" id="novel-details-title">Stylistic Analysis</h3>
+            <div id="stats-content" class="stats-content-scroll">
+              <p class="placeholder-text">Select a novel from the list to load its stylistic analysis & visualizations.</p>
             </div>
           </div>
 
           <!-- Ingestion Form -->
           <div class="card">
-            <h3 style="font-family: var(--font-display); margin-bottom: 1rem;">Ingest Dataset</h3>
+            <h3 style="font-family: var(--font-display); font-size: 1.15rem; margin-bottom: 0.75rem;">Ingest Dataset</h3>
             <form id="ingest-form">
               <div class="form-group">
                 <label for="dataset_name">HuggingFace Dataset / Gutenberg ID</label>
                 <input
                   type="text"
                   id="dataset_name"
-                  placeholder="e.g. gutenberg/1342 or botp/RyokoAI_CNNovel125K"
+                  placeholder="e.g. gutenberg/1234 or org/dataset-name"
                   required
                 />
               </div>
-              <div class="form-group">
-                <label for="num_records">Record Ingestion Limit</label>
-                <input
-                  type="number"
-                  id="num_records"
-                  value="2"
-                  min="1"
-                  max="100"
-                  required
-                />
-              </div>
-              <div class="alert alert--success" id="alert-success">Ingestion task successfully scheduled!</div>
-              <div class="alert alert--error" id="alert-error">Failed to schedule ingestion.</div>
-              <div class="form-actions">
-                <button type="submit" class="btn btn--primary" id="ingest-submit" style="width: 100%;">Schedule Ingest</button>
+              <div style="display: flex; gap: 0.75rem; align-items: flex-end;">
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                  <label for="num_records">Record Limit</label>
+                  <input
+                    type="number"
+                    id="num_records"
+                    value="12"
+                    min="1"
+                    max="500"
+                    required
+                  />
+                </div>
+                <button type="submit" class="btn btn--primary" id="ingest-submit" style="flex: 1.5; height: 38px; font-size: 0.85rem;">Schedule Ingest</button>
               </div>
             </form>
           </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Client-side logic -->
-    <script is:inline>
-      const API_URL = "http://127.0.0.1:8000";
-
-      // 1. Fetch and render novels on load
-      async function loadNovels() {
-        const container = document.getElementById("novels-container");
-        try {
-          const res = await fetch(`${API_URL}/api/novels`);
-          if (!res.ok) throw new Error("API request failed");
-          const novels = await res.json();
-
-          if (novels.length === 0) {
-            container.innerHTML = `<div class="placeholder-text">No novels found in the database. Ingest a dataset below to populate.</div>`;
-            return;
-          }
-
-          container.innerHTML = novels
-            .map(
-              (n) => `
-            <div class="card card-novel" onclick="selectNovel(${n.id}, this)">
-              <div class="card__title">${escapeHtml(n.title)}</div>
-              <div class="card__meta">
-                <span>By ${escapeHtml(n.author)}</span>
-                <span>Source: <strong style="color: var(--color-accent-2);">${escapeHtml(n.source)}</strong></span>
-                <span>${n.chapter_count} chs</span>
+          <!-- Ingestion Status Loading Card -->
+          <div class="card" id="ingest-status-card" style="display: none;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+              <h4 style="font-family: var(--font-display); font-size: 0.9rem; font-weight: 600; margin: 0;">Ingestion Status</h4>
+              <span id="ingest-status-badge" class="status-pill status-pill--running">Processing</span>
+            </div>
+            
+            <div style="display: flex; align-items: flex-start; gap: 0.75rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 0.75rem 0.85rem; border-radius: 8px;">
+              <div id="ingest-status-icon" class="status-spinner"></div>
+              <div style="flex: 1; min-width: 0;">
+                <div id="ingest-status-dataset" style="font-size: 0.82rem; font-weight: 600; color: var(--color-text); word-break: break-all;"></div>
+                <div id="ingest-status-message" style="font-size: 0.78rem; color: var(--color-muted); margin-top: 0.15rem;">Fetching and indexing records...</div>
+                <div id="ingest-status-detail" style="font-size: 0.72rem; color: rgb(248, 113, 113); margin-top: 0.25rem; display: none; word-break: break-word;"></div>
               </div>
             </div>
-          `
-            )
-            .join("");
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Middle Section: Controls Bar for Selection & Baseline Comparisons -->
+      <div class="controls-bar">
+        <div class="selector-group">
+          <label for="novelSelect">Selected Novel</label>
+          <select id="novelSelect">
+            <option value="">— Select a novel —</option>
+          </select>
+        </div>
+        <div class="baseline-group">
+          <span>Compare to:</span>
+          <button id="btnWebNovel" class="baseline-btn active" data-baseline="web_novel">Web Novel</button>
+          <button id="btnClassic"  class="baseline-btn"        data-baseline="classic_lit">Classic Lit</button>
+        </div>
+      </div>
+
+      <!-- 3. Bottom Section: Interactive Visualizations (Archetype Radar, Sentiment Arc, Pacing Barcode) -->
+      <div class="charts-grid" id="chartsGrid" style="display: none;">
+
+        <!-- Archetype Radar Chart -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h2 class="chart-title">Archetype Radar</h2>
+            <div class="chart-legend">
+              <span class="legend-item"><span class="legend-dot user"></span>Selected Novel</span>
+              <span class="legend-item"><span class="legend-dot wn" id="radarBaselineLegendDot"></span><span id="radarBaselineLegendLabel">Web Novel</span></span>
+            </div>
+          </div>
+          <canvas id="radarChart"></canvas>
+          <p id="archetypeLabel" class="archetype-label"></p>
+        </div>
+
+        <!-- Kishōtenketsu Sentiment Arc Chart -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h2 class="chart-title">Kishōtenketsu Sentiment Arc</h2>
+            <div class="chart-legend">
+              <span class="legend-item"><span class="legend-dot user"></span>Selected Novel</span>
+              <span class="legend-item"><span class="legend-dot baseline" id="arcBaselineLegendDot"></span><span id="baselineLegendLabel">Web Novel</span></span>
+            </div>
+          </div>
+          <p style="color: rgba(255,255,255,0.4); font-size: 0.8rem; line-height: 1.4; margin-top: -0.25rem;">
+            Tracks emotional polarity of the language used across the 4 acts (Ki, Shō, Ten, Ketsu).
+          </p>
+          <svg id="arcChart" viewBox="0 0 600 420" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+
+        <!-- Rhythmic Pacing Barcode (Full Width) -->
+        <div class="chart-card" style="grid-column: 1 / -1;">
+          <div class="chart-header">
+            <h2 class="chart-title">Rhythmic Pacing (Paragraph Density)</h2>
+            <div class="chart-legend">
+              <span class="legend-item"><span class="legend-dot user"></span>Selected Novel</span>
+              <span class="legend-item"><span class="legend-dot baseline" id="pacingBaselineLegendDot"></span><span id="pacingBaselineLegendLabel">Web Novel</span></span>
+            </div>
+          </div>
+          <p style="color: rgba(255,255,255,0.45); font-size: 0.8rem; line-height: 1.45;">
+            Each block represents a paragraph. Height/opacity represents word or character count. Web Novels rely on rapid, fragmented lines for mobile scrolling, while classics use dense text blocks.
+          </p>
+          
+          <div style="margin-top: 1rem;">
+            <h4 style="color: rgba(255,255,255,0.5); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;" id="pacingDraftLabel">Selected Novel (Paragraph Lengths)</h4>
+            <div id="pacingBarcodeUser" style="display: flex; height: 60px; align-items: stretch; gap: 2px; background: rgba(0,0,0,0.25); padding: 4px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);"></div>
+          </div>
+          
+          <div style="margin-top: 1.25rem;">
+            <h4 style="color: rgba(255,255,255,0.5); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;" id="pacingBaselineLabel">Web Novel Baseline</h4>
+            <div id="pacingBarcodeBaseline" style="display: flex; height: 60px; align-items: stretch; gap: 2px; background: rgba(0,0,0,0.25); padding: 4px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);"></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Tooltip Nodes for Interactive Chart Hover -->
+    <div id="radarTooltip" class="radar-tooltip"></div>
+    <div id="arcTooltip" class="radar-tooltip"></div>
+
+    <!-- Client-side Logic -->
+    <script is:inline>
+      const API_URL = "http://localhost:8000";
+
+      let allNovels = [];
+      let selectedTerritory = "All";
+      let selectedGenres = new Set(["All"]);
+      let searchQuery = "";
+      let selectedNovelId = null;
+
+      let currentStats = null;
+      let currentArc   = null;
+      let activeBaseline = "web_novel";
+      let hoveredIndex = -1;
+      let hoveredArcIndex = -1;
+
+      // 1. Definition of Territories and Prose Genres
+      const TERRITORIES = {
+        "Classic Literature Territory": {
+          description: "Traditional printed classics characterized by rich syntax structures, formal descriptive vocabulary, and low dialogic reliance.",
+          genres: {
+            "Victorian Novel": { icon: "🎩", description: "Complex sentence clauses, formal vocabulary, and low dialogue." },
+            "Philosophical Fiction": { icon: "👁️", description: "High lexical density, thematic reflections, and existential text flow." }
+          }
+        },
+        "Traditional Fiction Territory": {
+          description: "Modern commercial print fiction characterized by narrative pacing, targeted dialogue, and descriptive immersion.",
+          genres: {
+            "Modern Thriller": { icon: "🕵️", description: "High dialogue ratio, short paragraph spacing, and rapid action flow." },
+            "Hard Sci-Fi": { icon: "🚀", description: "Deep conceptual themes, science explication, and world grounding." },
+            "High Fantasy": { icon: "🏰", description: "Rich descriptive density, deep sensory focus, and complex syntax." }
+          }
+        },
+        "Web Novel Territory": {
+          description: "Serialized internet fiction characterized by rapid sentence pacing, dialogue reliance, and progression tropes.",
+          genres: {
+            "LitRPG": { icon: "🎮", description: "Gaming mechanics, status brackets, rapid pacing, and high dialogue." },
+            "Isekai": { icon: "🌀", description: "Portal/reincarnation tropes, informal flow, and dialogue reliance." },
+            "Urban Romance": { icon: "🌆", description: "High dialogue ratio, emotional monologue, and short paragraph structures." },
+            "Wuxia / Xianxia": { icon: "⚔️", description: "Cultivation terminology, internal energy flow, and combat verbs." },
+            "Gothic Horror": { icon: "🦇", description: "Atmospheric environment description, low dialogue, and high sensory density." }
+          }
+        }
+      };
+
+      // 2. Fetch and render novels
+      async function fetchNovels() {
+        try {
+          const res = await fetch(`${API_URL}/api/novels`);
+          if (!res.ok) throw new Error("Failed to fetch novels");
+          allNovels = await res.json();
+
+          populateNovelDropdown();
+          renderGenreCheckboxes();
+          filterNovels();
         } catch (err) {
-          container.innerHTML = `<div class="placeholder-text" style="color: rgb(248, 113, 113);">Error fetching novels from backend API. Make sure the FastAPI server is running.</div>`;
+          console.error("Error fetching novels:", err);
+          document.getElementById("novels-container").innerHTML = `<p class="placeholder-text">Failed to load novels. Ensure backend API is running at ${API_URL}</p>`;
         }
       }
 
-      // 2. Click handler to select novel and fetch statistics
-      async function selectNovel(id, element) {
-        // Highlight selected card
-        document.querySelectorAll(".card-novel").forEach((c) => c.classList.remove("active"));
-        element.classList.add("active");
+      function populateNovelDropdown(novelsToPopulate = allNovels) {
+        const sel = document.getElementById("novelSelect");
+        sel.innerHTML = '<option value="">— Select a novel —</option>';
+        novelsToPopulate.forEach(n => {
+          const opt = document.createElement("option");
+          opt.value = n.id;
+          opt.textContent = `${n.title} (${n.chapter_count || 1} ch)`;
+          sel.appendChild(opt);
+        });
+        if (selectedNovelId && novelsToPopulate.some(n => n.id === selectedNovelId)) {
+          sel.value = selectedNovelId;
+        } else {
+          sel.value = "";
+        }
+      }
 
+      function selectTerritory(tName) {
+        selectedTerritory = tName;
+        selectedGenres.clear();
+        selectedGenres.add("All");
+        
+        document.querySelectorAll("#territory-selector .t-tab").forEach(tab => {
+          if (tab.getAttribute("data-territory") === tName) {
+            tab.classList.add("active");
+          } else {
+            tab.classList.remove("active");
+          }
+        });
+
+        const descContainer = document.getElementById("territory-description");
+        if (tName === "All") {
+          descContainer.innerText = "Explore prose archetypes, pacing metrics, and structural profiles across all literature territories.";
+        } else if (TERRITORIES[tName]) {
+          descContainer.innerText = TERRITORIES[tName].description;
+        }
+
+        renderGenreCheckboxes();
+        filterNovels();
+      }
+
+      function renderGenreCheckboxes() {
+        const container = document.getElementById("genre-checkboxes-container");
+        container.innerHTML = "";
+
+        let genresToRender = {};
+        if (selectedTerritory === "All") {
+          Object.values(TERRITORIES).forEach(t => {
+            Object.assign(genresToRender, t.genres);
+          });
+        } else if (TERRITORIES[selectedTerritory]) {
+          genresToRender = TERRITORIES[selectedTerritory].genres;
+        }
+
+        // Render 'All Genres' checkbox
+        const allBox = document.createElement("label");
+        const isAllChecked = selectedGenres.has("All");
+        allBox.className = `genre-check-box ${isAllChecked ? "active" : ""}`;
+        allBox.innerHTML = `
+          <input type="checkbox" value="All" ${isAllChecked ? "checked" : ""} onchange="toggleGenreCheck('All')" />
+          <span>🌐 All Genres</span>
+        `;
+        container.appendChild(allBox);
+
+        Object.entries(genresToRender).forEach(([gName, gInfo]) => {
+          const box = document.createElement("label");
+          const isChecked = selectedGenres.has(gName);
+          box.className = `genre-check-box ${isChecked ? "active" : ""}`;
+          box.title = gInfo.description;
+          box.innerHTML = `
+            <input type="checkbox" value="${gName}" ${isChecked ? "checked" : ""} onchange="toggleGenreCheck('${gName}')" />
+            <span>${gInfo.icon} ${gName}</span>
+          `;
+          container.appendChild(box);
+        });
+      }
+
+      function toggleGenreCheck(gName) {
+        if (gName === "All") {
+          selectedGenres.clear();
+          selectedGenres.add("All");
+        } else {
+          selectedGenres.delete("All");
+          if (selectedGenres.has(gName)) {
+            selectedGenres.delete(gName);
+          } else {
+            selectedGenres.add(gName);
+          }
+          if (selectedGenres.size === 0) {
+            selectedGenres.add("All");
+          }
+        }
+        renderGenreCheckboxes();
+        filterNovels();
+      }
+
+      function filterNovels() {
+        const container = document.getElementById("novels-container");
+        const titleEl = document.getElementById("novels-list-title");
+        const badgeEl = document.getElementById("novel-count-badge");
+        
+        searchQuery = document.getElementById("novel-search-input").value.toLowerCase().trim();
+
+        let filtered = allNovels;
+
+        // Filter by territory
+        if (selectedTerritory !== "All") {
+          filtered = filtered.filter(n => {
+            if (selectedTerritory === "Classic Literature Territory") return n.source === "gutenberg";
+            return n.source !== "gutenberg";
+          });
+        }
+
+        // Filter by genre checkboxes
+        if (!selectedGenres.has("All") && selectedGenres.size > 0) {
+          const genreList = Array.from(selectedGenres);
+          titleEl.innerText = `📚 Novels matching ${genreList.join(", ")}`;
+          filtered = filtered.filter(n => {
+            const nGenre = (n.archetype_match && n.archetype_match.closest_trope) || n.genre || "";
+            return genreList.some(g => nGenre.toLowerCase().includes(g.toLowerCase()) || g.toLowerCase().includes(nGenre.toLowerCase()));
+          });
+        } else if (selectedTerritory !== "All") {
+          titleEl.innerText = `📚 Novels in ${selectedTerritory}`;
+        } else {
+          titleEl.innerText = "📚 Ingested Novels";
+        }
+
+        // Filter by search query
+        if (searchQuery) {
+          filtered = filtered.filter(n => 
+            (n.title && n.title.toLowerCase().includes(searchQuery)) ||
+            (n.author && n.author.toLowerCase().includes(searchQuery)) ||
+            (n.source && n.source.toLowerCase().includes(searchQuery))
+          );
+        }
+
+        if (badgeEl) {
+          badgeEl.innerText = `${filtered.length} ${filtered.length === 1 ? 'novel' : 'novels'}`;
+        }
+
+        // Update dropdown options
+        populateNovelDropdown(filtered);
+
+        if (filtered.length === 0) {
+          container.innerHTML = `<p class="placeholder-text" style="padding: 1.5rem 1rem;">No matching novels found.</p>`;
+          return;
+        }
+
+        container.innerHTML = "";
+        filtered.forEach(novel => {
+          const card = document.createElement("div");
+          card.className = `card-novel ${selectedNovelId === novel.id ? "active" : ""}`;
+          card.setAttribute("data-novel-id", novel.id);
+          card.addEventListener("click", () => selectNovel(novel.id, novel.title));
+
+          const srcTag = novel.source === "gutenberg" ? "📜 Gutenberg" : "⚡ Web";
+
+          card.innerHTML = `
+            <div class="card__title">${novel.title}</div>
+            <div class="card__meta">
+              <span>${novel.author || "Unknown Author"}</span>
+              <span style="font-weight: 600; color: var(--color-accent-2);">${srcTag} (${novel.chapter_count || 1} ch)</span>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      }
+
+      async function selectNovel(id, title) {
+        selectedNovelId = id;
+        
+        // Highlight active card in grid
+        document.querySelectorAll(".card-novel").forEach(c => {
+          if (c.getAttribute("data-novel-id") == id) {
+            c.classList.add("active");
+          } else {
+            c.classList.remove("active");
+          }
+        });
+
+        // Sync dropdown
+        const dropdown = document.getElementById("novelSelect");
+        if (dropdown) dropdown.value = id;
+
+        // Fetch stats and arc concurrently
         const statsContent = document.getElementById("stats-content");
         const titleElement = document.getElementById("novel-details-title");
-        statsContent.innerHTML = `<p class="placeholder-text">Fetching stylistic stats...</p>`;
+        statsContent.innerHTML = `<p class="placeholder-text" style="padding: 1.5rem 1rem;">Fetching stats & rendering charts...</p>`;
 
         try {
-          const res = await fetch(`${API_URL}/api/novels/${id}/stats`);
-          if (!res.ok) throw new Error("Stats request failed");
-          const stats = await res.json();
+          const [statsRes, arcRes] = await Promise.all([
+            fetch(`${API_URL}/api/novels/${id}/stats`),
+            fetch(`${API_URL}/api/novels/${id}/arc`)
+          ]);
 
-          // Get the novel title from clicked card
-          const title = element.querySelector(".card__title").innerText;
+          if (!statsRes.ok) throw new Error("Stats request failed");
+          if (!arcRes.ok) throw new Error("Arc request failed");
+
+          const stats = await statsRes.json();
+          const arc = await arcRes.json();
+
+          currentStats = stats;
+          currentArc = arc;
+
           titleElement.innerText = `${title} Metrics`;
 
           if (Object.keys(stats).length === 0) {
-            statsContent.innerHTML = `<p class="placeholder-text">No text metrics found. Chapter files might be empty.</p>`;
+            statsContent.innerHTML = `<p class="placeholder-text">No text metrics found for this novel.</p>`;
             return;
           }
 
-          // Build a clean metrics grid
+          // Render Stats Grid
           let gridHtml = `<div class="stat-grid">`;
-          
-          // Determine language from prefix
           const keys = Object.keys(stats);
           const isEn = keys.some(k => k.startsWith("en_"));
           const isJa = keys.some(k => k.startsWith("ja_"));
@@ -356,16 +1179,12 @@ import "../styles/global.css";
             gridHtml += buildStatItem("Verb Ratio", `${(stats.en_verb_ratio * 100)?.toFixed(1)}%`);
             gridHtml += buildStatItem("Sentences/Paragraph", stats.en_avg_sentences_per_paragraph?.toFixed(2));
             gridHtml += buildStatItem("Sentiment (VADER)", stats.en_compound_sentiment?.toFixed(3));
-            gridHtml += buildStatItem("Theme Explication Ratio", `${(stats.en_theme_explication_ratio * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Linearity Subversion", stats.en_linearity_subversion_score?.toFixed(3));
-            gridHtml += buildStatItem("Sensory Body Density", `${(stats.en_sensory_body_density * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Outside World Engagement", `${(stats.en_outside_world_engagement * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Narrative Diversity", stats.en_narrative_feature_diversity?.toFixed(3));
-            gridHtml += buildStatItem("Theme Explication Ratio", `${(stats.en_theme_explication_ratio * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Linearity Subversion", stats.en_linearity_subversion_score?.toFixed(3));
-            gridHtml += buildStatItem("Sensory Body Density", `${(stats.en_sensory_body_density * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Outside World Engagement", `${(stats.en_outside_world_engagement * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Narrative Diversity", stats.en_narrative_feature_diversity?.toFixed(3));
+            gridHtml += buildStatItem("Thematic Explicitness", `${(stats.en_theme_explication_ratio * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Temporal Complexity", stats.en_linearity_subversion_score?.toFixed(3));
+            gridHtml += buildStatItem("Visceral Emotion", `${(stats.en_sensory_body_density * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("World Grounding", `${(stats.en_outside_world_engagement * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Time Shifts", stats.en_temporal_shift_score?.toFixed(3));
+            gridHtml += buildStatItem("Subplot Diversity", stats.en_narrative_feature_diversity?.toFixed(3));
           } else if (isJa) {
             gridHtml += buildStatItem("Character Count", stats.ja_char_count?.toFixed(0));
             gridHtml += buildStatItem("Sentence Count", stats.ja_sentence_count?.toFixed(0));
@@ -377,16 +1196,12 @@ import "../styles/global.css";
             gridHtml += buildStatItem("Kanji Density", `${(stats.ja_kanji_ratio * 100)?.toFixed(1)}%`);
             gridHtml += buildStatItem("Sentences/Paragraph", stats.ja_avg_sentences_per_paragraph?.toFixed(2));
             gridHtml += buildStatItem("Sentiment (Lexicon)", stats.ja_compound_sentiment?.toFixed(3));
-            gridHtml += buildStatItem("Theme Explication Ratio", `${(stats.ja_theme_explication_ratio * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Linearity Subversion", stats.ja_linearity_subversion_score?.toFixed(3));
-            gridHtml += buildStatItem("Sensory Body Density", `${(stats.ja_sensory_body_density * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Outside World Engagement", `${(stats.ja_outside_world_engagement * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Narrative Diversity", stats.ja_narrative_feature_diversity?.toFixed(3));
-            gridHtml += buildStatItem("Theme Explication Ratio", `${(stats.ja_theme_explication_ratio * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Linearity Subversion", stats.ja_linearity_subversion_score?.toFixed(3));
-            gridHtml += buildStatItem("Sensory Body Density", `${(stats.ja_sensory_body_density * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Outside World Engagement", `${(stats.ja_outside_world_engagement * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Narrative Diversity", stats.ja_narrative_feature_diversity?.toFixed(3));
+            gridHtml += buildStatItem("Thematic Explicitness", `${(stats.ja_theme_explication_ratio * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Temporal Complexity", stats.ja_linearity_subversion_score?.toFixed(3));
+            gridHtml += buildStatItem("Visceral Emotion", `${(stats.ja_sensory_body_density * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("World Grounding", `${(stats.ja_outside_world_engagement * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Time Shifts", stats.ja_temporal_shift_score?.toFixed(3));
+            gridHtml += buildStatItem("Subplot Diversity", stats.ja_narrative_feature_diversity?.toFixed(3));
           } else if (isZh) {
             gridHtml += buildStatItem("Character Count", stats.zh_char_count?.toFixed(0));
             gridHtml += buildStatItem("Sentence Count", stats.zh_sentence_count?.toFixed(0));
@@ -398,133 +1213,848 @@ import "../styles/global.css";
             gridHtml += buildStatItem("Verb Ratio", `${(stats.zh_verb_ratio * 100)?.toFixed(1)}%`);
             gridHtml += buildStatItem("Sentences/Paragraph", stats.zh_avg_sentences_per_paragraph?.toFixed(2));
             gridHtml += buildStatItem("Sentiment (Lexicon)", stats.zh_compound_sentiment?.toFixed(3));
-            gridHtml += buildStatItem("Theme Explication Ratio", `${(stats.zh_theme_explication_ratio * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Linearity Subversion", stats.zh_linearity_subversion_score?.toFixed(3));
-            gridHtml += buildStatItem("Sensory Body Density", `${(stats.zh_sensory_body_density * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Outside World Engagement", `${(stats.zh_outside_world_engagement * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Narrative Diversity", stats.zh_narrative_feature_diversity?.toFixed(3));
-            gridHtml += buildStatItem("Theme Explication Ratio", `${(stats.zh_theme_explication_ratio * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Linearity Subversion", stats.zh_linearity_subversion_score?.toFixed(3));
-            gridHtml += buildStatItem("Sensory Body Density", `${(stats.zh_sensory_body_density * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Outside World Engagement", `${(stats.zh_outside_world_engagement * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Narrative Diversity", stats.zh_narrative_feature_diversity?.toFixed(3));
+            gridHtml += buildStatItem("Thematic Explicitness", `${(stats.zh_theme_explication_ratio * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Temporal Complexity", stats.zh_linearity_subversion_score?.toFixed(3));
+            gridHtml += buildStatItem("Visceral Emotion", `${(stats.zh_sensory_body_density * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("World Grounding", `${(stats.zh_outside_world_engagement * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Time Shifts", stats.zh_temporal_shift_score?.toFixed(3));
+            gridHtml += buildStatItem("Subplot Diversity", stats.zh_narrative_feature_diversity?.toFixed(3));
           }
           gridHtml += `</div>`;
-          
-          // Append Archetype Match section
-          if (stats.archetype_match) {
-            let matchBody = '';
-            const am = stats.archetype_match;
-             if (am.top_genres && am.top_territories) {
-               const genresStr = am.top_genres.slice(0, 3).map(g => `${escapeHtml(g.genre)} (${(g.confidence * 100).toFixed(0)}%)`).join(", ");
-               const territoryStr = am.top_territories[0].territory;
-               const maxConf = (am.confidence * 100).toFixed(1);
-               
-               matchBody = `
-                 <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                   <div style="display: flex; justify-content: space-between; align-items: center;">
-                     <span style="font-size: 0.85rem; color: var(--color-muted);">Territory</span>
-                     <span style="font-weight: 600; color: var(--color-text);">${escapeHtml(territoryStr)}</span>
-                   </div>
-                   <div style="display: flex; justify-content: space-between; align-items: center;">
-                     <span style="font-size: 0.85rem; color: var(--color-muted);">Top Genres</span>
-                     <span style="font-weight: 600; color: var(--color-accent-2); text-align: right;">${genresStr}</span>
-                   </div>
-                   <div style="display: flex; justify-content: space-between; align-items: center;">
-                     <span style="font-size: 0.85rem; color: var(--color-muted);">Confidence Score</span>
-                     <span style="font-weight: 700; background: linear-gradient(135deg, #ff7b00, #ffae00); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${maxConf}%</span>
-                   </div>
-                 </div>
-               `;
-            } else {
-              matchBody = `
-                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                  <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 0.85rem; color: var(--color-muted);">Territory</span>
-                    <span style="font-weight: 600; color: var(--color-text);">${escapeHtml(am.territory)}</span>
-                  </div>
-                  <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 0.85rem; color: var(--color-muted);">Closest Trope</span>
-                    <span style="font-weight: 600; color: var(--color-accent-2);">${escapeHtml(am.closest_trope)}</span>
-                  </div>
-                  <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 0.85rem; color: var(--color-muted);">Confidence Score</span>
-                    <span style="font-weight: 700; background: linear-gradient(135deg, #ff7b00, #ffae00); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${(am.confidence * 100)?.toFixed(1)}%</span>
-                  </div>
-                </div>
-              `;
-            }
 
+          if (stats.archetype_match) {
+            const am = stats.archetype_match;
             gridHtml += `
-              <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--color-border);">
-                <h4 style="font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 0.75rem; color: var(--color-accent);">Archetype Match</h4>
-                <div style="background: rgba(124, 106, 255, 0.04); border: 1px solid rgba(124, 106, 255, 0.15); border-radius: 8px; padding: 1rem;">
-                  ${matchBody}
+              <div style="margin-top: 0.85rem; padding-top: 0.85rem; border-top: 1px solid var(--color-border);">
+                <h4 style="font-family: var(--font-display); font-size: 0.88rem; margin-bottom: 0.35rem; color: var(--color-accent);">Archetype Match</h4>
+                <div style="background: rgba(124, 106, 255, 0.04); border: 1px solid rgba(124, 106, 255, 0.15); border-radius: 8px; padding: 0.65rem 0.8rem;">
+                  <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.15rem;">
+                    <span>${am.closest_trope}</span>
+                    <span style="color: var(--color-accent-2);">${(am.confidence * 100).toFixed(1)}%</span>
+                  </div>
+                  <div style="font-size: 0.75rem; color: var(--color-muted);">${am.territory}</div>
                 </div>
               </div>
             `;
           }
-          
+
           statsContent.innerHTML = gridHtml;
+
+          // Unhide charts container and render visualizations
+          const chartsGrid = document.getElementById("chartsGrid");
+          if (chartsGrid) chartsGrid.style.display = "grid";
+          renderAll();
+
         } catch (err) {
-          statsContent.innerHTML = `<p class="placeholder-text" style="color: rgb(248, 113, 113);">Error fetching stats: ${err.message}</p>`;
+          console.error("Error loading stats or arc:", err);
+          statsContent.innerHTML = `<p class="placeholder-text">Error loading metrics or visualizations for this novel.</p>`;
         }
       }
 
-      function buildStatItem(label, val) {
+      function buildStatItem(label, value) {
         return `
           <div class="stat-item">
-            <span class="stat-label">${label}</span>
-            <span class="stat-value">${val !== undefined && val !== null ? val : 'N/A'}</span>
+            <div class="stat-label">${label}</div>
+            <div class="stat-value">${value ?? 'N/A'}</div>
           </div>
         `;
       }
 
-      // 3. Handle Ingest Form Submit
-      const ingestForm = document.getElementById("ingest-form");
-      ingestForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const successAlert = document.getElementById("alert-success");
-        const errorAlert = document.getElementById("alert-error");
-        
-        successAlert.style.display = "none";
-        errorAlert.style.display = "none";
+      /* ── Visualization Charts Logic (Identical to Latest Visualization Page) ── */
+      const RADAR_DIMS = [
+        { key: "en_theme_explication_ratio",     label: "Thematic Explicitness", min: 0,    max: 10.0 },
+        { key: "en_linearity_subversion_score",  label: "Temporal Complexity",  min: 0,    max: 0.20 },
+        { key: "en_sensory_body_density",        label: "Visceral Emotion",     min: 0,    max: 1.0  },
+        { key: "en_outside_world_engagement",    label: "World Grounding",      min: 0.5,  max: 4.0  },
+        { key: "en_narrative_feature_diversity", label: "Subplot Diversity",    min: 0,    max: 1.0  },
+        { key: "en_dialogue_ratio",              label: "Dialogue Density",     min: 0,    max: 0.8  },
+        { key: "en_ttr",                         label: "Lexical Richness",     min: 0.3,  max: 0.9  },
+        { key: "en_compound_sentiment",          label: "Emotional Tone",       min: 0,    max: 1.0  },
+      ];
 
-        const dataset_name = document.getElementById("dataset_name").value.trim();
-        const num_records = parseInt(document.getElementById("num_records").value, 10);
+      const RADAR_BASELINES = {
+        web_novel:   [0.35, 0.55, 0.60, 0.40, 0.40, 0.65, 0.45, 0.50],
+        classic_lit: [0.30, 0.20, 0.40, 0.80, 0.70, 0.30, 0.80, 0.40],
+      };
 
-        try {
-          const res = await fetch(`${API_URL}/api/pipeline/ingest`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ dataset_name, num_records })
-          });
+      const PACING_BASELINES = {
+        web_novel: [15, 8, 22, 5, 12, 30, 9, 14, 6, 18, 11, 25, 7, 16, 13, 8, 20, 10, 15, 6, 24, 9, 12, 17, 8, 14, 5, 21, 7, 13, 11, 28, 6, 15, 9, 19, 12, 10, 16, 8, 23, 7, 11, 14, 5, 17, 12, 9, 21, 6],
+        classic_lit: [85, 112, 64, 140, 95, 130, 78, 105, 88, 120, 90, 115, 130, 80, 125, 95, 110, 140, 75, 100, 105, 120, 85, 135, 95, 110, 130, 90, 115, 100, 112, 88, 98, 125, 70, 118, 132, 92, 104, 115]
+      };
 
-          if (!res.ok) throw new Error("Submission failed");
-          successAlert.style.display = "block";
+      function norm(val, min, max) {
+        return Math.max(0, Math.min(1, (val - min) / Math.max(1e-9, max - min)));
+      }
+
+      function renderAll() {
+        if (!currentStats) return;
+        drawRadar(currentStats, activeBaseline);
+        if (currentArc) drawArc(currentArc, activeBaseline);
+        drawPacing(currentStats, activeBaseline);
+      }
+
+      /* ── Baseline Switch Click Handlers ── */
+      document.querySelectorAll(".baseline-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".baseline-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          activeBaseline = btn.dataset.baseline;
           
-          // Reload novels after a short delay to see if background ingestion started populating
-          setTimeout(loadNovels, 3000);
-        } catch (err) {
-          errorAlert.style.display = "block";
+          // Update legends dynamically
+          const isWeb = activeBaseline === "web_novel";
+          const labelText = isWeb ? "Web Novel" : "Classic Lit";
+          const dotColor = isWeb ? "#a78bfa" : "#fbbf24";
+          
+          const rLbl = document.getElementById("radarBaselineLegendLabel");
+          const aLbl = document.getElementById("baselineLegendLabel");
+          const pLbl = document.getElementById("pacingBaselineLegendLabel");
+          if (rLbl) rLbl.textContent = labelText;
+          if (aLbl) aLbl.textContent = labelText;
+          if (pLbl) pLbl.textContent = labelText;
+          
+          const rDot = document.getElementById("radarBaselineLegendDot");
+          const aDot = document.getElementById("arcBaselineLegendDot");
+          const pDot = document.getElementById("pacingBaselineLegendDot");
+          if (rDot) rDot.style.backgroundColor = dotColor;
+          if (aDot) aDot.style.backgroundColor = dotColor;
+          if (pDot) pDot.style.backgroundColor = dotColor;
+          
+          if (currentStats && currentArc) renderAll();
+        });
+      });
+
+      /* ── Radar chart (Canvas) ── */
+      function drawRadar(stats, baseline) {
+        const canvas = document.getElementById("radarChart");
+        if (!canvas) return;
+        const dpr = window.devicePixelRatio || 1;
+
+        const cssW = canvas.clientWidth  || 480;
+        const cssH = canvas.clientHeight || 480;
+        if (canvas.width !== Math.round(cssW * dpr) || canvas.height !== Math.round(cssH * dpr)) {
+          canvas.width  = Math.round(cssW * dpr);
+          canvas.height = Math.round(cssH * dpr);
+        }
+
+        const ctx = canvas.getContext("2d");
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        const W = cssW, H = cssH;
+        const cx = W / 2, cy = H / 2;
+        const labelPad = 80;
+        const R  = Math.min(W, H) / 2 - labelPad;
+        const n  = RADAR_DIMS.length;
+        ctx.clearRect(0, 0, W, H);
+
+        /* Grid rings */
+        for (let ring = 1; ring <= 5; ring++) {
+          ctx.beginPath();
+          for (let i = 0; i < n; i++) {
+            const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+            const r = R * ring / 5;
+            const x = cx + r * Math.cos(angle);
+            const y = cy + r * Math.sin(angle);
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          }
+          ctx.closePath();
+          ctx.strokeStyle = "rgba(255,255,255,0.07)";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          ctx.fillStyle = "rgba(255,255,255,0.18)";
+          ctx.font = "10px Inter, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(`${ring * 20}%`, cx + 4, cy - R * ring / 5 - 7);
+        }
+
+        /* Spokes + axis labels */
+        RADAR_DIMS.forEach((dim, i) => {
+          const isHovered = hoveredIndex === i;
+          const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(cx + R * Math.cos(angle), cy + R * Math.sin(angle));
+          
+          ctx.strokeStyle = isHovered ? "rgba(255,255,255,0.38)" : "rgba(255,255,255,0.10)";
+          ctx.lineWidth = isHovered ? 2.5 : 1;
+          ctx.stroke();
+
+          const labelR = R + 36;
+          const lx = cx + labelR * Math.cos(angle);
+          const ly = cy + labelR * Math.sin(angle);
+
+          const words = dim.label.split(" ");
+          ctx.fillStyle = isHovered ? "#7dd3fc" : "rgba(255,255,255,0.58)";
+          ctx.font = isHovered ? "bold 11px Inter, sans-serif" : "bold 10px Inter, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          if (words.length === 2) {
+            ctx.fillText(words[0], lx, ly - 6);
+            ctx.fillText(words[1], lx, ly + 6);
+          } else {
+            ctx.fillText(dim.label, lx, ly);
+          }
+        });
+
+        function plotPolygon(values, strokeColor, fillColor) {
+          ctx.beginPath();
+          values.forEach((v, i) => {
+            const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+            const r = R * Math.max(0, Math.min(1, v));
+            i === 0 ? ctx.moveTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle))
+                    : ctx.lineTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
+          });
+          ctx.closePath();
+          ctx.fillStyle = fillColor;
+          ctx.fill();
+          ctx.strokeStyle = strokeColor;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+
+        const hasHover = hoveredIndex !== -1;
+        const blOpacityStroke = hasHover ? 0.35 : 0.8;
+        const blOpacityFill   = hasHover ? 0.04 : 0.12;
+        const userOpacityStroke = hasHover ? 0.40 : 0.85;
+        const userOpacityFill   = hasHover ? 0.03 : 0.10;
+
+        const blColor = baseline === "web_novel" ? "#a78bfa" : "#fbbf24";
+        const blRgb = baseline === "web_novel" ? "167,139,250" : "251,191,36";
+
+        const blVals = (stats.baselines && stats.baselines.radar && stats.baselines.radar[baseline])
+          ? stats.baselines.radar[baseline]
+          : RADAR_BASELINES[baseline];
+
+        plotPolygon(
+          blVals,
+          `rgba(${blRgb}, ${blOpacityStroke})`,
+          `rgba(${blRgb}, ${blOpacityFill})`
+        );
+
+        const prefix = Object.keys(stats).find(k => k.startsWith("zh_")) ? "zh_" :
+                       Object.keys(stats).find(k => k.startsWith("ja_")) ? "ja_" : "en_";
+        const userVals = RADAR_DIMS.map(d => {
+          const statsKey = d.key.replace("en_", prefix);
+          if (stats.normalized_radar && stats.normalized_radar[statsKey] !== undefined) {
+            return stats.normalized_radar[statsKey];
+          }
+          return norm(stats[statsKey] ?? 0, d.min, d.max);
+        });
+        plotPolygon(
+          userVals,
+          `rgba(125,211,252, ${userOpacityStroke})`,
+          `rgba(125,211,252, ${userOpacityFill})`
+        );
+
+        /* Dot on each axis */
+        userVals.forEach((v, i) => {
+          const isHovered = hoveredIndex === i;
+          const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+          const r = R * Math.max(0, Math.min(1, v));
+          ctx.beginPath();
+          
+          if (isHovered) {
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = "#7dd3fc";
+            ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 6, 0, 2 * Math.PI);
+            ctx.fillStyle = "#7dd3fc";
+            ctx.fill();
+            ctx.strokeStyle = "rgba(255,255,255,0.95)";
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+          } else {
+            ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 3.5, 0, 2 * Math.PI);
+            ctx.fillStyle = hasHover ? "rgba(125,211,252,0.4)" : "#7dd3fc";
+            ctx.fill();
+          }
+        });
+
+        if (hasHover) {
+          const blVal = blVals[hoveredIndex];
+          const angle = (2 * Math.PI * hoveredIndex / n) - Math.PI / 2;
+          const r = R * Math.max(0, Math.min(1, blVal));
+          ctx.beginPath();
+          ctx.shadowBlur = 8;
+          ctx.shadowColor = blColor;
+          ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 6, 0, 2 * Math.PI);
+          ctx.fillStyle = blColor;
+          ctx.fill();
+          ctx.strokeStyle = "rgba(255,255,255,0.95)";
+          ctx.lineWidth = 2.5;
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        }
+
+        const am = stats["archetype_match"];
+        if (am) {
+          if (am.top_genres && am.top_territories) {
+            const genresStr = am.top_genres.slice(0, 3).map(g => `${g.genre} (${(g.confidence * 100).toFixed(0)}%)`).join(", ");
+            const territoryStr = am.top_territories[0].territory;
+            const maxConf = (am.confidence * 100).toFixed(0);
+            document.getElementById("archetypeLabel").textContent =
+              `${genresStr} · ${territoryStr} · ${maxConf}% match`;
+          } else {
+            document.getElementById("archetypeLabel").textContent =
+              `${am.closest_trope} · ${am.territory} · ${(am.confidence * 100).toFixed(0)}% match`;
+          }
+        }
+      }
+
+      /* ── Kishōtenketsu arc (SVG) ── */
+      function drawArc(arcData, baseline) {
+        const svg = document.getElementById("arcChart");
+        if (!svg) return;
+        svg.innerHTML = "";
+        const W = 600, H = 420;
+        const PAD = { top: 30, bottom: 48, left: 48, right: 48 };
+        const plotW = W - PAD.left - PAD.right;
+        const plotH = H - PAD.top - PAD.bottom;
+        const ns = "http://www.w3.org/2000/svg";
+
+        const acts    = (arcData.quantiles && arcData.quantiles.length > 0)
+          ? arcData.quantiles.map((v, i) => ({ sentiment: v, actIndex: i }))
+          : arcData.acts;
+        const blVals  = (arcData.baselines && arcData.baselines[baseline])
+          ? arcData.baselines[baseline]
+          : [0.0839, 0.0588, 0.1347, 0.1006];
+        const blColor = baseline === "web_novel" ? "#a78bfa" : "#fbbf24";
+        const blRgb   = baseline === "web_novel" ? "167,139,250" : "251,191,36";
+
+        const sentY = s => PAD.top + plotH * (1 - (s + 1) / 2);
+        const actX  = i => PAD.left + i * plotW / (acts.length - 1);
+        const axisX  = actX(0);
+        const endX   = actX(acts.length - 1);
+        const bottomY = PAD.top + plotH;
+        const zeroY   = sentY(0);
+
+        function smoothPath(pts_x, pts_y) {
+          const pts = pts_x.map((x, i) => [x, pts_y[i]]);
+          let d = `M ${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
+          for (let i = 0; i < pts.length - 1; i++) {
+            const cpx = ((pts[i][0] + pts[i+1][0]) / 2).toFixed(1);
+            d += ` C ${cpx},${pts[i][1].toFixed(1)} ${cpx},${pts[i+1][1].toFixed(1)} ${pts[i+1][0].toFixed(1)},${pts[i+1][1].toFixed(1)}`;
+          }
+          return d;
+        }
+
+        const xs      = acts.map((_, i) => actX(i));
+        const userYs  = acts.map(a => sentY(typeof a === "number" ? a : a.sentiment));
+        const blYs    = blVals.map(v => sentY(v));
+        const pathD   = smoothPath(xs, userYs);
+        const blPathD = smoothPath(xs, blYs);
+
+        const areaClose = (path, xArr) =>
+          `${path} L ${xArr[xArr.length-1].toFixed(1)},${zeroY.toFixed(1)} L ${xArr[0].toFixed(1)},${zeroY.toFixed(1)} Z`;
+
+        const userAvgAbs = acts.reduce((s, a) => s + Math.abs(typeof a === "number" ? a : a.sentiment), 0) / acts.length;
+        const blAvgAbs   = blVals.reduce((s, v) => s + Math.abs(v), 0) / blVals.length;
+        const userIsInner = userAvgAbs <= blAvgAbs;
+        const [innerPathD, outerPathD] = userIsInner ? [pathD, blPathD] : [blPathD, pathD];
+        const [innerGrad,  outerGrad]  = userIsInner ? ["arcUserGrad", "arcBaselineGrad"] : ["arcBaselineGrad", "arcUserGrad"];
+
+        const defs = document.createElementNS(ns, "defs");
+        const zf = (zeroY - PAD.top) / plotH;
+
+        const makeGrad = (id, rgb, alpha) => {
+          const g = document.createElementNS(ns, "linearGradient");
+          g.setAttribute("id", id);
+          g.setAttribute("gradientUnits", "userSpaceOnUse");
+          g.setAttribute("x1", "0"); g.setAttribute("y1", String(PAD.top));
+          g.setAttribute("x2", "0"); g.setAttribute("y2", String(bottomY));
+          const pct = p => `${(Math.max(0, Math.min(1, p)) * 100).toFixed(1)}%`;
+          const minA = (alpha * 0.40).toFixed(3);
+          [
+            [0,   `rgba(${rgb},${alpha})`],
+            [zf,  `rgba(${rgb},${minA})`],
+            [1,   `rgba(${rgb},${alpha})`],
+          ].forEach(([offset, color]) => {
+            const s = document.createElementNS(ns, "stop");
+            s.setAttribute("offset", pct(offset));
+            s.setAttribute("stop-color", color);
+            g.appendChild(s);
+          });
+          return g;
+        };
+
+        defs.appendChild(makeGrad("arcUserGrad",     "125,211,252", 0.80));
+        defs.appendChild(makeGrad("arcBaselineGrad", blRgb,         0.75));
+
+        const clipPath = document.createElementNS(ns, "clipPath");
+        clipPath.setAttribute("id", "outerFillClip");
+        const clipShape = document.createElementNS(ns, "path");
+        const boundingRect =
+          `M ${axisX.toFixed(1)},${PAD.top} L ${endX.toFixed(1)},${PAD.top}` +
+          ` L ${endX.toFixed(1)},${bottomY} L ${axisX.toFixed(1)},${bottomY} Z`;
+        clipShape.setAttribute("d", `${boundingRect} ${areaClose(innerPathD, xs)}`);
+        clipShape.setAttribute("clip-rule", "evenodd");
+        clipPath.appendChild(clipShape);
+        defs.appendChild(clipPath);
+
+        svg.appendChild(defs);
+
+        // Vertical guide line when hovering
+        if (hoveredArcIndex >= 0 && hoveredArcIndex < acts.length) {
+          const hx = actX(hoveredArcIndex);
+          const vGuide = document.createElementNS(ns, "line");
+          vGuide.setAttribute("x1", hx); vGuide.setAttribute("y1", PAD.top);
+          vGuide.setAttribute("x2", hx); vGuide.setAttribute("y2", bottomY);
+          vGuide.setAttribute("stroke", "rgba(255,255,255,0.25)");
+          vGuide.setAttribute("stroke-dasharray", "3 3");
+          svg.appendChild(vGuide);
+        }
+
+        // Horizontal grid lines
+        [-1, -0.5, 0, 0.5, 1].forEach(val => {
+          const y = sentY(val);
+          const isZero = val === 0;
+
+          const line = document.createElementNS(ns, "line");
+          line.setAttribute("x1", String(axisX));
+          line.setAttribute("y1", y);
+          line.setAttribute("x2", String(endX));
+          line.setAttribute("y2", y);
+          line.setAttribute("stroke", isZero ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.055)");
+          if (!isZero) line.setAttribute("stroke-dasharray", "4 5");
+          svg.appendChild(line);
+
+          const lbl = document.createElementNS(ns, "text");
+          lbl.setAttribute("x", String(axisX - 8));
+          lbl.setAttribute("y", y + 3.5);
+          lbl.setAttribute("fill", "rgba(255,255,255,0.3)");
+          lbl.setAttribute("font-size", "9");
+          lbl.setAttribute("font-family", "Inter, sans-serif");
+          lbl.setAttribute("text-anchor", "end");
+          lbl.textContent = val > 0 ? `+${val.toFixed(1)}` : val.toFixed(1);
+          svg.appendChild(lbl);
+        });
+
+        // Y-axis line
+        const yAxis = document.createElementNS(ns, "line");
+        yAxis.setAttribute("x1", String(axisX)); yAxis.setAttribute("y1", String(PAD.top));
+        yAxis.setAttribute("x2", String(axisX)); yAxis.setAttribute("y2", String(bottomY));
+        yAxis.setAttribute("stroke", "rgba(255,255,255,0.22)");
+        svg.appendChild(yAxis);
+
+        // X-axis line & labels
+        const xAxis = document.createElementNS(ns, "line");
+        xAxis.setAttribute("x1", String(axisX)); xAxis.setAttribute("y1", String(bottomY));
+        xAxis.setAttribute("x2", String(endX));  xAxis.setAttribute("y2", String(bottomY));
+        xAxis.setAttribute("stroke", "rgba(255,255,255,0.22)");
+        svg.appendChild(xAxis);
+
+        ["Ki (Intro)", "Shō (Dev)", "Ten (Twist)", "Ketsu (Res)"].forEach((label, i) => {
+          const lx = actX(i);
+          const tick = document.createElementNS(ns, "line");
+          tick.setAttribute("x1", lx); tick.setAttribute("y1", bottomY);
+          tick.setAttribute("x2", lx); tick.setAttribute("y2", bottomY + 4);
+          tick.setAttribute("stroke", "rgba(255,255,255,0.2)");
+          svg.appendChild(tick);
+
+          const txt = document.createElementNS(ns, "text");
+          txt.setAttribute("x", lx); txt.setAttribute("y", bottomY + 16);
+          txt.setAttribute("fill", "rgba(255,255,255,0.45)");
+          txt.setAttribute("font-size", "10"); txt.setAttribute("font-weight", "600");
+          txt.setAttribute("font-family", "Inter, sans-serif");
+          txt.setAttribute("text-anchor", "middle");
+          txt.textContent = label;
+          svg.appendChild(txt);
+        });
+
+        // Outer fill
+        const outerFill = document.createElementNS(ns, "path");
+        outerFill.setAttribute("d", areaClose(outerPathD, xs));
+        outerFill.setAttribute("fill", `url(#${outerGrad})`);
+        outerFill.setAttribute("clip-path", "url(#outerFillClip)");
+        svg.appendChild(outerFill);
+
+        // Inner fill
+        const innerFill = document.createElementNS(ns, "path");
+        innerFill.setAttribute("d", areaClose(innerPathD, xs));
+        innerFill.setAttribute("fill", `url(#${innerGrad})`);
+        svg.appendChild(innerFill);
+
+        // Baseline stroke
+        const blPath = document.createElementNS(ns, "path");
+        blPath.setAttribute("d", blPathD);
+        blPath.setAttribute("fill", "none");
+        blPath.setAttribute("stroke", blColor);
+        blPath.setAttribute("stroke-width", "1.75");
+        blPath.setAttribute("stroke-dasharray", "5 4");
+        blPath.setAttribute("opacity", "0.85");
+        svg.appendChild(blPath);
+
+        // User stroke
+        const userPath = document.createElementNS(ns, "path");
+        userPath.setAttribute("d", pathD);
+        userPath.setAttribute("fill", "none");
+        userPath.setAttribute("stroke", "#7dd3fc");
+        userPath.setAttribute("stroke-width", "2.5");
+        svg.appendChild(userPath);
+
+        // Dots
+        xs.forEach((x, i) => {
+          const userDot = document.createElementNS(ns, "circle");
+          userDot.setAttribute("cx", x); userDot.setAttribute("cy", userYs[i]);
+          userDot.setAttribute("r", i === hoveredArcIndex ? "6" : "4");
+          userDot.setAttribute("fill", "#7dd3fc");
+          userDot.setAttribute("stroke", "#0a0a12");
+          userDot.setAttribute("stroke-width", "2");
+          svg.appendChild(userDot);
+
+          const blDot = document.createElementNS(ns, "circle");
+          blDot.setAttribute("cx", x); blDot.setAttribute("cy", blYs[i]);
+          blDot.setAttribute("r", i === hoveredArcIndex ? "5" : "3.5");
+          blDot.setAttribute("fill", blColor);
+          blDot.setAttribute("stroke", "#0a0a12");
+          blDot.setAttribute("stroke-width", "1.5");
+          svg.appendChild(blDot);
+        });
+      }
+
+      /* ── Rhythmic Pacing (Paragraph Barcode) ── */
+      function drawPacing(stats, baseline) {
+        const userPacing = stats.pacing || [];
+        const isWeb = baseline === "web_novel";
+        const baselineColor = isWeb ? "#a78bfa" : "#fbbf24";
+        const baselineData = (stats.baselines && stats.baselines.pacing)
+          ? stats.baselines.pacing[baseline]
+          : PACING_BASELINES[baseline];
+
+        const userAvg = userPacing.length > 0 ? (userPacing.reduce((a,b)=>a+b,0)/userPacing.length).toFixed(1) : 0;
+        const baseAvg = (baselineData.reduce((a,b)=>a+b,0)/baselineData.length).toFixed(1);
+
+        const draftLabel = document.getElementById("pacingDraftLabel");
+        const baseLabel  = document.getElementById("pacingBaselineLabel");
+        if (draftLabel) draftLabel.textContent = `Selected Novel (Average Paragraph Length: ${userAvg} words/chars)`;
+        if (baseLabel) baseLabel.textContent = `${isWeb ? "Web Novel" : "Classic Lit"} Baseline (Average Paragraph Length: ${baseAvg} words/chars)`;
+
+        renderBarcode("pacingBarcodeUser", userPacing, "#7dd3fc");
+        renderBarcode("pacingBarcodeBaseline", baselineData, baselineColor);
+      }
+
+      function renderBarcode(containerId, data, color) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = "";
+
+        if (!data || data.length === 0) {
+          container.innerHTML = "<div style='color:rgba(255,255,255,0.3); font-size:0.8rem; padding: 1rem; width:100%; text-align:center;'>No paragraph pacing data available</div>";
+          return;
+        }
+
+        const maxVal = Math.max(...data);
+        data.forEach(val => {
+          const intensity = val / maxVal;
+          const bar = document.createElement("div");
+          bar.style.flex = "1";
+          bar.style.backgroundColor = color;
+          bar.style.opacity = (0.2 + intensity * 0.8).toFixed(2);
+          bar.style.borderRadius = "2px";
+          bar.title = `${val} words/chars`;
+          container.appendChild(bar);
+        });
+      }
+
+      // 4. Dropdown Selector Listener
+      document.getElementById("novelSelect").addEventListener("change", (e) => {
+        const id = parseInt(e.target.value);
+        if (!id) return;
+        const novel = allNovels.find(n => n.id === id);
+        if (novel) {
+          selectNovel(novel.id, novel.title);
         }
       });
 
-      // Escape helpers
-      function escapeHtml(str) {
-        if (!str) return '';
-        return str
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#039;");
+      // 5. Search Bar Listener
+      document.getElementById("novel-search-input").addEventListener("input", filterNovels);
+
+      // 6. Archetype Radar Mouse Hover & Tooltip Events
+      const canvasNode = document.getElementById("radarChart");
+      const tooltipNode = document.getElementById("radarTooltip");
+
+      if (canvasNode && tooltipNode) {
+        canvasNode.addEventListener("mousemove", (e) => {
+          if (!currentStats) return;
+          const rect = canvasNode.getBoundingClientRect();
+          const mx = e.clientX - rect.left;
+          const my = e.clientY - rect.top;
+          const cx = rect.width / 2;
+          const cy = rect.height / 2;
+          const dx = mx - cx;
+          const dy = my - cy;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          let angle = Math.atan2(dy, dx);
+
+          const labelPad = 75;
+          const R_css = Math.min(rect.width, rect.height) / 2 - labelPad;
+          const n = RADAR_DIMS.length;
+          let bestIndex = -1;
+          let minDiff = Infinity;
+
+          if (d <= R_css + 45 && d >= 12) {
+            for (let i = 0; i < n; i++) {
+              const spokeAngle = (2 * Math.PI * i / n) - Math.PI / 2;
+              let diff = Math.abs(angle - spokeAngle);
+              while (diff > Math.PI) {
+                diff = Math.abs(diff - 2 * Math.PI);
+              }
+              if (diff < minDiff) {
+                minDiff = diff;
+                bestIndex = i;
+              }
+            }
+            if (minDiff > 0.35) {
+              bestIndex = -1;
+            }
+          }
+
+          if (bestIndex !== hoveredIndex) {
+            hoveredIndex = bestIndex;
+            renderAll();
+          }
+
+          if (hoveredIndex !== -1) {
+            const dim = RADAR_DIMS[hoveredIndex];
+            const prefix = Object.keys(currentStats).find(k => k.startsWith("zh_")) ? "zh_" :
+                           Object.keys(currentStats).find(k => k.startsWith("ja_")) ? "ja_" : "en_";
+            const statsKey = dim.key.replace("en_", prefix);
+
+            const userVal = (currentStats.normalized_radar && currentStats.normalized_radar[statsKey] !== undefined)
+              ? currentStats.normalized_radar[statsKey]
+              : norm(currentStats[statsKey] ?? 0, dim.min, dim.max);
+            
+            const blVals = (currentStats.baselines && currentStats.baselines.radar && currentStats.baselines.radar[activeBaseline])
+              ? currentStats.baselines.radar[activeBaseline]
+              : RADAR_BASELINES[activeBaseline];
+            const blVal = blVals ? blVals[hoveredIndex] : 0;
+
+            const userPct = (userVal * 100).toFixed(0) + "%";
+            const blPct = (blVal * 100).toFixed(0) + "%";
+            const baseName = activeBaseline === "web_novel" ? "Web Novel Baseline" : "Classic Lit Baseline";
+            const blColor = activeBaseline === "web_novel" ? "#a78bfa" : "#fbbf24";
+
+            tooltipNode.innerHTML = `
+              <div class="radar-tooltip-title">${dim.label}</div>
+              <div class="radar-tooltip-row">
+                <span style="color: rgba(255,255,255,0.7)">Selected Novel:</span>
+                <span class="radar-tooltip-val" style="color: #7dd3fc">${userPct}</span>
+              </div>
+              <div class="radar-tooltip-row">
+                <span style="color: rgba(255,255,255,0.7)">${baseName}:</span>
+                <span class="radar-tooltip-val" style="color: ${blColor}">${blPct}</span>
+              </div>
+            `;
+            tooltipNode.style.display = "block";
+            tooltipNode.style.left = (e.clientX + 15) + "px";
+            tooltipNode.style.top = (e.clientY + 15) + "px";
+          } else {
+            tooltipNode.style.display = "none";
+          }
+        });
+
+        canvasNode.addEventListener("mouseleave", () => {
+          if (hoveredIndex !== -1) {
+            hoveredIndex = -1;
+            renderAll();
+          }
+          tooltipNode.style.display = "none";
+        });
       }
 
-      // Boot
-      loadNovels();
+      // 7. Kishōtenketsu Sentiment Arc Mouse Hover & Tooltip Events
+      const svgNode = document.getElementById("arcChart");
+      const arcTooltipNode = document.getElementById("arcTooltip");
+
+      if (svgNode && arcTooltipNode) {
+        svgNode.addEventListener("mousemove", (e) => {
+          try {
+            if (!currentArc) return;
+            const rect = svgNode.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) return;
+
+            const svgX = (e.clientX - rect.left) * (600 / rect.width);
+            const W = 600;
+            const PAD = { top: 30, bottom: 48, left: 48, right: 48 };
+            const plotW = W - PAD.left - PAD.right;
+            const acts = (currentArc.quantiles && currentArc.quantiles.length > 0)
+              ? currentArc.quantiles.map((v, i) => ({ sentiment: v, actIndex: i }))
+              : currentArc.acts;
+
+            const actX = i => PAD.left + i * plotW / (acts.length - 1);
+
+            let closestIdx = -1;
+            let minDiff = Infinity;
+
+            for (let i = 0; i < acts.length; i++) {
+              const diff = Math.abs(svgX - actX(i));
+              if (diff < minDiff) {
+                minDiff = diff;
+                closestIdx = i;
+              }
+            }
+
+            if (svgX < PAD.left - 25 || svgX > W - PAD.right + 25) {
+              closestIdx = -1;
+            }
+
+            if (closestIdx !== hoveredArcIndex) {
+              hoveredArcIndex = closestIdx;
+              if (currentArc) drawArc(currentArc, activeBaseline);
+            }
+
+            if (hoveredArcIndex !== -1) {
+              const act = acts[hoveredArcIndex];
+              const userVal = typeof act === "number" ? act : act.sentiment;
+              const blVals = (currentArc.baselines && currentArc.baselines[activeBaseline])
+                ? currentArc.baselines[activeBaseline]
+                : [0.0839, 0.0588, 0.1347, 0.1006];
+              const blVal = blVals[hoveredArcIndex] || 0;
+
+              const labelMap = { "Introduction": "Intro", "Development": "Dev", "Twist": "Twist", "Resolution": "Res" };
+              const actNames = ["Ki (Intro)", "Shō (Dev)", "Ten (Twist)", "Ketsu (Res)"];
+              const titleFmt = actNames[hoveredArcIndex] || `${act.act || ''} (${labelMap[act.label] || act.label || ''})`;
+
+              const userFmt = userVal >= 0 ? `+${userVal.toFixed(2)}` : userVal.toFixed(2);
+              const blFmt = blVal >= 0 ? `+${blVal.toFixed(2)}` : blVal.toFixed(2);
+              const baseName = activeBaseline === "web_novel" ? "Web Novel Baseline" : "Classic Lit Baseline";
+              const blColor = activeBaseline === "web_novel" ? "#a78bfa" : "#fbbf24";
+
+              arcTooltipNode.innerHTML = `
+                <div class="radar-tooltip-title">${titleFmt}</div>
+                <div class="radar-tooltip-row">
+                  <span style="color: rgba(255,255,255,0.7)">Selected Novel:</span>
+                  <span class="radar-tooltip-val" style="color: #7dd3fc">${userFmt}</span>
+                </div>
+                <div class="radar-tooltip-row">
+                  <span style="color: rgba(255,255,255,0.7)">${baseName}:</span>
+                  <span class="radar-tooltip-val" style="color: ${blColor}">${blFmt}</span>
+                </div>
+              `;
+
+              arcTooltipNode.style.display = "block";
+              arcTooltipNode.style.left = (e.clientX + 15) + "px";
+              arcTooltipNode.style.top = (e.clientY + 15) + "px";
+            } else {
+              arcTooltipNode.style.display = "none";
+            }
+          } catch (err) {
+            console.error("Error handling arc tooltip:", err);
+          }
+        });
+
+        svgNode.addEventListener("mouseleave", () => {
+          if (hoveredArcIndex !== -1) {
+            hoveredArcIndex = -1;
+            if (currentArc) drawArc(currentArc, activeBaseline);
+          }
+          arcTooltipNode.style.display = "none";
+        });
+      }
+
+      // 8. Ingestion Form & Job Polling
+      const ingestForm = document.getElementById("ingest-form");
+      const ingestSubmitBtn = document.getElementById("ingest-submit");
+
+      if (ingestForm) {
+        ingestForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const datasetName = document.getElementById("dataset_name").value.trim();
+          const numRecords = parseInt(document.getElementById("num_records").value, 10);
+
+          if (!datasetName) return;
+
+          ingestSubmitBtn.disabled = true;
+          ingestSubmitBtn.innerText = "Submitting Job...";
+
+          try {
+            const resp = await fetch(`${API_URL}/api/pipeline/ingest`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ dataset_name: datasetName, num_records: numRecords })
+            });
+
+            if (!resp.ok) {
+              const errData = await resp.json();
+              throw new Error(errData.detail || "Failed to schedule ingestion job");
+            }
+
+            const data = await resp.json();
+            const jobId = data.job_id;
+
+            showIngestStatusCard(jobId, datasetName);
+            pollIngestJobStatus(jobId);
+
+          } catch (err) {
+            alert(`Ingestion Error: ${err.message}`);
+            ingestSubmitBtn.disabled = false;
+            ingestSubmitBtn.innerText = "Schedule Ingest";
+          }
+        });
+      }
+
+      function showIngestStatusCard(jobId, datasetName) {
+        const card = document.getElementById("ingest-status-card");
+        const badge = document.getElementById("ingest-status-badge");
+        const dataset = document.getElementById("ingest-status-dataset");
+        const message = document.getElementById("ingest-status-message");
+        const detail = document.getElementById("ingest-status-detail");
+        const iconContainer = document.getElementById("ingest-status-icon");
+
+        card.style.display = "block";
+        badge.className = "status-pill status-pill--running";
+        badge.innerText = "Processing";
+        dataset.innerText = datasetName;
+        message.innerText = "Fetching records, extracting features, and parsing chapters...";
+        detail.style.display = "none";
+        iconContainer.innerHTML = '<div class="status-spinner"></div>';
+      }
+
+      function pollIngestJobStatus(jobId) {
+        const interval = setInterval(async () => {
+          try {
+            const resp = await fetch(`${API_URL}/api/pipeline/ingest/status/${jobId}`);
+            if (!resp.ok) return;
+            const data = await resp.json();
+
+            const badge = document.getElementById("ingest-status-badge");
+            const message = document.getElementById("ingest-status-message");
+            const detail = document.getElementById("ingest-status-detail");
+            const iconContainer = document.getElementById("ingest-status-icon");
+
+            if (data.status === "completed") {
+              clearInterval(interval);
+              badge.className = "status-pill status-pill--completed";
+              badge.innerText = "Completed";
+              message.innerText = "Ingestion complete! Successfully indexed records into library.";
+              iconContainer.innerHTML = '<div class="status-icon--success">✓</div>';
+
+              ingestSubmitBtn.disabled = false;
+              ingestSubmitBtn.innerText = "Schedule Ingest";
+
+              fetchNovels();
+
+            } else if (data.status === "failed") {
+              clearInterval(interval);
+              badge.className = "status-pill status-pill--failed";
+              badge.innerText = "Failed";
+              message.innerText = "Ingestion failed during processing.";
+              detail.style.display = "block";
+              detail.innerText = data.error || "Unknown error encountered.";
+              iconContainer.innerHTML = '<div class="status-icon--error">✕</div>';
+
+              ingestSubmitBtn.disabled = false;
+              ingestSubmitBtn.innerText = "Schedule Ingest";
+            }
+          } catch (err) {
+            console.error("Error polling job status:", err);
+          }
+        }, 2000);
+      }
+
+      // Initial Load
+      fetchNovels();
     </script>
   </body>
 </html>

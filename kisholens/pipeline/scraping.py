@@ -185,8 +185,16 @@ def parse_gutenberg(text: str) -> Tuple[str, str, List[Dict[str, Any]]]:
 
     body = text[start_idx:end_idx].strip()
 
-    # Split by chapter headers (supports standard English, Roman stories, and Chinese 回/章)
-    chapter_pattern = r"(?mi)^(?:\s*(?:CHAPTER|Chapter|Ch\.|CHAP|Chap|Story|Adventure|ADVENTURE|STORY)\s+(?:[0-9]+|[IVXLCDM]+)\.?.*|(?:\s*[IVXLCDM]+\.\s+[A-Z].*)|(?:\s*[IVXLCDM]+\.?\s*\n)|(?:\s*第[一二三四五六七八九十百千零0-9]+[回章].*))"
+    # Strip Table of Contents block at the top if present
+    toc_match = re.search(r"(?mi)^\s*(?:Contents|TABLE OF CONTENTS)\b", body[:4000])
+    if toc_match:
+        after_toc_idx = toc_match.end()
+        main_start = re.search(r"(?mi)^\s*(?:Dramatis Personæ|DRAMATIS PERSONAE|THE PROLOGUE|PROLOGUE|ACT I|Act I|ACT 1|CHAPTER I|Chapter I|Chapter 1|BOOK I)\b", body[after_toc_idx:])
+        if main_start:
+            body = body[after_toc_idx + main_start.start():]
+
+    # Split by chapter, act, scene, prologue, and section headers
+    chapter_pattern = r"(?mi)^(?:\s*(?:CHAPTER|Chapter|Ch\.|CHAP|Chap|ACT|Act|SCENE|Scene|BOOK|Book|PART|Part|SECTION|Section|CANTO|Canto|Story|Adventure|ADVENTURE|STORY)\s+(?:[0-9]+|[IVXLCDM]+)\.?.*|(?:\s*(?:PROLOGUE|Prologue|EPILOGUE|Epilogue|PREFACE|Preface|DRAMATIS PERSONAE|Dramatis Personæ)\b.*)|(?:\s*[IVXLCDM]+\.\s+[A-Z].*)|(?:\s*[IVXLCDM]+\.?\s*\r?\n)|(?:\s*第[一二三四五六七八九十百千零0-9]+[回章].*))"
     all_matches = list(re.finditer(chapter_pattern, body))
 
     # Filter out Table of Contents matches (where chapter body would be too short)
@@ -194,7 +202,7 @@ def parse_gutenberg(text: str) -> Tuple[str, str, List[Dict[str, Any]]]:
     for idx, match in enumerate(all_matches):
         start = match.start()
         end = all_matches[idx + 1].start() if idx + 1 < len(all_matches) else len(body)
-        if (end - start) >= 400:
+        if (end - start) >= 200:
             matches.append(match)
 
     chapters = []

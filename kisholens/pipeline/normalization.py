@@ -4,11 +4,17 @@ from typing import Optional, Tuple
 from bs4 import BeautifulSoup
 
 def clean_html(text: str) -> str:
-    """Removes HTML tags using BeautifulSoup with lxml parser."""
+    """Removes HTML tags using BeautifulSoup while preserving paragraph newlines."""
     if not text:
         return ""
+    # Convert <br> and paragraph closing tags to newlines before stripping tags
+    text = re.sub(r"(?i)<br\s*/?>", "\n", text)
+    text = re.sub(r"(?i)</(?:p|div|li|h[1-6])>", "\n\n", text)
     soup = BeautifulSoup(text, "lxml")
-    return soup.get_text()
+    cleaned = soup.get_text()
+    cleaned = re.sub(r"\r\n", "\n", cleaned)
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+    return cleaned.strip()
 
 def clean_japanese(text: str) -> str:
     """Removes Japanese ruby tags (｜ and 《 》) and normalizes unicode (NFKC)."""

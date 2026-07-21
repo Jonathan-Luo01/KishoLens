@@ -27,49 +27,52 @@ if (!fs.existsSync(cmdPath)) {
   spawnArgs = ['run', ...args];
 }
 
+const { exec } = require('child_process');
+
 const child = spawn(spawnCmd, spawnArgs, {
-  stdio: 'inherit'
+  stdio: 'inherit',
+  detached: true,
+  env: {
+    ...process.env,
+    PYTHONWARNINGS: 'ignore::UserWarning:multiprocessing.resource_tracker',
+    PYTHONUNBUFFERED: '1'
+  }
 });
 
-// Function to clean up the child process and its entire process tree recursively
-const killProcessTree = () => {
-  if (child && child.pid) {
+let isExiting = false;
+
+const killProcessTree = (signal = 'SIGINT') => {
+  if (child && child.pid && !child.killed) {
     if (isWin) {
       exec(`taskkill /pid ${child.pid} /f /t`, () => {});
     } else {
       try {
-        process.kill(-child.pid, 'SIGKILL');
+        process.kill(-child.pid, signal);
       } catch (e) {
         try {
-          process.kill(child.pid, 'SIGKILL');
+          process.kill(child.pid, signal);
         } catch (err) {}
       }
     }
   }
 };
 
-const { exec } = require('child_process');
-
-// Register cleanup listeners for all common exit and termination signals
 process.on('SIGINT', () => {
-  killProcessTree();
-  process.exit(130);
+  if (isExiting) return;
+  isExiting = true;
+  killProcessTree('SIGINT');
 });
 
 process.on('SIGTERM', () => {
-  killProcessTree();
-  process.exit(143);
-});
-
-process.on('SIGHUP', () => {
-  killProcessTree();
-  process.exit(129);
+  if (isExiting) return;
+  isExiting = true;
+  killProcessTree('SIGTERM');
 });
 
 process.on('exit', () => {
-  killProcessTree();
+  killProcessTree('SIGKILL');
 });
 
-child.on('close', (code) => {
-  process.exit(code);
+child.on('close', () => {
+  process.exit(0);
 });

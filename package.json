@@ -9,7 +9,7 @@
     "dev:pipeline": "node run-venv.js python -m kisholens.pipeline.main",
     "dev:ml": "node run-venv.js python -m kisholens.ml.main",
     "dev:build-centroids": "node run-venv.js python -m kisholens.ml.build_centroids",
-    "dev": "concurrently \"npm:dev:frontend\" \"npm:dev:backend\""
+    "dev": "concurrently -k --handle-input \"npm:dev:frontend\" \"npm:dev:backend\""
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

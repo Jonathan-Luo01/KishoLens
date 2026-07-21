@@ -174,15 +174,29 @@ GENRE_TERRITORIES: dict[str, str] = {
 def consolidate_genre(tags: list[str]) -> Optional[str]:
     """
     Map a list of raw source tags to a canonical genre name.
-    Returns the first canonical genre whose tag set intersects with `tags`,
-    or None if no match.
-
-    Comparison is case-insensitive.
+    Uses a priority order where specific/sub-genres are matched before general ones.
     """
-    normalised = {t.lower() for t in tags}
-    for genre, genre_tags in GENRE_TAG_MAP.items():
-        if normalised & {gt.lower() for gt in genre_tags}:
-            return genre
+    t_lows = {t.lower().strip() for t in tags}
+    
+    # Priority order for matching
+    priority_order = [
+        # Specific sub-genres first
+        "LitRPG", "Isekai", "Xianxia / Wuxia", "Urban Romance", "Cozy Fantasy",
+        "Slice of Life", "Contemporary",
+        "Villainess / Otome Game", "Kingdom Building / Strategy",
+        "Monster Protagonist / Evolution", "Dungeon Core / Dungeon MC",
+        "Urban Fantasy / Dungeons", "Harem", "Girls Love / Boys Love",
+        "High Fantasy", "Hard Sci-Fi", "Modern Thriller", "Victorian Novel", "Philosophical Fiction",
+        "Romance", "Mystery", "Horror", "Comedy",
+        # General broad genres last
+        "Fantasy", "Sci-Fi", "Action / Adventure"
+    ]
+    
+    for canonical in priority_order:
+        tag_list = GENRE_TAG_MAP.get(canonical, [])
+        if any(tag in t_lows for tag in tag_list):
+            return canonical
+            
     return None
 
 
@@ -190,14 +204,19 @@ def consolidate_genre(tags: list[str]) -> Optional[str]:
 # Embedding
 # ---------------------------------------------------------------------------
 
+import threading
+
 _model_cache: dict[str, object] = {}
+_model_lock = threading.Lock()
 
 
 def _get_model(model_name: str = "all-MiniLM-L6-v2"):
-    """Lazy-load and cache the SentenceTransformer model."""
+    """Lazy-load and cache the SentenceTransformer model on CPU safely."""
     if model_name not in _model_cache:
-        from sentence_transformers import SentenceTransformer
-        _model_cache[model_name] = SentenceTransformer(model_name)
+        with _model_lock:
+            if model_name not in _model_cache:
+                from sentence_transformers import SentenceTransformer
+                _model_cache[model_name] = SentenceTransformer(model_name, device="cpu")
     return _model_cache[model_name]
 
 
@@ -337,23 +356,45 @@ def _stream_hf_genre_texts(
         return genre_texts
 
     max_scan = max(5000, samples_per_genre * 50)
-    for idx, row in enumerate(ds):
-        if idx >= max_scan:
-            break
-        if all(len(genre_texts[g]) >= samples_per_genre for g in hf_genres):
-            break
-        raw_tags = row.get(tags_field, []) or []
-        if not raw_tags and "meta" in row and isinstance(row["meta"], dict):
-            raw_tags = row["meta"].get(tags_field, []) or []
-        if isinstance(raw_tags, str):
-            raw_tags = [t.strip() for t in raw_tags.split(",")]
-        genre = consolidate_genre(raw_tags)
-        if genre is None or len(genre_texts[genre]) >= samples_per_genre:
-            continue
-        text = row.get(text_field, "") or ""
-        if len(text.strip()) < 100:
-            continue
-        genre_texts[genre].append(text)
+    ds_iter = iter(ds)
+    try:
+        for idx, row in enumerate(ds_iter):
+            if idx >= max_scan:
+                break
+            if all(len(genre_texts[g]) >= samples_per_genre for g in hf_genres):
+                break
+            raw_tags = row.get(tags_field, []) or []
+            if not raw_tags and "meta" in row and isinstance(row["meta"], dict):
+                raw_tags = row["meta"].get(tags_field, []) or []
+            if isinstance(raw_tags, str):
+                raw_tags = raw_tags.strip()
+                if raw_tags.startswith("[") and raw_tags.endswith("]"):
+                    try:
+                        import json
+                        raw_tags = json.loads(raw_tags)
+                    except Exception:
+                        raw_tags = [t.strip() for t in raw_tags.split(",")]
+                else:
+                    raw_tags = [t.strip() for t in raw_tags.split(",")]
+            genre = consolidate_genre(raw_tags)
+            if genre is None or len(genre_texts[genre]) >= samples_per_genre:
+                continue
+            text = row.get(text_field, "") or ""
+            if len(text.strip()) < 100:
+                continue
+            genre_texts[genre].append(text)
+    finally:
+        if 'ds_iter' in locals():
+            if hasattr(ds_iter, 'close'):
+                try:
+                    ds_iter.close()
+                except Exception:
+                    pass
+            del ds_iter
+        if 'ds' in locals():
+            del ds
+        import gc
+        gc.collect()
 
     return genre_texts
 
@@ -449,19 +490,49 @@ def build_genre_centroids(
     samples_per_genre: int = 200,
 ) -> tuple[np.ndarray, dict, np.ndarray, dict]:
     """
-    Build genre and territory centroids from HuggingFace + Gutenberg data.
-
-    Returns:
-        genre_centroids: (G, 384) float32 array
-        genre_meta: {"genres": [...], "samples_used": {...}}
-        territory_centroids: (T, 384) float32 array
-        territory_meta: {"territories": [...], "samples_used": {...}}
+    Build genre and territory centroids from HuggingFace (stable live streams)
+    and local database classic novels (to avoid flaky live Gutenberg API).
     """
     import ssl
     try:
         ssl._create_default_https_context = ssl._create_unverified_context
     except AttributeError:
         pass
+
+    # Helper to load classic texts from local DB first
+    def get_classic_texts_from_db(genre_name: str, limit: int) -> list[str]:
+        db_path = "data/kisholens.db"
+        if os.path.exists(db_path):
+            try:
+                from sqlmodel import Session, select
+                from kisholens.models import Novel, Chapter, get_engine
+                engine = get_engine()
+                with Session(engine) as s:
+                    # Find Gutenberg novels with this genre
+                    novels = s.exec(select(Novel).where(Novel.source == "gutenberg", Novel.genre == genre_name)).all()
+                    texts = []
+                    for n in novels:
+                        if len(texts) >= limit:
+                            break
+                        # Fetch chapters
+                        chapters = s.exec(select(Chapter).where(Chapter.novel_id == n.id).order_by(Chapter.chapter_number)).all()
+                        if not chapters:
+                            continue
+                        # Use the representative multi-chapter structure
+                        if len(chapters) == 1:
+                            t = chapters[0].text_en or chapters[0].text_ja or getattr(chapters[0], 'text_zh', '') or ''
+                        elif len(chapters) == 2:
+                            t = (chapters[0].text_en or '') + '\n\n' + (chapters[1].text_en or '')
+                        else:
+                            t = (chapters[0].text_en or '') + '\n\n' + (chapters[len(chapters)//2].text_en or '') + '\n\n' + (chapters[-1].text_en or '')
+                        if t.strip():
+                            texts.append(t)
+                    if len(texts) > 0:
+                        print(f"Loaded {len(texts)} classic '{genre_name}' texts from database offline.")
+                        return texts
+            except Exception as e:
+                print(f"[WARN] Error loading classic '{genre_name}' from DB: {e}")
+        return []
 
     # 1. HuggingFace: ScribbleHub17K
     print("Streaming ScribbleHub17K...")
@@ -514,7 +585,7 @@ def build_genre_centroids(
         "Dungeon Core / Dungeon MC", "Urban Fantasy / Dungeons",
         "Harem", "Girls Love / Boys Love"
     }
-    trad_specific_genres = {"High Fantasy", "Hard Sci-Fi", "Modern Thriller", "Slice of Life / Contemporary"}
+    trad_specific_genres = {"High Fantasy", "Hard Sci-Fi", "Modern Thriller", "Slice of Life", "Contemporary"}
     classic_specific_genres = {"Victorian Novel", "Philosophical Fiction"}
     common_genres = {"Mystery", "Horror", "Romance", "Fantasy", "Sci-Fi", "Action / Adventure", "Comedy"}
 
@@ -528,16 +599,19 @@ def build_genre_centroids(
             combined[genre] = texts
             trad_texts.extend(texts)
         elif genre in classic_specific_genres:
-            needed = samples_per_genre
-            print(f"Fetching Gutenberg texts for {genre}...")
-            fetched = []
-            for topic in gutenberg_topics[genre]:
-                if needed <= 0:
-                    break
-                f = _fetch_gutenberg_texts_by_topic(topic, genre, needed)
-                fetched.extend(f)
-                needed -= len(f)
-            texts = fetched[:samples_per_genre]
+            # Try DB first
+            texts = get_classic_texts_from_db(genre, samples_per_genre)
+            if not texts:
+                needed = samples_per_genre
+                print(f"Fetching Gutenberg texts for {genre}...")
+                fetched = []
+                for topic in gutenberg_topics[genre]:
+                    if needed <= 0:
+                        break
+                    f = _fetch_gutenberg_texts_by_topic(topic, genre, needed)
+                    fetched.extend(f)
+                    needed -= len(f)
+                texts = fetched[:samples_per_genre]
             combined[genre] = texts
             classic_texts.extend(texts)
         elif genre in common_genres:
@@ -548,17 +622,19 @@ def build_genre_centroids(
             hf_texts = hf_pool.get(genre, [])[:half]
             trad_texts.extend(hf_texts)
 
-            # Gutenberg portion (classic)
-            needed = half
-            print(f"Fetching Gutenberg texts for Classic {genre}...")
-            fetched = []
-            for topic in gutenberg_topics[genre]:
-                if needed <= 0:
-                    break
-                f = _fetch_gutenberg_texts_by_topic(topic, genre, needed)
-                fetched.extend(f)
-                needed -= len(f)
-            g_texts = fetched[:half]
+            # Gutenberg portion (classic) - Try DB first
+            g_texts = get_classic_texts_from_db(genre, half)
+            if not g_texts:
+                needed = half
+                print(f"Fetching Gutenberg texts for Classic {genre}...")
+                fetched = []
+                for topic in gutenberg_topics[genre]:
+                    if needed <= 0:
+                        break
+                    f = _fetch_gutenberg_texts_by_topic(topic, genre, needed)
+                    fetched.extend(f)
+                    needed -= len(f)
+                g_texts = fetched[:half]
             classic_texts.extend(g_texts)
 
             combined[genre] = hf_texts + g_texts

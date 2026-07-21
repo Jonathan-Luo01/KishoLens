@@ -7,7 +7,8 @@ import "../styles/global.css";
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Paste your prose and analyze stylistic pacing, dialogue ratios, and prose archetypes." />
-    <title>Analyze Prose — KishoLens</title>
+    <title>Analyze Prose</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
@@ -423,9 +424,8 @@ import "../styles/global.css";
       <header>
         <a href="/" class="brand-title">Kish<span>o</span>Lens</a>
         <nav style="display:flex;gap:1.5rem;align-items:center;">
-          <a href="/analyze" style="color:var(--color-accent);text-decoration:none;font-size:0.9rem;font-weight:500;">Analyze</a>
+          <a href="/analyze" style="color:var(--color-accent);text-decoration:none;font-size:0.9rem;font-weight:500;">Analyze Prose</a>
           <a href="/library" style="color:rgba(255,255,255,0.45);text-decoration:none;font-size:0.9rem;font-weight:500;">Library</a>
-          <a href="/visualize" style="color:rgba(255,255,255,0.45);text-decoration:none;font-size:0.9rem;font-weight:500;">Visualize</a>
         </nav>
       </header>
 
@@ -677,7 +677,7 @@ import "../styles/global.css";
 
           sessionStorage.setItem("custom_analysis", JSON.stringify(data));
           const linkBtn = document.getElementById("btn-visualize-link");
-          linkBtn.href = `/visualize?novelId=custom`;
+          linkBtn.href = `/library?novelId=custom`;
           document.getElementById("visualize-link-container").style.display = "block";
         } catch (err) {
           loadingState.style.display = "none";
@@ -743,22 +743,20 @@ import "../styles/global.css";
         resultsContainer.style.display = "flex";
       }
 
-      /* ── Charts Baseline Configuration ── */
       const RADAR_DIMS = [
-        { key: "en_theme_explication_ratio",     label: "Theme Depth",         min: 0,    max: 0.05  },
-        { key: "en_linearity_subversion_score",  label: "Temporal Complexity", min: 0,    max: 0.10  },
-        { key: "en_sensory_body_density",        label: "Visceral Emotion",    min: 0,    max: 0.08  },
-        { key: "en_outside_world_engagement",    label: "World Grounding",     min: 0,    max: 0.06  },
-        { key: "en_narrative_feature_diversity", label: "Narrative Diversity",  min: 0,    max: 1.0   },
-        { key: "en_dialogue_ratio",              label: "Dialogue Density",    min: 0,    max: 0.5   },
-        { key: "en_ttr",                         label: "Lexical Richness",    min: 0.3,  max: 0.9   },
-        { key: "en_compound_sentiment",          label: "Emotional Tone",      min: -1.0, max: 1.0   },
-        { key: "en_temporal_shift_score",        label: "Time Shifts",         min: 0,    max: 0.10  },
+        { key: "en_theme_explication_ratio",     label: "Thematic Explicitness", min: 0,    max: 10.0 },
+        { key: "en_linearity_subversion_score",  label: "Temporal Complexity",  min: 0,    max: 0.20 },
+        { key: "en_sensory_body_density",        label: "Visceral Emotion",     min: 0,    max: 1.0  },
+        { key: "en_outside_world_engagement",    label: "World Grounding",      min: 0.5,  max: 4.0  },
+        { key: "en_narrative_feature_diversity", label: "Subplot Diversity",    min: 0,    max: 1.0  },
+        { key: "en_dialogue_ratio",              label: "Dialogue Density",     min: 0,    max: 0.8  },
+        { key: "en_ttr",                         label: "Lexical Richness",     min: 0.3,  max: 0.9  },
+        { key: "en_compound_sentiment",          label: "Emotional Tone",       min: 0,    max: 1.0  },
       ];
 
       const RADAR_BASELINES = {
-        web_novel:   [0.40, 0.35, 0.55, 0.50, 0.52, 0.42, 0.38, 0.30, 0.22],
-        classic_lit: [0.65, 0.60, 0.40, 0.45, 0.70, 0.20, 0.72, 0.15, 0.60],
+        web_novel:   [0.35, 0.55, 0.60, 0.40, 0.40, 0.65, 0.45, 0.50],
+        classic_lit: [0.30, 0.20, 0.40, 0.80, 0.70, 0.30, 0.80, 0.40],
       };
 
       const PACING_BASELINES = {
@@ -907,6 +905,9 @@ import "../styles/global.css";
                        Object.keys(stats).find(k => k.startsWith("ja_")) ? "ja_" : "en_";
         const userVals = RADAR_DIMS.map(d => {
           const statsKey = d.key.replace("en_", prefix);
+          if (stats.normalized_radar && stats.normalized_radar[statsKey] !== undefined) {
+            return stats.normalized_radar[statsKey];
+          }
           return norm(stats[statsKey] ?? 0, d.min, d.max);
         });
         plotPolygon(
@@ -980,7 +981,9 @@ import "../styles/global.css";
         const plotH = H - PAD.top - PAD.bottom;
         const ns = "http://www.w3.org/2000/svg";
 
-        const acts    = arcData.acts;
+        const acts    = (arcData.quantiles && arcData.quantiles.length > 0)
+          ? arcData.quantiles.map((v, i) => ({ sentiment: v, actIndex: i }))
+          : arcData.acts;
         const blVals  = arcData.baselines[baseline];
         const blColor = baseline === "web_novel" ? "#a78bfa" : "#fbbf24";
         const blRgb   = baseline === "web_novel" ? "167,139,250" : "251,191,36";
@@ -1288,8 +1291,9 @@ import "../styles/global.css";
                          Object.keys(currentStats).find(k => k.startsWith("ja_")) ? "ja_" : "en_";
           const statsKey = dim.key.replace("en_", prefix);
           
-          const rawVal   = currentStats[statsKey] ?? 0;
-          const userVal  = norm(rawVal, dim.min, dim.max);
+          const userVal  = (currentStats.normalized_radar && currentStats.normalized_radar[statsKey] !== undefined)
+            ? currentStats.normalized_radar[statsKey]
+            : norm(currentStats[statsKey] ?? 0, dim.min, dim.max);
           const blVal    = RADAR_BASELINES[activeBaseline][hoveredIndex];
 
           const userPct  = (userVal * 100).toFixed(0) + "%";
@@ -1364,12 +1368,12 @@ import "../styles/global.css";
 
           if (hoveredArcIndex !== -1) {
             const act = acts[hoveredArcIndex];
-            const userVal = act.sentiment;
-            const blVal = currentArc.baselines[activeBaseline][hoveredArcIndex];
+            const userVal = typeof act === "number" ? act : act.sentiment;
+            const blVal = currentArc.baselines[activeBaseline][hoveredArcIndex] || 0;
             
             const labelMap = { "Introduction": "Intro", "Development": "Dev", "Twist": "Twist", "Resolution": "Res" };
-            const labelTxt = labelMap[act.label] || act.label;
-            const titleFmt = `${act.act} (${labelTxt})`;
+            const actNames = ["Ki (Intro)", "Shō (Dev)", "Ten (Twist)", "Ketsu (Res)"];
+            const titleFmt = actNames[hoveredArcIndex] || `${act.act || ''} (${labelMap[act.label] || act.label || ''})`;
 
             const userFmt = userVal >= 0 ? `+${userVal.toFixed(2)}` : userVal.toFixed(2);
             const blFmt = blVal >= 0 ? `+${blVal.toFixed(2)}` : blVal.toFixed(2);

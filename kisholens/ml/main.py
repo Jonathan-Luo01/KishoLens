@@ -106,6 +106,8 @@ def main():
     print("\n==================================================")
     print("PROSE ARCHETYPE ANALYSIS REPORT")
     print("==================================================")
+    
+
     for (title, src), sub_df in df.groupby(["novel_title", "source"]):
         prefix = ""
         for col in sub_df.columns:
@@ -137,6 +139,18 @@ def main():
             for trope, sim in sorted(match['similarities'].items(), key=lambda x: x[1], reverse=True):
                 print(f"    - {trope}: {sim:.4f}")
             print()
+            
+            # Save matched values back to database
+            try:
+                with Session(engine) as session:
+                    db_novel = session.exec(select(Novel).where(Novel.title == title, Novel.source == src)).first()
+                    if db_novel:
+                        db_novel.genre = match['closest_trope']
+                        db_novel.territory = match['territory']
+                        session.add(db_novel)
+                        session.commit()
+            except Exception as e:
+                print(f"Failed to save db match for {title}: {e}")
 
 if __name__ == "__main__":
     main()

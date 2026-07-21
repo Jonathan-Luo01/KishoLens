@@ -1,5 +1,10 @@
 import re
-from typing import Optional
+import uuid
+import random
+import warnings
+from typing import Dict, Any
+
+warnings.filterwarnings("ignore", category=UserWarning, module="multiprocessing.resource_tracker")
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -13,12 +18,16 @@ from kisholens.ml.features import (
     extract_japanese_features,
     extract_chinese_features,
     match_archetype,
+    normalize_feature_percentile,
+    compute_sentence_sentiment_normalized,
+    split_paragraphs,
     JA_POS_WORDS, JA_NEG_WORDS,
     ZH_POS_WORDS, ZH_NEG_WORDS,
     EN_POS_WORDS, EN_NEG_WORDS,
     _init_nlp_resources,
 )
 from kisholens.ml.semantic_match import match_semantic
+from kisholens.ml.sentiment_arc import compute_kishotenketsu_quantile_arc
 
 app = FastAPI(title="KishoLens API")
 
@@ -57,6 +66,8 @@ def get_novels():
                     "author": novel.author,
                     "source": novel.source,
                     "chapter_count": chapter_count,
+                    "genre": novel.genre,
+                    "territory": novel.territory,
                 }
                 for novel, chapter_count in results
             ]
@@ -160,7 +171,7 @@ def get_stats_sources():
 
                 for k in sorted(keys):
                     vals = [r[k] for r in rows if k in r and r[k] is not None]
-                    agg[k] = sum(vals) / len(vals) if vals else None
+                    agg[k] = sum(vals) / len(vals) if vals else 0.0
                 agg["archetype_match"] = match_archetype(agg)
                 agg_records.append(agg)
 
@@ -177,8 +188,13 @@ class IngestRequest(BaseModel):
     num_records: int
 
 
+_cached_novel_stats: Dict[int, Any] = {}
+
 @app.get("/api/novels/{novel_id}/stats")
 def get_novel_stats(novel_id: int):
+    global _cached_novel_stats
+    if novel_id in _cached_novel_stats:
+        return _cached_novel_stats[novel_id]
     try:
         with Session(engine) as session:
             novel = session.get(Novel, novel_id)
@@ -190,8 +206,16 @@ def get_novel_stats(novel_id: int):
                 .where(Chapter.novel_id == novel_id)
             ).all()
 
+            # Fast sampling for stats API: sample up to 6 evenly-spaced chapters across the book
+            sorted_chs = sorted(chapters, key=lambda c: c.chapter_number)
+            if len(sorted_chs) > 6:
+                step = (len(sorted_chs) - 1) / 5.0
+                sampled_chs = [sorted_chs[int(round(i * step))] for i in range(6)]
+            else:
+                sampled_chs = sorted_chs
+
             features_list = []
-            for ch in chapters:
+            for ch in sampled_chs:
                 row = {}
                 if ch.text_en:
                     en_feat = extract_english_features(ch.text_en)
@@ -218,11 +242,19 @@ def get_novel_stats(novel_id: int):
                 vals = [r[k] for r in features_list if k in r and r[k] is not None]
                 agg[k] = sum(vals) / len(vals) if vals else None
 
+            # Add percentile normalized radar scores to agg
+            normalized_radar = {}
+            for k in sorted(keys):
+                if agg[k] is not None:
+                    base_k = re.sub(r'^(en_|ja_|zh_)', '', k)
+                    normalized_radar[k] = normalize_feature_percentile(base_k, agg[k])
+            agg["normalized_radar"] = normalized_radar
+
             # Dynamically compute pacing paragraph lengths for the barcodes
             paragraph_lengths = []
             for ch in sorted(chapters, key=lambda c: c.chapter_number):
                 text = ch.text_en or ch.text_ja or getattr(ch, "text_zh", "") or ""
-                paragraphs = [p.strip() for p in text.split('\n') if p.strip()]
+                paragraphs = split_paragraphs(text)
                 for p in paragraphs:
                     if ch.text_en:
                         word_count = len(re.findall(r'\b\w+\b', p))
@@ -256,6 +288,17 @@ def get_novel_stats(novel_id: int):
             semantic = match_semantic(text) if text else None
 
             if agg:
+                # Detect language dynamically for baselines
+                lang = "en"
+                if chapters:
+                    first_ch = chapters[0]
+                    if not first_ch.text_en:
+                        if first_ch.text_ja:
+                            lang = "ja"
+                        elif getattr(first_ch, "text_zh", ""):
+                            lang = "zh"
+                agg["baselines"] = compute_dynamic_baselines(lang)
+
                 if semantic:
                     agg["archetype_match"] = {
                         "closest_trope": semantic["genre"],
@@ -271,6 +314,7 @@ def get_novel_stats(novel_id: int):
                         "confidence": 0.85
                     }
 
+            _cached_novel_stats[novel_id] = agg
             return agg
     except Exception as e:
         if isinstance(e, HTTPException):
@@ -281,13 +325,18 @@ def get_novel_stats(novel_id: int):
         )
 
 
+def compute_4act_peak_arc(all_sentences: list[str], lang: str) -> list[dict]:
+    """
+    Computes the Kishōtenketsu 4-act sentiment arc derived from quantile sentiment density weighing.
+    """
+    arc_res = compute_kishotenketsu_quantile_arc(all_sentences, lang)
+    return arc_res["acts"]
+
+
 @app.get("/api/novels/{novel_id}/arc")
 def get_novel_arc(novel_id: int):
     """
-    Computes the Kishōtenketsu 4-act sentiment arc for a novel.
-    All chapters are pooled in order, split into individual sentences,
-    then divided into 4 equal quantile bins (Ki / Shō / Ten / Ketsu).
-    Compound VADER sentiment is averaged per bin.
+    Computes the 4-act Kishōtenketsu sentiment arc for a novel.
     """
     try:
         with Session(engine) as session:
@@ -301,7 +350,6 @@ def get_novel_arc(novel_id: int):
                 .order_by(Chapter.chapter_number)
             ).all()
 
-        # Detect which language is present in the novel's chapters
         lang = "en"
         if chapters:
             first_ch = chapters[0]
@@ -311,7 +359,6 @@ def get_novel_arc(novel_id: int):
                 elif getattr(first_ch, "text_zh", ""):
                     lang = "zh"
 
-        # Pool all sentences from all chapters, preserving order
         all_sentences: list[str] = []
         for ch in chapters:
             if lang == "en":
@@ -331,77 +378,14 @@ def get_novel_arc(novel_id: int):
                 detail="No raw text found for this novel"
             )
 
-        # Attempt VADER sentiment scoring per sentence
-        sia = None
-        if lang == "en":
-            try:
-                from nltk.sentiment.vader import SentimentIntensityAnalyzer
-                _init_nlp_resources()
-                sia = SentimentIntensityAnalyzer()
-            except Exception:
-                pass
-
-        def score_sentence(s: str) -> float:
-            if lang == "en":
-                if sia:
-                    return sia.polarity_scores(s)["compound"]
-                pos = len(re.findall(
-                    r'\b(' + '|'.join(EN_POS_WORDS) + r')\b',
-                    s.lower()
-                ))
-                neg = len(re.findall(
-                    r'\b(' + '|'.join(EN_NEG_WORDS) + r')\b',
-                    s.lower()
-                ))
-                return (pos - neg) / (pos + neg + 1)
-            elif lang == "ja":
-                pos = sum(s.count(w) for w in JA_POS_WORDS)
-                neg = sum(s.count(w) for w in JA_NEG_WORDS)
-                return (pos - neg) / (pos + neg + 1)
-            else:  # zh
-                pos = sum(s.count(w) for w in ZH_POS_WORDS)
-                neg = sum(s.count(w) for w in ZH_NEG_WORDS)
-                return (pos - neg) / (pos + neg + 1)
-
-        # Pre-score and filter out neutral sentences to form an emotional-beats-only stream
-        scored_sentences = [(s, score_sentence(s)) for s in all_sentences]
-        emotional_beats = [item for item in scored_sentences if abs(item[1]) >= 0.1]
-        
-        # Fallback to all sentences if there are no strongly emotional beats
-        if not emotional_beats:
-            emotional_beats = scored_sentences
-
-        n = len(emotional_beats)
-        boundaries = [0, n // 4, n // 2, 3 * n // 4, n]
-        act_defs = [
-            ("Ki",    "Introduction"),
-            ("Shō",   "Development"),
-            ("Ten",   "Twist"),
-            ("Ketsu", "Resolution"),
-        ]
-
-        acts = []
-        for i, (act_key, act_label) in enumerate(act_defs):
-            start = boundaries[i]
-            end   = boundaries[i + 1]
-            segment = emotional_beats[start:end]
-            avg_sentiment = sum(score for s, score in segment) / len(segment) if segment else 0.0
-            
-            acts.append({
-                "act": act_key,
-                "label": act_label,
-                "sentiment": round(avg_sentiment, 4),
-                "sentence_range": [start, end - 1],
-            })
+        arc_res = compute_kishotenketsu_quantile_arc(all_sentences, lang)
 
         return {
             "novel_id": novel_id,
             "title": novel.title,
-            "acts": acts,
-            "baselines": {
-                "web_novel":   [0.10,  0.07, -0.04,  0.18],
-                "classic_lit": [0.03,  0.01, -0.18,  0.22],
-            },
+            "acts": arc_res["acts"],
+            "quantiles": arc_res["quantiles"],
+            "baselines": compute_dynamic_baselines(lang)["arc"]
         }
 
     except Exception as e:
@@ -413,16 +397,46 @@ def get_novel_arc(novel_id: int):
         )
 
 
+ingestion_jobs: Dict[str, Any] = {}
+
+
+def _execute_ingest_job(job_id: str, dataset_name: str, num_records: int):
+    try:
+        run_etl(dataset_name, num_records=num_records)
+        ingestion_jobs[job_id]["status"] = "completed"
+    except Exception as e:
+        ingestion_jobs[job_id]["status"] = "failed"
+        ingestion_jobs[job_id]["error"] = str(e)
+
+
 @app.post("/api/pipeline/ingest")
 def post_pipeline_ingest(request: IngestRequest, background_tasks: BackgroundTasks):
     try:
-        background_tasks.add_task(run_etl, request.dataset_name, request.num_records)
-        return {"status": "ingest_scheduled", "dataset_name": request.dataset_name}
+        job_id = str(uuid.uuid4())[:8]
+        ingestion_jobs[job_id] = {
+            "job_id": job_id,
+            "dataset_name": request.dataset_name,
+            "status": "running",
+            "error": None,
+        }
+        background_tasks.add_task(_execute_ingest_job, job_id, request.dataset_name, request.num_records)
+        return {
+            "status": "ingest_scheduled",
+            "job_id": job_id,
+            "dataset_name": request.dataset_name,
+        }
     except Exception as e:
         raise HTTPException(
             status_code=500,
             detail=f"Failed to schedule ingestion: {str(e)}"
         )
+
+
+@app.get("/api/pipeline/ingest/status/{job_id}")
+def get_ingest_status(job_id: str):
+    if job_id not in ingestion_jobs:
+        raise HTTPException(status_code=404, detail="Ingestion job not found")
+    return ingestion_jobs[job_id]
 
 
 class AnalysisRequest(BaseModel):
@@ -437,6 +451,223 @@ def detect_language(text: str) -> str:
     if re.search(r"[\u4e00-\u9fff]", text):
         return "zh"
     return "en"
+
+
+_cached_dynamic_visual_baselines = {}
+
+def compute_dynamic_baselines(lang: str):
+    global _cached_dynamic_visual_baselines
+    if lang in _cached_dynamic_visual_baselines:
+        return _cached_dynamic_visual_baselines[lang]
+
+    fallbacks = {
+        "en": {
+            "radar": {
+                "web_novel":   [0.35, 0.55, 0.60, 0.40, 0.40, 0.65, 0.45, 0.50],
+                "classic_lit": [0.30, 0.20, 0.40, 0.80, 0.70, 0.30, 0.80, 0.40],
+            },
+            "pacing": {
+                "web_novel": [15, 8, 22, 5, 12, 30, 9, 14, 6, 18, 11, 25, 7, 16, 13, 8, 20, 10, 15, 6, 24, 9, 12, 17, 8, 14, 5, 21, 7, 13, 11, 28, 6, 15, 9, 19, 12, 10, 16, 8, 23, 7, 11, 14, 5, 17, 12, 9, 21, 6],
+                "classic_lit": [85, 112, 64, 140, 95, 130, 78, 105, 88, 120, 90, 115, 130, 80, 125, 95, 110, 140, 75, 100, 105, 120, 85, 135, 95, 110, 130, 90, 115, 100, 112, 88, 98, 125, 70, 118, 132, 92, 104, 115],
+            },
+            "arc": {
+                "web_novel":   [0.12, 0.18, 0.25, 0.32],
+                "classic_lit": [0.15, 0.08, -0.12, 0.28],
+            }
+        },
+        "ja": {
+            "radar": {
+                "web_novel":   [0.35, 0.50, 0.65, 0.40, 0.40, 0.65, 0.40, 0.60],
+                "classic_lit": [0.50, 0.40, 0.70, 0.70, 0.50, 0.45, 0.45, 0.45],
+            },
+            "pacing": {
+                "web_novel": [45, 28, 62, 18, 35, 80, 24, 40, 15, 55, 30, 72, 22, 45, 38, 26, 60, 32, 44, 20, 70, 28, 35, 50, 25, 40, 16, 65, 22, 38, 32, 84, 18, 44, 28, 55, 36, 30, 48, 25, 68, 20, 32, 42, 15, 50, 35, 26, 62, 18],
+                "classic_lit": [180, 240, 150, 310, 200, 280, 160, 220, 190, 260, 175, 250, 290, 165, 270, 210, 230, 320, 155, 225, 210, 255, 185, 300, 205, 240, 275, 195, 265, 220, 245, 190, 215, 280, 140, 260, 295, 205, 235, 250],
+            },
+            "arc": {
+                "web_novel":   [0.10, 0.20, 0.15, 0.35],
+                "classic_lit": [0.12, 0.15, -0.08, 0.25],
+            }
+        },
+        "zh": {
+            "radar": {
+                "web_novel":   [0.30, 0.50, 0.65, 0.40, 0.40, 0.65, 0.45, 0.60],
+                "classic_lit": [0.50, 0.40, 0.80, 0.70, 0.50, 0.45, 0.45, 0.45],
+            },
+            "pacing": {
+                "web_novel": [50, 30, 70, 20, 40, 90, 25, 45, 18, 60, 35, 80, 24, 50, 42, 28, 65, 35, 50, 22, 75, 30, 40, 55, 28, 45, 18, 70, 24, 42, 35, 90, 20, 50, 30, 60, 40, 32, 52, 28, 75, 22, 35, 48, 18, 55, 40, 28, 70, 20],
+                "classic_lit": [220, 280, 180, 350, 240, 310, 190, 260, 220, 300, 210, 290, 330, 200, 310, 250, 270, 360, 180, 260, 240, 290, 210, 340, 230, 270, 310, 220, 300, 250, 280, 220, 250, 320, 160, 300, 330, 230, 270, 290],
+            },
+            "arc": {
+                "web_novel":   [0.10, 0.18, 0.15, 0.30],
+                "classic_lit": [0.12, 0.15, -0.05, 0.25],
+            }
+        }
+    }
+
+    import copy
+    result = copy.deepcopy(fallbacks.get(lang, fallbacks["en"]))
+    
+    try:
+        import random
+        with Session(engine) as session:
+            # Gutenberg Chapters for this language
+            gutenberg_stmt = (
+                select(Chapter)
+                .join(Novel, Chapter.novel_id == Novel.id)
+                .where(Novel.source == "gutenberg")
+            )
+            gutenberg_chapters = session.exec(gutenberg_stmt).all()
+            
+            # Webnovel Chapters for this language
+            webnovel_stmt = (
+                select(Chapter)
+                .join(Novel, Chapter.novel_id == Novel.id)
+                .where(Novel.source != "gutenberg")
+            )
+            webnovel_chapters = session.exec(webnovel_stmt).all()
+
+            def filter_by_lang(chapters_list):
+                res = []
+                for ch in chapters_list:
+                    if lang == "en" and ch.text_en:
+                        res.append(ch)
+                    elif lang == "ja" and ch.text_ja:
+                        res.append(ch)
+                    elif lang == "zh" and getattr(ch, "text_zh", ""):
+                        res.append(ch)
+                return res
+
+            g_chs = filter_by_lang(gutenberg_chapters)
+            w_chs = filter_by_lang(webnovel_chapters)
+
+            g_chs = sorted(g_chs, key=lambda c: c.id)
+            w_chs = sorted(w_chs, key=lambda c: c.id)
+
+            rng = random.Random(42)
+            if len(g_chs) > 30:
+                g_chs = rng.sample(g_chs, 30)
+            if len(w_chs) > 30:
+                w_chs = rng.sample(w_chs, 30)
+
+            def compute_full_novel_arcs_for_source(source_type: str) -> list[float]:
+                if source_type == "gutenberg":
+                    novels = session.exec(select(Novel).where(Novel.source == "gutenberg")).all()
+                else:
+                    novels = session.exec(select(Novel).where(Novel.source != "gutenberg")).all()
+
+                arc_grid = [[] for _ in range(4)]
+                for n in novels[:25]:
+                    chs = session.exec(
+                        select(Chapter)
+                        .where(Chapter.novel_id == n.id)
+                        .order_by(Chapter.chapter_number)
+                    ).all()
+                    
+                    lang_texts = []
+                    for ch in chs:
+                        if lang == "en" and ch.text_en:
+                            lang_texts.append(ch.text_en)
+                        elif lang == "ja" and ch.text_ja:
+                            lang_texts.append(ch.text_ja)
+                        elif lang == "zh" and getattr(ch, "text_zh", ""):
+                            lang_texts.append(getattr(ch, "text_zh", ""))
+                    
+                    if lang_texts:
+                        full_text = "\n".join(lang_texts)
+                        if lang == "en":
+                            sents = [s.strip() for s in re.split(r'[.!?]+', full_text) if s.strip()]
+                        else:
+                            sents = [s.strip() for s in re.split(r'[。！？]+', full_text) if s.strip()]
+                        if len(sents) >= 4:
+                            arc_res = compute_kishotenketsu_quantile_arc(sents, lang)
+                            for i, val in enumerate(arc_res["quantiles"]):
+                                arc_grid[i].append(val)
+
+                avg_arcs = [
+                    round(sum(vals) / len(vals), 4) if vals else 0.0
+                    for vals in arc_grid
+                ]
+                return avg_arcs if any(x != 0.0 for x in avg_arcs) else []
+
+            def extract_baselines_from_sampled_chapters(sampled_chs, source_type):
+                feats = []
+                pacing_grid = [[] for _ in range(40)]
+                
+                # 1. Fast regex pacing across sampled chapters
+                for ch in sampled_chs:
+                    text = ch.text_en if lang == "en" else (ch.text_ja if lang == "ja" else getattr(ch, "text_zh", ""))
+                    if text:
+                        paras = split_paragraphs(text)
+                        for i, p in enumerate(paras[:40]):
+                            wc = len(re.findall(r'\b\w+\b', p)) if lang == "en" else len([c for c in p if not c.isspace()])
+                            if wc > 0:
+                                pacing_grid[i].append(wc)
+
+                avg_pacings = [
+                    int(round(sum(vals) / len(vals))) if vals else 20
+                    for vals in pacing_grid
+                ]
+
+                avg_arcs = compute_full_novel_arcs_for_source(source_type)
+
+                # 2. Heavy spaCy/NLP feature extraction on a small 5-chapter subset
+                radar_chs = sampled_chs[:5]
+                for ch in radar_chs:
+                    row = {}
+                    if lang == "en" and ch.text_en:
+                        row = extract_english_features(ch.text_en)
+                    elif lang == "ja" and ch.text_ja:
+                        row = extract_japanese_features(ch.text_ja)
+                    elif lang == "zh" and getattr(ch, "text_zh", ""):
+                        row = extract_chinese_features(getattr(ch, "text_zh", ""))
+                    if row:
+                        feats.append(row)
+
+                radar_vals = []
+                keys_list = [
+                    "theme_explication_ratio",
+                    "linearity_subversion_score",
+                    "sensory_body_density",
+                    "outside_world_engagement",
+                    "narrative_feature_diversity",
+                    "dialogue_ratio",
+                    "ttr",
+                    "compound_sentiment"
+                ]
+                
+                if feats:
+                    for k in keys_list:
+                        raw_vals = [f.get(k, 0) for f in feats if f.get(k) is not None]
+                        avg_raw = sum(raw_vals) / len(raw_vals) if raw_vals else 0.0
+                        norm_val = normalize_feature_percentile(k, avg_raw)
+                        radar_vals.append(round(norm_val, 4))
+                
+                return radar_vals, (avg_pacings if avg_pacings else []), (avg_arcs if avg_arcs else [])
+
+            if g_chs:
+                g_radar, g_pacing, g_arc = extract_baselines_from_sampled_chapters(g_chs, "gutenberg")
+                if g_radar:
+                    result["radar"]["classic_lit"] = g_radar
+                if g_pacing:
+                    result["pacing"]["classic_lit"] = g_pacing
+                if g_arc:
+                    result["arc"]["classic_lit"] = g_arc
+
+            if w_chs:
+                w_radar, w_pacing, w_arc = extract_baselines_from_sampled_chapters(w_chs, "web")
+                if w_radar:
+                    result["radar"]["web_novel"] = w_radar
+                if w_pacing:
+                    result["pacing"]["web_novel"] = w_pacing
+                if w_arc:
+                    result["arc"]["web_novel"] = w_arc
+                
+    except Exception as e:
+        print(f"Error computing dynamic visual baselines: {e}")
+        
+    _cached_dynamic_visual_baselines[lang] = result
+    return result
 
 
 _cached_baselines = {}
@@ -570,7 +801,7 @@ def post_analyze(request: AnalysisRequest):
     baselines = get_baseline_stats(lang)
 
     # 1. Compute paragraph pacing lengths for input text
-    paragraphs = [p.strip() for p in request.text.split('\n') if p.strip()]
+    paragraphs = [p.strip() for p in re.split(r'\n\s*\n', request.text) if p.strip()]
     paragraph_lengths = []
     for p in paragraphs:
         if lang == "en":
@@ -584,6 +815,13 @@ def post_analyze(request: AnalysisRequest):
     # 2. Format features for matcher and add pacing array
     agg = {f"{lang}_{k}": v for k, v in features.items()}
     agg["pacing"] = pacing
+
+    normalized_radar = {}
+    for k, v in features.items():
+        if v is not None:
+            normalized_radar[f"{lang}_{k}"] = normalize_feature_percentile(k, v)
+    agg["normalized_radar"] = normalized_radar
+
     archetype = match_archetype(agg)
     # Semantic genre matching is currently optimized for English text (all-MiniLM-L6-v2)
     semantic = match_semantic(request.text) if lang == "en" else None
@@ -599,73 +837,20 @@ def post_analyze(request: AnalysisRequest):
     else:
         agg["archetype_match"] = archetype
 
-    # 3. Compute Kishōtenketsu 4-act sentiment arc
+    # 3. Compute Kishōtenketsu 4-quantile sentiment arc
     if lang == "en":
         sents = [s.strip() for s in re.split(r'[.!?]+', request.text) if s.strip()]
     else:
         sents = [s.strip() for s in re.split(r'[。！？]+', request.text) if s.strip()]
 
-    # Score sentences using vocabulary mapping / VADER
-    sia = None
-    if lang == "en":
-        try:
-            from nltk.sentiment.vader import SentimentIntensityAnalyzer
-            _init_nlp_resources()
-            sia = SentimentIntensityAnalyzer()
-        except Exception:
-            pass
+    arc_res = compute_kishotenketsu_quantile_arc(sents, lang)
 
-    def score_sentence(s: str) -> float:
-        if lang == "en":
-            if sia:
-                return sia.polarity_scores(s)["compound"]
-            pos = len(re.findall(r'\b(' + '|'.join(EN_POS_WORDS) + r')\b', s.lower()))
-            neg = len(re.findall(r'\b(' + '|'.join(EN_NEG_WORDS) + r')\b', s.lower()))
-            return (pos - neg) / (pos + neg + 1)
-        elif lang == "ja":
-            pos = sum(s.count(w) for w in JA_POS_WORDS)
-            neg = sum(s.count(w) for w in JA_NEG_WORDS)
-            return (pos - neg) / (pos + neg + 1)
-        else:  # zh
-            pos = sum(s.count(w) for w in ZH_POS_WORDS)
-            neg = sum(s.count(w) for w in ZH_NEG_WORDS)
-            return (pos - neg) / (pos + neg + 1)
-
-    scored_sentences = [(s, score_sentence(s)) for s in sents]
-    emotional_beats = [item for item in scored_sentences if abs(item[1]) >= 0.1]
-    if not emotional_beats:
-        emotional_beats = scored_sentences
-
-    n_beats = len(emotional_beats)
-    boundaries = [0, n_beats // 4, n_beats // 2, 3 * n_beats // 4, n_beats]
-    act_defs = [
-        ("Ki",    "Introduction"),
-        ("Shō",   "Development"),
-        ("Ten",   "Twist"),
-        ("Ketsu", "Resolution"),
-    ]
-
-    acts = []
-    for i, (act_key, act_label) in enumerate(act_defs):
-        start = boundaries[i]
-        end   = boundaries[i + 1]
-        segment = emotional_beats[start:end]
-        avg_sentiment = sum(score for s, score in segment) / len(segment) if segment else 0.0
-        
-        acts.append({
-            "act": act_key,
-            "label": act_label,
-            "sentiment": round(avg_sentiment, 4),
-            "sentence_range": [start, end - 1],
-        })
-
+    dyn_baselines = compute_dynamic_baselines(lang)
     arc = {
         "title": request.title or "Untitled",
-        "acts": acts,
-        "baselines": {
-            "web_novel":   [0.10,  0.07, -0.04,  0.18],
-            "classic_lit": [0.03,  0.01, -0.18,  0.22],
-        }
+        "acts": arc_res["acts"],
+        "quantiles": arc_res["quantiles"],
+        "baselines": dyn_baselines.get("arc", {})
     }
 
     response = {
