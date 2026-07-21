@@ -1,4 +1,4 @@
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
@@ -27,11 +27,9 @@ if (!fs.existsSync(cmdPath)) {
   spawnArgs = ['run', ...args];
 }
 
-const { exec } = require('child_process');
-
 const child = spawn(spawnCmd, spawnArgs, {
   stdio: 'inherit',
-  detached: true,
+  detached: !isWin,
   env: {
     ...process.env,
     PYTHONWARNINGS: 'ignore::UserWarning:multiprocessing.resource_tracker',
@@ -41,38 +39,34 @@ const child = spawn(spawnCmd, spawnArgs, {
 
 let isExiting = false;
 
-const killProcessTree = (signal = 'SIGINT') => {
-  if (child && child.pid && !child.killed) {
+function terminate(signal = 'SIGINT') {
+  if (isExiting) return;
+  isExiting = true;
+
+  if (child && child.pid) {
     if (isWin) {
-      exec(`taskkill /pid ${child.pid} /f /t`, () => {});
+      try {
+        execSync(`taskkill /pid ${child.pid} /f /t`, { stdio: 'ignore' });
+      } catch (e) {}
     } else {
       try {
-        process.kill(-child.pid, signal);
+        process.kill(-child.pid, 'SIGKILL');
       } catch (e) {
         try {
-          process.kill(child.pid, signal);
+          process.kill(child.pid, 'SIGKILL');
         } catch (err) {}
       }
     }
   }
-};
 
-process.on('SIGINT', () => {
-  if (isExiting) return;
-  isExiting = true;
-  killProcessTree('SIGINT');
-});
+  setTimeout(() => {
+    process.exit(0);
+  }, 100);
+}
 
-process.on('SIGTERM', () => {
-  if (isExiting) return;
-  isExiting = true;
-  killProcessTree('SIGTERM');
-});
+process.on('SIGINT', () => terminate('SIGINT'));
+process.on('SIGTERM', () => terminate('SIGTERM'));
 
-process.on('exit', () => {
-  killProcessTree('SIGKILL');
-});
-
-child.on('close', () => {
-  process.exit(0);
+child.on('close', (code) => {
+  process.exit(code ?? 0);
 });
