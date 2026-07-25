@@ -1895,6 +1895,154 @@ import "../styles/global.css";
         });
       }
 
+      const METRIC_METADATA = {
+        // Structure
+        word_count:                  { label: "Word Count", category: "structure", tooltip: "Total words analyzed across sampled chapters" },
+        char_count:                  { label: "Character Count", category: "structure", tooltip: "Total characters in text" },
+        sentence_count:              { label: "Sentence Count", category: "structure", tooltip: "Total sentences identified" },
+        avg_sentence_len:            { label: "Avg Sentence Length", category: "structure", tooltip: "Average words/characters per sentence" },
+        avg_sentences_per_paragraph: { label: "Sentences/Paragraph", category: "structure", tooltip: "Paragraph density and pacing structure" },
+        dep_tree_depth:              { label: "Dep Tree Depth", category: "structure", tooltip: "Syntactic dependency tree depth (higher = more complex sentence grammar)" },
+
+        // Prose & Style
+        dialogue_ratio:              { label: "Dialogue Ratio", category: "prose", isPercent: true, tooltip: "Percentage of prose contained within quotation marks" },
+        ttr:                         { label: "Lexical Density (TTR)", category: "prose", tooltip: "Type-Token Ratio: vocabulary diversity and richness" },
+        adj_ratio:                   { label: "Adjective Ratio", category: "prose", isPercent: true, tooltip: "Proportion of adjectives relative to total word count" },
+        verb_ratio:                  { label: "Verb Ratio", category: "prose", isPercent: true, tooltip: "Action verb frequency relative to word count" },
+        particle_ratio:              { label: "Particle Ratio", category: "prose", isPercent: true, tooltip: "Grammatical particle density" },
+        kanji_ratio:                 { label: "Kanji Density", category: "prose", isPercent: true, tooltip: "Kanji character density in Japanese text" },
+
+        // Theme & Emotion
+        compound_sentiment:          { label: "Sentiment Tone", category: "theme", tooltip: "Overall emotional valence score (-1.0 negative to +1.0 positive)" },
+        theme_explication_ratio:     { label: "Thematic Explicitness", category: "theme", tooltip: "Density of explicit moral/theme statements per 10k units" },
+        sensory_body_density:        { label: "Visceral Emotion", category: "theme", isPercent: true, tooltip: "Ratio of somatic body sensations vs direct emotion words" },
+        outside_world_engagement:    { label: "World Grounding", category: "theme", isPercent: true, tooltip: "Engagement with setting and physical world descriptions" },
+
+        // Pacing & Subplots
+        linearity_subversion_score:  { label: "Temporal Complexity", category: "pacing", tooltip: "Non-linear story structure and flashback frequency" },
+        temporal_shift_score:        { label: "Time Shifts", category: "pacing", tooltip: "Frequency of time jump markers and scene transitions" },
+        narrative_feature_diversity: { label: "Subplot Diversity", category: "pacing", tooltip: "Co-occurrence diversity of secondary entities and subplots" }
+      };
+
+      function renderEnhancedMetricsDashboard(stats) {
+        const keys = Object.keys(stats);
+        const langPrefix = keys.some(k => k.startsWith("en_")) ? "en_" :
+                           keys.some(k => k.startsWith("ja_")) ? "ja_" : "zh_";
+
+        const normRadar = stats.normalized_radar || {};
+        const baselines = stats.baselines?.radar?.web_novel || stats.baselines?.radar?.classic_lit || [];
+
+        // 1. Hero Summary Header
+        const heroHtml = `
+          <div class="metrics-hero">
+            <div class="hero-chip">
+              <span class="hero-chip-label">Archetype</span>
+              <span class="hero-chip-val" style="color: #a78bfa;">${stats.archetype_match?.closest_trope || 'Unknown'}</span>
+            </div>
+            <div class="hero-chip">
+              <span class="hero-chip-label">Territory</span>
+              <span class="hero-chip-val" style="color: #38bdf8;">${stats.archetype_match?.territory || 'Web Novel'}</span>
+            </div>
+            <div class="hero-chip">
+              <span class="hero-chip-label">Word Count</span>
+              <span class="hero-chip-val">${(stats[`${langPrefix}word_count`] || stats[`${langPrefix}char_count`] || 0).toLocaleString()}</span>
+            </div>
+            <div class="hero-chip">
+              <span class="hero-chip-label">Lexical Richness</span>
+              <span class="hero-chip-val" style="color: #34d399;">${stats[`${langPrefix}ttr`]?.toFixed(2) || 'N/A'}</span>
+            </div>
+          </div>
+        `;
+
+        // 2. Filter Tabs
+        const tabsHtml = `
+          <div class="metrics-category-tabs">
+            <button class="category-tab active" data-cat="all">All Metrics</button>
+            <button class="category-tab" data-cat="structure">Structure</button>
+            <button class="category-tab" data-cat="prose">Prose & Style</button>
+            <button class="category-tab" data-cat="theme">Theme & Emotion</button>
+            <button class="category-tab" data-cat="pacing">Pacing & Narrative</button>
+          </div>
+        `;
+
+        // 3. Metric Sections Grouping
+        const categories = [
+          { id: "structure", title: "Structure & Volume", class: "cat-structure", barClass: "bar-fill-structure" },
+          { id: "prose", title: "Prose & Style", class: "cat-prose", barClass: "bar-fill-prose" },
+          { id: "theme", title: "Theme & Emotion", class: "cat-theme", barClass: "bar-fill-theme" },
+          { id: "pacing", title: "Pacing & Narrative", class: "cat-pacing", barClass: "bar-fill-pacing" }
+        ];
+
+        let sectionsHtml = "";
+
+        categories.forEach(cat => {
+          let cardsInCatHtml = "";
+          Object.keys(METRIC_METADATA).forEach(key => {
+            const meta = METRIC_METADATA[key];
+            if (meta.category !== cat.id) return;
+
+            const rawKey = `${langPrefix}${key}`;
+            if (stats[rawKey] === undefined && stats[key] === undefined) return;
+
+            const rawVal = stats[rawKey] !== undefined ? stats[rawKey] : stats[key];
+            if (rawVal === null || rawVal === undefined) return;
+
+            let displayVal = meta.isPercent ? `${(rawVal * 100).toFixed(1)}%` :
+                             typeof rawVal === 'number' ? (rawVal % 1 !== 0 ? rawVal.toFixed(2) : rawVal.toString()) : rawVal;
+
+            const normScore = normRadar[rawKey] !== undefined ? normRadar[rawKey] :
+                              normRadar[key] !== undefined ? normRadar[key] : 0.5;
+
+            const pctWidth = Math.min(100, Math.max(0, Math.round(normScore * 100)));
+
+            // Benchmark comparison chip
+            let benchChipHtml = "";
+            if (normScore >= 0.65) {
+              benchChipHtml = `<span class="benchmark-chip higher">High (+${Math.round((normScore - 0.5) * 100)}% vs Avg)</span>`;
+            } else if (normScore <= 0.35) {
+              benchChipHtml = `<span class="benchmark-chip lower">Low (-${Math.round((0.5 - normScore) * 100)}% vs Avg)</span>`;
+            } else {
+              benchChipHtml = `<span class="benchmark-chip neutral">Balanced</span>`;
+            }
+
+            cardsInCatHtml += `
+              <div class="metric-card" data-category="${cat.id}">
+                <div class="metric-card-header">
+                  <span class="metric-card-label">${meta.label}</span>
+                  <span class="metric-info-icon" title="${meta.tooltip}">ⓘ</span>
+                </div>
+                <div class="metric-val-row">
+                  <span class="metric-primary-val">${displayVal}</span>
+                  ${benchChipHtml}
+                </div>
+                <div class="percentile-bar-bg">
+                  <div class="percentile-bar-fill ${cat.barClass}" style="width: ${pctWidth}%;"></div>
+                </div>
+              </div>
+            `;
+          });
+
+          if (cardsInCatHtml) {
+            sectionsHtml += `
+              <div class="metric-category-section" data-cat-section="${cat.id}">
+                <div class="category-section-title ${cat.class}">${cat.title}</div>
+                <div class="metric-card-grid">
+                  ${cardsInCatHtml}
+                </div>
+              </div>
+            `;
+          }
+        });
+
+        return `
+          <div class="metrics-dashboard">
+            ${heroHtml}
+            ${tabsHtml}
+            ${sectionsHtml}
+          </div>
+        `;
+      }
+
       async function selectNovel(id, title) {
         selectedNovelId = id;
         
@@ -1947,87 +2095,25 @@ import "../styles/global.css";
             return;
           }
 
-          // Render Stats Grid
-          let gridHtml = `<div class="stat-grid">`;
-          const keys = Object.keys(stats);
-          const isEn = keys.some(k => k.startsWith("en_"));
-          const isJa = keys.some(k => k.startsWith("ja_"));
-          const isZh = keys.some(k => k.startsWith("zh_"));
+          statsContent.innerHTML = renderEnhancedMetricsDashboard(stats);
 
-          if (isEn) {
-            gridHtml += buildStatItem("Word Count", stats.en_word_count?.toFixed(0));
-            gridHtml += buildStatItem("Sentence Count", stats.en_sentence_count?.toFixed(0));
-            gridHtml += buildStatItem("Avg Sentence Length", stats.en_avg_sentence_len?.toFixed(1));
-            gridHtml += buildStatItem("Dialogue Ratio", `${(stats.en_dialogue_ratio * 100)?.toFixed(1)}%`);
-            gridHtml += buildStatItem("Lexical Density (TTR)", stats.en_ttr?.toFixed(3));
-            gridHtml += buildStatItem("Dep Tree Depth", stats.en_dep_tree_depth?.toFixed(2));
-            gridHtml += buildStatItem("Adjective Ratio", `${(stats.en_adj_ratio * 100)?.toFixed(1)}%`);
-            gridHtml += buildStatItem("Verb Ratio", `${(stats.en_verb_ratio * 100)?.toFixed(1)}%`);
-            gridHtml += buildStatItem("Sentences/Paragraph", stats.en_avg_sentences_per_paragraph?.toFixed(2));
-            gridHtml += buildStatItem("Sentiment (VADER)", stats.en_compound_sentiment?.toFixed(3));
-            gridHtml += buildStatItem("Thematic Explicitness", stats.en_theme_explication_ratio?.toFixed(2));
-            gridHtml += buildStatItem("Temporal Complexity", stats.en_linearity_subversion_score?.toFixed(3));
-            gridHtml += buildStatItem("Visceral Emotion", `${(stats.en_sensory_body_density * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("World Grounding", `${(stats.en_outside_world_engagement * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Time Shifts", stats.en_temporal_shift_score?.toFixed(3));
-            gridHtml += buildStatItem("Subplot Diversity", stats.en_narrative_feature_diversity?.toFixed(3));
-          } else if (isJa) {
-            gridHtml += buildStatItem("Character Count", stats.ja_char_count?.toFixed(0));
-            gridHtml += buildStatItem("Sentence Count", stats.ja_sentence_count?.toFixed(0));
-            gridHtml += buildStatItem("Avg Sentence Length", stats.ja_avg_sentence_len?.toFixed(1));
-            gridHtml += buildStatItem("Dialogue Ratio", `${(stats.ja_dialogue_ratio * 100)?.toFixed(1)}%`);
-            gridHtml += buildStatItem("Lexical Density (TTR)", stats.ja_ttr?.toFixed(3));
-            gridHtml += buildStatItem("Dep Tree Depth", stats.ja_dep_tree_depth?.toFixed(2));
-            gridHtml += buildStatItem("Particle Ratio", `${(stats.ja_particle_ratio * 100)?.toFixed(1)}%`);
-            gridHtml += buildStatItem("Kanji Density", `${(stats.ja_kanji_ratio * 100)?.toFixed(1)}%`);
-            gridHtml += buildStatItem("Sentences/Paragraph", stats.ja_avg_sentences_per_paragraph?.toFixed(2));
-            gridHtml += buildStatItem("Sentiment (Lexicon)", stats.ja_compound_sentiment?.toFixed(3));
-            gridHtml += buildStatItem("Thematic Explicitness", stats.ja_theme_explication_ratio?.toFixed(2));
-            gridHtml += buildStatItem("Temporal Complexity", stats.ja_linearity_subversion_score?.toFixed(3));
-            gridHtml += buildStatItem("Visceral Emotion", `${(stats.ja_sensory_body_density * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("World Grounding", `${(stats.ja_outside_world_engagement * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Time Shifts", stats.ja_temporal_shift_score?.toFixed(3));
-            gridHtml += buildStatItem("Subplot Diversity", stats.ja_narrative_feature_diversity?.toFixed(3));
-          } else if (isZh) {
-            gridHtml += buildStatItem("Character Count", stats.zh_char_count?.toFixed(0));
-            gridHtml += buildStatItem("Sentence Count", stats.zh_sentence_count?.toFixed(0));
-            gridHtml += buildStatItem("Avg Sentence Length", stats.zh_avg_sentence_len?.toFixed(1));
-            gridHtml += buildStatItem("Dialogue Ratio", `${(stats.zh_dialogue_ratio * 100)?.toFixed(1)}%`);
-            gridHtml += buildStatItem("Lexical Density (TTR)", stats.zh_ttr?.toFixed(3));
-            gridHtml += buildStatItem("Dep Tree Depth", stats.zh_dep_tree_depth?.toFixed(2));
-            gridHtml += buildStatItem("Particle Ratio", `${(stats.zh_particle_ratio * 100)?.toFixed(1)}%`);
-            gridHtml += buildStatItem("Verb Ratio", `${(stats.zh_verb_ratio * 100)?.toFixed(1)}%`);
-            gridHtml += buildStatItem("Sentences/Paragraph", stats.zh_avg_sentences_per_paragraph?.toFixed(2));
-            gridHtml += buildStatItem("Sentiment (Lexicon)", stats.zh_compound_sentiment?.toFixed(3));
-            gridHtml += buildStatItem("Thematic Explicitness", stats.zh_theme_explication_ratio?.toFixed(2));
-            gridHtml += buildStatItem("Temporal Complexity", stats.zh_linearity_subversion_score?.toFixed(3));
-            gridHtml += buildStatItem("Visceral Emotion", `${(stats.zh_sensory_body_density * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("World Grounding", `${(stats.zh_outside_world_engagement * 100)?.toFixed(2)}%`);
-            gridHtml += buildStatItem("Time Shifts", stats.zh_temporal_shift_score?.toFixed(3));
-            gridHtml += buildStatItem("Subplot Diversity", stats.zh_narrative_feature_diversity?.toFixed(3));
-          }
-          gridHtml += `</div>`;
-
-          if (stats.archetype_match) {
-            const am = stats.archetype_match;
-            const tropeLabel = (am.top_genres && am.top_genres.length > 0)
-              ? am.top_genres.slice(0, 3).map(g => `${g.genre} (${(g.confidence * 100).toFixed(0)}%)`).join(", ")
-              : am.closest_trope;
-            gridHtml += `
-              <div style="margin-top: 0.85rem; padding-top: 0.85rem; border-top: 1px solid var(--color-border);">
-                <h4 style="font-family: var(--font-display); font-size: 0.88rem; margin-bottom: 0.35rem; color: var(--color-accent);">Archetype Match</h4>
-                <div style="background: rgba(124, 106, 255, 0.04); border: 1px solid rgba(124, 106, 255, 0.15); border-radius: 8px; padding: 0.65rem 0.8rem;">
-                  <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.15rem;">
-                    <span>${tropeLabel}</span>
-                    <span style="color: var(--color-accent-2);">${(am.confidence * 100).toFixed(1)}%</span>
-                  </div>
-                  <div style="font-size: 0.75rem; color: var(--color-muted);">${am.territory}</div>
-                </div>
-              </div>
-            `;
-          }
-
-          statsContent.innerHTML = gridHtml;
+          // Attach tab filter click handler
+          const tabBtns = statsContent.querySelectorAll(".category-tab");
+          tabBtns.forEach(btn => {
+            btn.addEventListener("click", () => {
+              tabBtns.forEach(b => b.classList.remove("active"));
+              btn.classList.add("active");
+              const targetCat = btn.getAttribute("data-cat");
+              const sections = statsContent.querySelectorAll("[data-cat-section]");
+              sections.forEach(sec => {
+                if (targetCat === "all" || sec.getAttribute("data-cat-section") === targetCat) {
+                  sec.style.display = "flex";
+                } else {
+                  sec.style.display = "none";
+                }
+              });
+            });
+          });
 
           // Unhide charts container and render visualizations
           const chartsGrid = document.getElementById("chartsGrid");
