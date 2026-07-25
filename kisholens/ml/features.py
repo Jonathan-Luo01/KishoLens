@@ -421,29 +421,39 @@ def compute_world_grounding(text: str, doc=None, lang: str = "en") -> float:
 
 def compute_thematic_explicitness(text: str, lang: str = "en") -> float:
     """
-    Task 1 & Task 6: Thematic Explicitness using DIDACTIC_MARKERS
-    and epiphanic structures, normalized per 10,000 units.
+    Computes Thematic Explicitness using didactic markers, epiphanic reflection structures,
+    and thematic core concept frequencies, normalized per 1,000 units.
     """
     if not text:
         return 0.0
-        
+
     text_lower = text.lower()
     didactic_count = 0
     epiphanic_count = 0
-    
+    theme_count = 0
+
     if lang == "en":
         didactic_markers = [
             "the true meaning of", "the lesson here was", "with the power of",
             "the moral of", "in the end", "what matters most", "the nature of",
-            "real meaning of", "purpose of life", "true value of", "essence of"
+            "real meaning of", "purpose of life", "true value of", "essence of",
+            "meaning of", "lesson", "purpose", "moral", "destiny", "fate"
         ]
         didactic_count = sum(len(re.findall(r'\b' + re.escape(p) + r'\b', text_lower)) for p in didactic_markers)
-        
-        epiphanic_verbs = ["realized", "learned", "understood", "discovered", "comprehended", "recognized", "saw that", "knew that"]
-        theme_keywords = ["love", "life", "death", "truth", "friendship", "power", "destiny", "fate", "courage", "sacrifice", "family", "hope", "justice", "humanity", "peace", "war"]
-        epiphanic_pattern = r'\b(' + '|'.join(epiphanic_verbs) + r')\b(?:\W+\w+){0,10}?\W+\b(' + '|'.join(theme_keywords) + r')\b'
-        epiphanic_count = len(re.findall(epiphanic_pattern, text_lower))
-        
+
+        epiphanic_verbs = [
+            "realized", "realize", "learned", "learn", "understood", "understand",
+            "discovered", "discover", "comprehended", "recognized", "recognize",
+            "decided", "decide", "believed", "believe", "remembered", "remember", "knew"
+        ]
+        theme_keywords = [
+            "love", "life", "death", "truth", "friendship", "power", "destiny", "fate",
+            "courage", "sacrifice", "family", "hope", "justice", "humanity", "peace",
+            "war", "freedom", "honor", "trust", "soul", "heart", "world", "strength"
+        ]
+        epiphanic_count = sum(len(re.findall(r'\b' + v + r'\b', text_lower)) for v in epiphanic_verbs)
+        theme_count = sum(len(re.findall(r'\b' + k + r'\b', text_lower)) for k in theme_keywords)
+
         words = re.findall(r'\b\w+\b', text_lower)
         total_units = max(1, len(words))
 
@@ -453,36 +463,32 @@ def compute_thematic_explicitness(text: str, lang: str = "en") -> float:
             "这告诉我们", "真正的力量", "终究", "生命的意义", "真实含义", "核心道德"
         ]
         didactic_count = sum(text.count(p) for p in didactic_markers)
-        
-        epiphanic_verbs = ["悟出", "领悟", "明白", "懂得", "体会到", "意识到", "学到", "看清"]
-        theme_keywords = ["爱", "生命", "死亡", "真理", "友情", "命运", "希望", "正义", "和平", "勇气"]
-        
-        for v in epiphanic_verbs:
-            for k in theme_keywords:
-                if v in text and k in text:
-                    epiphanic_count += text.count(v + k) + (text.count(v) // 4)
-                    
+
+        epiphanic_verbs = ["悟出", "领悟", "明白", "懂得", "体会到", "意识到", "学到", "看清", "明白", "决定"]
+        theme_keywords = ["爱", "生命", "死亡", "真理", "友情", "命运", "希望", "正义", "和平", "勇气", "世界", "力量"]
+
+        epiphanic_count = sum(text.count(v) for v in epiphanic_verbs)
+        theme_count = sum(text.count(k) for k in theme_keywords)
+
         total_units = max(1, len([c for c in text if not c.isspace()]))
 
-    else: # ja
+    else:  # ja
         didactic_markers = [
             "本当の意味", "教訓", "人生の意義", "大切なのは", "真の価値",
             "命の意味", "結局のところ", "心の底から", "生きる意味", "友情の力"
         ]
         didactic_count = sum(text.count(p) for p in didactic_markers)
-        
-        epiphanic_verbs = ["悟った", "気づいた", "理解した", "学んだ", "見出した", "知った"]
-        theme_keywords = ["愛", "命", "死", "真実", "絆", "運命", "希望", "正義", "平和"]
-        
-        for v in epiphanic_verbs:
-            for k in theme_keywords:
-                if v in text and k in text:
-                    epiphanic_count += text.count(v + k) + (text.count(v) // 4)
-                    
+
+        epiphanic_verbs = ["悟った", "気づいた", "理解した", "学んだ", "見出した", "知った", "決めた", "信じた"]
+        theme_keywords = ["愛", "命", "死", "真実", "絆", "運命", "希望", "正義", "平和", "世界", "力"]
+
+        epiphanic_count = sum(text.count(v) for v in epiphanic_verbs)
+        theme_count = sum(text.count(k) for k in theme_keywords)
+
         total_units = max(1, len([c for c in text if not c.isspace()]))
 
-    explicitness = (didactic_count + epiphanic_count) / total_units * 10000.0
-    return float(explicitness)
+    raw_score = ((didactic_count * 2.0) + (epiphanic_count * 1.0) + (theme_count * 0.15)) / (total_units / 1000.0)
+    return float(round(raw_score, 2))
 
 
 def compute_subplot_diversity(text: str, doc=None, lang: str = "en") -> float:
@@ -586,6 +592,39 @@ def extract_english_features(text: str) -> Dict[str, Any]:
                 subplot_diversity = compute_subplot_diversity(sample_text, doc=doc, lang="en")
         except Exception as e:
             print(f"Error in English spaCy features extraction: {e}")
+
+    # Fallback when spaCy is not loaded or returned zero values
+    if adj_ratio == 0.0 or verb_ratio == 0.0 or dep_tree_depth == 0.0:
+        try:
+            tagged = nltk.pos_tag(words[:5000]) if HAS_NLTK else []
+            if tagged:
+                total_t = max(1, len(tagged))
+                if adj_ratio == 0.0:
+                    adj_ratio = len([w for w, t in tagged if t.startswith("JJ")]) / total_t
+                if verb_ratio == 0.0:
+                    verb_ratio = len([w for w, t in tagged if t.startswith("VB")]) / total_t
+                if pron_ratio == 0.0:
+                    pron_ratio = len([w for w, t in tagged if t.startswith("PR")]) / total_t
+        except Exception:
+            pass
+
+        if adj_ratio == 0.0 and word_count > 0:
+            adj_cnt = len([w for w in words if w.endswith(("ful", "ous", "ive", "able", "al", "ic", "y", "ish", "less", "ent", "ant", "ary", "ory"))])
+            adj_ratio = adj_cnt / word_count
+
+        if verb_ratio == 0.0 and word_count > 0:
+            verb_cnt = len([w for w in words if w.endswith(("ed", "ing", "es", "s")) or w in ("is", "was", "were", "are", "be", "been", "have", "had", "has", "do", "did", "go", "went", "come", "came", "make", "made", "know", "knew", "think", "thought", "see", "saw", "take", "took", "say", "said")])
+            verb_ratio = verb_cnt / word_count
+
+        if dep_tree_depth == 0.0:
+            clause_markers = ["that", "which", "who", "whom", "whose", "because", "although", "though", "if", "when", "where", "while", "unless", "since", "until", "and", "but", "or"]
+            depths = []
+            for s in sentences:
+                s_words = re.findall(r'\b\w+\b', s.lower())
+                c_count = sum(1 for w in s_words if w in clause_markers)
+                depth = 2.0 + (c_count * 0.75) + (math.sqrt(len(s_words)) * 0.35)
+                depths.append(depth)
+            dep_tree_depth = float(sum(depths) / len(depths)) if depths else 2.5
 
     return {
         "word_count": word_count,
@@ -788,50 +827,223 @@ def normalize_feature_percentile(key: str, raw_val: float) -> float:
 
 # ARCHETYPE REFERENCE VECTORS
 ARCHETYPES = {
-    "Victorian Novel": {
-        "ttr": 0.80,
-        "dialogue_ratio": 0.30,
-        "punc_density": 0.50,
-        "dep_tree_depth": 0.85,
-        "verb_ratio": 0.45,
-        "avg_sentences_per_paragraph": 0.60,
-        "compound_sentiment": 0.40,
-        "theme_explication_ratio": 0.30,
-        "linearity_subversion_score": 0.20,
-        "sensory_body_density": 0.40,
-        "outside_world_engagement": 0.80,
-        "narrative_feature_diversity": 0.70
-    },
-    "Philosophical Fiction": {
+    # Classic Literature Territory
+    "Philosophy": {
         "ttr": 0.85,
-        "dialogue_ratio": 0.20,
-        "punc_density": 0.40,
-        "dep_tree_depth": 0.80,
-        "verb_ratio": 0.50,
+        "dialogue_ratio": 0.15,
+        "punc_density": 0.60,
+        "dep_tree_depth": 0.85,
+        "verb_ratio": 0.35,
         "avg_sentences_per_paragraph": 0.70,
-        "compound_sentiment": 0.50,
+        "compound_sentiment": 0.30,
         "theme_explication_ratio": 0.90,
-        "linearity_subversion_score": 0.30,
-        "sensory_body_density": 0.30,
-        "outside_world_engagement": 0.60,
+        "linearity_subversion_score": 0.60,
+        "sensory_body_density": 0.20,
+        "outside_world_engagement": 0.40,
         "narrative_feature_diversity": 0.80
     },
-    "LitRPG": {
-        "ttr": 0.35,
-        "dialogue_ratio": 0.60,
-        "punc_density": 0.70,
-        "dep_tree_depth": 0.30,
-        "verb_ratio": 0.60,
-        "avg_sentences_per_paragraph": 0.20,
+    "Poetry": {
+        "ttr": 0.90,
+        "dialogue_ratio": 0.10,
+        "punc_density": 0.75,
+        "dep_tree_depth": 0.90,
+        "verb_ratio": 0.30,
+        "avg_sentences_per_paragraph": 0.80,
         "compound_sentiment": 0.50,
-        "theme_explication_ratio": 0.20,
+        "theme_explication_ratio": 0.70,
+        "linearity_subversion_score": 0.70,
+        "sensory_body_density": 0.85,
+        "outside_world_engagement": 0.50,
+        "narrative_feature_diversity": 0.90
+    },
+    "Tragedy": {
+        "ttr": 0.75,
+        "dialogue_ratio": 0.40,
+        "punc_density": 0.55,
+        "dep_tree_depth": 0.75,
+        "verb_ratio": 0.45,
+        "avg_sentences_per_paragraph": 0.60,
+        "compound_sentiment": 0.15,
+        "theme_explication_ratio": 0.70,
         "linearity_subversion_score": 0.60,
+        "sensory_body_density": 0.65,
+        "outside_world_engagement": 0.50,
+        "narrative_feature_diversity": 0.70
+    },
+    "Supernatural": {
+        "ttr": 0.80,
+        "dialogue_ratio": 0.25,
+        "punc_density": 0.50,
+        "dep_tree_depth": 0.80,
+        "verb_ratio": 0.45,
+        "avg_sentences_per_paragraph": 0.65,
+        "compound_sentiment": 0.35,
+        "theme_explication_ratio": 0.60,
+        "linearity_subversion_score": 0.65,
+        "sensory_body_density": 0.85,
+        "outside_world_engagement": 0.60,
+        "narrative_feature_diversity": 0.75
+    },
+
+    # Traditional Fiction Territory
+    "Historical": {
+        "ttr": 0.75,
+        "dialogue_ratio": 0.30,
+        "punc_density": 0.45,
+        "dep_tree_depth": 0.75,
+        "verb_ratio": 0.45,
+        "avg_sentences_per_paragraph": 0.60,
+        "compound_sentiment": 0.45,
+        "theme_explication_ratio": 0.65,
+        "linearity_subversion_score": 0.40,
+        "sensory_body_density": 0.75,
+        "outside_world_engagement": 0.90,
+        "narrative_feature_diversity": 0.75
+    },
+    "Fantasy": {
+        "ttr": 0.70,
+        "dialogue_ratio": 0.40,
+        "punc_density": 0.45,
+        "dep_tree_depth": 0.65,
+        "verb_ratio": 0.50,
+        "avg_sentences_per_paragraph": 0.50,
+        "compound_sentiment": 0.50,
+        "theme_explication_ratio": 0.55,
+        "linearity_subversion_score": 0.45,
+        "sensory_body_density": 0.70,
+        "outside_world_engagement": 0.80,
+        "narrative_feature_diversity": 0.75
+    },
+    "Sci-Fi": {
+        "ttr": 0.75,
+        "dialogue_ratio": 0.35,
+        "punc_density": 0.40,
+        "dep_tree_depth": 0.70,
+        "verb_ratio": 0.45,
+        "avg_sentences_per_paragraph": 0.50,
+        "compound_sentiment": 0.45,
+        "theme_explication_ratio": 0.60,
+        "linearity_subversion_score": 0.50,
+        "sensory_body_density": 0.40,
+        "outside_world_engagement": 0.85,
+        "narrative_feature_diversity": 0.75
+    },
+    "Mystery": {
+        "ttr": 0.65,
+        "dialogue_ratio": 0.55,
+        "punc_density": 0.45,
+        "dep_tree_depth": 0.55,
+        "verb_ratio": 0.55,
+        "avg_sentences_per_paragraph": 0.40,
+        "compound_sentiment": 0.40,
+        "theme_explication_ratio": 0.45,
+        "linearity_subversion_score": 0.75,
         "sensory_body_density": 0.60,
-        "outside_world_engagement": 0.30,
-        "narrative_feature_diversity": 0.30
+        "outside_world_engagement": 0.60,
+        "narrative_feature_diversity": 0.65
+    },
+    "Horror": {
+        "ttr": 0.75,
+        "dialogue_ratio": 0.30,
+        "punc_density": 0.50,
+        "dep_tree_depth": 0.70,
+        "verb_ratio": 0.50,
+        "avg_sentences_per_paragraph": 0.55,
+        "compound_sentiment": 0.20,
+        "theme_explication_ratio": 0.50,
+        "linearity_subversion_score": 0.60,
+        "sensory_body_density": 0.90,
+        "outside_world_engagement": 0.50,
+        "narrative_feature_diversity": 0.65
+    },
+    "Romance": {
+        "ttr": 0.55,
+        "dialogue_ratio": 0.70,
+        "punc_density": 0.45,
+        "dep_tree_depth": 0.45,
+        "verb_ratio": 0.50,
+        "avg_sentences_per_paragraph": 0.35,
+        "compound_sentiment": 0.70,
+        "theme_explication_ratio": 0.35,
+        "linearity_subversion_score": 0.40,
+        "sensory_body_density": 0.70,
+        "outside_world_engagement": 0.40,
+        "narrative_feature_diversity": 0.50
+    },
+    "Action / Adventure": {
+        "ttr": 0.60,
+        "dialogue_ratio": 0.45,
+        "punc_density": 0.40,
+        "dep_tree_depth": 0.45,
+        "verb_ratio": 0.65,
+        "avg_sentences_per_paragraph": 0.35,
+        "compound_sentiment": 0.50,
+        "theme_explication_ratio": 0.30,
+        "linearity_subversion_score": 0.45,
+        "sensory_body_density": 0.75,
+        "outside_world_engagement": 0.75,
+        "narrative_feature_diversity": 0.60
+    },
+    "Comedy": {
+        "ttr": 0.60,
+        "dialogue_ratio": 0.65,
+        "punc_density": 0.50,
+        "dep_tree_depth": 0.40,
+        "verb_ratio": 0.55,
+        "avg_sentences_per_paragraph": 0.30,
+        "compound_sentiment": 0.80,
+        "theme_explication_ratio": 0.30,
+        "linearity_subversion_score": 0.50,
+        "sensory_body_density": 0.50,
+        "outside_world_engagement": 0.45,
+        "narrative_feature_diversity": 0.55
+    },
+    "Drama": {
+        "ttr": 0.65,
+        "dialogue_ratio": 0.60,
+        "punc_density": 0.45,
+        "dep_tree_depth": 0.55,
+        "verb_ratio": 0.50,
+        "avg_sentences_per_paragraph": 0.40,
+        "compound_sentiment": 0.45,
+        "theme_explication_ratio": 0.60,
+        "linearity_subversion_score": 0.50,
+        "sensory_body_density": 0.60,
+        "outside_world_engagement": 0.50,
+        "narrative_feature_diversity": 0.65
+    },
+
+    # Web Novel Territory
+    "Slice of Life": {
+        "ttr": 0.50,
+        "dialogue_ratio": 0.60,
+        "punc_density": 0.40,
+        "dep_tree_depth": 0.40,
+        "verb_ratio": 0.50,
+        "avg_sentences_per_paragraph": 0.30,
+        "compound_sentiment": 0.70,
+        "theme_explication_ratio": 0.25,
+        "linearity_subversion_score": 0.35,
+        "sensory_body_density": 0.50,
+        "outside_world_engagement": 0.40,
+        "narrative_feature_diversity": 0.45
+    },
+    "Cultivation": {
+        "ttr": 0.50,
+        "dialogue_ratio": 0.45,
+        "punc_density": 0.40,
+        "dep_tree_depth": 0.45,
+        "verb_ratio": 0.55,
+        "avg_sentences_per_paragraph": 0.30,
+        "compound_sentiment": 0.45,
+        "theme_explication_ratio": 0.50,
+        "linearity_subversion_score": 0.50,
+        "sensory_body_density": 0.80,
+        "outside_world_engagement": 0.70,
+        "narrative_feature_diversity": 0.55
     },
     "Isekai": {
-        "ttr": 0.40,
+        "ttr": 0.45,
         "dialogue_ratio": 0.65,
         "punc_density": 0.50,
         "dep_tree_depth": 0.35,
@@ -841,106 +1053,46 @@ ARCHETYPES = {
         "theme_explication_ratio": 0.30,
         "linearity_subversion_score": 0.50,
         "sensory_body_density": 0.65,
-        "outside_world_engagement": 0.40,
-        "narrative_feature_diversity": 0.40
+        "outside_world_engagement": 0.45,
+        "narrative_feature_diversity": 0.45
     },
-    "Xianxia Cultivation": {
-        "ttr": 0.45,
-        "dialogue_ratio": 0.45,
-        "punc_density": 0.40,
-        "dep_tree_depth": 0.40,
-        "verb_ratio": 0.50,
-        "avg_sentences_per_paragraph": 0.30,
-        "compound_sentiment": 0.45,
-        "theme_explication_ratio": 0.50,
-        "linearity_subversion_score": 0.50,
-        "sensory_body_density": 0.80,
-        "outside_world_engagement": 0.70,
-        "narrative_feature_diversity": 0.50
-    },
-    "Modern Thriller": {
-        "ttr": 0.50,
-        "dialogue_ratio": 0.70,
-        "punc_density": 0.35,
-        "dep_tree_depth": 0.35,
-        "verb_ratio": 0.65,
-        "avg_sentences_per_paragraph": 0.25,
-        "compound_sentiment": 0.60,
-        "theme_explication_ratio": 0.20,
-        "linearity_subversion_score": 0.70,
-        "sensory_body_density": 0.60,
-        "outside_world_engagement": 0.40,
-        "narrative_feature_diversity": 0.60
-    },
-    "Hard Sci-Fi": {
-        "ttr": 0.75,
-        "dialogue_ratio": 0.25,
-        "punc_density": 0.40,
-        "dep_tree_depth": 0.75,
-        "verb_ratio": 0.40,
-        "avg_sentences_per_paragraph": 0.55,
-        "compound_sentiment": 0.40,
-        "theme_explication_ratio": 0.50,
-        "linearity_subversion_score": 0.40,
-        "sensory_body_density": 0.30,
-        "outside_world_engagement": 0.90,
-        "narrative_feature_diversity": 0.70
-    },
-    "High Fantasy": {
-        "ttr": 0.80,
-        "dialogue_ratio": 0.35,
+    "Progression Fantasy": {
+        "ttr": 0.48,
+        "dialogue_ratio": 0.55,
         "punc_density": 0.45,
-        "dep_tree_depth": 0.70,
-        "verb_ratio": 0.45,
-        "avg_sentences_per_paragraph": 0.65,
-        "compound_sentiment": 0.50,
-        "theme_explication_ratio": 0.60,
-        "linearity_subversion_score": 0.40,
-        "sensory_body_density": 0.70,
-        "outside_world_engagement": 0.85,
-        "narrative_feature_diversity": 0.80
-    },
-    "Wuxia Martial Arts": {
-        "ttr": 0.55,
-        "dialogue_ratio": 0.40,
-        "punc_density": 0.40,
-        "dep_tree_depth": 0.50,
-        "verb_ratio": 0.65,
-        "avg_sentences_per_paragraph": 0.40,
+        "dep_tree_depth": 0.40,
+        "verb_ratio": 0.60,
+        "avg_sentences_per_paragraph": 0.25,
         "compound_sentiment": 0.50,
         "theme_explication_ratio": 0.40,
-        "linearity_subversion_score": 0.40,
-        "sensory_body_density": 0.90,
-        "outside_world_engagement": 0.50,
+        "linearity_subversion_score": 0.45,
+        "sensory_body_density": 0.70,
+        "outside_world_engagement": 0.65,
         "narrative_feature_diversity": 0.50
-    },
-    "Urban Romance": {
-        "ttr": 0.45,
-        "dialogue_ratio": 0.80,
-        "punc_density": 0.40,
-        "dep_tree_depth": 0.40,
-        "verb_ratio": 0.50,
-        "avg_sentences_per_paragraph": 0.30,
-        "compound_sentiment": 0.70,
-        "theme_explication_ratio": 0.20,
-        "linearity_subversion_score": 0.40,
-        "sensory_body_density": 0.60,
-        "outside_world_engagement": 0.30,
-        "narrative_feature_diversity": 0.40
     }
 }
 
 ARCHETYPE_TERRITORIES = {
-    "Victorian Novel": "Classic Literature Territory",
-    "Philosophical Fiction": "Classic Literature Territory",
-    "LitRPG": "Web Novel Territory",
-    "Isekai": "Web Novel Territory",
-    "Xianxia Cultivation": "Web Novel Territory",
-    "Modern Thriller": "Traditional Fiction Territory",
-    "Hard Sci-Fi": "Traditional Fiction Territory",
-    "High Fantasy": "Traditional Fiction Territory",
-    "Wuxia Martial Arts": "Web Novel Territory",
-    "Urban Romance": "Web Novel Territory"
+    # Classic Literature Territory
+    "Philosophy":         "Classic Literature Territory",
+    "Poetry":             "Classic Literature Territory",
+    "Tragedy":            "Classic Literature Territory",
+    "Supernatural":       "Classic Literature Territory",
+    "Historical":         "Classic Literature Territory",
+    "Mystery":            "Classic Literature Territory",
+    "Horror":             "Classic Literature Territory",
+    "Romance":            "Classic Literature Territory",
+    "Action / Adventure": "Classic Literature Territory",
+    "Comedy":             "Classic Literature Territory",
+    "Drama":              "Classic Literature Territory",
+    "Fantasy":            "Classic Literature Territory",
+    "Sci-Fi":             "Classic Literature Territory",
+
+    # Web Novel Territory
+    "Slice of Life":        "Web Novel Territory",
+    "Cultivation":          "Web Novel Territory",
+    "Isekai":               "Web Novel Territory",
+    "Progression Fantasy": "Web Novel Territory",
 }
 
 def match_archetype(features: dict) -> dict:
@@ -965,7 +1117,7 @@ def match_archetype(features: dict) -> dict:
             
     # Task 2: Data-driven percentileofscore normalization
     normalized = {}
-    keys = list(ARCHETYPES["Victorian Novel"].keys())
+    keys = list(next(iter(ARCHETYPES.values())).keys())
     for k in keys:
         raw_val = agnostic.get(k, 0.0)
         normalized[k] = normalize_feature_percentile(k, raw_val)
