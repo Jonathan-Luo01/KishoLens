@@ -221,6 +221,144 @@ import "../styles/global.css";
         color: var(--color-muted);
       }
 
+      /* Doppelgängers / Similar Novels Card Styles */
+      .doppelganger-card {
+        background: #0f172a;
+        padding: 24px;
+        border-radius: 16px;
+        border: 1px solid #1e293b;
+        display: flex;
+        flex-direction: column;
+        grid-column: 1 / -1;
+      }
+
+      .doppelganger-title {
+        margin: 0 0 4px 0;
+        font-family: var(--font-display);
+        font-size: 18px;
+        font-weight: 600;
+        color: #f8fafc;
+      }
+
+      .doppelganger-subtitle {
+        color: #64748b;
+        font-size: 13px;
+        margin: 0 0 20px 0;
+        line-height: 1.4;
+      }
+
+      .doppelganger-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      :global(.doppelganger-item) {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        background: #020617;
+        padding: 16px;
+        border-radius: 12px;
+        border: 1px solid #1e293b;
+        transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+        cursor: pointer;
+      }
+
+      :global(.doppelganger-item):hover {
+        transform: translateX(4px);
+        border-color: #334155;
+        background: #090d1e;
+      }
+
+      :global(.doppelganger-left) {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex: 1;
+        min-width: 0;
+      }
+
+      :global(.doppelganger-rank) {
+        color: #475569;
+        font-size: 18px;
+        font-weight: bold;
+        font-variant-numeric: tabular-nums;
+        min-width: 28px;
+        flex-shrink: 0;
+      }
+
+      :global(.doppelganger-info) {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+      }
+
+      :global(.doppelganger-item-title) {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: 16px;
+        font-weight: 600;
+        color: #e2e8f0;
+        line-height: 1.3;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      :global(.doppelganger-author) {
+        font-size: 12px;
+        color: #64748b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      :global(.doppelganger-badge) {
+        display: inline-block;
+        margin-top: 4px;
+        padding: 2px 8px;
+        background: #1e293b;
+        color: #94a3b8;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        width: fit-content;
+      }
+
+      :global(.doppelganger-right) {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+        flex-shrink: 0;
+        margin-left: 16px;
+      }
+
+      :global(.doppelganger-score) {
+        font-size: 18px;
+        font-weight: bold;
+        font-variant-numeric: tabular-nums;
+      }
+
+      :global(.doppelganger-progress-bg) {
+        width: 80px;
+        height: 4px;
+        background: #1e293b;
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      :global(.doppelganger-progress-fill) {
+        height: 100%;
+        border-radius: 2px;
+        transition: width 0.4s ease-out;
+      }
+
       .section-title {
         font-family: var(--font-display);
         font-size: 1.05rem;
@@ -229,45 +367,129 @@ import "../styles/global.css";
       }
 
       /* Genre Checkboxes Grid */
+      /* Genre Checkboxes Grid & Helper Tips */
+      .genre-help-tips {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.75rem;
+      }
+
+      .tip-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.2rem 0.5rem;
+        border-radius: 6px;
+        font-size: 0.72rem;
+        font-weight: 500;
+        user-select: none;
+      }
+
+      .tip-badge.tip-include {
+        background: rgba(34, 197, 94, 0.12);
+        color: #4ade80;
+        border: 1px solid rgba(34, 197, 94, 0.25);
+      }
+
+      .tip-badge.tip-exclude {
+        background: rgba(239, 68, 68, 0.12);
+        color: #fca5a5;
+        border: 1px solid rgba(239, 68, 68, 0.25);
+      }
+
+      .btn-reset-filters {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.6);
+        border-radius: 6px;
+        padding: 0.2rem 0.55rem;
+        font-size: 0.72rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .btn-reset-filters:hover {
+        background: rgba(255, 255, 255, 0.12);
+        color: #ffffff;
+      }
+
       .genre-checkbox-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
         gap: 0.5rem;
         margin-bottom: 1rem;
       }
 
-      .genre-check-box {
+      .genre-checkbox-item {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px solid var(--color-border);
-        border-radius: 8px;
-        padding: 0.45rem 0.75rem;
-        font-size: 0.82rem;
-        color: var(--color-muted);
+        gap: 0.6rem;
+        padding: 0.45rem 0.7rem;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #e2e8f0;
+        font-size: 0.84rem;
+        font-weight: 500;
         cursor: pointer;
         user-select: none;
-        transition: all 0.2s;
+        transition: background 0.15s, border-color 0.15s;
       }
 
-      .genre-check-box:hover {
-        background: rgba(255, 255, 255, 0.05);
-        color: var(--color-text);
-        border-color: rgba(124, 106, 255, 0.3);
-      }
-
-      .genre-check-box.active {
-        background: rgba(124, 106, 255, 0.14);
-        border-color: var(--color-accent);
+      .genre-checkbox-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(124, 106, 255, 0.4);
         color: #ffffff;
       }
 
-      .genre-check-box input[type="checkbox"] {
+      .genre-checkbox-item.included {
+        background: rgba(124, 106, 255, 0.12);
+        border-color: rgba(124, 106, 255, 0.4);
+        color: #ffffff;
+      }
+
+      :global(.genre-checkbox-item.excluded) {
+        background: rgba(220, 38, 38, 0.22) !important;
+        border-color: #ef4444 !important;
+        color: #fca5a5 !important;
+        box-shadow: 0 0 8px rgba(220, 38, 38, 0.35) !important;
+      }
+
+      :global(.genre-checkbox-item.excluded .genre-name-text) {
+        text-decoration: line-through !important;
+        color: #f87171 !important;
+        font-weight: 600 !important;
+      }
+
+      .real-genre-checkbox {
+        appearance: auto;
+        -webkit-appearance: checkbox;
+        width: 16px;
+        height: 16px;
         accent-color: var(--color-accent);
-        width: 14px;
-        height: 14px;
         cursor: pointer;
+        flex-shrink: 0;
+        margin: 0;
+      }
+
+      :global(.x-mark-box) {
+        width: 16px !important;
+        height: 16px !important;
+        border-radius: 3px !important;
+        background: #dc2626 !important;
+        border: 1px solid #f87171 !important;
+        color: #ffffff !important;
+        font-size: 10px !important;
+        font-weight: 900 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+        line-height: 1 !important;
+        box-shadow: 0 0 6px rgba(220, 38, 38, 0.6) !important;
+        margin: 0 !important;
       }
 
       /* Card novel styling */
@@ -375,6 +597,197 @@ import "../styles/global.css";
         font-size: 1.1rem;
         font-weight: 600;
         color: var(--color-accent-2);
+      }
+
+      /* Enhanced Metrics Dashboard Component Styles */
+      .metrics-dashboard {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .metrics-hero {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.6rem;
+        background: rgba(124, 106, 255, 0.05);
+        border: 1px solid rgba(124, 106, 255, 0.2);
+        border-radius: 10px;
+        padding: 0.85rem;
+      }
+
+      .hero-chip {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+      }
+
+      .hero-chip-label {
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-muted);
+      }
+
+      .hero-chip-val {
+        font-family: var(--font-display);
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #ffffff;
+      }
+
+      .metrics-category-tabs {
+        display: flex;
+        gap: 0.4rem;
+        overflow-x: auto;
+        padding-bottom: 0.25rem;
+      }
+
+      .category-tab {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--color-muted);
+        border-radius: 20px;
+        padding: 0.3rem 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+      }
+
+      .category-tab:hover, .category-tab.active {
+        background: rgba(124, 106, 255, 0.18);
+        border-color: rgba(124, 106, 255, 0.5);
+        color: #ffffff;
+      }
+
+      .metric-category-section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .category-section-title {
+        font-family: var(--font-display);
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin-top: 0.4rem;
+      }
+
+      .category-section-title.cat-structure { color: #38bdf8; }
+      .category-section-title.cat-prose     { color: #a78bfa; }
+      .category-section-title.cat-theme     { color: #f472b6; }
+      .category-section-title.cat-pacing    { color: #34d399; }
+
+      .metric-card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 0.6rem;
+      }
+
+      .metric-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        padding: 0.65rem 0.8rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        position: relative;
+        transition: border-color 0.2s ease, transform 0.2s ease;
+      }
+
+      .metric-card:hover {
+        border-color: rgba(124, 106, 255, 0.3);
+        transform: translateY(-1px);
+      }
+
+      .metric-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .metric-card-label {
+        font-size: 0.7rem;
+        font-weight: 500;
+        color: #cbd5e1;
+      }
+
+      .metric-info-icon {
+        font-size: 0.7rem;
+        color: var(--color-muted);
+        cursor: help;
+        opacity: 0.6;
+        transition: opacity 0.15s;
+      }
+      .metric-info-icon:hover { opacity: 1.0; }
+
+      .metric-val-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.4rem;
+      }
+
+      .metric-primary-val {
+        font-family: var(--font-display);
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #f8fafc;
+      }
+
+      .percentile-bar-bg {
+        width: 100%;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .percentile-bar-fill {
+        height: 100%;
+        border-radius: 2px;
+        transition: width 0.4s ease-out;
+      }
+
+      .bar-fill-structure { background: linear-gradient(90deg, #0284c7, #38bdf8); }
+      .bar-fill-prose     { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+      .bar-fill-theme     { background: linear-gradient(90deg, #db2777, #f472b6); }
+      .bar-fill-pacing    { background: linear-gradient(90deg, #059669, #34d399); }
+
+      .benchmark-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.15rem 0.45rem;
+        border-radius: 4px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        width: fit-content;
+      }
+
+      .benchmark-chip.higher {
+        background: rgba(34, 197, 94, 0.15);
+        color: #4ade80;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+      }
+
+      .benchmark-chip.lower {
+        background: rgba(239, 68, 68, 0.15);
+        color: #fca5a5;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+      }
+
+      .benchmark-chip.neutral {
+        background: rgba(148, 163, 184, 0.12);
+        color: #cbd5e1;
+        border: 1px solid rgba(148, 163, 184, 0.2);
       }
 
       /* Form inputs */
@@ -678,6 +1091,104 @@ import "../styles/global.css";
         font-family: var(--font-display);
         font-weight: 600;
       }
+
+      /* Database Statistics Overview - Impeccable Clean Styling */
+      :global(.db-stats-card) {
+        background: rgba(18, 18, 30, 0.75);
+        border: 1px solid rgba(124, 106, 255, 0.18);
+        border-radius: 12px;
+        padding: 1.15rem;
+        backdrop-filter: blur(12px);
+      }
+
+      :global(.db-kpi-grid) {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+        margin-bottom: 0.85rem;
+      }
+
+      :global(.db-kpi-tile) {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 8px;
+        padding: 0.55rem 0.7rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        transition: border-color 0.2s ease, background 0.2s ease;
+      }
+      :global(.db-kpi-tile:hover) {
+        border-color: rgba(124, 106, 255, 0.35);
+        background: rgba(124, 106, 255, 0.04);
+      }
+
+      :global(.db-kpi-val) {
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #ffffff;
+        line-height: 1.2;
+      }
+
+      :global(.db-kpi-lbl) {
+        font-size: 0.68rem;
+        color: var(--color-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-top: 0.15rem;
+      }
+
+      :global(.db-source-chip) {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 6px;
+        padding: 0.22rem 0.55rem;
+        font-size: 0.74rem;
+        color: rgba(255, 255, 255, 0.85);
+        transition: all 0.2s ease;
+      }
+      :global(.db-source-chip:hover) {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-1px);
+      }
+      :global(.db-source-dot) {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      :global(.db-genre-chip) {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.4rem;
+        background: rgba(124, 106, 255, 0.05);
+        border: 1px solid rgba(124, 106, 255, 0.12);
+        border-radius: 6px;
+        padding: 0.22rem 0.5rem;
+        font-size: 0.72rem;
+        color: rgba(255, 255, 255, 0.8);
+        transition: all 0.18s ease;
+      }
+      :global(.db-genre-chip:hover) {
+        border-color: rgba(124, 106, 255, 0.4);
+        background: rgba(124, 106, 255, 0.12);
+        color: #ffffff;
+      }
+      :global(.db-genre-count) {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        padding: 0.05rem 0.3rem;
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: #a78bfa;
+      }
     </style>
   </head>
   <body>
@@ -703,7 +1214,7 @@ import "../styles/global.css";
           <!-- Section 1: Search & Territory Selection -->
           <div class="explorer-section">
             <div class="explorer-section-title">
-              <span>🔍 Search & Territory</span>
+              <span>Search & Territory</span>
             </div>
 
             <!-- Search Input with Icon -->
@@ -714,16 +1225,15 @@ import "../styles/global.css";
               <input
                 type="text"
                 id="novel-search-input"
-                placeholder="Search by novel title, author, or dataset..."
+                placeholder="Search by title, author, genre, or dataset..."
               />
             </div>
 
             <!-- Territory Selector Tabs -->
             <div class="territory-tabs" id="territory-selector" style="margin-top: 0.4rem; margin-bottom: 0;">
-              <button class="t-tab active" data-territory="All" onclick="selectTerritory('All')">🌐 All Genres</button>
-              <button class="t-tab" data-territory="Classic Literature Territory" onclick="selectTerritory('Classic Literature Territory')">📜 Classics</button>
-              <button class="t-tab" data-territory="Traditional Fiction Territory" onclick="selectTerritory('Traditional Fiction Territory')">📚 Traditional</button>
-              <button class="t-tab" data-territory="Web Novel Territory" onclick="selectTerritory('Web Novel Territory')">⚡ Web Novels</button>
+              <button class="t-tab active" data-territory="All" onclick="selectTerritory('All')">All Genres</button>
+              <button class="t-tab" data-territory="Classic Literature Territory" onclick="selectTerritory('Classic Literature Territory')">Classic Literature Territory</button>
+              <button class="t-tab" data-territory="Web Novel Territory" onclick="selectTerritory('Web Novel Territory')">Web Novel Territory</button>
             </div>
 
             <!-- Active Territory Description -->
@@ -734,8 +1244,13 @@ import "../styles/global.css";
 
           <!-- Section 2: Prose Genre Filters -->
           <div class="explorer-section">
-            <div class="explorer-section-title">
-              <span>🏷️ Filter by Prose Genre</span>
+            <div class="explorer-section-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+              <span>Filter by Prose Genre</span>
+              <div class="genre-help-tips">
+                <span class="tip-badge tip-include">Click to Select</span>
+                <span class="tip-badge tip-exclude">✕ Double-Click to Exclude</span>
+                <button type="button" class="btn-reset-filters" onclick="resetGenreFilters()">Reset All</button>
+              </div>
             </div>
             <div class="genre-checkbox-grid" id="genre-checkboxes-container">
               <div class="placeholder-text" style="padding: 0.5rem 0; grid-column: 1 / -1;">Loading genres...</div>
@@ -745,7 +1260,7 @@ import "../styles/global.css";
           <!-- Section 3: Ingested Novels List -->
           <div class="explorer-section">
             <div class="explorer-section-title">
-              <span id="novels-list-title">📚 Ingested Novels</span>
+              <span id="novels-list-title">Ingested Novels</span>
             </div>
             <div class="novel-list" id="novels-container">
               <div class="placeholder-text">Loading library novels...</div>
@@ -791,6 +1306,87 @@ import "../styles/global.css";
                 <button type="submit" class="btn btn--primary" id="ingest-submit" style="flex: 1.5; height: 38px; font-size: 0.85rem;">Schedule Ingest</button>
               </div>
             </form>
+          </div>
+
+          <!-- Database Statistics Overview Card -->
+          <div class="card db-stats-card" id="db-stats-card">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
+              <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: #a78bfa; box-shadow: 0 0 10px #a78bfa; display: inline-block;"></span>
+                <h3 style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; margin: 0; color: #ffffff;">Database Overview</h3>
+              </div>
+              <span id="db-total-badge" class="count-badge" style="background: rgba(124, 106, 255, 0.15); border: 1px solid rgba(124, 106, 255, 0.4); color: #a78bfa; font-weight: 700; font-size: 0.8rem; padding: 0.2rem 0.65rem; border-radius: 999px;">529 Novels</span>
+            </div>
+
+            <!-- KPI Tiles Grid -->
+            <div class="db-kpi-grid">
+              <div class="db-kpi-tile">
+                <div class="db-kpi-val" id="kpi-total-val">529</div>
+                <div class="db-kpi-lbl">Total Novels</div>
+              </div>
+              <div class="db-kpi-tile">
+                <div class="db-kpi-val" id="kpi-web-val" style="color: #c084fc;">398</div>
+                <div class="db-kpi-lbl">Web Novels</div>
+              </div>
+              <div class="db-kpi-tile">
+                <div class="db-kpi-val" id="kpi-classic-val" style="color: #fbbf24;">131</div>
+                <div class="db-kpi-lbl">Classic Lit</div>
+              </div>
+              <div class="db-kpi-tile">
+                <div class="db-kpi-val" id="kpi-genres-val" style="color: #38bdf8;">17</div>
+                <div class="db-kpi-lbl">Taxonomies</div>
+              </div>
+            </div>
+
+            <div id="db-stats-container">
+              <!-- Literature Territory Ratio Visual Bar -->
+              <div style="margin-bottom: 0.95rem; background: rgba(0,0,0,0.2); padding: 0.65rem 0.75rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04);">
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--color-muted); margin-bottom: 0.4rem; font-weight: 600;">
+                  <span>Territory Distribution</span>
+                  <span id="db-territory-ratio" style="color: #ffffff;">398 Web (75.2%) • 131 Classic (24.8%)</span>
+                </div>
+                <div style="display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: rgba(255,255,255,0.06); box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);">
+                  <div id="db-bar-web" style="width: 75.2%; background: linear-gradient(90deg, #a855f7, #ec4899); transition: width 0.4s ease;"></div>
+                  <div id="db-bar-classic" style="width: 24.8%; background: linear-gradient(90deg, #f59e0b, #eab308); transition: width 0.4s ease;"></div>
+                </div>
+              </div>
+
+              <!-- Data Sources Breakdown Chips -->
+              <div style="margin-bottom: 0.95rem;">
+                <h4 style="font-size: 0.72rem; color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.45rem;">Ingested Data Sources</h4>
+                <div id="db-sources-badges" style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+                  <span class="db-source-chip"><span class="db-source-dot" style="background: #a855f7;"></span>ScribbleHub: 167</span>
+                  <span class="db-source-chip"><span class="db-source-dot" style="background: #f59e0b;"></span>Gutenberg: 131</span>
+                  <span class="db-source-chip"><span class="db-source-dot" style="background: #10b981;"></span>CN Novel: 125</span>
+                  <span class="db-source-chip"><span class="db-source-dot" style="background: #38bdf8;"></span>Royal Road: 68</span>
+                  <span class="db-source-chip"><span class="db-source-dot" style="background: #f43f5e;"></span>Syosetu: 38</span>
+                </div>
+              </div>
+
+              <!-- Top Parent Genres Breakdown Chips -->
+              <div>
+                <h4 style="font-size: 0.72rem; color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.45rem;">Genre Distribution</h4>
+                <div id="db-genres-badges" style="display: flex; flex-wrap: wrap; gap: 0.35rem; max-height: 140px; overflow-y: auto; padding-right: 4px;">
+                  <span class="db-genre-chip">Action / Adventure <span class="db-genre-count">485</span></span>
+                  <span class="db-genre-chip">Fantasy <span class="db-genre-count">397</span></span>
+                  <span class="db-genre-chip">Progression Fantasy <span class="db-genre-count">367</span></span>
+                  <span class="db-genre-chip">Historical <span class="db-genre-count">120</span></span>
+                  <span class="db-genre-chip">Drama <span class="db-genre-count">108</span></span>
+                  <span class="db-genre-chip">Isekai <span class="db-genre-count">41</span></span>
+                  <span class="db-genre-chip">Slice of Life <span class="db-genre-count">19</span></span>
+                  <span class="db-genre-chip">Mystery <span class="db-genre-count">13</span></span>
+                  <span class="db-genre-chip">Horror <span class="db-genre-count">7</span></span>
+                  <span class="db-genre-chip">Romance <span class="db-genre-count">7</span></span>
+                  <span class="db-genre-chip">Comedy <span class="db-genre-count">6</span></span>
+                  <span class="db-genre-chip">Philosophy <span class="db-genre-count">6</span></span>
+                  <span class="db-genre-chip">Supernatural <span class="db-genre-count">6</span></span>
+                  <span class="db-genre-chip">Cultivation <span class="db-genre-count">5</span></span>
+                  <span class="db-genre-chip">Sci-Fi <span class="db-genre-count">4</span></span>
+                  <span class="db-genre-chip">Tragedy <span class="db-genre-count">4</span></span>
+                  <span class="db-genre-chip">Poetry <span class="db-genre-count">2</span></span>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Ingestion Status Loading Card -->
@@ -882,6 +1478,17 @@ import "../styles/global.css";
           </div>
         </div>
 
+        <!-- Doppelgängers / Similar Novels Card (Full Width) -->
+        <div class="doppelganger-card">
+          <h3 class="doppelganger-title">Your Literary Doppelgängers</h3>
+          <p class="doppelganger-subtitle">
+            The closest structural and semantic matches from the database.
+          </p>
+          <div class="doppelganger-list" id="similarNovelsContainer">
+            <div style="color: #64748b; font-size: 13px; margin: 0; padding: 12px;">Loading matches...</div>
+          </div>
+        </div>
+
       </div>
 
     </div>
@@ -896,7 +1503,7 @@ import "../styles/global.css";
 
       let allNovels = [];
       let selectedTerritory = "All";
-      let selectedGenres = new Set(["All"]);
+      let excludedGenres = new Set();
       let searchQuery = "";
       let selectedNovelId = null;
 
@@ -906,39 +1513,73 @@ import "../styles/global.css";
       let hoveredIndex = -1;
       let hoveredArcIndex = -1;
 
-      // 1. Definition of Territories and Prose Genres
+      // 1. Definition of Territories and Prose Genres (Clean plain text names, no emojis)
       const TERRITORIES = {
         "Classic Literature Territory": {
           description: "Traditional printed classics characterized by rich syntax structures, formal descriptive vocabulary, and low dialogic reliance.",
           genres: {
-            "Victorian Novel": { icon: "🎩", description: "Complex sentence clauses, formal vocabulary, and low dialogue." },
-            "Philosophical Fiction": { icon: "👁️", description: "High lexical density, thematic reflections, and existential text flow." }
-          }
-        },
-        "Traditional Fiction Territory": {
-          description: "Modern commercial print fiction characterized by narrative pacing, targeted dialogue, and descriptive immersion.",
-          genres: {
-            "Modern Thriller": { icon: "🕵️", description: "High dialogue ratio, short paragraph spacing, and rapid action flow." },
-            "Hard Sci-Fi": { icon: "🚀", description: "Deep conceptual themes, science explication, and world grounding." },
-            "High Fantasy": { icon: "🏰", description: "Rich descriptive density, deep sensory focus, and complex syntax." }
+            "Action / Adventure": { description: "Expeditions, sea voyages, wilderness survival, and heroic quests." },
+            "Comedy": { description: "Satire, parody, humorous stories, and social wit." },
+            "Drama": { description: "Domestic drama, plays, social conflicts, and interpersonal relations." },
+            "Fantasy": { description: "Mythology, folklore, fairy tales, allegories, and magic." },
+            "Horror": { description: "Gothic fiction, ghost stories, macabre tales, and atmospheric dread." },
+            "Historical": { description: "Historical fiction, Victorian settings, regency stories, and war fiction." },
+            "Sci-Fi": { description: "Early precursors of science fiction, time travel, and imaginary voyages." },
+            "Philosophy": { description: "Philosophical fiction, ethics, utilitarianism, and existential inquiry." },
+            "Mystery": { description: "Detective stories, crime, police procedural, and whodunit plots." },
+            "Tragedy": { description: "Fatalism, moral downfall, melancholy, and tragic downfall." },
+            "Supernatural": { description: "Apparitions, spiritualism, demonology, and occult fiction." },
+            "Poetry": { description: "Sonnets, epic poetry, ballads, and metered verse." },
+            "Romance": { description: "Courtship, romantic fiction, love stories, and marital dynamics." }
           }
         },
         "Web Novel Territory": {
           description: "Serialized internet fiction characterized by rapid sentence pacing, dialogue reliance, and progression tropes.",
           genres: {
-            "LitRPG": { icon: "🎮", description: "Gaming mechanics, status brackets, rapid pacing, and high dialogue." },
-            "Isekai": { icon: "🌀", description: "Portal/reincarnation tropes, informal flow, and dialogue reliance." },
-            "Urban Romance": { icon: "🌆", description: "High dialogue ratio, emotional monologue, and short paragraph structures." },
-            "Wuxia / Xianxia": { icon: "⚔️", description: "Cultivation terminology, internal energy flow, and combat verbs." },
-            "Gothic Horror": { icon: "🦇", description: "Atmospheric environment description, low dialogue, and high sensory density." }
+            "Action / Adventure": { description: "Martial action, dungeons, revenge, death games, and unlimited flow." },
+            "Comedy": { description: "Slapstick, misunderstandings, gag comedy, and funny protagonists." },
+            "Romance": { description: "Urban romance, CEO tropes, office romance, harem, and GL/BL." },
+            "Drama": { description: "Betrayal, family conflict, politics, and emotional tension." },
+            "Fantasy": { description: "LitRPG, status systems, magic academies, and dungeon building." },
+            "Horror": { description: "Ghosts, demons, gore, and mystery horror." },
+            "Historical": { description: "Ancient China, palace court intrigue, royalty, and kingdom building." },
+            "Sci-Fi": { description: "Mecha, post-apocalyptic, VRMMO, and interstellar empire." },
+            "Slice of Life": { description: "Slow life, farming, cooking, pet raising, and school life." },
+            "Cultivation": { description: "Xianxia, Wuxia, Qi cultivation, sects, and immortal ascension." },
+            "Tragedy": { description: "Sad endings, angst, heartbreak, and character sacrifice." },
+            "Isekai": { description: "Portal fantasy, reincarnation, transmigration, and otome regressors." },
+            "Progression Fantasy": { description: "LitRPG, status screens, level ups, stat points, and system notifications." },
+            "Supernatural": { description: "Urban fantasy, modern magic, hunters, necromancy, and exorcism." }
           }
         }
       };
 
+      function getAllAvailableGenres() {
+        let set = new Set();
+        if (selectedTerritory === "All") {
+          Object.values(TERRITORIES).forEach(t => {
+            Object.keys(t.genres).forEach(g => set.add(g));
+          });
+        } else if (TERRITORIES[selectedTerritory]) {
+          Object.keys(TERRITORIES[selectedTerritory].genres).forEach(g => set.add(g));
+        }
+        return Array.from(set);
+      }
+
+      // Initialize empty set by default (no checkboxes checked at start, all genres active)
+      let selectedGenres = new Set();
+
       // 2. Fetch and render novels
       async function fetchNovels() {
+        selectedGenres.clear();
+        excludedGenres.clear();
+        renderGenreCheckboxes(); // Render checkboxes immediately on page load
+        fetchDbStats();
         try {
-          const res = await fetch(`${API_URL}/api/novels`);
+          let res = await fetch(`${API_URL}/api/novels`).catch(() => null);
+          if (!res || !res.ok) {
+            res = await fetch("/api/novels");
+          }
           if (!res.ok) throw new Error("Failed to fetch novels");
           allNovels = await res.json();
 
@@ -948,6 +1589,80 @@ import "../styles/global.css";
         } catch (err) {
           console.error("Error fetching novels:", err);
           document.getElementById("novels-container").innerHTML = `<p class="placeholder-text">Failed to load novels. Ensure backend API is running at ${API_URL}</p>`;
+        }
+      }
+
+      async function fetchDbStats() {
+        try {
+          let res = await fetch(`${API_URL}/api/db/stats`).catch(() => null);
+          if (!res || !res.ok) return;
+          const stats = await res.json();
+          
+          // Update total badge & KPI tiles
+          const badgeEl = document.getElementById("db-total-badge");
+          const kpiTotal = document.getElementById("kpi-total-val");
+          const kpiWeb = document.getElementById("kpi-web-val");
+          const kpiClassic = document.getElementById("kpi-classic-val");
+          const kpiGenres = document.getElementById("kpi-genres-val");
+
+          if (stats.total_novels) {
+            if (badgeEl) badgeEl.innerText = `${stats.total_novels} Novels`;
+            if (kpiTotal) kpiTotal.innerText = stats.total_novels;
+          }
+
+          // Update territory ratio
+          const ratioEl = document.getElementById("db-territory-ratio");
+          const barWeb = document.getElementById("db-bar-web");
+          const barClassic = document.getElementById("db-bar-classic");
+          if (stats.by_territory) {
+            const webCnt = stats.by_territory["Web Novel Territory"] || 0;
+            const classicCnt = stats.by_territory["Classic Literature Territory"] || 0;
+            const total = webCnt + classicCnt || 1;
+            const webPct = ((webCnt / total) * 100).toFixed(1);
+            const classicPct = ((classicCnt / total) * 100).toFixed(1);
+
+            if (kpiWeb) kpiWeb.innerText = webCnt;
+            if (kpiClassic) kpiClassic.innerText = classicCnt;
+
+            if (ratioEl) ratioEl.innerText = `${webCnt} Web (${webPct}%) • ${classicCnt} Classic (${classicPct}%)`;
+            if (barWeb) barWeb.style.width = `${webPct}%`;
+            if (barClassic) barClassic.style.width = `${classicPct}%`;
+          }
+
+          if (stats.by_genre && kpiGenres) {
+            const activeGenreCount = Object.values(stats.by_genre).filter(c => c > 0).length;
+            kpiGenres.innerText = activeGenreCount;
+          }
+
+          // Update sources chips with theme dots
+          const sourcesContainer = document.getElementById("db-sources-badges");
+          if (sourcesContainer && stats.by_source) {
+            const srcMeta = {
+              scribblehub: { label: "ScribbleHub", color: "#a855f7" },
+              gutenberg:  { label: "Gutenberg",   color: "#f59e0b" },
+              cnnovel:    { label: "CN Novel",    color: "#10b981" },
+              royalroad:  { label: "Royal Road",  color: "#38bdf8" },
+              syosetu:    { label: "Syosetu",     color: "#f43f5e" }
+            };
+            sourcesContainer.innerHTML = Object.entries(stats.by_source)
+              .sort((a, b) => b[1] - a[1])
+              .map(([src, cnt]) => {
+                const meta = srcMeta[src] || { label: src, color: "#a78bfa" };
+                return `<span class="db-source-chip"><span class="db-source-dot" style="background: ${meta.color};"></span>${meta.label}: ${cnt}</span>`;
+              })
+              .join("");
+          }
+
+          // Update genre chips with count badges
+          const genresContainer = document.getElementById("db-genres-badges");
+          if (genresContainer && stats.by_genre) {
+            genresContainer.innerHTML = Object.entries(stats.by_genre)
+              .sort((a, b) => b[1] - a[1])
+              .map(([g, cnt]) => `<span class="db-genre-chip">${g} <span class="db-genre-count">${cnt}</span></span>`)
+              .join("");
+          }
+        } catch (err) {
+          console.error("Error fetching db stats:", err);
         }
       }
 
@@ -969,8 +1684,8 @@ import "../styles/global.css";
 
       function selectTerritory(tName) {
         selectedTerritory = tName;
+        excludedGenres.clear();
         selectedGenres.clear();
-        selectedGenres.add("All");
         
         document.querySelectorAll("#territory-selector .t-tab").forEach(tab => {
           if (tab.getAttribute("data-territory") === tName) {
@@ -991,59 +1706,100 @@ import "../styles/global.css";
         filterNovels();
       }
 
-      function renderGenreCheckboxes() {
-        const container = document.getElementById("genre-checkboxes-container");
-        container.innerHTML = "";
+      let lastClickTime = 0;
+      let lastClickGenre = null;
 
-        let genresToRender = {};
-        if (selectedTerritory === "All") {
-          Object.values(TERRITORIES).forEach(t => {
-            Object.assign(genresToRender, t.genres);
-          });
-        } else if (TERRITORIES[selectedTerritory]) {
-          genresToRender = TERRITORIES[selectedTerritory].genres;
+      function handleGenreItemClick(e, gName) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const now = Date.now();
+        if (lastClickGenre === gName && (now - lastClickTime) < 350) {
+          // Double Click detected -> Exclude genre (✕)
+          lastClickTime = 0;
+          lastClickGenre = null;
+          toggleExcludeGenre(gName);
+        } else {
+          // Single Click detected -> Toggle selected genre (✓)
+          lastClickTime = now;
+          lastClickGenre = gName;
+          toggleSelectGenre(gName);
         }
-
-        // Render 'All Genres' checkbox
-        const allBox = document.createElement("label");
-        const isAllChecked = selectedGenres.has("All");
-        allBox.className = `genre-check-box ${isAllChecked ? "active" : ""}`;
-        allBox.innerHTML = `
-          <input type="checkbox" value="All" ${isAllChecked ? "checked" : ""} onchange="toggleGenreCheck('All')" />
-          <span>🌐 All Genres</span>
-        `;
-        container.appendChild(allBox);
-
-        Object.entries(genresToRender).forEach(([gName, gInfo]) => {
-          const box = document.createElement("label");
-          const isChecked = selectedGenres.has(gName);
-          box.className = `genre-check-box ${isChecked ? "active" : ""}`;
-          box.title = gInfo.description;
-          box.innerHTML = `
-            <input type="checkbox" value="${gName}" ${isChecked ? "checked" : ""} onchange="toggleGenreCheck('${gName}')" />
-            <span>${gInfo.icon} ${gName}</span>
-          `;
-          container.appendChild(box);
-        });
       }
 
-      function toggleGenreCheck(gName) {
-        if (gName === "All") {
-          selectedGenres.clear();
-          selectedGenres.add("All");
+      function toggleSelectGenre(gName) {
+        if (excludedGenres.has(gName)) {
+          excludedGenres.delete(gName);
+        }
+        if (selectedGenres.has(gName)) {
+          selectedGenres.delete(gName);
         } else {
-          selectedGenres.delete("All");
-          if (selectedGenres.has(gName)) {
-            selectedGenres.delete(gName);
-          } else {
-            selectedGenres.add(gName);
-          }
-          if (selectedGenres.size === 0) {
-            selectedGenres.add("All");
-          }
+          selectedGenres.add(gName);
         }
         renderGenreCheckboxes();
         filterNovels();
+      }
+
+      function toggleExcludeGenre(gName) {
+        if (selectedGenres.has(gName)) {
+          selectedGenres.delete(gName);
+        }
+        if (excludedGenres.has(gName)) {
+          excludedGenres.delete(gName);
+        } else {
+          excludedGenres.add(gName);
+        }
+        renderGenreCheckboxes();
+        filterNovels();
+      }
+
+      function resetGenreFilters() {
+        excludedGenres.clear();
+        selectedGenres.clear();
+        renderGenreCheckboxes();
+        filterNovels();
+      }
+
+      function renderGenreCheckboxes() {
+        const container = document.getElementById("genre-checkboxes-container");
+        if (!container) return;
+        container.innerHTML = "";
+
+        const allAvail = getAllAvailableGenres();
+
+        allAvail.forEach(gName => {
+          const item = document.createElement("label");
+          const isIncluded = selectedGenres.has(gName);
+          const isExcluded = excludedGenres.has(gName);
+
+          let itemClass = "genre-checkbox-item";
+          if (isExcluded) {
+            itemClass += " excluded";
+          } else if (isIncluded) {
+            itemClass += " included";
+          }
+
+          item.className = itemClass;
+          
+          let desc = "";
+          if (TERRITORIES[selectedTerritory] && TERRITORIES[selectedTerritory].genres[gName]) {
+            desc = TERRITORIES[selectedTerritory].genres[gName].description;
+          }
+          if (desc) item.title = `${gName}: ${desc}`;
+
+          const controlHTML = isExcluded
+            ? `<span class="x-mark-box" style="display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:3px; background:#dc2626; border:1px solid #f87171; color:#ffffff; font-size:10px; font-weight:900; line-height:1; flex-shrink:0; box-shadow:0 0 6px rgba(220,38,38,0.6); margin:0;">✕</span>`
+            : `<input type="checkbox" class="real-genre-checkbox" ${isIncluded ? "checked" : ""} />`;
+
+          item.innerHTML = `
+            ${controlHTML}
+            <span class="genre-name-text">${gName}</span>
+          `;
+
+          item.onclick = (e) => handleGenreItemClick(e, gName);
+
+          container.appendChild(item);
+        });
       }
 
       function filterNovels() {
@@ -1055,7 +1811,7 @@ import "../styles/global.css";
 
         let filtered = allNovels;
 
-        // Filter by territory
+        // 1. Filter by territory
         if (selectedTerritory !== "All") {
           filtered = filtered.filter(n => {
             if (selectedTerritory === "Classic Literature Territory") return n.source === "gutenberg";
@@ -1063,49 +1819,70 @@ import "../styles/global.css";
           });
         }
 
-        // Filter by genre checkboxes
-        if (!selectedGenres.has("All") && selectedGenres.size > 0) {
-          const genreList = Array.from(selectedGenres);
-          titleEl.innerText = `📚 Novels matching ${genreList.join(", ")}`;
+        // 2. Exclude double-clicked genres
+        if (excludedGenres.size > 0) {
+          const exList = Array.from(excludedGenres).map(g => g.toLowerCase());
           filtered = filtered.filter(n => {
-            const nGenre = (n.archetype_match && n.archetype_match.closest_trope) || n.genre || "";
-            return genreList.some(g => nGenre.toLowerCase().includes(g.toLowerCase()) || g.toLowerCase().includes(nGenre.toLowerCase()));
+            const nGenre = (n.genre || "").toLowerCase();
+            return !exList.some(ex => nGenre.includes(ex));
           });
-        } else if (selectedTerritory !== "All") {
-          titleEl.innerText = `📚 Novels in ${selectedTerritory}`;
-        } else {
-          titleEl.innerText = "📚 Ingested Novels";
         }
 
-        // Filter by search query
+        // 3. Filter by selected (included) genres (if user has explicitly checked 1+ checkboxes)
+        if (selectedGenres.size > 0) {
+          const incList = Array.from(selectedGenres).map(g => g.toLowerCase());
+          filtered = filtered.filter(n => {
+            const nGenre = (n.genre || "").toLowerCase();
+            return incList.some(inc => nGenre.includes(inc));
+          });
+        }
+
+        // 4. Search query filter
         if (searchQuery) {
           filtered = filtered.filter(n => 
             (n.title && n.title.toLowerCase().includes(searchQuery)) ||
             (n.author && n.author.toLowerCase().includes(searchQuery)) ||
+            (n.genre && n.genre.toLowerCase().includes(searchQuery)) ||
             (n.source && n.source.toLowerCase().includes(searchQuery))
           );
         }
 
-        if (badgeEl) {
-          badgeEl.innerText = `${filtered.length} ${filtered.length === 1 ? 'novel' : 'novels'}`;
+        // Update list title text
+        if (selectedGenres.size > 0 || excludedGenres.size > 0) {
+          let parts = [];
+          if (selectedGenres.size > 0) {
+            parts.push(`matching ${Array.from(selectedGenres).join(", ")}`);
+          }
+          if (excludedGenres.size > 0) {
+            parts.push(`excluding ${Array.from(excludedGenres).join(", ")}`);
+          }
+          titleEl.innerText = `Ingested Novels (${parts.join("; ")})`;
+        } else if (selectedTerritory !== "All") {
+          titleEl.innerText = `Ingested Novels in ${selectedTerritory}`;
+        } else {
+          titleEl.innerText = "Ingested Novels";
         }
 
-        // Update dropdown options
+        badgeEl.innerText = `${filtered.length} novel${filtered.length === 1 ? "" : "s"}`;
         populateNovelDropdown(filtered);
+        renderNovelsList(filtered);
+      }
 
-        if (filtered.length === 0) {
+      function renderNovelsList(novelsToRender) {
+        const container = document.getElementById("novels-container");
+        if (novelsToRender.length === 0) {
           container.innerHTML = `<p class="placeholder-text" style="padding: 1.5rem 1rem;">No matching novels found.</p>`;
           return;
         }
 
         container.innerHTML = "";
-        filtered.forEach(novel => {
+        novelsToRender.forEach(novel => {
           const card = document.createElement("div");
           card.className = `card-novel ${selectedNovelId === novel.id ? "active" : ""}`;
           card.setAttribute("data-novel-id", novel.id);
           card.addEventListener("click", () => selectNovel(novel.id, novel.title));
 
-          const srcTag = novel.source === "gutenberg" ? "📜 Gutenberg" : "⚡ Web";
+          const srcTag = novel.source === "gutenberg" ? "Gutenberg" : "Web Novel";
 
           card.innerHTML = `
             <div class="card__title">${novel.title}</div>
@@ -1134,10 +1911,19 @@ import "../styles/global.css";
         const dropdown = document.getElementById("novelSelect");
         if (dropdown) dropdown.value = id;
 
-        // Fetch stats and arc concurrently
+        // Reset state and hide old visualizations immediately
+        currentStats = null;
+        currentArc = null;
+
         const statsContent = document.getElementById("stats-content");
         const titleElement = document.getElementById("novel-details-title");
-        statsContent.innerHTML = `<p class="placeholder-text" style="padding: 1.5rem 1rem;">Fetching stats & rendering charts...</p>`;
+        const chartsGrid = document.getElementById("chartsGrid");
+        const similarContainer = document.getElementById("similarNovelsContainer");
+
+        if (titleElement) titleElement.innerText = `${title} Metrics`;
+        if (statsContent) statsContent.innerHTML = `<p class="placeholder-text" style="padding: 1.5rem 1rem;">Fetching stats & rendering charts...</p>`;
+        if (chartsGrid) chartsGrid.style.display = "none";
+        if (similarContainer) similarContainer.innerHTML = `<p style="color: #64748b; font-size: 13px; margin: 0; padding: 12px;">Loading recommendations...</p>`;
 
         try {
           const [statsRes, arcRes] = await Promise.all([
@@ -1179,7 +1965,7 @@ import "../styles/global.css";
             gridHtml += buildStatItem("Verb Ratio", `${(stats.en_verb_ratio * 100)?.toFixed(1)}%`);
             gridHtml += buildStatItem("Sentences/Paragraph", stats.en_avg_sentences_per_paragraph?.toFixed(2));
             gridHtml += buildStatItem("Sentiment (VADER)", stats.en_compound_sentiment?.toFixed(3));
-            gridHtml += buildStatItem("Thematic Explicitness", `${(stats.en_theme_explication_ratio * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Thematic Explicitness", stats.en_theme_explication_ratio?.toFixed(2));
             gridHtml += buildStatItem("Temporal Complexity", stats.en_linearity_subversion_score?.toFixed(3));
             gridHtml += buildStatItem("Visceral Emotion", `${(stats.en_sensory_body_density * 100)?.toFixed(2)}%`);
             gridHtml += buildStatItem("World Grounding", `${(stats.en_outside_world_engagement * 100)?.toFixed(2)}%`);
@@ -1196,7 +1982,7 @@ import "../styles/global.css";
             gridHtml += buildStatItem("Kanji Density", `${(stats.ja_kanji_ratio * 100)?.toFixed(1)}%`);
             gridHtml += buildStatItem("Sentences/Paragraph", stats.ja_avg_sentences_per_paragraph?.toFixed(2));
             gridHtml += buildStatItem("Sentiment (Lexicon)", stats.ja_compound_sentiment?.toFixed(3));
-            gridHtml += buildStatItem("Thematic Explicitness", `${(stats.ja_theme_explication_ratio * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Thematic Explicitness", stats.ja_theme_explication_ratio?.toFixed(2));
             gridHtml += buildStatItem("Temporal Complexity", stats.ja_linearity_subversion_score?.toFixed(3));
             gridHtml += buildStatItem("Visceral Emotion", `${(stats.ja_sensory_body_density * 100)?.toFixed(2)}%`);
             gridHtml += buildStatItem("World Grounding", `${(stats.ja_outside_world_engagement * 100)?.toFixed(2)}%`);
@@ -1213,7 +1999,7 @@ import "../styles/global.css";
             gridHtml += buildStatItem("Verb Ratio", `${(stats.zh_verb_ratio * 100)?.toFixed(1)}%`);
             gridHtml += buildStatItem("Sentences/Paragraph", stats.zh_avg_sentences_per_paragraph?.toFixed(2));
             gridHtml += buildStatItem("Sentiment (Lexicon)", stats.zh_compound_sentiment?.toFixed(3));
-            gridHtml += buildStatItem("Thematic Explicitness", `${(stats.zh_theme_explication_ratio * 100)?.toFixed(2)}%`);
+            gridHtml += buildStatItem("Thematic Explicitness", stats.zh_theme_explication_ratio?.toFixed(2));
             gridHtml += buildStatItem("Temporal Complexity", stats.zh_linearity_subversion_score?.toFixed(3));
             gridHtml += buildStatItem("Visceral Emotion", `${(stats.zh_sensory_body_density * 100)?.toFixed(2)}%`);
             gridHtml += buildStatItem("World Grounding", `${(stats.zh_outside_world_engagement * 100)?.toFixed(2)}%`);
@@ -1224,12 +2010,15 @@ import "../styles/global.css";
 
           if (stats.archetype_match) {
             const am = stats.archetype_match;
+            const tropeLabel = (am.top_genres && am.top_genres.length > 0)
+              ? am.top_genres.slice(0, 3).map(g => `${g.genre} (${(g.confidence * 100).toFixed(0)}%)`).join(", ")
+              : am.closest_trope;
             gridHtml += `
               <div style="margin-top: 0.85rem; padding-top: 0.85rem; border-top: 1px solid var(--color-border);">
                 <h4 style="font-family: var(--font-display); font-size: 0.88rem; margin-bottom: 0.35rem; color: var(--color-accent);">Archetype Match</h4>
                 <div style="background: rgba(124, 106, 255, 0.04); border: 1px solid rgba(124, 106, 255, 0.15); border-radius: 8px; padding: 0.65rem 0.8rem;">
                   <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.15rem;">
-                    <span>${am.closest_trope}</span>
+                    <span>${tropeLabel}</span>
                     <span style="color: var(--color-accent-2);">${(am.confidence * 100).toFixed(1)}%</span>
                   </div>
                   <div style="font-size: 0.75rem; color: var(--color-muted);">${am.territory}</div>
@@ -1244,6 +2033,9 @@ import "../styles/global.css";
           const chartsGrid = document.getElementById("chartsGrid");
           if (chartsGrid) chartsGrid.style.display = "grid";
           renderAll();
+          if (stats.top_matches) {
+            renderSimilarNovels(stats.top_matches);
+          }
 
         } catch (err) {
           console.error("Error loading stats or arc:", err);
@@ -1757,6 +2549,46 @@ import "../styles/global.css";
         });
       }
 
+      /* ── Doppelgängers / Similar Novels Renderer ── */
+      function renderSimilarNovels(matches) {
+        const container = document.getElementById("similarNovelsContainer");
+        if (!container) return;
+        container.innerHTML = "";
+
+        if (!matches || matches.length === 0) {
+          container.innerHTML = `<p style="color: #64748b; font-size: 13px; margin: 0; padding: 12px;">No similar matches found.</p>`;
+          return;
+        }
+
+        matches.forEach((m, index) => {
+          const item = document.createElement("div");
+          item.className = "doppelganger-item";
+          item.addEventListener("click", () => selectNovel(m.id, m.title));
+
+          const pct = Math.round((m.similarity_score || 0) * 100);
+          const scoreColor = m.similarity_score > 0.9 ? '#38bdf8' : m.similarity_score > 0.8 ? '#818cf8' : '#94a3b8';
+
+          item.innerHTML = `
+            <div class="doppelganger-left">
+              <span class="doppelganger-rank">#${index + 1}</span>
+              <div class="doppelganger-info">
+                <h4 class="doppelganger-item-title">${m.title}</h4>
+                ${m.author ? `<span class="doppelganger-author">${m.author}</span>` : ''}
+                <span class="doppelganger-badge">${m.genre || 'Fiction'}</span>
+              </div>
+            </div>
+
+            <div class="doppelganger-right">
+              <span class="doppelganger-score" style="color: ${scoreColor}">${pct}%</span>
+              <div class="doppelganger-progress-bg">
+                <div class="doppelganger-progress-fill" style="width: ${pct}%; background-color: ${scoreColor}"></div>
+              </div>
+            </div>
+          `;
+          container.appendChild(item);
+        });
+      }
+
       // 4. Dropdown Selector Listener
       document.getElementById("novelSelect").addEventListener("change", (e) => {
         const id = parseInt(e.target.value);
@@ -2053,8 +2885,16 @@ import "../styles/global.css";
         }, 2000);
       }
 
-      // Initial Load
-      fetchNovels();
+      // Initial Load with DOMContentLoaded safety
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => {
+          renderGenreCheckboxes();
+          fetchNovels();
+        });
+      } else {
+        renderGenreCheckboxes();
+        fetchNovels();
+      }
     </script>
   </body>
 </html>
