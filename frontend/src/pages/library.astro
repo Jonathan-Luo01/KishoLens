@@ -600,13 +600,13 @@ import "../styles/global.css";
       }
 
       /* Enhanced Metrics Dashboard Component Styles */
-      .metrics-dashboard {
+      :global(.metrics-dashboard) {
         display: flex;
         flex-direction: column;
         gap: 1rem;
       }
 
-      .metrics-hero {
+      :global(.metrics-hero) {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
         gap: 0.6rem;
@@ -616,34 +616,34 @@ import "../styles/global.css";
         padding: 0.85rem;
       }
 
-      .hero-chip {
+      :global(.hero-chip) {
         display: flex;
         flex-direction: column;
         gap: 0.2rem;
       }
 
-      .hero-chip-label {
+      :global(.hero-chip-label) {
         font-size: 0.68rem;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         color: var(--color-muted);
       }
 
-      .hero-chip-val {
+      :global(.hero-chip-val) {
         font-family: var(--font-display);
         font-size: 1.15rem;
         font-weight: 700;
         color: #ffffff;
       }
 
-      .metrics-category-tabs {
+      :global(.metrics-category-tabs) {
         display: flex;
         gap: 0.4rem;
         overflow-x: auto;
         padding-bottom: 0.25rem;
       }
 
-      .category-tab {
+      :global(.category-tab) {
         background: rgba(255, 255, 255, 0.04);
         border: 1px solid rgba(255, 255, 255, 0.1);
         color: var(--color-muted);
@@ -656,19 +656,19 @@ import "../styles/global.css";
         transition: all 0.2s ease;
       }
 
-      .category-tab:hover, .category-tab.active {
+      :global(.category-tab:hover), :global(.category-tab.active) {
         background: rgba(124, 106, 255, 0.18);
         border-color: rgba(124, 106, 255, 0.5);
         color: #ffffff;
       }
 
-      .metric-category-section {
+      :global(.metric-category-section) {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
       }
 
-      .category-section-title {
+      :global(.category-section-title) {
         font-family: var(--font-display);
         font-size: 0.8rem;
         font-weight: 600;
@@ -680,18 +680,18 @@ import "../styles/global.css";
         margin-top: 0.4rem;
       }
 
-      .category-section-title.cat-structure { color: #38bdf8; }
-      .category-section-title.cat-prose     { color: #a78bfa; }
-      .category-section-title.cat-theme     { color: #f472b6; }
-      .category-section-title.cat-pacing    { color: #34d399; }
+      :global(.category-section-title.cat-structure) { color: #38bdf8; }
+      :global(.category-section-title.cat-prose)     { color: #a78bfa; }
+      :global(.category-section-title.cat-theme)     { color: #f472b6; }
+      :global(.category-section-title.cat-pacing)    { color: #34d399; }
 
-      .metric-card-grid {
+      :global(.metric-card-grid) {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 0.6rem;
       }
 
-      .metric-card {
+      :global(.metric-card) {
         background: rgba(255, 255, 255, 0.02);
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 8px;
@@ -703,47 +703,47 @@ import "../styles/global.css";
         transition: border-color 0.2s ease, transform 0.2s ease;
       }
 
-      .metric-card:hover {
+      :global(.metric-card:hover) {
         border-color: rgba(124, 106, 255, 0.3);
         transform: translateY(-1px);
       }
 
-      .metric-card-header {
+      :global(.metric-card-header) {
         display: flex;
         justify-content: space-between;
         align-items: center;
       }
 
-      .metric-card-label {
+      :global(.metric-card-label) {
         font-size: 0.7rem;
         font-weight: 500;
         color: #cbd5e1;
       }
 
-      .metric-info-icon {
+      :global(.metric-info-icon) {
         font-size: 0.7rem;
         color: var(--color-muted);
         cursor: help;
         opacity: 0.6;
         transition: opacity 0.15s;
       }
-      .metric-info-icon:hover { opacity: 1.0; }
+      :global(.metric-info-icon:hover) { opacity: 1.0; }
 
-      .metric-val-row {
+      :global(.metric-val-row) {
         display: flex;
         align-items: baseline;
         justify-content: space-between;
         gap: 0.4rem;
       }
 
-      .metric-primary-val {
+      :global(.metric-primary-val) {
         font-family: var(--font-display);
         font-size: 1.15rem;
         font-weight: 700;
         color: #f8fafc;
       }
 
-      .percentile-bar-bg {
+      :global(.percentile-bar-bg) {
         width: 100%;
         height: 4px;
         background: rgba(255, 255, 255, 0.08);
@@ -751,18 +751,18 @@ import "../styles/global.css";
         overflow: hidden;
       }
 
-      .percentile-bar-fill {
+      :global(.percentile-bar-fill) {
         height: 100%;
         border-radius: 2px;
         transition: width 0.4s ease-out;
       }
 
-      .bar-fill-structure { background: linear-gradient(90deg, #0284c7, #38bdf8); }
-      .bar-fill-prose     { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
-      .bar-fill-theme     { background: linear-gradient(90deg, #db2777, #f472b6); }
-      .bar-fill-pacing    { background: linear-gradient(90deg, #059669, #34d399); }
+      :global(.bar-fill-structure) { background: linear-gradient(90deg, #0284c7, #38bdf8); }
+      :global(.bar-fill-prose)     { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+      :global(.bar-fill-theme)     { background: linear-gradient(90deg, #db2777, #f472b6); }
+      :global(.bar-fill-pacing)    { background: linear-gradient(90deg, #059669, #34d399); }
 
-      .benchmark-chip {
+      :global(.benchmark-chip) {
         display: inline-flex;
         align-items: center;
         padding: 0.15rem 0.45rem;
@@ -772,19 +772,19 @@ import "../styles/global.css";
         width: fit-content;
       }
 
-      .benchmark-chip.higher {
+      :global(.benchmark-chip.higher) {
         background: rgba(34, 197, 94, 0.15);
         color: #4ade80;
         border: 1px solid rgba(34, 197, 94, 0.3);
       }
 
-      .benchmark-chip.lower {
+      :global(.benchmark-chip.lower) {
         background: rgba(239, 68, 68, 0.15);
         color: #fca5a5;
         border: 1px solid rgba(239, 68, 68, 0.3);
       }
 
-      .benchmark-chip.neutral {
+      :global(.benchmark-chip.neutral) {
         background: rgba(148, 163, 184, 0.12);
         color: #cbd5e1;
         border: 1px solid rgba(148, 163, 184, 0.2);
@@ -1897,9 +1897,9 @@ import "../styles/global.css";
 
       const METRIC_METADATA = {
         // Structure
-        word_count:                  { label: "Word Count", category: "structure", tooltip: "Total words analyzed across sampled chapters" },
-        char_count:                  { label: "Character Count", category: "structure", tooltip: "Total characters in text" },
-        sentence_count:              { label: "Sentence Count", category: "structure", tooltip: "Total sentences identified" },
+        word_count:                  { label: "Word Count", category: "structure", isInteger: true, tooltip: "Total words analyzed across sampled chapters" },
+        char_count:                  { label: "Character Count", category: "structure", isInteger: true, tooltip: "Total characters in text" },
+        sentence_count:              { label: "Sentence Count", category: "structure", isInteger: true, tooltip: "Total sentences identified" },
         avg_sentence_len:            { label: "Avg Sentence Length", category: "structure", tooltip: "Average words/characters per sentence" },
         avg_sentences_per_paragraph: { label: "Sentences/Paragraph", category: "structure", tooltip: "Paragraph density and pacing structure" },
         dep_tree_depth:              { label: "Dep Tree Depth", category: "structure", tooltip: "Syntactic dependency tree depth (higher = more complex sentence grammar)" },
@@ -1945,7 +1945,7 @@ import "../styles/global.css";
             </div>
             <div class="hero-chip">
               <span class="hero-chip-label">Word Count</span>
-              <span class="hero-chip-val">${(stats[`${langPrefix}word_count`] || stats[`${langPrefix}char_count`] || 0).toLocaleString()}</span>
+              <span class="hero-chip-val">${Math.round(stats[`${langPrefix}word_count`] || stats[`${langPrefix}char_count`] || 0).toLocaleString()}</span>
             </div>
             <div class="hero-chip">
               <span class="hero-chip-label">Lexical Richness</span>
@@ -1988,6 +1988,7 @@ import "../styles/global.css";
             if (rawVal === null || rawVal === undefined) return;
 
             let displayVal = meta.isPercent ? `${(rawVal * 100).toFixed(1)}%` :
+                             meta.isInteger ? Math.round(rawVal).toLocaleString() :
                              typeof rawVal === 'number' ? (rawVal % 1 !== 0 ? rawVal.toFixed(2) : rawVal.toString()) : rawVal;
 
             const normScore = normRadar[rawKey] !== undefined ? normRadar[rawKey] :
