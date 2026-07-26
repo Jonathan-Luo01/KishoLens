@@ -25,146 +25,131 @@ import numpy as np
 # ---------------------------------------------------------------------------
 
 COMMON_GENRES = {
-    "Mystery": [
-        "mystery", "detective", "crime", "cozy mystery", "investigation", "mystery-thriller",
-    ],
-    "Horror": [
-        "horror", "ghosts", "paranormal", "dark-fantasy", "dark fantasy",
-    ],
-    "Romance": [
-        "romance", "romantic", "love", "romantic comedy", "rom-com",
-    ],
-    "Fantasy": [
-        "fantasy", "magic", "mythology", "myth", "supernatural",
-    ],
-    "Sci-Fi": [
-        "science-fiction", "science fiction", "sci-fi", "sci fi", "aliens", "mecha",
-    ],
     "Action / Adventure": [
-        "action", "adventure", "quest", "journey",
+        "action", "adventure", "martial arts", "sports", "assassin", "mercenary",
+        "revenge", "survival", "dungeons", "hunting", "death game", "unlimited flow",
+        "sea stories", "wilderness survival", "voyages and travels", "expeditions",
+        "pirates", "shipwrecks", "adventure stories", "quest", "journey",
     ],
     "Comedy": [
-        "comedy", "humor", "satire", "parody", "funny",
+        "comedy", "humor", "humorous stories", "satire", "parody", "wit and humor",
+        "comedies", "domestic comedy", "slapstick", "funny protagonist", "misunderstandings",
+        "cheerful protagonist", "gag", "funny", "rom-com", "romantic comedy",
     ],
-}
-
-GENRE_TAG_MAP: dict[str, list[str]] = {
-    # --- Specific Web Novel Genres ---
-    "LitRPG": [
-        "litrpg", "system", "vrmmo", "leveling", "game", "game-elements",
-        "game elements", "stat", "stats", "gamelit",
-    ],
-    "Isekai": [
-        "isekai", "reincarnation", "portal-fantasy", "portal fantasy",
-        "transported", "another-world", "another world", "transmigration",
-    ],
-    "Xianxia / Wuxia": [
-        "xianxia", "wuxia", "cultivation", "eastern-fantasy", "eastern fantasy",
-        "xuanhuan", "martial-arts", "martial arts", "daoist", "dao",
-    ],
-    "Urban Romance": [
-        "ceo", "modern romance", "urban romance", "office romance", "contemporary-romance", "contemporary romance",
-    ],
-    "Cozy Fantasy": [
-        "cozy", "cozy-fantasy", "cozy fantasy", "farming", "shopkeeper", "crafting", "alchemy", "cooking",
-    ],
-    "Slice of Life": [
-        "slice-of-life", "slice of life", "ordinary life", "daily life",
-    ],
-    "Contemporary": [
-        "contemporary", "school-life", "school life", "modern-day", "modern day", "school",
-    ],
-    "Villainess / Otome Game": [
-        "villainess", "otome", "otome-game", "otome game", "noble",
-        "aristocracy", "engagement-broken", "broken-engagement",
-    ],
-    "Kingdom Building / Strategy": [
-        "kingdom-building", "kingdom building", "lord", "territory-development",
-        "technology-uplift", "strategy", "managerial", "fief", "town-building",
-    ],
-    "Monster Protagonist / Evolution": [
-        "monster-protagonist", "monster protagonist", "non-human-mc", "non-human mc",
-        "beast-mc", "evolution", "evolving", "reincarnated-as-a",
-    ],
-    "Dungeon Core / Dungeon MC": [
-        "dungeon-core", "dungeon core", "dungeon-mc", "dungeon mc",
-        "dungeon-building", "dungeon building",
-    ],
-    "Urban Fantasy / Dungeons": [
-        "urban-fantasy", "urban fantasy", "modern-fantasy", "modern fantasy",
-        "hunters", "gates", "dungeons-appearing", "modern-magic", "hunter", "gate",
-    ],
-    "Harem": [
-        "harem", "reverse-harem", "reverse harem", "polyamory", "multiple-partners",
-    ],
-    "Girls Love / Boys Love": [
-        "yuri", "girls-love", "girls love", "yaoi", "boys-love", "boys love",
+    "Romance": [
+        "romance", "romantic", "love", "romantic fiction", "courtship", "love stories",
+        "romance fiction", "marriage", "man-woman relationships", "shoujo", "josei",
+        "harem", "smut", "modern romance", "urban romance", "ceo", "office romance",
+        "entertainment industry", "first love", "contract marriage", "reverse harem",
+        "yuri", "girls love", "girls-love", "yaoi", "boys love", "boys-love",
         "shounen-ai", "shoujo-ai", "danmei", "gl", "bl",
     ],
-
-    # --- Specific Traditional Fiction Genres ---
-    "High Fantasy": [
-        "high-fantasy", "high fantasy", "epic-fantasy", "epic fantasy",
-        "sword-and-sorcery", "sword and sorcery", "tolkienesque", "medieval-fantasy",
-        "medieval fantasy",
+    "Drama": [
+        "drama", "plays", "theatre", "domestic drama", "social drama", "domestic fiction",
+        "family life", "interpersonal relations", "family conflict", "betrayal",
+        "emotional", "social hierarchy", "politics", "psychological",
     ],
-    "Hard Sci-Fi": [
-        "hard-sci-fi", "hard sci-fi", "space-opera", "space opera", "cyberpunk",
+    "Fantasy": [
+        "fantasy", "mythology", "folklore", "fairy tales", "legends", "fables",
+        "magic", "allegories", "high fantasy", "high-fantasy", "epic fantasy",
+        "epic-fantasy", "sword and sorcery", "sword-and-sorcery", "tolkienesque",
+        "medieval fantasy", "medieval-fantasy", "litrpg", "system", "vrmmo",
+        "leveling", "gamelit", "game elements", "stat", "stats", "kingdom building",
+        "kingdom-building", "dragons", "elves", "sword and magic", "academy",
+        "cozy fantasy", "cozy-fantasy", "monster protagonist", "beast mc",
+        "dungeon core", "dungeon mc", "dungeon building",
     ],
-    "Modern Thriller": [
-        "thriller", "suspense", "psychological", "noir",
+    "Horror": [
+        "horror", "gothic fiction", "ghost stories", "horror tales", "vampires",
+        "monsters", "occult fiction", "macabre", "survival horror", "ghosts",
+        "demons", "gore", "psychological horror", "mystery horror",
     ],
-
-    # --- Specific Classic Literature Genres ---
-    "Victorian Novel": [
-        "victorian", "gothic", "19th-century", "19th century",
+    "Historical": [
+        "historical fiction", "historical", "regency fiction", "victorian",
+        "victorian novel", "19th century", "history", "biographical fiction",
+        "war stories", "middle ages", "ancient china", "palace court", "royalty",
+        "historical romance", "historical politics",
     ],
-    "Philosophical Fiction": [
-        "philosophy", "philosophical", "existential",
+    "Sci-Fi": [
+        "science fiction", "sci-fi", "sci fi", "mecha", "time travel", "space voyages",
+        "space flight", "dystopias", "dystopian", "precursors of science fiction", "imaginary voyages",
+        "cyberpunk", "post-apocalyptic", "interstellar", "vrmmo", "space opera",
+        "galactic empire", "futuristic", "hard sci-fi", "hard-sci-fi", "future", "future life",
+        "technology", "invention", "robot", "cyborg", "space", "outer space", "aliens",
     ],
-
-    # --- General / Common Genres ---
-    "Mystery":            COMMON_GENRES["Mystery"],
-    "Horror":             COMMON_GENRES["Horror"],
-    "Romance":            COMMON_GENRES["Romance"],
-    "Fantasy":            COMMON_GENRES["Fantasy"],
-    "Sci-Fi":             COMMON_GENRES["Sci-Fi"],
-    "Action / Adventure": COMMON_GENRES["Action / Adventure"],
-    "Comedy":             COMMON_GENRES["Comedy"],
+    "Philosophy": [
+        "philosophical fiction", "philosophical", "philosophy", "utilitarianism",
+        "ethics", "conduct of life", "existentialism", "existential",
+        "epistemology", "metaphysics", "stoicism", "nihilism", "rationalism",
+    ],
+    "Mystery": [
+        "detective fiction", "crime stories", "mystery", "detective and mystery stories",
+        "crime", "murder", "police procedural", "whodunit", "criminology", "investigation",
+        "thriller", "suspense", "noir", "modern thriller", "detective", "sleuth", "clue", "puzzle",
+    ],
+    "Tragedy": [
+        "tragedies", "tragedy", "tragic", "dark literature", "fatalism", "moral downfall",
+        "melancholy", "suffering", "sad ending", "terminal illness", "heartbreak",
+        "character death", "angst", "grief", "sorrow", "mourning", "doom",
+    ],
+    "Supernatural": [
+        "supernatural", "occult", "paranormal", "spiritualism", "apparitions",
+        "demonology", "metaphysical fiction", "urban fantasy", "modern magic",
+        "hunters", "necromancy", "vampires", "vampire", "werewolves", "exorcism", "gates",
+        "ghost", "ghosts", "witch", "witches", "witchcraft", "demon", "demons", "monster", "monsters", "spirit", "spirits",
+    ],
+    "Poetry": [
+        "poetry", "ballads", "epic poetry", "sonnets", "lyric poetry", "verse",
+    ],
+    "Slice of Life": [
+        "slice of life", "slice-of-life", "slow life", "slow-life", "farming", "cooking",
+        "pet raising", "school life", "school-life", "esports", "medical", "cute children",
+        "ordinary life", "daily life", "contemporary", "cozy", "relaxing", "everyday life",
+        "village life", "gardening", "ranching", "peaceful life", "baking", "housework",
+    ],
+    "Cultivation": [
+        "cultivation", "cultivator", "cultivate", "xianxia", "xuanhuan", "wuxia", "qi", "dao", "dantian",
+        "alchemy", "immortal", "immortality", "sects", "sect", "realm breakthrough", "eastern fantasy",
+        "daoist", "golden core", "foundation building", "internal energy",
+    ],
+    "Isekai": [
+        "isekai", "portal fantasy", "portal-fantasy", "reincarnation", "reincarnated", "reincarnate",
+        "reborn", "transmigration", "transmigrated", "transmigrate", "otome game", "otome-game",
+        "villainess", "regressor", "second chance", "world travel", "transported", "another world",
+        "other world", "different world", "tensei", "summoned hero", "summoned",
+    ],
+    "Progression Fantasy": [
+        "progression fantasy", "progression-fantasy", "progression", "litrpg", "system",
+        "weak to strong", "level system", "cheats", "accelerated growth", "system administrator",
+        "vrmmorpg", "vrmmo", "dungeon", "adventurers", "status window", "stat points",
+        "level up", "dungeon core", "monster protagonist", "gamelit", "stat screen",
+        "leveling", "dungeon building", "system notification", "class rank",
+    ],
 }
 
+GENRE_TAG_MAP: dict[str, list[str]] = COMMON_GENRES
+
 GENRE_TERRITORIES: dict[str, str] = {
-    # Web Novel Territory
-    "LitRPG":                          "Web Novel Territory",
-    "Isekai":                          "Web Novel Territory",
-    "Xianxia / Wuxia":                "Web Novel Territory",
-    "Urban Romance":                   "Web Novel Territory",
-    "Cozy Fantasy":                    "Web Novel Territory",
-    "Villainess / Otome Game":        "Web Novel Territory",
-    "Kingdom Building / Strategy":     "Web Novel Territory",
-    "Monster Protagonist / Evolution": "Web Novel Territory",
-    "Dungeon Core / Dungeon MC":       "Web Novel Territory",
-    "Urban Fantasy / Dungeons":        "Web Novel Territory",
-    "Harem":                           "Web Novel Territory",
-    "Girls Love / Boys Love":          "Web Novel Territory",
-
-    # Traditional Fiction Territory
-    "High Fantasy":                    "Traditional Fiction Territory",
-    "Hard Sci-Fi":                     "Traditional Fiction Territory",
-    "Modern Thriller":                 "Traditional Fiction Territory",
-    "Slice of Life":                   "Traditional Fiction Territory",
-    "Contemporary":                    "Traditional Fiction Territory",
-    "Mystery":                         "Traditional Fiction Territory",
-    "Horror":                          "Traditional Fiction Territory",
-    "Romance":                         "Traditional Fiction Territory",
-    "Fantasy":                         "Traditional Fiction Territory",
-    "Sci-Fi":                          "Traditional Fiction Territory",
-    "Action / Adventure":              "Traditional Fiction Territory",
-    "Comedy":                          "Traditional Fiction Territory",
-
     # Classic Literature Territory
-    "Victorian Novel":                 "Classic Literature Territory",
-    "Philosophical Fiction":           "Classic Literature Territory",
+    "Action / Adventure": "Classic Literature Territory",
+    "Comedy":             "Classic Literature Territory",
+    "Drama":              "Classic Literature Territory",
+    "Fantasy":            "Classic Literature Territory",
+    "Horror":             "Classic Literature Territory",
+    "Historical":         "Classic Literature Territory",
+    "Sci-Fi":             "Classic Literature Territory",
+    "Philosophy":         "Classic Literature Territory",
+    "Mystery":            "Classic Literature Territory",
+    "Tragedy":            "Classic Literature Territory",
+    "Supernatural":       "Classic Literature Territory",
+    "Poetry":             "Classic Literature Territory",
+    "Romance":            "Classic Literature Territory",
+
+    # Web Novel Territory
+    "Slice of Life":        "Web Novel Territory",
+    "Cultivation":          "Web Novel Territory",
+    "Isekai":               "Web Novel Territory",
+    "Progression Fantasy": "Web Novel Territory",
 }
 
 # ---------------------------------------------------------------------------
@@ -173,29 +158,23 @@ GENRE_TERRITORIES: dict[str, str] = {
 
 def consolidate_genre(tags: list[str]) -> Optional[str]:
     """
-    Map a list of raw source tags to a canonical genre name.
-    Uses a priority order where specific/sub-genres are matched before general ones.
+    Map a list of raw source tags to one of the 17 canonical parent genres.
     """
-    t_lows = {t.lower().strip() for t in tags}
+    import re
+    t_lows = [t.lower().strip() for t in tags]
     
-    # Priority order for matching
+    # Priority order for matching canonical parent genres
     priority_order = [
-        # Specific sub-genres first
-        "LitRPG", "Isekai", "Xianxia / Wuxia", "Urban Romance", "Cozy Fantasy",
-        "Slice of Life", "Contemporary",
-        "Villainess / Otome Game", "Kingdom Building / Strategy",
-        "Monster Protagonist / Evolution", "Dungeon Core / Dungeon MC",
-        "Urban Fantasy / Dungeons", "Harem", "Girls Love / Boys Love",
-        "High Fantasy", "Hard Sci-Fi", "Modern Thriller", "Victorian Novel", "Philosophical Fiction",
-        "Romance", "Mystery", "Horror", "Comedy",
-        # General broad genres last
-        "Fantasy", "Sci-Fi", "Action / Adventure"
+        "Isekai", "Cultivation", "Progression Fantasy", "Slice of Life", "Poetry", "Tragedy",
+        "Philosophy", "Supernatural", "Mystery", "Horror", "Historical",
+        "Sci-Fi", "Fantasy", "Drama", "Comedy", "Romance", "Action / Adventure"
     ]
     
     for canonical in priority_order:
         tag_list = GENRE_TAG_MAP.get(canonical, [])
-        if any(tag in t_lows for tag in tag_list):
-            return canonical
+        for tag in tag_list:
+            if any(re.search(r'\b' + re.escape(tag) + r'\b', t) for t in t_lows):
+                return canonical
             
     return None
 
@@ -258,19 +237,59 @@ def get_representative_sample(text: str, target_words: int = 1000) -> str:
     return f"{chunk_beg}\n\n{chunk_mid}\n\n{chunk_end}"
 
 
+def extract_3window_slices(text: str, words_per_slice: int = 300) -> tuple[str, str, str]:
+    """
+    Sample 3 distinct 300-word slices across the text:
+    - Window A (0% mark / Beginning): Captures setup, exposition, and core tropes
+    - Window B (25% mark): Captures general pacing and narrative tone
+    - Window C (60% mark): Captures mid-story execution and secondary elements
+    """
+    import re
+    if not text:
+        return ("", "", "")
+
+    def get_slice(start_pct: float) -> str:
+        start_idx = int(len(text) * start_pct)
+        match = re.search(r'\n\s*\n', text[start_idx:])
+        if match and match.end() < 500:
+            start_idx = start_idx + match.end()
+        buffer_len = words_per_slice * 12
+        raw_chunk = text[start_idx : start_idx + buffer_len]
+        return " ".join(raw_chunk.split()[:words_per_slice])
+
+    win_a = get_slice(0.0)
+    win_b = get_slice(0.25)
+    win_c = get_slice(0.60)
+    return (win_a, win_b, win_c)
+
+
 def embed_texts(
     texts: list[str],
     model_name: str = "all-MiniLM-L6-v2",
     max_words: int = 1000,
 ) -> np.ndarray:
     """
-    Embed a list of texts (each truncated to a representative `max_words` words).
+    Embed a list of texts using 3-window weighted pooling:
+    V_prose = 0.50 * V_A + 0.25 * V_B + 0.25 * V_C
     Returns a (N, 384) float32 numpy array.
     """
-    truncated = [get_representative_sample(t, max_words) for t in texts]
     model = _get_model(model_name)
-    embeddings = model.encode(truncated, convert_to_numpy=True, show_progress_bar=False)
-    return embeddings.astype(np.float32)
+    all_embeddings = []
+
+    for t in texts:
+        win_a, win_b, win_c = extract_3window_slices(t, words_per_slice=300)
+        slices = [s if s.strip() else "sample prose text" for s in [win_a, win_b, win_c]]
+        v_s = model.encode(slices, convert_to_numpy=True, show_progress_bar=False).astype(np.float32)
+        v_a, v_b, v_c = v_s[0], v_s[1], v_s[2]
+
+        v_prose = 0.50 * v_a + 0.25 * v_b + 0.25 * v_c
+        norm = np.linalg.norm(v_prose)
+        if norm == 0:
+            norm = 1.0
+        v_prose = v_prose / norm
+        all_embeddings.append(v_prose)
+
+    return np.vstack(all_embeddings).astype(np.float32)
 
 
 # ---------------------------------------------------------------------------
@@ -559,15 +578,19 @@ def build_genre_centroids(
 
     # Gutenberg classic topics mapping
     gutenberg_topics = {
-        "Victorian Novel": ["gothic fiction", "fiction"],
-        "Philosophical Fiction": ["philosophy", "fiction"],
+        "Philosophy": ["philosophy", "ethics", "philosophical fiction"],
+        "Poetry": ["poetry", "sonnets", "verse"],
+        "Tragedy": ["tragedy", "tragedies", "fatalism"],
+        "Supernatural": ["supernatural", "apparitions", "spiritualism"],
         "Mystery": ["detective", "mystery", "crime"],
         "Horror": ["horror", "gothic"],
         "Romance": ["romance", "love"],
-        "Fantasy": ["fantasy", "fairy tales"],
+        "Fantasy": ["fantasy", "fairy tales", "mythology"],
         "Sci-Fi": ["science fiction", "sci-fi"],
-        "Action / Adventure": ["adventure", "action"],
+        "Action / Adventure": ["adventure", "action", "sea stories"],
         "Comedy": ["humor", "comedy", "satire"],
+        "Historical": ["historical fiction", "history"],
+        "Drama": ["drama", "plays"],
     }
 
     # Lists for territory centroids
@@ -578,26 +601,15 @@ def build_genre_centroids(
     # Combined dictionary of texts per canonical genre
     combined: dict[str, list[str]] = {}
 
-    web_genres = {
-        "LitRPG", "Isekai", "Xianxia / Wuxia", "Urban Romance",
-        "Cozy Fantasy", "Villainess / Otome Game",
-        "Kingdom Building / Strategy", "Monster Protagonist / Evolution",
-        "Dungeon Core / Dungeon MC", "Urban Fantasy / Dungeons",
-        "Harem", "Girls Love / Boys Love"
-    }
-    trad_specific_genres = {"High Fantasy", "Hard Sci-Fi", "Modern Thriller", "Slice of Life", "Contemporary"}
-    classic_specific_genres = {"Victorian Novel", "Philosophical Fiction"}
-    common_genres = {"Mystery", "Horror", "Romance", "Fantasy", "Sci-Fi", "Action / Adventure", "Comedy"}
+    web_genres = {"Slice of Life", "Cultivation", "Isekai"}
+    classic_specific_genres = {"Philosophy", "Poetry", "Tragedy", "Supernatural"}
+    common_genres = {"Action / Adventure", "Comedy", "Drama", "Fantasy", "Horror", "Historical", "Sci-Fi", "Mystery", "Romance"}
 
     for genre in GENRE_TAG_MAP:
         if genre in web_genres:
             texts = hf_pool.get(genre, [])[:samples_per_genre]
             combined[genre] = texts
             web_texts.extend(texts)
-        elif genre in trad_specific_genres:
-            texts = hf_pool.get(genre, [])[:samples_per_genre]
-            combined[genre] = texts
-            trad_texts.extend(texts)
         elif genre in classic_specific_genres:
             # Try DB first
             texts = get_classic_texts_from_db(genre, samples_per_genre)
@@ -605,7 +617,7 @@ def build_genre_centroids(
                 needed = samples_per_genre
                 print(f"Fetching Gutenberg texts for {genre}...")
                 fetched = []
-                for topic in gutenberg_topics[genre]:
+                for topic in gutenberg_topics.get(genre, [genre.lower()]):
                     if needed <= 0:
                         break
                     f = _fetch_gutenberg_texts_by_topic(topic, genre, needed)
@@ -628,7 +640,7 @@ def build_genre_centroids(
                 needed = half
                 print(f"Fetching Gutenberg texts for Classic {genre}...")
                 fetched = []
-                for topic in gutenberg_topics[genre]:
+                for topic in gutenberg_topics.get(genre, [genre.lower()]):
                     if needed <= 0:
                         break
                     f = _fetch_gutenberg_texts_by_topic(topic, genre, needed)
@@ -665,11 +677,10 @@ def build_genre_centroids(
     # 5. Embed + compute territory centroids
     territory_centroids_list = []
     territory_samples_used = {}
-    territory_names = ["Web Novel Territory", "Traditional Fiction Territory", "Classic Literature Territory"]
+    territory_names = ["Classic Literature Territory", "Web Novel Territory"]
 
-    for name, texts in [("Web Novel Territory", web_texts),
-                        ("Traditional Fiction Territory", trad_texts),
-                        ("Classic Literature Territory", classic_texts)]:
+    for name, texts in [("Classic Literature Territory", classic_texts),
+                        ("Web Novel Territory", web_texts)]:
         print(f"Embedding {len(texts)} texts for territory '{name}'...")
         if not texts:
             print(f"[WARN] No texts for territory '{name}' — using zero vector.", file=sys.stderr)
