@@ -493,47 +493,84 @@ def compute_thematic_explicitness(text: str, lang: str = "en") -> float:
 
 def compute_subplot_diversity(text: str, doc=None, lang: str = "en") -> float:
     """
-    Computes Subplot Diversity by evaluating secondary entity co-occurrence
-    and character ensemble presence vs single-protagonist dominance.
+    Computes Subplot Diversity by:
+    1. Dividing input text into 4 equal sequential macro-windows.
+    2. Generating MiniLM embedding vectors for each window.
+    3. Calculating average adjacent cosine distance between consecutive windows.
+    4. Extracting GPE, LOC, and FAC entities via spaCy across windows.
+    5. Applying a +0.05 boost per distinct novel location introduced across window transitions.
     """
     if not text or len(text.strip()) < 100:
         return 0.0
 
-    names = []
-    if doc is not None:
-        names = [ent.text.strip().lower() for ent in doc.ents if ent.label_ in ("PERSON", "PER", "ORG", "GPE", "人名")]
+    import numpy as np
 
-    if not names:
-        if lang == "en":
-            stopwords = {
-                "the", "and", "they", "there", "this", "that", "with", "from", "when", "what",
-                "where", "then", "into", "your", "their", "some", "here", "after", "before",
-                "have", "been", "were", "would", "could", "should", "said", "about", "just",
-                "like", "than", "them", "will", "more", "also", "down", "over", "even",
-                "first", "back", "well", "only", "most", "made", "time", "very", "good", "much"
-            }
-            raw_names = re.findall(r'\b[A-Z][a-z]{2,}\b', text)
-            names = [w.lower() for w in raw_names if w.lower() not in stopwords]
-        elif lang in ("ja", "zh"):
-            names = re.findall(r'[\u4e00-\u9fff]{2,4}', text)
+    # 1. Divide input text into 4 equal sequential macro-windows
+    n = len(text)
+    w_size = n // 4
+    if w_size == 0:
+        return 0.0
 
-    if not names:
-        return 0.20
+    w0 = text[0 : w_size]
+    w1 = text[w_size : 2 * w_size]
+    w2 = text[2 * w_size : 3 * w_size]
+    w3 = text[3 * w_size :]
+    windows = [w0, w1, w2, w3]
 
-    counts = Counter(names)
-    recurring = [cnt for name, cnt in counts.items() if cnt >= 2]
+    # 2. Generate embedding vectors for each macro-window using MiniLM
+    try:
+        from kisholens.ml.build_centroids import _get_model
+        model = _get_model("all-MiniLM-L6-v2")
+        slices = [w.strip() if w.strip() else "prose text" for w in windows]
+        v_s = model.encode(slices, convert_to_numpy=True, show_progress_bar=False).astype(np.float32)
 
-    if not recurring:
-        return 0.25
+        norms = np.linalg.norm(v_s, axis=1, keepdims=True)
+        norms[norms == 0] = 1.0
+        v_s = v_s / norms
 
-    top_count = max(recurring)
-    total_recurring_mentions = sum(recurring)
+        # 3. Calculate cosine distance between consecutive windows & average adjacent distance
+        d01 = float(1.0 - np.dot(v_s[0], v_s[1]))
+        d12 = float(1.0 - np.dot(v_s[1], v_s[2]))
+        d23 = float(1.0 - np.dot(v_s[2], v_s[3]))
+        avg_adj_dist = (d01 + d12 + d23) / 3.0
+    except Exception as e:
+        print(f"Error computing MiniLM window embeddings: {e}")
+        avg_adj_dist = 0.35
 
-    primary_dominance = top_count / total_recurring_mentions
-    num_secondary_entities = len(recurring) - 1
+    # 4. Extract GPE, LOC, and FAC entities from each window using spaCy
+    window_locations = []
+    nlp_model = _nlp_en if lang == "en" else (_nlp_ja if lang == "ja" else _nlp_zh)
 
-    diversity = (1.0 - primary_dominance) * 0.65 + min(1.0, num_secondary_entities / 5.0) * 0.35
-    return float(round(max(0.05, min(1.0, diversity)), 2))
+    for win in windows:
+        locs = set()
+        if HAS_SPACY and nlp_model is not None:
+            try:
+                c_doc = nlp_model(win[:5000])
+                for ent in c_doc.ents:
+                    if ent.label_ in ("GPE", "LOC", "FAC", "地名", "施設"):
+                        locs.add(ent.text.strip().lower())
+            except Exception:
+                pass
+
+        if not locs:
+            matches = re.findall(r'\b(?:[A-Z][a-z]+\s+)?(?:Kingdom|Empire|Capital|City|Town|Village|Forest|Mountain|River|Sea|Castle|Palace|Tower|Domain|Territory)\b', win)
+            for m in matches:
+                locs.add(m.strip().lower())
+
+        window_locations.append(locs)
+
+    # 5. Track distinct novel locations introduced across window transitions (+0.05 boost per distinct shift)
+    seen_locs = set(window_locations[0])
+    distinct_location_shifts = 0
+    for i in range(1, 4):
+        new_locs = window_locations[i] - seen_locs
+        if new_locs:
+            distinct_location_shifts += len(new_locs)
+            seen_locs.update(new_locs)
+
+    location_boost = 0.05 * distinct_location_shifts
+    final_score = avg_adj_dist + location_boost
+    return float(round(max(0.0, min(1.0, final_score)), 4))
 
 
 # --- FEATURE EXTRACTION ROUTER ---
