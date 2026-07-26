@@ -2,7 +2,10 @@ import re
 import uuid
 import random
 import warnings
+import os
+import json
 from typing import Dict, Any
+from contextlib import asynccontextmanager
 
 warnings.filterwarnings("ignore", category=UserWarning, module="multiprocessing.resource_tracker")
 from fastapi import FastAPI, HTTPException, BackgroundTasks
@@ -28,8 +31,94 @@ from kisholens.ml.features import (
 )
 from kisholens.ml.semantic_match import match_semantic
 from kisholens.ml.sentiment_arc import compute_kishotenketsu_quantile_arc
+from kisholens.ml.similarity import find_top_matches
 
-app = FastAPI(title="KishoLens API")
+DATA_CACHE_PATH = "data/stats_cache.json"
+VECTOR_CACHE_PATH = "data/vector_cache.json"
+
+def _load_disk_cache():
+    if os.path.exists(DATA_CACHE_PATH):
+        try:
+            with open(DATA_CACHE_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                for k, v in data.items():
+                    _cached_novel_stats[int(k)] = v
+            print(f"[CACHE] Loaded {len(_cached_novel_stats)} pre-computed novel stats from disk cache.")
+        except Exception as e:
+            print(f"[CACHE WARN] Could not load disk cache: {e}")
+
+def _save_disk_cache():
+    try:
+        with open(DATA_CACHE_PATH, "w", encoding="utf-8") as f:
+            json.dump(_cached_novel_stats, f, ensure_ascii=False)
+    except Exception as e:
+        print(f"[CACHE WARN] Could not save disk cache: {e}")
+
+def _load_vector_disk_cache():
+    """Load pre-computed novel feature vectors into similarity._novel_vector_cache."""
+    from kisholens.ml.similarity import _novel_vector_cache
+    import numpy as np
+    if os.path.exists(VECTOR_CACHE_PATH):
+        try:
+            with open(VECTOR_CACHE_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            for k, v in data.items():
+                entry = dict(v)
+                entry["vector"] = np.array(entry["vector"], dtype=float)
+                _novel_vector_cache[int(k)] = entry
+            print(f"[CACHE] Loaded {len(_novel_vector_cache)} novel vectors from disk vector cache.")
+        except Exception as e:
+            print(f"[CACHE WARN] Could not load vector cache: {e}")
+
+def _save_novel_to_vector_cache(novel_id: int, title: str, author: str, genre: str, territory: str, feature_vec):
+    """Persist a single novel's vector to the vector cache JSON (incremental save)."""
+    from kisholens.ml.similarity import _novel_vector_cache
+    import numpy as np
+    entry = {
+        "id": novel_id,
+        "title": title,
+        "author": author or "Unknown Author",
+        "genre": genre or "",
+        "territory": territory or "Unknown",
+        "vector": feature_vec.tolist() if hasattr(feature_vec, 'tolist') else list(feature_vec),
+        "semantic": None,
+    }
+    _novel_vector_cache[novel_id] = {**entry, "vector": np.array(entry["vector"], dtype=float)}
+    # Incremental save: update only this novel's entry in the JSON file
+    try:
+        existing = {}
+        if os.path.exists(VECTOR_CACHE_PATH):
+            with open(VECTOR_CACHE_PATH, "r", encoding="utf-8") as f:
+                existing = json.load(f)
+        existing[str(novel_id)] = entry
+        with open(VECTOR_CACHE_PATH, "w", encoding="utf-8") as f:
+            json.dump(existing, f, ensure_ascii=False)
+    except Exception as e:
+        print(f"[CACHE WARN] Could not save vector cache entry: {e}")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Asynchronously pre-load PyTorch, sentence-transformers, and spaCy models at server launch."""
+    import threading
+    def _warmup():
+        try:
+            print("[WARMUP] Pre-loading spaCy, NLTK VADER, SentenceTransformers, and multi-lingual NLP pipelines...")
+            _init_nlp_resources()
+            _load_disk_cache()
+            _load_vector_disk_cache()
+            sample_en = "This is a generic prose warmup sample for initializing spaCy, VADER, and sentence transformer models."
+            extract_english_features(sample_en)
+            extract_japanese_features("これはモデルを事前ロードするためのウォームアップテキストです。")
+            extract_chinese_features("这是一个用于模型预热的文本示例。")
+            match_semantic(sample_en)
+            compute_kishotenketsu_quantile_arc([sample_en, "The story reaches a climax.", "All conflicts are resolved."], lang="en")
+            print("[WARMUP] All NLP models & pipeline engines successfully pre-loaded in background! Ready for any novel or custom input.")
+        except Exception as e:
+            print(f"[WARMUP WARN] {e}")
+    threading.Thread(target=_warmup, daemon=True).start()
+    yield
+
+app = FastAPI(title="KishoLens API", lifespan=lifespan)
 
 # Add CORS middleware so the Astro frontend can fetch data
 app.add_middleware(
@@ -78,6 +167,48 @@ def get_novels():
         )
 
 
+@app.get("/api/db/stats")
+def get_db_stats():
+    """Returns database overview statistics including total novels, source counts, territory counts, and genre breakdown."""
+    try:
+        with Session(engine) as session:
+            novels = session.exec(select(Novel)).all()
+            total_novels = len(novels)
+
+            by_source = {}
+            by_territory = {}
+            by_genre = {}
+
+            genres_list = [
+                "Action / Adventure", "Comedy", "Drama", "Fantasy", "Horror",
+                "Historical", "Sci-Fi", "Philosophy", "Mystery", "Tragedy",
+                "Supernatural", "Poetry", "Romance", "Slice of Life",
+                "Cultivation", "Isekai", "Progression Fantasy"
+            ]
+            for g in genres_list:
+                by_genre[g] = 0
+
+            for novel in novels:
+                raw_src = novel.source or "unknown"
+                src = raw_src.split("/")[0].lower() if "/" in raw_src else raw_src.lower()
+                by_source[src] = by_source.get(src, 0) + 1
+
+                terr = novel.territory or ("Classic Literature Territory" if src == "gutenberg" else "Web Novel Territory")
+                by_territory[terr] = by_territory.get(terr, 0) + 1
+
+                n_g = (novel.genre or "").lower()
+                for g in genres_list:
+                    if g.lower() in n_g:
+                        by_genre[g] += 1
+
+            return {
+                "total_novels": total_novels,
+                "by_source": by_source,
+                "by_territory": by_territory,
+                "by_genre": by_genre
+            }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/novels/{novel_id}")
@@ -285,7 +416,7 @@ def get_novel_stats(novel_id: int):
                 text_end = ch_end.text_en or ch_end.text_ja or getattr(ch_end, "text_zh", "") or ""
                 text = text_beg + "\n\n" + text_mid + "\n\n" + text_end
 
-            semantic = match_semantic(text) if text else None
+            semantic = match_semantic(text, title=novel.title, synopsis=getattr(novel, "synopsis", None)) if text else None
 
             if agg:
                 # Detect language dynamically for baselines
@@ -305,16 +436,34 @@ def get_novel_stats(novel_id: int):
                         "territory": semantic["territory"],
                         "confidence": semantic["genre_confidence"],
                         "top_genres": [{"genre": x["genre"], "confidence": x["score"]} for x in semantic["genre_scores"][:3]],
-                        "top_territories": [{"territory": x["territory"], "confidence": x["score"]} for x in semantic["territory_scores"][:3]]
+                        "top_territories": [{"territory": x["territory"], "confidence": x["score"]} for x in semantic["territory_scores"][:2]]
                     }
                 else:
                     agg["archetype_match"] = {
                         "closest_trope": novel.genre or "Unknown",
                         "territory": novel.territory or "Unknown",
-                        "confidence": 0.85
+                        "confidence": 0.75,
+                        "top_genres": [{"genre": novel.genre, "confidence": 0.75}] if novel.genre else [],
+                        "top_territories": [{"territory": novel.territory, "confidence": 0.75}] if novel.territory else []
                     }
 
+                # Compute top 3 nearest neighbor matching novels from database
+                from kisholens.ml.similarity import extract_feature_vector
+                import numpy as np
+                feat_vec = extract_feature_vector(agg)
+                # Pre-populate the vector cache so future find_top_matches calls skip NLP recompute
+                _save_novel_to_vector_cache(
+                    novel_id=novel_id,
+                    title=novel.title,
+                    author=novel.author or "",
+                    genre=novel.genre or "",
+                    territory=novel.territory or "Unknown",
+                    feature_vec=feat_vec,
+                )
+                agg["top_matches"] = find_top_matches(agg, exclude_novel_id=novel_id, top_k=3)
+
             _cached_novel_stats[novel_id] = agg
+            _save_disk_cache()
             return agg
     except Exception as e:
         if isinstance(e, HTTPException):
@@ -333,11 +482,17 @@ def compute_4act_peak_arc(all_sentences: list[str], lang: str) -> list[dict]:
     return arc_res["acts"]
 
 
+_cached_novel_arcs: Dict[int, Any] = {}
+
 @app.get("/api/novels/{novel_id}/arc")
 def get_novel_arc(novel_id: int):
     """
-    Computes the 4-act Kishōtenketsu sentiment arc for a novel.
+    Computes the 4-act Kishōtenketsu sentiment arc for a novel with in-memory caching.
     """
+    global _cached_novel_arcs
+    if novel_id in _cached_novel_arcs:
+        return _cached_novel_arcs[novel_id]
+
     try:
         with Session(engine) as session:
             novel = session.get(Novel, novel_id)
@@ -380,13 +535,15 @@ def get_novel_arc(novel_id: int):
 
         arc_res = compute_kishotenketsu_quantile_arc(all_sentences, lang)
 
-        return {
+        arc_data = {
             "novel_id": novel_id,
             "title": novel.title,
             "acts": arc_res["acts"],
             "quantiles": arc_res["quantiles"],
             "baselines": compute_dynamic_baselines(lang)["arc"]
         }
+        _cached_novel_arcs[novel_id] = arc_data
+        return arc_data
 
     except Exception as e:
         if isinstance(e, HTTPException):
@@ -877,7 +1034,8 @@ def post_analyze(request: AnalysisRequest):
             }
         },
         "stats": agg,
-        "arc": arc
+        "arc": arc,
+        "top_matches": find_top_matches(agg, query_text=request.text, top_k=3)
     }
     if semantic is not None:
         response["semantic"] = semantic
