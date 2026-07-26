@@ -493,45 +493,47 @@ def compute_thematic_explicitness(text: str, lang: str = "en") -> float:
 
 def compute_subplot_diversity(text: str, doc=None, lang: str = "en") -> float:
     """
-    Task 6: Subplot Diversity using Entity Co-occurrence Windowing.
-    Extracts top 3 active cast members across 10 chapter chunks and computes unique active cast ratio.
+    Computes Subplot Diversity by evaluating secondary entity co-occurrence
+    and character ensemble presence vs single-protagonist dominance.
     """
-    if not text:
+    if not text or len(text.strip()) < 100:
         return 0.0
-        
-    num_chunks = 10
-    chunk_size = len(text) // num_chunks
-    if chunk_size == 0:
-        return 0.0
-        
-    chunks = [text[i * chunk_size : (i + 1) * chunk_size] for i in range(num_chunks)]
-    active_casts = []
-    
-    for chunk in chunks:
-        names = []
-        if HAS_SPACY and (lang == "en" and _nlp_en or lang == "ja" and _nlp_ja or lang == "zh" and _nlp_zh):
-            nlp_model = _nlp_en if lang == "en" else (_nlp_ja if lang == "ja" else _nlp_zh)
-            if nlp_model:
-                try:
-                    c_doc = nlp_model(chunk[:3000])
-                    names = [ent.text.strip().lower() for ent in c_doc.ents if ent.label_ in ("PERSON", "PER", "人名")]
-                except Exception:
-                    pass
-        if not names:
-            if lang == "en":
-                names = [w.lower() for w in re.findall(r'\b[A-Z][a-z]{2,}\b', chunk) if w.lower() not in ("the", "and", "they", "there", "this", "that", "with", "from", "when", "what", "where", "then", "into", "your", "their", "some", "here")]
-            else:
-                names = [w for w in re.findall(r'[\u4e00-\u9fff]{2,4}', chunk) if any(sur in w for sur in ["李", "张", "王", "刘", "陈", "杨", "赵", "黄", "周", "吴", "徐", "孙", "佐藤", "鈴木", "高橋", "田中", "渡辺", "伊藤", "关羽", "刘备", "曹操", "诸葛亮", "孙权"])]
-                
-        if names:
-            top_3 = [pair[0] for pair in Counter(names).most_common(3)]
-            active_casts.append(tuple(sorted(top_3)))
-        else:
-            active_casts.append(("default",))
-            
-    unique_casts_count = len(set(active_casts))
-    diversity_score = (unique_casts_count - 1) / 9.0
-    return float(max(0.0, min(1.0, diversity_score)))
+
+    names = []
+    if doc is not None:
+        names = [ent.text.strip().lower() for ent in doc.ents if ent.label_ in ("PERSON", "PER", "ORG", "GPE", "人名")]
+
+    if not names:
+        if lang == "en":
+            stopwords = {
+                "the", "and", "they", "there", "this", "that", "with", "from", "when", "what",
+                "where", "then", "into", "your", "their", "some", "here", "after", "before",
+                "have", "been", "were", "would", "could", "should", "said", "about", "just",
+                "like", "than", "them", "will", "more", "also", "down", "over", "even",
+                "first", "back", "well", "only", "most", "made", "time", "very", "good", "much"
+            }
+            raw_names = re.findall(r'\b[A-Z][a-z]{2,}\b', text)
+            names = [w.lower() for w in raw_names if w.lower() not in stopwords]
+        elif lang in ("ja", "zh"):
+            names = re.findall(r'[\u4e00-\u9fff]{2,4}', text)
+
+    if not names:
+        return 0.20
+
+    counts = Counter(names)
+    recurring = [cnt for name, cnt in counts.items() if cnt >= 2]
+
+    if not recurring:
+        return 0.25
+
+    top_count = max(recurring)
+    total_recurring_mentions = sum(recurring)
+
+    primary_dominance = top_count / total_recurring_mentions
+    num_secondary_entities = len(recurring) - 1
+
+    diversity = (1.0 - primary_dominance) * 0.65 + min(1.0, num_secondary_entities / 5.0) * 0.35
+    return float(round(max(0.05, min(1.0, diversity)), 2))
 
 
 # --- FEATURE EXTRACTION ROUTER ---
