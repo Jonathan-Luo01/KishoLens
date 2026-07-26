@@ -57,9 +57,9 @@ def _get_or_create_novel(session: Session, title: str, author: str, source: str,
             if updated:
                 session.add(existing_novel)
                 session.commit()
-            cache[novel_key] = existing_novel.id
         else:
-            novel = Novel(title=title, author=author, source=source, genre=genre, territory=territory)
+            default_territory = territory or ("Classic Literature Territory" if source.lower() == "gutenberg" else "Web Novel Territory")
+            novel = Novel(title=title, author=author, source=source, genre=genre, territory=default_territory)
             session.add(novel)
             session.commit()
             session.refresh(novel)
@@ -81,8 +81,11 @@ def run_etl(dataset_name: str, num_records: int = 20, max_chapters: int = 12, on
             book_id = dataset_name.split("/")[1]
             print(f"\nDownloading Gutenberg book ID: {book_id}...")
             raw_text = download_gutenberg(book_id)
-            series_title, author, chapters = parse_gutenberg(raw_text)
+            series_title, author, raw_tags, chapters = parse_gutenberg(raw_text)
             source = "gutenberg"
+            detected_genre = consolidate_genre(raw_tags)
+            final_genre = genre or detected_genre or "Drama"
+            final_territory = territory or "Classic Literature Territory"
             
             with Session(engine) as session:
                 if only_existing:
@@ -94,7 +97,7 @@ def run_etl(dataset_name: str, num_records: int = 20, max_chapters: int = 12, on
 
                 novel_id = _get_or_create_novel(
                     session, series_title, author, source, novels_cache,
-                    genre=genre, territory=territory
+                    genre=final_genre, territory=final_territory
                 )
                 
                 ch_count = session.exec(select(func.count(Chapter.id)).where(Chapter.novel_id == novel_id)).one()
@@ -284,25 +287,57 @@ def verify_pipeline():
         for genre, count in sorted(res_genre, key=lambda x: x[1], reverse=True):
             print(f"  - {genre or 'Unclassified'}: {count} novels")
 
+DATASET_ALIASES = {
+    "syosetu": "NilanE/ParallelFiction-Ja_En-100k",
+    "parallelfiction": "NilanE/ParallelFiction-Ja_En-100k",
+    "parallel-fiction": "NilanE/ParallelFiction-Ja_En-100k",
+    "scribblehub": "botp/RyokoAI_ScribbleHub17K",
+    "royalroad": "OmniAICreator/RoyalRoad-1.61M",
+    "cnnovel": "botp/RyokoAI_CNNovel125K",
+}
+
 def main():
     if hasattr(sys.stdout, 'reconfigure'):
         sys.stdout.reconfigure(encoding='utf-8')
     if hasattr(sys.stderr, 'reconfigure'):
         sys.stderr.reconfigure(encoding='utf-8')
-        
+
+    import argparse
+    parser = argparse.ArgumentParser(description="Generic KishoLens Dataset Ingestion Pipeline")
+    parser.add_argument("--dataset", type=str, help="Dataset name or alias (e.g. syosetu, scribblehub, royalroad, cnnovel, gutenberg/1234)")
+    parser.add_argument("--count", type=int, default=20, help="Number of records/novels to ingest")
+    parser.add_argument("--genre", type=str, help="Optional genre filter/assignment")
+    parser.add_argument("--rebuild-centroids", action="store_true", help="Rebuild ML centroids after ingestion")
+    args = parser.parse_args()
+
+    if args.dataset:
+        ds_name = DATASET_ALIASES.get(args.dataset.lower(), args.dataset)
+        print(f"\nIngesting dataset '{ds_name}' (Target count: {args.count})...")
+        run_etl(ds_name, num_records=args.count, max_chapters=5, genre=args.genre)
+        if args.rebuild_centroids:
+            import os
+            os.system("uv run python scratch/build_centroids_db.py")
+        sys.stdout.flush()
+        sys.stderr.flush()
+        os._exit(0)
+
     engine = get_engine()
     
-    # 1. Ingest Gutenberg Books for Classic Literature Territory
-    print("\n--- Ingesting Gutenberg Books for Classic Literature Territory (Stratified Sampling) ---")
+    # 1. Ingest Classic Gutenberg Books for Classic Literature Territory
     classic_genres_topics = {
-        "Victorian Novel": "gothic fiction",
-        "Philosophical Fiction": "philosophy",
-        "Mystery": "detective",
-        "Horror": "horror",
-        "Romance": "romance",
-        "Sci-Fi": "science fiction",
         "Action / Adventure": "adventure",
-        "Comedy": "humor"
+        "Comedy": "humor",
+        "Drama": "plays",
+        "Fantasy": "fairy tales",
+        "Horror": "horror",
+        "Historical": "history",
+        "Sci-Fi": "science fiction",
+        "Philosophy": "philosophy",
+        "Mystery": "detective",
+        "Tragedy": "tragedy",
+        "Supernatural": "gothic fiction",
+        "Poetry": "poetry",
+        "Romance": "romance",
     }
     
     for genre, topic in classic_genres_topics.items():
@@ -324,10 +359,9 @@ def main():
     # 2. Ingest Web Novels for Web/Traditional Territories
     print("\n--- Ingesting Web Novels for Web/Traditional Territories (Stratified Sampling) ---")
     web_and_trad_genres = {
-        "LitRPG", "Isekai", "Xianxia / Wuxia", "Urban Romance", "Cozy Fantasy",
-        "Slice of Life / Contemporary", "Villainess / Otome Game", "Kingdom Building / Strategy",
-        "Monster Protagonist / Evolution", "Dungeon Core / Dungeon MC", "Urban Fantasy / Dungeons",
-        "Harem", "Girls Love / Boys Love", "High Fantasy", "Hard Sci-Fi", "Modern Thriller"
+        "Action / Adventure", "Comedy", "Romance", "Drama", "Fantasy",
+        "Horror", "Historical", "Sci-Fi", "Slice of Life", "Cultivation",
+        "Tragedy", "Isekai", "Supernatural"
     }
     
     # Count current books per genre in database
@@ -393,7 +427,7 @@ def main():
                                 author=author,
                                 source=source_type,
                                 genre=genre,
-                                territory=GENRE_TERRITORIES.get(genre, "Web Novel Territory")
+                                territory="Classic Literature Territory" if source_type.lower() == "gutenberg" else "Web Novel Territory"
                             )
                             session.add(novel)
                             session.commit()
