@@ -72,10 +72,11 @@ COMMON_GENRES = {
     ],
     "Sci-Fi": [
         "science fiction", "sci-fi", "sci fi", "mecha", "time travel", "space voyages",
-        "space flight", "dystopias", "dystopian", "precursors of science fiction", "imaginary voyages",
-        "cyberpunk", "post-apocalyptic", "interstellar", "vrmmo", "space opera",
-        "galactic empire", "futuristic", "hard sci-fi", "hard-sci-fi", "future", "future life",
-        "technology", "invention", "robot", "cyborg", "space", "outer space", "aliens",
+        "space flight", "dystopias", "dystopian", "precursors of science fiction",
+        "cyberpunk", "post-apocalyptic", "interstellar", "space opera",
+        "galactic empire", "futuristic", "hard sci-fi", "hard-sci-fi",
+        "futuristic technology", "advanced technology", "robot", "cyborg",
+        "outer space", "space exploration", "space station", "spacecraft", "aliens", "android",
     ],
     "Philosophy": [
         "philosophical fiction", "philosophical", "philosophy", "utilitarianism",
