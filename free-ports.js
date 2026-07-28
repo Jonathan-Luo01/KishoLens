@@ -15,4 +15,7 @@ function freePorts() {
 }
 
 freePorts();
-console.log('✓ Ports 8000 and 4321 verified free.');
+console.log('\x1b[32m✓ Ports 8000 and 4321 verified free.\x1b[0m');
+console.log('\n\x1b[36m🚀 KishoLens Dev Environment Starting:\x1b[0m');
+console.log('  \x1b[1m│\x1b[0m 🎨 \x1b[35mFrontend UI:\x1b[0m  \x1b[4mhttp://localhost:4321\x1b[0m');
+console.log('  \x1b[1m│\x1b[0m ⚡ \x1b[33mBackend API:\x1b[0m  \x1b[4mhttp://127.0.0.1:8000\x1b[0m\n');
