@@ -66,9 +66,9 @@ COMMON_GENRES = {
     ],
     "Historical": [
         "historical fiction", "historical", "regency fiction", "victorian",
-        "victorian novel", "19th century", "history", "biographical fiction",
-        "war stories", "middle ages", "ancient china", "palace court", "royalty",
-        "historical romance", "historical politics",
+        "victorian novel", "19th century", "18th century", "biographical fiction",
+        "middle ages", "ancient china", "palace court", "historical romance",
+        "historical politics", "three kingdoms", "edo period", "sengoku",
     ],
     "Sci-Fi": [
         "science fiction", "sci-fi", "sci fi", "mecha", "time travel", "space voyages",
