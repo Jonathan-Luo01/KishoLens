@@ -73,7 +73,7 @@ COMMON_GENRES = {
     "Sci-Fi": [
         "science fiction", "sci-fi", "sci fi", "mecha", "time travel", "space voyages",
         "space flight", "dystopias", "dystopian", "precursors of science fiction",
-        "cyberpunk", "post-apocalyptic", "interstellar", "space opera",
+        "cyberpunk", "post-apocalyptic", "interstellar", "vrmmo", "space opera",
         "galactic empire", "futuristic", "hard sci-fi", "hard-sci-fi",
         "futuristic technology", "advanced technology", "robot", "cyborg",
         "outer space", "space exploration", "space station", "spacecraft", "aliens", "android",
@@ -110,9 +110,11 @@ COMMON_GENRES = {
         "village life", "gardening", "ranching", "peaceful life", "baking", "housework",
     ],
     "Cultivation": [
-        "cultivation", "cultivator", "cultivate", "xianxia", "xuanhuan", "wuxia", "qi", "dao", "dantian",
-        "alchemy", "immortal", "immortality", "sects", "sect", "realm breakthrough", "eastern fantasy",
-        "daoist", "golden core", "foundation building", "internal energy",
+        "xianxia", "xuanhuan", "wuxia", "cultivator", "immortal cultivation", "qi cultivation",
+        "cultivation world", "cultivation novel", "cultivation system", "cultivation method",
+        "qi", "dantian", "immortal", "immortals", "immortality", "sects", "sect", "realm breakthrough",
+        "eastern fantasy", "daoist", "golden core", "foundation building", "internal energy",
+        "dao", "tao", "tribulation", "spirit stones", "martial peak", "douluo", "peerless cultivator",
     ],
     "Isekai": [
         "isekai", "portal fantasy", "portal-fantasy", "reincarnation", "reincarnated", "reincarnate",
