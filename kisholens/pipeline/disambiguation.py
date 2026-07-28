@@ -4,22 +4,26 @@ from typing import List, Dict, Any, Optional
 # --- HORROR ---
 MONSTER_ENTITY_MARKERS = [
     "skeleton", "demon lord", "demon king", "vampire", "ghost", "lich",
-    "undead", "necromancer", "zombie", "monster", "creature", "fiend", "spectre"
+    "undead", "necromancer", "zombie", "monster", "creature", "fiend", "spectre",
+    "骷髅", "魔王", "吸血鬼", "幽灵", "僵尸", "怪兽", "怪物", "魔兽"
 ]
 FEAR_ATMOSPHERE_MARKERS = [
     "dread", "spine-chilling", "grotesque", "horrifying", "unspeakable horror",
     "terror", "chilling", "uncanny", "creeping fear", "mutilated", "macabre",
-    "gruesome", "eldritch", "terrifying", "horror", "fear", "gothic"
+    "gruesome", "eldritch", "terrifying", "horror", "fear", "gothic",
+    "恐怖", "惊悚", "灵异", "鬼怪", "凶宅", "阴尸", "诡异"
 ]
 
 # --- SCI-FI ---
 PURE_SCIFI_MARKERS = [
     "spaceship", "cyberpunk", "interstellar", "alien", "galactic empire",
-    "dystopia", "starship", "quantum", "nanite", "android", "warp drive"
+    "dystopia", "starship", "quantum", "nanite", "android", "warp drive",
+    "星际", "末世", "机甲", "科幻", "赛博朋克", "太空", "战舰"
 ]
 SYSTEM_INTERFACE_MARKERS = [
     "status window", "level up", "stat point", "vrmmo", "system notification",
-    "skill point", "dungeon", "quest log", "inventory slot"
+    "skill point", "dungeon", "quest log", "inventory slot",
+    "系统", "加点", "属性面板", "任务日志", "面板"
 ]
 
 # --- CULTIVATION ---
@@ -32,7 +36,11 @@ CULTIVATION_CORE_MARKERS = [
     "young master of the clan", "young master of the sect", "yin", "yang",
     "escort agency", "internal energy", "acupoint", "bottleneck", "impurities",
     "nascent soul", "ginseng", "spirit stone", "jade slip", "heavenly tribulation",
-    "xianxia", "wuxia", "xuanhuan", "eastern fantasy"
+    "xianxia", "wuxia", "xuanhuan", "eastern fantasy",
+    "修仙", "仙侠", "修真", "玄幻", "武侠", "功法", "宗门", "丹药", "金丹", "元婴",
+    "道士", "灵石", "神通", "渡劫", "掌门", "仙尊", "仙帝", "洪荒", "大罗", "炼丹",
+    "飞升", "剑仙", "道尊", "神尊", "魔尊", "妖帝", "法宝", "筑基", "炼气", "真仙",
+    "天劫", "老祖", "洞府", "神功", "心法", "灵气", "突破", "成仙"
 ]
 
 # --- PROGRESSION & ISEKAI ---
@@ -40,7 +48,8 @@ PROGRESSION_ISEKAI_MARKERS = [
     "reincarnation", "reincarnated", "reincarnate", "transmigration",
     "transmigrated", "transmigrate", "another world", "other world",
     "different world", "summoned hero", "summoned", "truck-kun", "reborn",
-    "isekai", "tensei"
+    "isekai", "tensei",
+    "穿越", "重生", "转生", "穿书", "快穿", "异界", "异世", "魂穿"
 ]
 
 
@@ -160,7 +169,7 @@ def disambiguate_and_rank_genres(
         )
 
         has_explicit_cultivation_tag = any(
-            t in (tags_str or "").lower() for t in ["cultivation", "xianxia", "wuxia", "xuanhuan"]
+            t in (tags_str or "").lower() for t in ["cultivation", "xianxia", "wuxia", "xuanhuan", "修仙", "仙侠", "修真", "玄幻", "武侠"]
         )
 
         if cultivation_count >= 3:
@@ -168,13 +177,13 @@ def disambiguate_and_rank_genres(
             boosts.append(f"Cultivation Boost (+1.50): {cultivation_count} core cultivation markers found.")
             # Promote Cultivation to Primary Genre above generic Action / Fantasy
             scores["Cultivation"] = max(scores["Cultivation"], scores.get("Fantasy", 0.0) + 0.50, scores.get("Action / Adventure", 0.0) + 0.50)
-            if isekai_count >= 3 or "isekai" in (tags_str or "").lower():
+            if isekai_count >= 3 or any(k in (tags_str or "").lower() for k in ["isekai", "穿越", "重生"]):
                 # Hierarchy Rule: Cultivation as Parent Genre, Isekai as Secondary Subgenre
                 scores["Isekai"] = max(scores.get("Isekai", 0.0), scores.get("Fantasy", 0.0) + 0.25)
-        elif has_explicit_cultivation_tag:
+        elif has_explicit_cultivation_tag or cultivation_count >= 1:
             scores["Cultivation"] += 1.0
-        else:
-            # Zero out Cultivation for isolated occurrences without explicit tags or >= 3 markers
+        elif scores.get("Cultivation", 0.0) < 1.0:
+            # Zero out Cultivation only for isolated weak occurrences without explicit tags or markers
             scores["Cultivation"] = 0.0
 
         if not is_chinese_novel and scores.get("Cultivation", 0.0) > 0.0:
