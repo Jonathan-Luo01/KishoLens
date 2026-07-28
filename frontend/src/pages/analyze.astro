@@ -852,74 +852,13 @@ import "../styles/global.css";
           </div>
 
           <!-- State 3: Success -->
-          <div id="results-container">
-            <!-- Archetype Card -->
-            <div class="archetype-banner">
-              <div class="archetype-title-row">
-                <span class="archetype-name" id="result-archetype">Suspenseful Pacing</span>
-                <span class="archetype-confidence" id="result-confidence">Match: 82%</span>
-              </div>
-              <p class="archetype-description" id="result-description">
-                Fast pacing, low descriptive complexity, high dialogue ratio. Focuses heavily on action-beats.
-              </p>
-            </div>
+          <div id="results-container"></div>
 
-            <!-- Metrics Cards Grid -->
-            <div class="metric-grid">
-              <div class="metric-card">
-                <span class="metric-label">Language Used</span>
-                <span class="metric-value" style="color: var(--color-accent-2);" id="metric-lang">English</span>
-              </div>
-              <div class="metric-card">
-                <span class="metric-label">Vocabulary Richness</span>
-                <span class="metric-value" id="metric-ttr">0.00%</span>
-                <span style="font-size: 0.75rem; color: var(--color-muted);">Type-Token Ratio</span>
-                <div class="progress-bar-container">
-                  <div class="progress-bar-fill" id="ttr-progress"></div>
-                </div>
-                <div class="baseline-comparison">
-                  <span>Classic Lit: <strong id="ttr-gutenberg-val">0.0%</strong></span>
-                  <span>Web Novel: <strong id="ttr-webnovel-val">0.0%</strong></span>
-                </div>
-              </div>
-              <div class="metric-card">
-                <span class="metric-label">Dialogue Ratio</span>
-                <span class="metric-value" id="metric-dialogue">0.0%</span>
-                <span style="font-size: 0.75rem; color: var(--color-muted);">Spoken vs. Exposition</span>
-                <div class="progress-bar-container">
-                  <div class="progress-bar-fill" id="dialogue-progress"></div>
-                </div>
-                <div class="baseline-comparison">
-                  <span>Classic Lit: <strong id="dialogue-gutenberg-val">0.0%</strong></span>
-                  <span>Web Novel: <strong id="dialogue-webnovel-val">0.0%</strong></span>
-                </div>
-              </div>
-              <div class="metric-card">
-                <span class="metric-label">Avg Sentence Length</span>
-                <span class="metric-value" id="metric-sent-len">0.0 words</span>
-                <div class="baseline-comparison" style="margin-top: 0.5rem; border-top: 1px solid rgba(255, 255, 255, 0.03); padding-top: 0.3rem;">
-                  <span>Classic Lit: <strong id="sent-gutenberg-val">0.0w</strong></span>
-                  <span>Web Novel: <strong id="sent-webnovel-val">0.0w</strong></span>
-                </div>
-              </div>
-              <div class="metric-card">
-                <span class="metric-label">Sentence Count</span>
-                <span class="metric-value" id="metric-sent-count">0</span>
-              </div>
-              <div class="metric-card">
-                <span class="metric-label">Word Count</span>
-                <span class="metric-value" id="metric-word-count">0</span>
-                <span style="font-size: 0.75rem; color: var(--color-muted);">Parsed by NLP engine</span>
-              </div>
-            </div>
-
-            <!-- Dashboard Link Action -->
-            <div id="visualize-link-container" style="margin-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 1.5rem; text-align: center; display: none;">
-              <a id="btn-visualize-link" href="#" class="btn btn--primary" style="display: inline-block; width: 100%; text-decoration: none; text-align: center;">
-                Visualize Stylistic & Pacing Signatures →
-              </a>
-            </div>
-
+          <!-- Dashboard Link Action -->
+          <div id="visualize-link-container" style="margin-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 1.5rem; text-align: center; display: none;">
+            <a id="btn-visualize-link" href="#" class="btn btn--primary" style="display: inline-block; width: 100%; text-decoration: none; text-align: center;">
+              Visualize Stylistic & Pacing Signatures →
+            </a>
           </div>
         </div>
       </div>
@@ -1065,8 +1004,13 @@ import "../styles/global.css";
 
           sessionStorage.setItem("custom_analysis", JSON.stringify(data));
           const linkBtn = document.getElementById("btn-visualize-link");
-linkBtn.href = `/library?novelId=custom`;
-          document.getElementById("visualize-link-container").style.display = "block";
+          if (linkBtn) {
+            linkBtn.href = `/library?novelId=custom`;
+          }
+          const linkContainer = document.getElementById("visualize-link-container");
+          if (linkContainer) {
+            linkContainer.style.display = "block";
+          }
         } catch (err) {
           loadingState.style.display = "none";
           errorBox.textContent = `Analysis error: ${err.message}`;
