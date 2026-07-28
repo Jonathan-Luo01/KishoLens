@@ -27,8 +27,9 @@ import "../styles/global.css";
           Kish<span class="brand-accent">o</span>Lens
         </a>
         <nav class="header-nav">
-          <a href="/analyze" class="nav-item">Analyze</a>
-          <a href="/library" class="nav-item">Library Database</a>
+          <a href="/" class="nav-item active">Home</a>
+          <a href="/analyze" class="nav-item">Analyze Prose</a>
+          <a href="/library" class="nav-item">Library Explorer</a>
           <a href="#capabilities" class="nav-item">Capabilities</a>
         </nav>
         <div class="header-cta">
@@ -93,6 +94,13 @@ import "../styles/global.css";
               <span class="pill-lbl">Territory Match</span>
               <span id="metric-territory" class="pill-val color-pink">Web Novel Territory</span>
             </div>
+          </div>
+
+          <!-- Reader Action Link to Analyze Page -->
+          <div class="reader-action-row">
+            <a id="btn-open-in-analyzer" href="/analyze?text=%22The%20spiritual%20energy%20of%20the%20golden%20core%20surged%20through%20his%20meridians%20as%20the%20ancient%20Daoist%20inscription%20glowed.%20He%20broke%20through%20the%20bottleneck%20of%20the%20Nascent%20Soul%20stage%20in%20a%20burst%20of%20celestial%20light.%22" class="btn btn-sm btn-accent">
+              Analyze This Excerpt in Tool &rarr;
+            </a>
           </div>
         </div>
       </section>
@@ -196,6 +204,7 @@ import "../styles/global.css";
         const dialogueEl = document.getElementById("metric-dialogue");
         const ttrEl = document.getElementById("metric-ttr");
         const territoryEl = document.getElementById("metric-territory");
+        const actionBtn = document.getElementById("btn-open-in-analyzer");
 
         tabs.forEach((tab) => {
           tab.addEventListener("click", () => {
@@ -215,6 +224,7 @@ import "../styles/global.css";
               if (dialogueEl) dialogueEl.textContent = sample.dialogue;
               if (ttrEl) ttrEl.textContent = sample.ttr;
               if (territoryEl) territoryEl.textContent = sample.territory;
+              if (actionBtn) actionBtn.href = `/analyze?text=${encodeURIComponent(sample.text)}`;
             }
           });
         });
@@ -501,6 +511,14 @@ import "../styles/global.css";
   .color-cyan { color: #38bdf8; }
   .color-emerald { color: #34d399; }
   .color-pink { color: #f472b6; }
+
+  .reader-action-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--border-line);
+  }
 
   /* Capabilities Grid */
   .capabilities-section {

@@ -820,8 +820,9 @@ import "../styles/global.css";
       <header>
         <a href="/" class="brand-title">Kish<span>o</span>Lens</a>
         <nav style="display:flex;gap:1.5rem;align-items:center;">
+          <a href="/" style="color:rgba(255,255,255,0.45);text-decoration:none;font-size:0.9rem;font-weight:500;">Home</a>
           <a href="/analyze" style="color:var(--color-accent);text-decoration:none;font-size:0.9rem;font-weight:500;">Analyze Prose</a>
-          <a href="/library" style="color:rgba(255,255,255,0.45);text-decoration:none;font-size:0.9rem;font-weight:500;">Library</a>
+          <a href="/library" style="color:rgba(255,255,255,0.45);text-decoration:none;font-size:0.9rem;font-weight:500;">Library Explorer</a>
         </nav>
       </header>
 
@@ -986,6 +987,14 @@ import "../styles/global.css";
         const words = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
         wordCounter.textContent = `${words} words`;
       });
+
+      // Pre-fill text if passed via URL parameter (e.g. from homepage reader widget)
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlText = urlParams.get("text");
+      if (urlText && textarea) {
+        textarea.value = urlText;
+        textarea.dispatchEvent(new Event("input"));
+      }
 
       // 2. Submit form to API
       form.addEventListener("submit", async (e) => {
