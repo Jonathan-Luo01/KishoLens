@@ -42,9 +42,11 @@ def extract_features(text: str, lang: str = "en"):
 
 
 def _get_or_create_novel(session: Session, title: str, author: str, source: str, cache: dict, genre: Optional[str] = None, territory: Optional[str] = None) -> int:
-    novel_key = (title, author)
+    clean_title = (title or "").strip()
+    clean_author = (author or "").strip()
+    novel_key = (clean_title, clean_author)
     if novel_key not in cache:
-        statement = select(Novel).where(Novel.title == title, Novel.author == author)
+        statement = select(Novel).where(func.lower(func.trim(Novel.title)) == clean_title.lower(), func.lower(func.trim(Novel.author)) == clean_author.lower())
         existing_novel = session.exec(statement).first()
         if existing_novel:
             updated = False
@@ -57,14 +59,15 @@ def _get_or_create_novel(session: Session, title: str, author: str, source: str,
             if updated:
                 session.add(existing_novel)
                 session.commit()
+            cache[novel_key] = existing_novel.id
         else:
             default_territory = territory or ("Classic Literature Territory" if source.lower() == "gutenberg" else "Web Novel Territory")
-            novel = Novel(title=title, author=author, source=source, genre=genre, territory=default_territory)
+            novel = Novel(title=clean_title, author=clean_author, source=source, genre=genre, territory=default_territory)
             session.add(novel)
             session.commit()
             session.refresh(novel)
             cache[novel_key] = novel.id
-            print(f"Added Novel: '{title}' by {author} (ID: {novel.id}, Genre: {genre}, Territory: {territory})")
+            print(f"Added Novel: '{clean_title}' by {clean_author} (ID: {novel.id}, Genre: {genre}, Territory: {territory})")
     return cache[novel_key]
 
 def run_etl(dataset_name: str, num_records: int = 20, max_chapters: int = 12, only_existing: bool = False, genre: Optional[str] = None, territory: Optional[str] = None):
