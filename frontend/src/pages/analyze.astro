@@ -356,6 +356,144 @@ import "../styles/global.css";
         min-height: 1.2em;
       }
 
+      /* Doppelgängers / Similar Novels Card Styles */
+      .doppelganger-card {
+        background: #0f172a;
+        padding: 24px;
+        border-radius: 16px;
+        border: 1px solid #1e293b;
+        display: flex;
+        flex-direction: column;
+        grid-column: 1 / -1;
+      }
+
+      .doppelganger-title {
+        margin: 0 0 4px 0;
+        font-family: 'Outfit', sans-serif;
+        font-size: 18px;
+        font-weight: 600;
+        color: #f8fafc;
+      }
+
+      .doppelganger-subtitle {
+        color: #64748b;
+        font-size: 13px;
+        margin: 0 0 20px 0;
+        line-height: 1.4;
+      }
+
+      .doppelganger-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      :global(.doppelganger-item) {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        background: #020617;
+        padding: 16px;
+        border-radius: 12px;
+        border: 1px solid #1e293b;
+        transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+        cursor: pointer;
+      }
+
+      :global(.doppelganger-item):hover {
+        transform: translateX(4px);
+        border-color: #334155;
+        background: #090d1e;
+      }
+
+      :global(.doppelganger-left) {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex: 1;
+        min-width: 0;
+      }
+
+      :global(.doppelganger-rank) {
+        color: #475569;
+        font-size: 18px;
+        font-weight: bold;
+        font-variant-numeric: tabular-nums;
+        min-width: 28px;
+        flex-shrink: 0;
+      }
+
+      :global(.doppelganger-info) {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+      }
+
+      :global(.doppelganger-item-title) {
+        margin: 0;
+        font-family: 'Outfit', sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        color: #e2e8f0;
+        line-height: 1.3;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      :global(.doppelganger-author) {
+        font-size: 12px;
+        color: #64748b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      :global(.doppelganger-badge) {
+        display: inline-block;
+        margin-top: 4px;
+        padding: 2px 8px;
+        background: #1e293b;
+        color: #94a3b8;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        width: fit-content;
+      }
+
+      :global(.doppelganger-right) {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+        flex-shrink: 0;
+        margin-left: 16px;
+      }
+
+      :global(.doppelganger-score) {
+        font-size: 18px;
+        font-weight: bold;
+        font-variant-numeric: tabular-nums;
+      }
+
+      :global(.doppelganger-progress-bg) {
+        width: 80px;
+        height: 4px;
+        background: #1e293b;
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      :global(.doppelganger-progress-fill) {
+        height: 100%;
+        border-radius: 2px;
+        transition: width 0.4s ease-out;
+      }
+
       svg#arcChart {
         width: 100%;
         height: auto;
@@ -383,6 +521,242 @@ import "../styles/global.css";
         font-size: 0.7rem;
         color: rgba(255,255,255,0.35);
         letter-spacing: 0.03em;
+      }
+
+      /* ── ENHANCED METRICS DASHBOARD (PARITY WITH LIBRARY) ── */
+      .metrics-dashboard {
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+      }
+
+      .metrics-hero {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 0.6rem;
+        background: rgba(124, 106, 255, 0.05);
+        border: 1px solid rgba(124, 106, 255, 0.2);
+        border-radius: 10px;
+        padding: 0.85rem;
+      }
+
+      .hero-chip {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+      }
+
+      .hero-chip-label {
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-muted);
+      }
+
+      .hero-chip-val {
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #ffffff;
+      }
+
+      .metrics-category-tabs {
+        display: flex;
+        gap: 0.4rem;
+        overflow-x: auto;
+        padding-bottom: 0.25rem;
+      }
+
+      .category-tab {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--color-muted);
+        border-radius: 20px;
+        padding: 0.3rem 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+      }
+
+      .category-tab:hover, .category-tab.active {
+        background: rgba(124, 106, 255, 0.18);
+        border-color: rgba(124, 106, 255, 0.5);
+        color: #ffffff;
+      }
+
+      .metric-category-section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .category-section-title {
+        font-family: var(--font-display);
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin-top: 0.4rem;
+      }
+
+      .category-section-title.cat-structure { color: #38bdf8; }
+      .category-section-title.cat-prose     { color: #a78bfa; }
+      .category-section-title.cat-theme     { color: #f472b6; }
+      .category-section-title.cat-pacing    { color: #34d399; }
+
+      .metric-card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+        gap: 0.6rem;
+      }
+
+      .metric-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        padding: 0.65rem 0.8rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        position: relative;
+        transition: border-color 0.2s ease, transform 0.2s ease;
+      }
+
+      .metric-card:hover {
+        border-color: rgba(124, 106, 255, 0.3);
+        transform: translateY(-1px);
+      }
+
+      .metric-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+      }
+
+      .metric-card-label {
+        font-size: 0.73rem;
+        font-weight: 500;
+        color: #cbd5e1;
+      }
+
+      .metric-info-icon {
+        font-size: 0.72rem;
+        color: var(--color-accent-2);
+        cursor: pointer;
+        opacity: 0.8;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: rgba(124, 106, 255, 0.12);
+        border: 1px solid rgba(124, 106, 255, 0.25);
+        user-select: none;
+      }
+
+      .metric-info-icon:hover, .metric-info-icon.active {
+        opacity: 1.0;
+        transform: scale(1.12);
+        background: rgba(124, 106, 255, 0.3);
+        border-color: var(--color-accent);
+        color: #ffffff;
+      }
+
+      .metric-tooltip-box {
+        position: absolute;
+        bottom: 125%;
+        right: 0;
+        background: #0f172a;
+        border: 1px solid rgba(124, 106, 255, 0.4);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), 0 0 12px rgba(124, 106, 255, 0.25);
+        border-radius: 8px;
+        padding: 0.6rem 0.8rem;
+        font-size: 0.73rem;
+        color: #e2e8f0;
+        line-height: 1.45;
+        width: 220px;
+        z-index: 100;
+        pointer-events: none;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(4px);
+        transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+      }
+
+      .metric-tooltip-box.visible,
+      .metric-info-icon:hover + .metric-tooltip-box {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .metric-val-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.4rem;
+      }
+
+      .metric-primary-val {
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #f8fafc;
+      }
+
+      .percentile-bar-bg {
+        width: 100%;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .percentile-bar-fill {
+        height: 100%;
+        border-radius: 2px;
+        transition: width 0.4s ease-out;
+      }
+
+      .bar-fill-structure { background: linear-gradient(90deg, #0284c7, #38bdf8); }
+      .bar-fill-prose     { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+      .bar-fill-theme     { background: linear-gradient(90deg, #db2777, #f472b6); }
+      .bar-fill-pacing    { background: linear-gradient(90deg, #059669, #34d399); }
+
+      .benchmark-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.15rem 0.45rem;
+        border-radius: 4px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        width: fit-content;
+      }
+
+      .benchmark-chip.higher {
+        background: rgba(34, 197, 94, 0.15);
+        color: #4ade80;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+      }
+
+      .benchmark-chip.lower {
+        background: rgba(239, 68, 68, 0.15);
+        color: #fca5a5;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+      }
+
+      .benchmark-chip.neutral {
+        background: rgba(148, 163, 184, 0.12);
+        color: #cbd5e1;
+        border: 1px solid rgba(148, 163, 184, 0.2);
       }
 
       /* Tooltip for Radar Chart */
@@ -611,6 +985,17 @@ import "../styles/global.css";
               <div id="pacingBarcodeBaseline" style="display: flex; height: 60px; align-items: stretch; gap: 2px; background: rgba(0,0,0,0.25); padding: 4px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);"></div>
             </div>
           </div>
+
+          <!-- Doppelgängers / Similar Novels Card (Full Width) -->
+          <div class="doppelganger-card">
+            <h3 class="doppelganger-title">Your Literary Doppelgängers</h3>
+            <p class="doppelganger-subtitle">
+              The closest structural and semantic matches from our 17,000-book database.
+            </p>
+            <div class="doppelganger-list" id="similarNovelsContainer">
+              <div style="color: #64748b; font-size: 13px; margin: 0; padding: 12px;">No similar matches found.</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -673,11 +1058,14 @@ import "../styles/global.css";
           currentArc   = data.arc;
           renderResults(data);
           renderAll();
+          if (data.top_matches) {
+            renderSimilarNovels(data.top_matches);
+          }
           document.getElementById("visualizations-container").style.display = "flex";
 
           sessionStorage.setItem("custom_analysis", JSON.stringify(data));
           const linkBtn = document.getElementById("btn-visualize-link");
-          linkBtn.href = `/library?novelId=custom`;
+linkBtn.href = `/library?novelId=custom`;
           document.getElementById("visualize-link-container").style.display = "block";
         } catch (err) {
           loadingState.style.display = "none";
@@ -686,61 +1074,206 @@ import "../styles/global.css";
         }
       });
 
+      const METRIC_METADATA = {
+        // Structure & Volume
+        word_count:                  { label: "Word Count", category: "structure", isInteger: true, tooltip: "Total words parsed in passage" },
+        char_count:                  { label: "Character Count", category: "structure", isInteger: true, tooltip: "Total characters in text" },
+        sentence_count:              { label: "Sentence Count", category: "structure", isInteger: true, tooltip: "Total sentences identified" },
+        avg_sentence_len:            { label: "Avg Sentence Length", category: "structure", tooltip: "Average words/characters per sentence" },
+        avg_sentences_per_paragraph: { label: "Sentences/Paragraph", category: "structure", tooltip: "Paragraph density and pacing structure" },
+        dep_tree_depth:              { label: "Dep Tree Depth", category: "structure", tooltip: "Syntactic dependency tree depth (higher = more complex sentence grammar)" },
+
+        // Prose & Style
+        dialogue_ratio:              { label: "Dialogue Ratio", category: "prose", isPercent: true, tooltip: "Percentage of prose contained within quotation marks" },
+        ttr:                         { label: "Lexical Density (TTR)", category: "prose", tooltip: "Type-Token Ratio: vocabulary diversity and richness" },
+        adj_ratio:                   { label: "Adjective Ratio", category: "prose", isPercent: true, tooltip: "Proportion of adjectives relative to total word count" },
+        verb_ratio:                  { label: "Verb Ratio", category: "prose", isPercent: true, tooltip: "Action verb frequency relative to word count" },
+        particle_ratio:              { label: "Particle Ratio", category: "prose", isPercent: true, tooltip: "Grammatical particle density" },
+        kanji_ratio:                 { label: "Kanji Density", category: "prose", isPercent: true, tooltip: "Kanji character density in Japanese text" },
+
+        // Theme & Emotion
+        compound_sentiment:          { label: "Sentiment Tone", category: "theme", tooltip: "Average emotional intensity score (0.0 calm to 1.0 highly charged)" },
+        theme_explication_ratio:     { label: "Thematic Explicitness", category: "theme", tooltip: "Density of explicit moral/theme statements per 10k units" },
+        sensory_body_density:        { label: "Visceral Emotion", category: "theme", isPercent: true, tooltip: "Ratio of somatic body sensations vs direct emotion words" },
+        outside_world_engagement:    { label: "World Grounding", category: "theme", tooltip: "Engagement with setting and physical world descriptions" },
+
+        // Pacing & Subplots
+        linearity_subversion_score:  { label: "Temporal Complexity", category: "pacing", tooltip: "Non-linear story structure and flashback frequency" },
+        temporal_shift_score:        { label: "Time Shifts", category: "pacing", tooltip: "Frequency of time jump markers and scene transitions" },
+        narrative_feature_diversity: { label: "Subplot Diversity", category: "pacing", tooltip: "Co-occurrence diversity of secondary entities and subplots" }
+      };
+
+      function renderEnhancedMetricsDashboard(stats) {
+        const keys = Object.keys(stats);
+        const langPrefix = keys.some(k => k.startsWith("en_")) ? "en_" :
+                           keys.some(k => k.startsWith("ja_")) ? "ja_" : "zh_";
+
+        const normRadar = stats.normalized_radar || {};
+
+        // 1. Hero Summary Header
+        const heroHtml = `
+          <div class="metrics-hero">
+            <div class="hero-chip">
+              <span class="hero-chip-label">Archetype</span>
+              <span class="hero-chip-val" style="color: #a78bfa;">${stats.archetype_match?.closest_trope || stats.archetype?.closest_trope || 'Unknown'}</span>
+            </div>
+            <div class="hero-chip">
+              <span class="hero-chip-label">Territory</span>
+              <span class="hero-chip-val" style="color: #38bdf8;">${stats.archetype_match?.territory || stats.archetype?.territory || 'Web Novel'}</span>
+            </div>
+            <div class="hero-chip">
+              <span class="hero-chip-label">Word Count</span>
+              <span class="hero-chip-val">${Math.round(stats[`${langPrefix}word_count`] || stats[`${langPrefix}char_count`] || stats.word_count || stats.char_count || 0).toLocaleString()}</span>
+            </div>
+            <div class="hero-chip">
+              <span class="hero-chip-label">Lexical Richness</span>
+              <span class="hero-chip-val" style="color: #34d399;">${(stats[`${langPrefix}ttr`] || stats.ttr || 0).toFixed(2)}</span>
+            </div>
+          </div>
+        `;
+
+        // 2. Filter Tabs
+        const tabsHtml = `
+          <div class="metrics-category-tabs">
+            <button class="category-tab active" data-cat="all">All Metrics</button>
+            <button class="category-tab" data-cat="structure">Structure</button>
+            <button class="category-tab" data-cat="prose">Prose & Style</button>
+            <button class="category-tab" data-cat="theme">Theme & Emotion</button>
+            <button class="category-tab" data-cat="pacing">Pacing & Narrative</button>
+          </div>
+        `;
+
+        // 3. Metric Sections Grouping
+        const categories = [
+          { id: "structure", title: "Structure & Volume", class: "cat-structure", barClass: "bar-fill-structure" },
+          { id: "prose", title: "Prose & Style", class: "cat-prose", barClass: "bar-fill-prose" },
+          { id: "theme", title: "Theme & Emotion", class: "cat-theme", barClass: "bar-fill-theme" },
+          { id: "pacing", title: "Pacing & Narrative", class: "cat-pacing", barClass: "bar-fill-pacing" }
+        ];
+
+        let sectionsHtml = "";
+
+        categories.forEach(cat => {
+          let cardsInCatHtml = "";
+          Object.keys(METRIC_METADATA).forEach(key => {
+            const meta = METRIC_METADATA[key];
+            if (meta.category !== cat.id) return;
+
+            const rawKey = `${langPrefix}${key}`;
+            if (stats[rawKey] === undefined && stats[key] === undefined) return;
+
+            const rawVal = stats[rawKey] !== undefined ? stats[rawKey] : stats[key];
+            if (rawVal === null || rawVal === undefined) return;
+
+            let displayVal = meta.isPercent ? `${(rawVal * 100).toFixed(1)}%` :
+                             meta.isInteger ? Math.round(rawVal).toLocaleString() :
+                             typeof rawVal === 'number' ? (rawVal % 1 !== 0 ? rawVal.toFixed(2) : rawVal.toString()) : rawVal;
+
+            const normScore = normRadar[rawKey] !== undefined ? normRadar[rawKey] :
+                              normRadar[key] !== undefined ? normRadar[key] : 0.5;
+
+            const pctWidth = Math.min(100, Math.max(0, Math.round(normScore * 100)));
+
+            // Benchmark comparison chip
+            let benchChipHtml = "";
+            if (normScore >= 0.65) {
+              benchChipHtml = `<span class="benchmark-chip higher">High (+${Math.round((normScore - 0.5) * 100)}% vs Avg)</span>`;
+            } else if (normScore <= 0.35) {
+              benchChipHtml = `<span class="benchmark-chip lower">Low (-${Math.round((0.5 - normScore) * 100)}% vs Avg)</span>`;
+            } else {
+              benchChipHtml = `<span class="benchmark-chip neutral">Balanced</span>`;
+            }
+
+            cardsInCatHtml += `
+              <div class="metric-card" data-category="${cat.id}">
+                <div class="metric-card-header">
+                  <span class="metric-card-label">${meta.label}</span>
+                  <span class="metric-info-icon" role="button" aria-label="${meta.tooltip}">ⓘ</span>
+                  <div class="metric-tooltip-box">${meta.tooltip}</div>
+                </div>
+                <div class="metric-val-row">
+                  <span class="metric-primary-val">${displayVal}</span>
+                  ${benchChipHtml}
+                </div>
+                <div class="percentile-bar-bg">
+                  <div class="percentile-bar-fill ${cat.barClass}" style="width: ${pctWidth}%;"></div>
+                </div>
+              </div>
+            `;
+          });
+
+          if (cardsInCatHtml) {
+            sectionsHtml += `
+              <div class="metric-category-section" data-cat-section="${cat.id}">
+                <div class="category-section-title ${cat.class}">${cat.title}</div>
+                <div class="metric-card-grid">
+                  ${cardsInCatHtml}
+                </div>
+              </div>
+            `;
+          }
+        });
+
+        return `
+          <div class="metrics-dashboard">
+            ${heroHtml}
+            ${tabsHtml}
+            ${sectionsHtml}
+          </div>
+        `;
+      }
+
       function renderResults(data) {
         loadingState.style.display = "none";
-        
-        // Set lang text
-        const langMap = { "en": "English", "ja": "Japanese", "zh": "Chinese" };
-        document.getElementById("metric-lang").textContent = langMap[data.detected_lang] || data.detected_lang;
+        resultsContainer.style.display = "block";
 
-        // Set archetype
-        const arch = data.archetype;
-        document.getElementById("result-archetype").textContent = arch.archetype || "Unknown Style";
-        document.getElementById("result-confidence").textContent = `Match: ${Math.round(arch.confidence * 100)}%`;
-        document.getElementById("result-description").textContent = arch.description || "";
-
-        // Set metrics
-        const feats = data.features;
-        
-        // TTR (vocabulary richness)
-        const ttr = (feats.ttr || 0) * 100;
-        document.getElementById("metric-ttr").textContent = `${ttr.toFixed(1)}%`;
-        document.getElementById("ttr-progress").style.width = `${ttr}%`;
-
-        // Dialogue Ratio
-        const dialogue = (feats.dialogue_ratio || 0) * 100;
-        document.getElementById("metric-dialogue").textContent = `${dialogue.toFixed(1)}%`;
-        document.getElementById("dialogue-progress").style.width = `${dialogue}%`;
-
-        // Sentence metrics
-        document.getElementById("metric-sent-count").textContent = feats.sentence_count || 0;
-        
-        const avgSentLen = feats.avg_sentence_len || 0;
-        const unit = data.detected_lang === "en" ? "words" : "chars";
-        document.getElementById("metric-sent-len").textContent = `${avgSentLen.toFixed(1)} ${unit}`;
-
-        // Word Count
-        document.getElementById("metric-word-count").textContent = feats.word_count || 0;
-
-        const base = data.baselines || {
-          gutenberg: { ttr: 0.173, dialogue_ratio: 0.182, avg_sentence_len: 12.464 },
-          webnovel: { ttr: 0.306, dialogue_ratio: 0.235, avg_sentence_len: 12.699 }
+        const statsObj = data.stats || {
+          ...data.features,
+          normalized_radar: data.normalized_radar,
+          archetype_match: data.archetype,
+          baselines: data.baselines
         };
-        const unitBaseline = data.detected_lang === "en" ? "w" : "c";
 
-        // Vocabulary Richness Baselines
-        document.getElementById("ttr-gutenberg-val").textContent = `${((base.gutenberg.ttr || 0) * 100).toFixed(1)}%`;
-        document.getElementById("ttr-webnovel-val").textContent = `${((base.webnovel.ttr || 0) * 100).toFixed(1)}%`;
+        resultsContainer.innerHTML = renderEnhancedMetricsDashboard(statsObj);
 
-        // Dialogue Ratio Baselines
-        document.getElementById("dialogue-gutenberg-val").textContent = `${((base.gutenberg.dialogue_ratio || 0) * 100).toFixed(1)}%`;
-        document.getElementById("dialogue-webnovel-val").textContent = `${((base.webnovel.dialogue_ratio || 0) * 100).toFixed(1)}%`;
+        // Attach category tab filter event listener
+        const tabBtns = resultsContainer.querySelectorAll(".category-tab");
+        tabBtns.forEach(btn => {
+          btn.addEventListener("click", () => {
+            tabBtns.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            const targetCat = btn.getAttribute("data-cat");
+            const sections = resultsContainer.querySelectorAll("[data-cat-section]");
+            sections.forEach(sec => {
+              if (targetCat === "all" || sec.getAttribute("data-cat-section") === targetCat) {
+                sec.style.display = "flex";
+              } else {
+                sec.style.display = "none";
+              }
+            });
+          });
+        });
 
-        // Avg Sentence Length Baselines
-        document.getElementById("sent-gutenberg-val").textContent = `${(base.gutenberg.avg_sentence_len || 0).toFixed(1)}${unitBaseline}`;
-        document.getElementById("sent-webnovel-val").textContent = `${(base.webnovel.avg_sentence_len || 0).toFixed(1)}${unitBaseline}`;
+        // Attach info icon click popover event listener
+        const infoIcons = resultsContainer.querySelectorAll(".metric-info-icon");
+        infoIcons.forEach(icon => {
+          icon.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const tooltipBox = icon.nextElementSibling;
+            const isVisible = tooltipBox?.classList.contains("visible");
+            resultsContainer.querySelectorAll(".metric-tooltip-box").forEach(box => box.classList.remove("visible"));
+            resultsContainer.querySelectorAll(".metric-info-icon").forEach(i => i.classList.remove("active"));
+            if (!isVisible && tooltipBox) {
+              tooltipBox.classList.add("visible");
+              icon.classList.add("active");
+            }
+          });
+        });
 
-        resultsContainer.style.display = "flex";
+        document.addEventListener("click", () => {
+          resultsContainer.querySelectorAll(".metric-tooltip-box").forEach(box => box.classList.remove("visible"));
+          resultsContainer.querySelectorAll(".metric-info-icon").forEach(i => i.classList.remove("active"));
+        });
       }
 
       const RADAR_DIMS = [
@@ -1239,6 +1772,48 @@ import "../styles/global.css";
           bar.style.transition = "all 0.3s ease";
           bar.title = `${val} words/characters`;
           container.appendChild(bar);
+        });
+      }
+
+      /* ── Doppelgängers / Similar Novels Renderer ── */
+      function renderSimilarNovels(matches) {
+        const container = document.getElementById("similarNovelsContainer");
+        if (!container) return;
+        container.innerHTML = "";
+
+        if (!matches || matches.length === 0) {
+          container.innerHTML = `<p style="color: #64748b; font-size: 13px; margin: 0; padding: 12px;">No similar matches found.</p>`;
+          return;
+        }
+
+        matches.forEach((m, index) => {
+          const item = document.createElement("div");
+          item.className = "doppelganger-item";
+          item.addEventListener("click", () => {
+            window.location.href = `/library?novelId=${m.id}`;
+          });
+
+          const pct = Math.round((m.similarity_score || 0) * 100);
+          const scoreColor = m.similarity_score > 0.9 ? '#38bdf8' : m.similarity_score > 0.8 ? '#818cf8' : '#94a3b8';
+
+          item.innerHTML = `
+            <div class="doppelganger-left">
+              <span class="doppelganger-rank">#${index + 1}</span>
+              <div class="doppelganger-info">
+                <h4 class="doppelganger-item-title">${m.title}</h4>
+                ${m.author ? `<span class="doppelganger-author">${m.author}</span>` : ''}
+                <span class="doppelganger-badge">${m.genre || 'Fiction'}</span>
+              </div>
+            </div>
+
+            <div class="doppelganger-right">
+              <span class="doppelganger-score" style="color: ${scoreColor}">${pct}%</span>
+              <div class="doppelganger-progress-bg">
+                <div class="doppelganger-progress-fill" style="width: ${pct}%; background-color: ${scoreColor}"></div>
+              </div>
+            </div>
+          `;
+          container.appendChild(item);
         });
       }
 
