@@ -88,9 +88,10 @@ COMMON_GENRES = {
         "thriller", "suspense", "noir", "modern thriller", "detective", "sleuth", "clue", "puzzle",
     ],
     "Tragedy": [
-        "tragedies", "tragedy", "tragic", "dark literature", "fatalism", "moral downfall",
-        "melancholy", "suffering", "sad ending", "terminal illness", "heartbreak",
-        "character death", "angst", "grief", "sorrow", "mourning", "doom",
+        "tragedies", "tragedy", "tragic ending", "tragic novel", "tragic story",
+        "dark literature", "fatalism", "moral downfall", "melancholy", "suffering",
+        "sad ending", "terminal illness", "heartbreak", "character death", "angst",
+        "grief", "sorrow", "mourning", "doom",
     ],
     "Supernatural": [
         "supernatural", "occult", "paranormal", "spiritualism", "apparitions",
