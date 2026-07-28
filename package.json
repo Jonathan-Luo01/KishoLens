@@ -4,6 +4,7 @@
   "private": true,
   "engines": { "node": ">=22.12.0" },
   "scripts": {
+    "predev": "node free-ports.js",
     "dev:frontend": "npm --prefix frontend run dev",
     "dev:backend": "node run-venv.js uvicorn kisholens.api.main:app --reload",
     "dev:pipeline": "node run-venv.js python -m kisholens.pipeline.main",
