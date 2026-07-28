@@ -41,6 +41,8 @@ def extract_features(text: str, lang: str = "en"):
         }
 
 
+from kisholens.pipeline.disambiguation import disambiguate_and_rank_genres
+
 def _get_or_create_novel(session: Session, title: str, author: str, source: str, cache: dict, genre: Optional[str] = None, territory: Optional[str] = None) -> int:
     clean_title = (title or "").strip()
     clean_author = (author or "").strip()
@@ -48,10 +50,16 @@ def _get_or_create_novel(session: Session, title: str, author: str, source: str,
     if novel_key not in cache:
         statement = select(Novel).where(func.lower(func.trim(Novel.title)) == clean_title.lower(), func.lower(func.trim(Novel.author)) == clean_author.lower())
         existing_novel = session.exec(statement).first()
+        
+        effective_genre = genre
+        if not effective_genre:
+            dis_res = disambiguate_and_rank_genres(tags_str=clean_title, source=source, territory=territory or "")
+            effective_genre = dis_res["parent_genre_str"]
+
         if existing_novel:
             updated = False
-            if genre and not existing_novel.genre:
-                existing_novel.genre = genre
+            if effective_genre and not existing_novel.genre:
+                existing_novel.genre = effective_genre
                 updated = True
             if territory and not existing_novel.territory:
                 existing_novel.territory = territory
@@ -62,12 +70,12 @@ def _get_or_create_novel(session: Session, title: str, author: str, source: str,
             cache[novel_key] = existing_novel.id
         else:
             default_territory = territory or ("Classic Literature Territory" if source.lower() == "gutenberg" else "Web Novel Territory")
-            novel = Novel(title=clean_title, author=clean_author, source=source, genre=genre, territory=default_territory)
+            novel = Novel(title=clean_title, author=clean_author, source=source, genre=effective_genre, territory=default_territory)
             session.add(novel)
             session.commit()
             session.refresh(novel)
             cache[novel_key] = novel.id
-            print(f"Added Novel: '{clean_title}' by {clean_author} (ID: {novel.id}, Genre: {genre}, Territory: {territory})")
+            print(f"Added Novel: '{clean_title}' by {clean_author} (ID: {novel.id}, Genre: {effective_genre}, Territory: {default_territory})")
     return cache[novel_key]
 
 def run_etl(dataset_name: str, num_records: int = 20, max_chapters: int = 12, only_existing: bool = False, genre: Optional[str] = None, territory: Optional[str] = None):

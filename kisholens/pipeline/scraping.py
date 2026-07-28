@@ -19,6 +19,12 @@ def parse_parallel_fiction(item: Dict[str, Any], idx: int) -> Dict[str, Any]:
     writer = meta.get('syosetu', {}).get('writer', 'Unknown')
     source = "syosetu"
     
+    nu_meta = meta.get('novelupdates', {})
+    nu_genres = nu_meta.get('genres', []) or []
+    nu_tags = nu_meta.get('tags', []) or []
+    combined_tags = list(set([str(g).strip() for g in (nu_genres + nu_tags) if g]))
+    tags_str = ", ".join(combined_tags) if combined_tags else None
+
     chapter_number, title_ja, title_en, body_ja, body_en = extract_chapter_info(item['src'], item['trg'])
     cleaned_ja = clean_japanese(clean_html(body_ja))
     cleaned_en = clean_english(clean_html(body_en))
@@ -31,7 +37,8 @@ def parse_parallel_fiction(item: Dict[str, Any], idx: int) -> Dict[str, Any]:
         "chapter_title": title_en,
         "text_ja": cleaned_ja,
         "text_en": cleaned_en,
-        "text_zh": ""
+        "text_zh": "",
+        "tags": tags_str
     }
 
 def parse_scribblehub(item: Dict[str, Any], idx: int) -> Dict[str, Any]:
@@ -99,7 +106,8 @@ def parse_cnnovel(item: Dict[str, Any], idx: int) -> Dict[str, Any]:
         "chapter_title": chapter_title,
         "text_ja": "",
         "text_en": "",
-        "text_zh": cleaned_zh
+        "text_zh": cleaned_zh,
+        "tags": f"chinese web novel, {series_title}"
     }
 
 DATASET_REGISTRY = {
@@ -155,11 +163,12 @@ def download_gutenberg(book_id: str) -> str:
     else:
         return loop.run_until_complete(download_gutenberg_async(book_id))
 
-def parse_gutenberg(text: str) -> Tuple[str, str, List[Dict[str, Any]]]:
-    """Extracts title, author, language and splits the body into chapters."""
+def parse_gutenberg(text: str) -> Tuple[str, str, List[str], List[Dict[str, Any]]]:
+    """Extracts title, author, language, raw_tags (bookshelves/subjects) and splits body into chapters."""
     title = "Unknown Gutenberg Book"
     author = "Unknown Author"
     lang = "en"
+    raw_tags: List[str] = []
 
     title_match = re.search(r"Title:\s*(.*)", text)
     if title_match:
@@ -176,6 +185,24 @@ def parse_gutenberg(text: str) -> Tuple[str, str, List[Dict[str, Any]]]:
             lang = "zh"
         elif "japanese" in lang_str or "ja" in lang_str:
             lang = "ja"
+
+    # Extract Subject / Bookshelf / Category tags from header
+    header_text = text[:10000]
+    for line in header_text.splitlines():
+        line_str = line.strip()
+        match = re.match(
+            r"^(?:Subject|Subjects|Library of Congress Subject Headings|Bookshelf|Bookshelves|Category):\s*(.*)",
+            line_str,
+            re.IGNORECASE
+        )
+        if match:
+            val = match.group(1).strip()
+            if val:
+                raw_tags.append(val)
+                sub_parts = [p.strip() for p in re.split(r"[;,]", val) if p.strip()]
+                raw_tags.extend(sub_parts)
+                dash_parts = [p.strip() for p in val.split("--") if p.strip()]
+                raw_tags.extend(dash_parts)
 
     start_match = re.search(r"\*\*\*\s*START OF TH[IS|E] PROJECT GUTENBERG EBOOK.*?\*\*\*", text, re.IGNORECASE)
     end_match = re.search(r"\*\*\*\s*END OF TH[IS|E] PROJECT GUTENBERG EBOOK.*?\*\*\*", text, re.IGNORECASE)
@@ -246,4 +273,4 @@ def parse_gutenberg(text: str) -> Tuple[str, str, List[Dict[str, Any]]]:
                 "text": ch_text,
                 "lang": lang
             })
-    return title, author, chapters
+    return title, author, raw_tags, chapters

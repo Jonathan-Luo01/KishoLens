@@ -30,11 +30,13 @@ COMMON_GENRES = {
         "revenge", "survival", "dungeons", "hunting", "death game", "unlimited flow",
         "sea stories", "wilderness survival", "voyages and travels", "expeditions",
         "pirates", "shipwrecks", "adventure stories", "quest", "journey",
+        "动作", "冒险", "兵王", "特种兵", "战神", "高武", "无敌", "至尊", "霸主", "争霸",
     ],
     "Comedy": [
         "comedy", "humor", "humorous stories", "satire", "parody", "wit and humor",
         "comedies", "domestic comedy", "slapstick", "funny protagonist", "misunderstandings",
         "cheerful protagonist", "gag", "funny", "rom-com", "romantic comedy",
+        "搞笑", "沙雕", "爆笑", "幽默", "喜剧", "逗比",
     ],
     "Romance": [
         "romance", "romantic", "love", "romantic fiction", "courtship", "love stories",
@@ -43,11 +45,13 @@ COMMON_GENRES = {
         "entertainment industry", "first love", "contract marriage", "reverse harem",
         "yuri", "girls love", "girls-love", "yaoi", "boys love", "boys-love",
         "shounen-ai", "shoujo-ai", "danmei", "gl", "bl",
+        "言情", "总裁", "豪门", "甜宠", "虐恋", "娇妻", "前夫", "后宫", "耽美", "百合", "纯爱", "恋爱", "嫁", "妻", "成婚", "相亲", "千金", "宠妻",
     ],
     "Drama": [
         "drama", "plays", "theatre", "domestic drama", "social drama", "domestic fiction",
         "family life", "interpersonal relations", "family conflict", "betrayal",
         "emotional", "social hierarchy", "politics", "psychological",
+        "戏剧", "家庭", "伦理", "情感", "纠葛",
     ],
     "Fantasy": [
         "fantasy", "mythology", "folklore", "fairy tales", "legends", "fables",
@@ -58,17 +62,20 @@ COMMON_GENRES = {
         "kingdom-building", "dragons", "elves", "sword and magic", "academy",
         "cozy fantasy", "cozy-fantasy", "monster protagonist", "beast mc",
         "dungeon core", "dungeon mc", "dungeon building",
+        "奇幻", "玄幻", "魔法", "神话",
     ],
     "Horror": [
         "horror", "gothic fiction", "ghost stories", "horror tales", "vampires",
         "monsters", "occult fiction", "macabre", "survival horror", "ghosts",
         "demons", "gore", "psychological horror", "mystery horror",
+        "恐怖", "惊悚", "灵异", "鬼怪", "凶宅", "阴尸",
     ],
     "Historical": [
         "historical fiction", "historical", "regency fiction", "victorian",
         "victorian novel", "19th century", "18th century", "biographical fiction",
         "middle ages", "ancient china", "palace court", "historical romance",
         "historical politics", "three kingdoms", "edo period", "sengoku",
+        "历史", "三国", "朝堂", "皇帝", "大明", "大唐", "清朝", "宋朝", "宫斗", "权谋", "太子",
     ],
     "Sci-Fi": [
         "science fiction", "sci-fi", "sci fi", "mecha", "time travel", "space voyages",
@@ -77,50 +84,59 @@ COMMON_GENRES = {
         "galactic empire", "futuristic", "hard sci-fi", "hard-sci-fi",
         "futuristic technology", "advanced technology", "robot", "cyborg",
         "outer space", "space exploration", "space station", "spacecraft", "aliens", "android",
+        "科幻", "星际", "末世", "机甲", "赛博朋克", "太空", "战舰",
     ],
     "Philosophy": [
         "philosophical fiction", "philosophical", "philosophy", "utilitarianism",
         "ethics", "conduct of life", "existentialism", "existential",
         "epistemology", "metaphysics", "stoicism", "nihilism", "rationalism",
+        "哲学", "思想", "人生",
     ],
     "Mystery": [
         "detective fiction", "crime stories", "mystery", "detective and mystery stories",
         "crime", "murder", "police procedural", "whodunit", "criminology", "investigation",
         "thriller", "suspense", "noir", "modern thriller", "detective", "sleuth", "clue", "puzzle",
+        "悬疑", "推理", "探案", "刑侦", "破案", "法医", "盗墓",
     ],
     "Tragedy": [
         "tragedies", "tragedy", "tragic ending", "tragic novel", "tragic story",
         "dark literature", "fatalism", "moral downfall", "melancholy", "suffering",
         "sad ending", "terminal illness", "heartbreak", "character death", "angst",
         "grief", "sorrow", "mourning", "doom",
+        "悲剧", "虐文", "悲伤",
     ],
     "Supernatural": [
         "supernatural", "occult", "paranormal", "spiritualism", "apparitions",
         "demonology", "metaphysical fiction", "urban fantasy", "modern magic",
         "hunters", "necromancy", "vampires", "vampire", "werewolves", "exorcism", "gates",
         "ghost", "ghosts", "witch", "witches", "witchcraft", "demon", "demons", "monster", "monsters", "spirit", "spirits",
+        "都市", "异能", "超能力", "风水", "阴阳", "捉鬼",
     ],
     "Poetry": [
         "poetry", "ballads", "epic poetry", "sonnets", "lyric poetry", "verse",
+        "诗歌", "诗词",
     ],
     "Slice of Life": [
         "slice of life", "slice-of-life", "slow life", "slow-life", "farming", "cooking",
         "pet raising", "school life", "school-life", "esports", "medical", "cute children",
         "ordinary life", "daily life", "contemporary", "cozy", "relaxing", "everyday life",
         "village life", "gardening", "ranching", "peaceful life", "baking", "housework",
+        "种田", "日常", "美食", "神医", "养娃", "育儿", "直播", "客栈", "乡村", "农家",
     ],
     "Cultivation": [
-        "xianxia", "xuanhuan", "wuxia", "cultivator", "immortal cultivation", "qi cultivation",
+        "cultivation", "xianxia", "xuanhuan", "wuxia", "cultivator", "immortal cultivation", "qi cultivation",
         "cultivation world", "cultivation novel", "cultivation system", "cultivation method",
         "qi", "dantian", "immortal", "immortals", "immortality", "sects", "sect", "realm breakthrough",
         "eastern fantasy", "daoist", "golden core", "foundation building", "internal energy",
         "dao", "tao", "tribulation", "spirit stones", "martial peak", "douluo", "peerless cultivator",
+        "修仙", "仙侠", "修真", "功法", "宗门", "丹药", "金丹", "元婴", "道士", "灵石", "神通", "渡劫", "掌门", "仙尊", "仙帝", "洪荒", "大罗", "筑基", "炼气", "飞升", "武侠",
     ],
     "Isekai": [
         "isekai", "portal fantasy", "portal-fantasy", "reincarnation", "reincarnated", "reincarnate",
         "reborn", "transmigration", "transmigrated", "transmigrate", "otome game", "otome-game",
         "villainess", "regressor", "second chance", "world travel", "transported", "another world",
         "other world", "different world", "tensei", "summoned hero", "summoned",
+        "穿越", "重生", "转生", "穿书", "快穿", "异界", "异世", "魂穿",
     ],
     "Progression Fantasy": [
         "progression fantasy", "progression-fantasy", "progression", "litrpg", "system",
@@ -128,6 +144,7 @@ COMMON_GENRES = {
         "vrmmorpg", "vrmmo", "dungeon", "adventurers", "status window", "stat points",
         "level up", "dungeon core", "monster protagonist", "gamelit", "stat screen",
         "leveling", "dungeon building", "system notification", "class rank",
+        "升级", "加点", "属性板", "签到", "网游",
     ],
 }
 
