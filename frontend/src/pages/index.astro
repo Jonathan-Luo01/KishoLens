@@ -8,38 +8,625 @@ import "../styles/global.css";
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="KishoLens — stylistic pacing and prose archetype analysis for web novels and light fiction."
+      content="KishoLens — Stylistic pacing, Kishōtenketsu narrative curves, and prose archetype analytics for web novels and classic literature."
     />
-    <title>KishoLens</title>
+    <title>KishoLens — Prose Archetypes & Pacing Analytics</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
   </head>
   <body>
-    <main class="hero">
-      <div class="hero__glow" aria-hidden="true"></div>
-      <div class="hero__content">
-        <h1 class="hero__title">
-          Kish<span class="hero__title--accent">o</span>Lens
-        </h1>
-        <p class="hero__subtitle">
-          Stylistic pacing · Prose archetypes · Structural metrics
-          <br />for web novels and light fiction
-        </p>
-        <div class="hero__actions">
-          <a href="/analyze" class="btn btn--primary" id="analyze-btn">Analyze Prose</a>
-          <a href="/library" class="btn btn--ghost" id="explore-btn">Explore Library</a>
+    <!-- Site Header -->
+    <header class="site-header">
+      <div class="header-container">
+        <a href="/" class="brand-mark">
+          Kish<span class="brand-accent">o</span>Lens
+        </a>
+        <nav class="header-nav">
+          <a href="/analyze" class="nav-item">Analyze</a>
+          <a href="/library" class="nav-item">Library Database</a>
+          <a href="#capabilities" class="nav-item">Capabilities</a>
+        </nav>
+        <div class="header-cta">
+          <a href="/analyze" class="btn btn-sm btn-accent">Analyze Prose &rarr;</a>
         </div>
       </div>
-      <div class="hero__grid" aria-hidden="true">
-        {Array.from({ length: 20 }).map((_, i) => (
-          <div class="grid__card" style={`animation-delay: ${i * 0.08}s`}></div>
-        ))}
-      </div>
+    </header>
+
+    <main class="page-container">
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <div class="hero-header">
+          <h1 class="hero-title">
+            Kish<span class="brand-accent">o</span>Lens
+          </h1>
+          <p class="hero-tagline">
+            Stylistic Pacing &bull; Prose Archetypes &bull; Structural Metrics
+          </p>
+          <p class="hero-desc">
+            Advanced narrative intelligence for web novels, light fiction, and classic literature across 17 canonical genres and 3 languages.
+          </p>
+
+          <div class="hero-actions">
+            <a href="/analyze" class="btn btn-primary" id="analyze-btn">Analyze Prose &rarr;</a>
+            <a href="/library" class="btn btn-secondary" id="explore-btn">Explore Library Database</a>
+          </div>
+        </div>
+
+        <!-- Interactive Sample Reader Widget -->
+        <div class="sample-reader">
+          <div class="reader-header">
+            <span class="reader-label">PROSE SAMPLE INTERACTIVE TEASER</span>
+            <div class="reader-tabs" role="tablist">
+              <button class="reader-tab active" data-sample="xianxia" role="tab" aria-selected="true">Xianxia Cultivation</button>
+              <button class="reader-tab" data-sample="gothic" role="tab" aria-selected="false">Classic Gothic</button>
+              <button class="reader-tab" data-sample="slice" role="tab" aria-selected="false">Cozy Slice of Life</button>
+            </div>
+          </div>
+
+          <!-- Excerpt Box -->
+          <div class="excerpt-box">
+            <p id="excerpt-text" class="excerpt-content">
+              "The spiritual energy of the golden core surged through his meridians as the ancient Daoist inscription glowed. He broke through the bottleneck of the Nascent Soul stage in a burst of celestial light."
+            </p>
+          </div>
+
+          <!-- Live Metrics Bar -->
+          <div class="reader-metrics">
+            <div class="metric-pill">
+              <span class="pill-lbl">Pacing Arc</span>
+              <span id="metric-pacing" class="pill-val color-purple">Ki 起 &rarr; Shō 承 &rarr; Ten 転 &rarr; Ketsu 结</span>
+            </div>
+            <div class="metric-pill">
+              <span class="pill-lbl">Dialogue Ratio</span>
+              <span id="metric-dialogue" class="pill-val color-cyan">34.2%</span>
+            </div>
+            <div class="metric-pill">
+              <span class="pill-lbl">Vocabulary TTR</span>
+              <span id="metric-ttr" class="pill-val color-emerald">0.84</span>
+            </div>
+            <div class="metric-pill">
+              <span class="pill-lbl">Territory Match</span>
+              <span id="metric-territory" class="pill-val color-pink">Web Novel Territory</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Editorial Capabilities Grid -->
+      <section id="capabilities" class="capabilities-section">
+        <div class="section-title-wrap">
+          <span class="section-num">ENGINE CAPABILITIES</span>
+          <h2 class="section-heading">Quantitative Prose Analysis</h2>
+        </div>
+
+        <div class="editorial-grid">
+          <div class="editorial-col">
+            <span class="col-num">01</span>
+            <h3 class="col-title">Kishōtenketsu Pacing Arcs</h3>
+            <p class="col-desc">
+              Tracks 4-quantile sentiment dynamics (Introduction, Development, Twist, Reconciliation) to uncover narrative momentum and climax structure without relying on Western 3-act formulas.
+            </p>
+          </div>
+
+          <div class="editorial-col">
+            <span class="col-num">02</span>
+            <h3 class="col-title">Vector Archetype Engine</h3>
+            <p class="col-desc">
+              384-dimensional embedding cosine similarity matching against 2,800+ ingested novels to map works into Web Novel Territory vs. Classic Literature Territory across 17 canonical genres.
+            </p>
+          </div>
+
+          <div class="editorial-col">
+            <span class="col-num">03</span>
+            <h3 class="col-title">Multi-Lingual Syntactic Metrics</h3>
+            <p class="col-desc">
+              Native syntactic dependency tree depth, TTR vocabulary richness, and dialogue density parsing engineered for English (spaCy), Japanese (SudachiPy), and Chinese (spaCy/HanLP).
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Database Stats Bar -->
+      <section class="stats-bar">
+        <div class="stat-unit">
+          <span class="stat-value">2,813</span>
+          <span class="stat-label">Ingested Novels</span>
+        </div>
+        <span class="stat-sep">&bull;</span>
+        <div class="stat-unit">
+          <span class="stat-value">17</span>
+          <span class="stat-label">Canonical Genres</span>
+        </div>
+        <span class="stat-sep">&bull;</span>
+        <div class="stat-unit">
+          <span class="stat-value">4</span>
+          <span class="stat-label">Metric Categories</span>
+        </div>
+        <span class="stat-sep">&bull;</span>
+        <div class="stat-unit">
+          <span class="stat-value">3</span>
+          <span class="stat-label">Languages (EN/JA/ZH)</span>
+        </div>
+      </section>
     </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-wrap">
+        <span class="footer-logo">Kish<span style="color: #a78bfa;">o</span>Lens</span>
+        <span class="footer-meta">KishoLens Engine &bull; Built with Astro, FastAPI, PyTorch &amp; spaCy</span>
+      </div>
+    </footer>
+
+    <!-- Tab Interactivity Script -->
+    <script>
+      const SAMPLES = {
+        xianxia: {
+          text: '"The spiritual energy of the golden core surged through his meridians as the ancient Daoist inscription glowed. He broke through the bottleneck of the Nascent Soul stage in a burst of celestial light."',
+          pacing: "Ki 起 → Shō 承 → Ten 転 → Ketsu 结",
+          dialogue: "34.2%",
+          ttr: "0.84",
+          territory: "Web Novel Territory"
+        },
+        gothic: {
+          text: '"It was a dreary night of November that I beheld the accomplishment of my labours. With an anxiety that almost amounted to agony, I collected the instruments of life around me..."',
+          pacing: "Ki 起 → Shō 承 → Ten 転 → Ketsu 结",
+          dialogue: "18.5%",
+          ttr: "0.92",
+          territory: "Classic Literature Territory"
+        },
+        slice: {
+          text: '"The morning sun filtered gently into the small hillside tea shop. The kettle began to simmer as old village friends gathered at the counter to talk about the seasonal harvest."',
+          pacing: "Ki 起 → Shō 承 → Ten 転 → Ketsu 结",
+          dialogue: "52.0%",
+          ttr: "0.76",
+          territory: "Web Novel Territory"
+        }
+      };
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const tabs = document.querySelectorAll(".reader-tab");
+        const textEl = document.getElementById("excerpt-text");
+        const pacingEl = document.getElementById("metric-pacing");
+        const dialogueEl = document.getElementById("metric-dialogue");
+        const ttrEl = document.getElementById("metric-ttr");
+        const territoryEl = document.getElementById("metric-territory");
+
+        tabs.forEach((tab) => {
+          tab.addEventListener("click", () => {
+            tabs.forEach((t) => {
+              t.classList.remove("active");
+              t.setAttribute("aria-selected", "false");
+            });
+            tab.classList.add("active");
+            tab.setAttribute("aria-selected", "true");
+
+            const key = tab.getAttribute("data-sample");
+            const sample = SAMPLES[key];
+
+            if (sample && textEl) {
+              textEl.textContent = sample.text;
+              if (pacingEl) pacingEl.textContent = sample.pacing;
+              if (dialogueEl) dialogueEl.textContent = sample.dialogue;
+              if (ttrEl) ttrEl.textContent = sample.ttr;
+              if (territoryEl) territoryEl.textContent = sample.territory;
+            }
+          });
+        });
+      });
+    </script>
   </body>
 </html>
+
+<style>
+  :root {
+    --font-heading: 'Outfit', -apple-system, sans-serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --bg-main: #0b0c10;
+    --card-bg: rgba(18, 20, 29, 0.7);
+    --border-line: rgba(255, 255, 255, 0.08);
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-main);
+    color: #e2e8f0;
+    font-family: var(--font-body);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Fixed Header */
+  .site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: rgba(11, 12, 16, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-line);
+  }
+
+  .header-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0.85rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand-mark {
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-decoration: none;
+  }
+
+  .brand-accent {
+    color: #a78bfa;
+  }
+
+  .header-nav {
+    display: flex;
+    gap: 1.8rem;
+  }
+
+  .nav-item {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  .nav-item:hover {
+    color: #ffffff;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.4rem;
+    border-radius: 0.5rem;
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-sm {
+    padding: 0.4rem 0.9rem;
+    font-size: 0.82rem;
+  }
+
+  .btn-accent {
+    background: rgba(167, 139, 250, 0.15);
+    color: #c4b5fd;
+    border: 1px solid rgba(167, 139, 250, 0.3);
+  }
+
+  .btn-accent:hover {
+    background: rgba(167, 139, 250, 0.25);
+    color: #ffffff;
+  }
+
+  .btn-primary {
+    background: #7c3aed;
+    color: #ffffff;
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background: #6d28d9;
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.04);
+    color: #e2e8f0;
+    border: 1px solid var(--border-line);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  /* Page Layout */
+  .page-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 7rem 1.5rem 4rem;
+  }
+
+  /* Hero Section */
+  .hero-section {
+    padding: 2rem 0 4rem;
+  }
+
+  .hero-header {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 3rem;
+  }
+
+  .hero-title {
+    font-family: var(--font-heading);
+    font-size: 3.4rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.03em;
+  }
+
+  .hero-tagline {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #a78bfa;
+    margin: 0 0 1rem;
+    letter-spacing: 0.02em;
+  }
+
+  .hero-desc {
+    font-size: 1.05rem;
+    color: #94a3b8;
+    margin: 0 0 2rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  /* Sample Reader Widget */
+  .sample-reader {
+    background: var(--card-bg);
+    border: 1px solid var(--border-line);
+    border-radius: 0.9rem;
+    padding: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .reader-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--border-line);
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+
+  .reader-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: 0.08em;
+  }
+
+  .reader-tabs {
+    display: flex;
+    gap: 0.4rem;
+  }
+
+  .reader-tab {
+    background: transparent;
+    border: 1px solid transparent;
+    color: #94a3b8;
+    padding: 0.35rem 0.8rem;
+    border-radius: 0.4rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .reader-tab:hover {
+    color: #ffffff;
+  }
+
+  .reader-tab.active {
+    background: rgba(167, 139, 250, 0.12);
+    border-color: rgba(167, 139, 250, 0.3);
+    color: #c4b5fd;
+    font-weight: 600;
+  }
+
+  .excerpt-box {
+    padding: 1.4rem;
+    background: rgba(9, 10, 14, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 0.6rem;
+    margin: 1.2rem 0;
+  }
+
+  .excerpt-content {
+    font-family: var(--font-mono);
+    font-size: 0.92rem;
+    color: #cbd5e1;
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .reader-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.8rem;
+  }
+
+  @media (max-width: 768px) {
+    .reader-metrics {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .metric-pill {
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-line);
+    padding: 0.6rem 0.8rem;
+    border-radius: 0.5rem;
+  }
+
+  .pill-lbl {
+    font-size: 0.68rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .pill-val {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 0.15rem;
+  }
+
+  .color-purple { color: #c4b5fd; }
+  .color-cyan { color: #38bdf8; }
+  .color-emerald { color: #34d399; }
+  .color-pink { color: #f472b6; }
+
+  /* Capabilities Grid */
+  .capabilities-section {
+    padding: 4rem 0 2rem;
+    border-top: 1px solid var(--border-line);
+  }
+
+  .section-title-wrap {
+    margin-bottom: 2.5rem;
+  }
+
+  .section-num {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #a78bfa;
+    letter-spacing: 0.1em;
+  }
+
+  .section-heading {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0.3rem 0 0;
+  }
+
+  .editorial-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .editorial-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .editorial-col {
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .col-num {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: #64748b;
+  }
+
+  .col-title {
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin: 0.4rem 0 0.6rem;
+  }
+
+  .col-desc {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  /* Stats Bar */
+  .stats-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 2.5rem 0;
+    margin-top: 3rem;
+    border-top: 1px solid var(--border-line);
+    flex-wrap: wrap;
+  }
+
+  .stat-unit {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .stat-value {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #ffffff;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+    color: #94a3b8;
+  }
+
+  .stat-sep {
+    color: #475569;
+    font-size: 0.8rem;
+  }
+
+  /* Footer */
+  .site-footer {
+    border-top: 1px solid var(--border-line);
+    padding: 1.8rem 1.5rem;
+    background: #07080b;
+    margin-top: 2rem;
+  }
+
+  .footer-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+
+  .footer-logo {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #ffffff;
+  }
+
+  .footer-meta {
+    font-size: 0.8rem;
+    color: #64748b;
+  }
+</style>
