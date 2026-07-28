@@ -979,6 +979,12 @@ def post_analyze(request: AnalysisRequest):
             normalized_radar[f"{lang}_{k}"] = normalize_feature_percentile(k, v)
     agg["normalized_radar"] = normalized_radar
 
+    dyn_baselines = compute_dynamic_baselines(lang)
+    agg["baselines"] = {
+        "radar": dyn_baselines.get("radar", {}),
+        "pacing": dyn_baselines.get("pacing", {}),
+    }
+
     archetype = match_archetype(agg)
     # Semantic genre matching is currently optimized for English text (all-MiniLM-L6-v2)
     semantic = match_semantic(request.text) if lang == "en" else None
@@ -1002,7 +1008,6 @@ def post_analyze(request: AnalysisRequest):
 
     arc_res = compute_kishotenketsu_quantile_arc(sents, lang)
 
-    dyn_baselines = compute_dynamic_baselines(lang)
     arc = {
         "title": request.title or "Untitled",
         "acts": arc_res["acts"],

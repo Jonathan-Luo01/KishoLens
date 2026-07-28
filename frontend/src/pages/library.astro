@@ -829,6 +829,28 @@ import "../styles/global.css";
         border: 1px solid rgba(148, 163, 184, 0.2);
       }
 
+      :global(.metric-baseline-row) {
+        display: flex;
+        gap: 0.55rem;
+        margin-top: 0.2rem;
+        flex-wrap: wrap;
+      }
+
+      :global(.metric-baseline-item) {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.63rem;
+        color: rgba(255,255,255,0.45);
+      }
+
+      :global(.metric-baseline-dot) {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
       /* Form inputs */
       .form-group {
         display: flex;
@@ -1373,7 +1395,7 @@ import "../styles/global.css";
               </div>
               <div class="db-kpi-tile">
                 <div class="db-kpi-val" id="kpi-genres-val" style="color: #38bdf8;">17</div>
-                <div class="db-kpi-lbl">Canonical Genres</div>
+                <div class="db-kpi-lbl">Genres</div>
               </div>
             </div>
 
@@ -1963,13 +1985,26 @@ import "../styles/global.css";
         narrative_feature_diversity: { label: "Subplot Diversity", category: "pacing", tooltip: "Co-occurrence diversity of secondary entities and subplots" }
       };
 
+      // Maps metric key -> index in RADAR_DIMS baselines array (shared with analyze page)
+      const RADAR_KEY_INDEX = {
+        theme_explication_ratio: 0,
+        linearity_subversion_score: 1,
+        sensory_body_density: 2,
+        outside_world_engagement: 3,
+        narrative_feature_diversity: 4,
+        dialogue_ratio: 5,
+        ttr: 6,
+        compound_sentiment: 7,
+      };
+
       function renderEnhancedMetricsDashboard(stats) {
         const keys = Object.keys(stats);
         const langPrefix = keys.some(k => k.startsWith("en_")) ? "en_" :
                            keys.some(k => k.startsWith("ja_")) ? "ja_" : "zh_";
 
         const normRadar = stats.normalized_radar || {};
-        const baselines = stats.baselines?.radar?.web_novel || stats.baselines?.radar?.classic_lit || [];
+        const wnRadar   = stats.baselines?.radar?.web_novel   || [];
+        const clRadar   = stats.baselines?.radar?.classic_lit || [];
 
         // 1. Hero Summary Header
         const heroHtml = `
@@ -2045,6 +2080,34 @@ import "../styles/global.css";
               benchChipHtml = `<span class="benchmark-chip neutral">Balanced</span>`;
             }
 
+            // Web Novel / Classic Lit baseline row
+            let baselineRowHtml = "";
+            const radarIdx = RADAR_KEY_INDEX[key];
+            if (radarIdx !== undefined) {
+              const wnVal = wnRadar[radarIdx];
+              const clVal = clRadar[radarIdx];
+              if (wnVal !== undefined || clVal !== undefined) {
+                baselineRowHtml = `<div class="metric-baseline-row">`;
+                if (wnVal !== undefined) {
+                  const wnPct = Math.round(wnVal * 100);
+                  baselineRowHtml += `
+                    <span class="metric-baseline-item">
+                      <span class="metric-baseline-dot" style="background:#a78bfa;"></span>
+                      WN: ${wnPct}%
+                    </span>`;
+                }
+                if (clVal !== undefined) {
+                  const clPct = Math.round(clVal * 100);
+                  baselineRowHtml += `
+                    <span class="metric-baseline-item">
+                      <span class="metric-baseline-dot" style="background:#fbbf24;"></span>
+                      CL: ${clPct}%
+                    </span>`;
+                }
+                baselineRowHtml += `</div>`;
+              }
+            }
+
             cardsInCatHtml += `
               <div class="metric-card" data-category="${cat.id}">
                 <div class="metric-card-header">
@@ -2059,6 +2122,7 @@ import "../styles/global.css";
                 <div class="percentile-bar-bg">
                   <div class="percentile-bar-fill ${cat.barClass}" style="width: ${pctWidth}%;"></div>
                 </div>
+                ${baselineRowHtml}
               </div>
             `;
           });
