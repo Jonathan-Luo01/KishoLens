@@ -1,0 +1,45 @@
+---
+import "../styles/global.css";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="KishoLens — stylistic pacing and prose archetype analysis for web novels and light fiction."
+    />
+    <title>KishoLens</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <main class="hero">
+      <div class="hero__glow" aria-hidden="true"></div>
+      <div class="hero__content">
+        <h1 class="hero__title">
+          Kish<span class="hero__title--accent">o</span>Lens
+        </h1>
+        <p class="hero__subtitle">
+          Stylistic pacing · Prose archetypes · Structural metrics
+          <br />for web novels and light fiction
+        </p>
+        <div class="hero__actions">
+          <a href="/analyze" class="btn btn--primary" id="analyze-btn">Analyze Prose</a>
+          <a href="/library" class="btn btn--ghost" id="explore-btn">Explore Library</a>
+        </div>
+      </div>
+      <div class="hero__grid" aria-hidden="true">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <div class="grid__card" style={`animation-delay: ${i * 0.08}s`}></div>
+        ))}
+      </div>
+    </main>
+  </body>
+</html>
