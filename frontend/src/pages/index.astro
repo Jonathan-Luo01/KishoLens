@@ -20,17 +20,16 @@ import "../styles/global.css";
     />
   </head>
   <body>
-    <!-- Site Header -->
-    <header class="site-header">
-      <a href="/" class="brand-title">Kish<span>o</span>Lens</a>
-      <nav class="site-nav">
-        <a href="/analyze">Analyze Prose</a>
-        <a href="/library">Library</a>
-        <a href="#capabilities" id="nav-capabilities">Capabilities</a>
-      </nav>
-    </header>
-
-    <main class="page-container">
+    <div class="hero__glow" aria-hidden="true"></div>
+    <div class="app-container">
+      <header class="site-header">
+        <a href="/" class="brand-title">Kish<span>o</span>Lens</a>
+        <nav class="site-nav">
+          <a href="/analyze">Analyze Prose</a>
+          <a href="/library">Library</a>
+          <a href="#capabilities" id="nav-capabilities">Capabilities</a>
+        </nav>
+      </header>
       <!-- Hero Section -->
       <section class="hero-section">
         <div class="hero-header">
@@ -153,7 +152,7 @@ import "../styles/global.css";
           <span class="stat-label">Languages (EN/JA/ZH)</span>
         </div>
       </section>
-    </main>
+    </div>
 
     <!-- Footer -->
     <footer class="site-footer">
@@ -257,61 +256,20 @@ import "../styles/global.css";
   body {
     margin: 0;
     padding: 0;
-    background-color: var(--bg-main);
-    color: #e2e8f0;
+    background-color: var(--color-bg);
+    color: var(--color-text);
     font-family: var(--font-body);
     line-height: 1.6;
     overflow-x: hidden;
   }
 
-  /* Fixed Header */
-  .site-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 50;
-    background: rgba(11, 12, 16, 0.85);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border-line);
-  }
-
-  .header-container {
-    max-width: 1100px;
+  .app-container {
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0.85rem 1.5rem;
+    padding: 2rem 1.5rem 4rem 1.5rem;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .brand-mark {
-    font-family: var(--font-heading);
-    font-size: 1.35rem;
-    font-weight: 700;
-    color: #ffffff;
-    text-decoration: none;
-  }
-
-  .brand-accent {
-    color: #a78bfa;
-  }
-
-  .header-nav {
-    display: flex;
-    gap: 1.8rem;
-  }
-
-  .nav-item {
-    color: #94a3b8;
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: color 0.2s ease;
-  }
-
-  .nav-item:hover {
-    color: #ffffff;
+    flex-direction: column;
+    gap: 2rem;
   }
 
   /* Buttons */
