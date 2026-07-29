@@ -1874,11 +1874,13 @@ import "../styles/global.css";
 
             if (hoveredIndex !== -1) {
               const dim = RADAR_DIMS[hoveredIndex];
-              const key = dim.key;
-              const statsKey = `en_${key}`;
+              const prefix = Object.keys(currentStats).find(k => k.startsWith("zh_")) ? "zh_" :
+                             Object.keys(currentStats).find(k => k.startsWith("ja_")) ? "ja_" : "en_";
+              const statsKey = dim.key.replace("en_", prefix);
+
               const userVal = (currentStats.normalized_radar && currentStats.normalized_radar[statsKey] !== undefined)
                 ? currentStats.normalized_radar[statsKey]
-                : (currentStats.features && currentStats.features[key] !== undefined ? currentStats.features[key] : 0.5);
+                : norm(currentStats[statsKey] ?? (currentStats.features ? currentStats.features[dim.key.replace("en_", "")] : 0), dim.min, dim.max);
 
               const blVals = (currentStats.baselines && currentStats.baselines.radar && currentStats.baselines.radar[activeBaseline])
                 ? currentStats.baselines.radar[activeBaseline]
