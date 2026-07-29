@@ -22,16 +22,12 @@ import "../styles/global.css";
   <body>
     <!-- Site Header -->
     <header class="site-header">
-      <div class="header-container">
-        <a href="/" class="brand-mark">
-          Kish<span class="brand-accent">o</span>Lens
-        </a>
-        <nav class="header-nav">
-          <a href="/analyze" class="nav-item">Analyze Prose</a>
-          <a href="/library" class="nav-item">Library</a>
-          <a href="#capabilities" class="nav-item">Capabilities</a>
-        </nav>
-      </div>
+      <a href="/" class="brand-title">Kish<span>o</span>Lens</a>
+      <nav class="site-nav">
+        <a href="/analyze">Analyze Prose</a>
+        <a href="/library">Library</a>
+        <a href="#capabilities" id="nav-capabilities">Capabilities</a>
+      </nav>
     </header>
 
     <main class="page-container">
@@ -224,6 +220,25 @@ import "../styles/global.css";
             }
           });
         });
+
+        // Capabilities section scroll highlight observer
+        const capSection = document.getElementById("capabilities");
+        const capNav = document.getElementById("nav-capabilities");
+        if (capSection && capNav) {
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  capNav.classList.add("active");
+                } else {
+                  capNav.classList.remove("active");
+                }
+              });
+            },
+            { threshold: 0.3 }
+          );
+          observer.observe(capSection);
+        }
       });
     </script>
   </body>
