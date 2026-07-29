@@ -62,7 +62,7 @@ import "../styles/global.css";
           <!-- Excerpt Box -->
           <div class="excerpt-box">
             <p id="excerpt-text" class="excerpt-content">
-              "The victim left no signs of struggle, Inspector," Miller whispered, pointing to the unlatched study window. "Only a silver timepiece lying shattered on the mahogany desk, its hands frozen at midnight."
+              Inspector Holmes knelt by the corpse, examining the faint scent of bitter almonds clinging to the victim's lips. "A classic case of cyanide poisoning, Watson," he declared, holding up a small glass vial found near the fireplace.
             </p>
           </div>
 
@@ -70,15 +70,15 @@ import "../styles/global.css";
           <div class="reader-metrics">
             <div class="metric-pill">
               <span class="pill-lbl">Syntactic Depth</span>
-              <span id="metric-depth" class="pill-val color-purple">4.5</span>
+              <span id="metric-depth" class="pill-val color-purple">8.5</span>
             </div>
             <div class="metric-pill">
               <span class="pill-lbl">Dialogue Ratio</span>
-              <span id="metric-dialogue" class="pill-val color-cyan">69.7%</span>
+              <span id="metric-dialogue" class="pill-val color-cyan">18.4%</span>
             </div>
             <div class="metric-pill">
               <span class="pill-lbl">Vocabulary TTR</span>
-              <span id="metric-ttr" class="pill-val color-emerald">0.88</span>
+              <span id="metric-ttr" class="pill-val color-emerald">0.87</span>
             </div>
             <div class="metric-pill">
               <span class="pill-lbl">Territory Match</span>
@@ -88,7 +88,7 @@ import "../styles/global.css";
 
           <!-- Reader Action Link to Analyze Page -->
           <div class="reader-action-row">
-            <a id="btn-open-in-analyzer" href="/analyze?text=%22The%20victim%20left%20no%20signs%20of%20struggle%2C%20Inspector%2C%22%20Miller%20whispered%2C%20pointing%20to%20the%20unlatched%20study%20window.%20%22Only%20a%20silver%20timepiece%20lying%20shattered%20on%20the%20mahogany%20desk%2C%20its%20hands%20frozen%20at%20midnight.%22" class="btn btn-sm btn-accent">
+            <a id="btn-open-in-analyzer" href="/analyze?text=Inspector%20Holmes%20knelt%20by%20the%20corpse%2C%20examining%20the%20faint%20scent%20of%20bitter%20almonds%20clinging%20to%20the%20victim%27s%20lips.%20%22A%20classic%20case%20of%20cyanide%20poisoning%2C%20Watson%2C%22%20he%20declared%2C%20holding%20up%20a%20small%20glass%20vial%20found%20near%20the%20fireplace." class="btn btn-sm btn-accent">
               Analyze This Excerpt in Tool &rarr;
             </a>
           </div>
@@ -165,24 +165,24 @@ import "../styles/global.css";
     <script>
       const SAMPLES = {
         mystery: {
-          text: '"The victim left no signs of struggle, Inspector," Miller whispered, pointing to the unlatched study window. "Only a silver timepiece lying shattered on the mahogany desk, its hands frozen at midnight."',
-          depth: "4.5",
-          dialogue: "69.7%",
-          ttr: "0.88",
+          text: 'Inspector Holmes knelt by the corpse, examining the faint scent of bitter almonds clinging to the victim\'s lips. "A classic case of cyanide poisoning, Watson," he declared, holding up a small glass vial found near the fireplace.',
+          depth: "8.5",
+          dialogue: "18.4%",
+          ttr: "0.87",
           territory: "Classic Literature Territory"
         },
         fantasy: {
-          text: '"Ancient runes of violet flame ignited along the obsidian archway, casting long shadows across the forgotten temple. Deep within the vault, the slumbering wyrm opened a single crimson eye."',
-          depth: "5.2",
+          text: 'High atop the ancient spire of the Archmage, Leylin channeled his mana into the crystal orb. Arcane lightning erupted across the stormy sky as the dragon unleashed a roar that shook the realm of Eldoria.',
+          depth: "6.5",
           dialogue: "0.0%",
-          ttr: "0.90",
+          ttr: "0.83",
           territory: "Classic Literature Territory"
         },
         isekai: {
-          text: '"Status Open!" Haruto shouted in disbelief. A glowing blue system interface materialized before his eyes, displaying his reincarnated stats: Level 1 Villager with MAX Luck and Divine Alchemy.',
-          depth: "4.2",
-          dialogue: "6.9%",
-          ttr: "0.86",
+          text: 'Haruto summoned his floating blue system menu in shock. "I really got reincarnated with Level 99 stats and cheat alchemy!" he exclaimed, checking his status window.',
+          depth: "4.3",
+          dialogue: "42.3%",
+          ttr: "0.96",
           territory: "Web Novel Territory"
         }
       };
