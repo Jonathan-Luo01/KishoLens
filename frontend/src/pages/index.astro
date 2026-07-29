@@ -39,7 +39,7 @@ import "../styles/global.css";
             Stylistic Pacing &bull; Prose Archetypes &bull; Structural Metrics
           </p>
           <p class="hero-desc">
-            Advanced narrative intelligence for web novels, light fiction, and classic literature across 17 canonical genres and 3 languages.
+            Prose analysis dashboard for web novels, light fiction, and classic literature across 17 genres and 3 languages.
           </p>
 
           <div class="hero-actions">
@@ -53,9 +53,9 @@ import "../styles/global.css";
           <div class="reader-header">
             <span class="reader-label">PROSE SAMPLE INTERACTIVE TEASER</span>
             <div class="reader-tabs" role="tablist">
-              <button class="reader-tab active" data-sample="xianxia" role="tab" aria-selected="true">Xianxia Cultivation</button>
+              <button class="reader-tab active" data-sample="xianxia" role="tab" aria-selected="true">Cultivation</button>
               <button class="reader-tab" data-sample="gothic" role="tab" aria-selected="false">Classic Gothic</button>
-              <button class="reader-tab" data-sample="slice" role="tab" aria-selected="false">Cozy Slice of Life</button>
+              <button class="reader-tab" data-sample="slice" role="tab" aria-selected="false">Slice of Life</button>
             </div>
           </div>
 
@@ -69,16 +69,16 @@ import "../styles/global.css";
           <!-- Live Metrics Bar -->
           <div class="reader-metrics">
             <div class="metric-pill">
-              <span class="pill-lbl">Pacing Arc</span>
-              <span id="metric-pacing" class="pill-val color-purple">Ki 起 &rarr; Shō 承 &rarr; Ten 転 &rarr; Ketsu 结</span>
+              <span class="pill-lbl">Syntactic Depth</span>
+              <span id="metric-depth" class="pill-val color-purple">4.8</span>
             </div>
             <div class="metric-pill">
               <span class="pill-lbl">Dialogue Ratio</span>
-              <span id="metric-dialogue" class="pill-val color-cyan">34.2%</span>
+              <span id="metric-dialogue" class="pill-val color-cyan">0.0%</span>
             </div>
             <div class="metric-pill">
               <span class="pill-lbl">Vocabulary TTR</span>
-              <span id="metric-ttr" class="pill-val color-emerald">0.84</span>
+              <span id="metric-ttr" class="pill-val color-emerald">0.85</span>
             </div>
             <div class="metric-pill">
               <span class="pill-lbl">Territory Match</span>
@@ -115,7 +115,7 @@ import "../styles/global.css";
             <span class="col-num">02</span>
             <h3 class="col-title">Vector Archetype Engine</h3>
             <p class="col-desc">
-              384-dimensional embedding cosine similarity matching against 2,800+ ingested novels to map works into Web Novel Territory vs. Classic Literature Territory across 17 canonical genres.
+              384-dimensional embedding cosine similarity matching against 2,800+ ingested novels to map works into Web Novel Territory vs. Classic Literature Territory across 17 genres.
             </p>
           </div>
 
@@ -138,7 +138,7 @@ import "../styles/global.css";
         <span class="stat-sep">&bull;</span>
         <div class="stat-unit">
           <span class="stat-value">17</span>
-          <span class="stat-label">Canonical Genres</span>
+          <span class="stat-label">Genres</span>
         </div>
         <span class="stat-sep">&bull;</span>
         <div class="stat-unit">
@@ -166,23 +166,23 @@ import "../styles/global.css";
       const SAMPLES = {
         xianxia: {
           text: '"The spiritual energy of the golden core surged through his meridians as the ancient Daoist inscription glowed. He broke through the bottleneck of the Nascent Soul stage in a burst of celestial light."',
-          pacing: "Ki 起 → Shō 承 → Ten 転 → Ketsu 结",
-          dialogue: "34.2%",
-          ttr: "0.84",
+          depth: "4.8",
+          dialogue: "0.0%",
+          ttr: "0.85",
           territory: "Web Novel Territory"
         },
         gothic: {
           text: '"It was a dreary night of November that I beheld the accomplishment of my labours. With an anxiety that almost amounted to agony, I collected the instruments of life around me..."',
-          pacing: "Ki 起 → Shō 承 → Ten 転 → Ketsu 结",
-          dialogue: "18.5%",
-          ttr: "0.92",
+          depth: "5.2",
+          dialogue: "0.0%",
+          ttr: "0.90",
           territory: "Classic Literature Territory"
         },
         slice: {
-          text: '"The morning sun filtered gently into the small hillside tea shop. The kettle began to simmer as old village friends gathered at the counter to talk about the seasonal harvest."',
-          pacing: "Ki 起 → Shō 承 → Ten 転 → Ketsu 结",
-          dialogue: "52.0%",
-          ttr: "0.76",
+          text: '"Good morning, grandmother!" she called out, setting down the fresh tea leaves. "The kettle is already simmering on the hearth."',
+          depth: "4.2",
+          dialogue: "54.5%",
+          ttr: "0.82",
           territory: "Web Novel Territory"
         }
       };
@@ -190,7 +190,7 @@ import "../styles/global.css";
       document.addEventListener("DOMContentLoaded", () => {
         const tabs = document.querySelectorAll(".reader-tab");
         const textEl = document.getElementById("excerpt-text");
-        const pacingEl = document.getElementById("metric-pacing");
+        const depthEl = document.getElementById("metric-depth");
         const dialogueEl = document.getElementById("metric-dialogue");
         const ttrEl = document.getElementById("metric-ttr");
         const territoryEl = document.getElementById("metric-territory");
@@ -210,7 +210,7 @@ import "../styles/global.css";
 
             if (sample && textEl) {
               textEl.textContent = sample.text;
-              if (pacingEl) pacingEl.textContent = sample.pacing;
+              if (depthEl) depthEl.textContent = sample.depth;
               if (dialogueEl) dialogueEl.textContent = sample.dialogue;
               if (ttrEl) ttrEl.textContent = sample.ttr;
               if (territoryEl) territoryEl.textContent = sample.territory;
