@@ -239,18 +239,8 @@ def find_top_matches(
             n_territory = n_meta.get("territory") or novel.territory
             territory_sim = 1.0 if (target_territory and n_territory and (target_territory.lower() in n_territory.lower() or n_territory.lower() in target_territory.lower())) else 0.0
 
-            # 5. Entity / Author / Title Overlap Boost
-            entity_boost = 0.0
-            if query_text:
-                q_low = query_text.lower()
-                t_low = (novel.title or "").lower()
-                a_low = (novel.author or "").lower()
-                if "holmes" in q_low or "watson" in q_low or "sherlock" in q_low:
-                    if "holmes" in t_low or "sherlock" in t_low or "doyle" in a_low:
-                        entity_boost += 0.35
-
-            # Composite weighted similarity score (35% style, 20% parent genre, 15% fine tags, 30% territory + entity boost)
-            composite_score = (0.35 * style_sim) + (0.20 * genre_sim) + (0.15 * tag_sim) + (0.30 * territory_sim) + entity_boost
+            # Composite weighted similarity score (35% style, 25% parent genre, 15% fine tags, 25% territory)
+            composite_score = (0.35 * style_sim) + (0.25 * genre_sim) + (0.15 * tag_sim) + (0.25 * territory_sim)
             id_variance = ((novel.id * 17 + 31) % 100) / 2000.0
             score = round(min(0.99, max(0.10, composite_score + id_variance)), 2)
 
