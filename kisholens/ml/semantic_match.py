@@ -60,7 +60,7 @@ ANCHOR_TERMS: dict[str, list[str]] = {
         r"\barchmage\b", r"\bwizard\b", r"\bsorcerer\b", r"\belf\b", r"\belven\b",
         r"\bdragon\b", r"\bmagic\b", r"\bspell\b", r"\bspire\b", r"\bgoblin\b", r"\borc\b",
         r"\bkingdom\b", r"\bpaladin\b", r"\bhigh fantasy\b", r"\bmonolith\b", r"\bwyrm\b",
-        r"\bmana\b"
+        r"\bmana\b", r"\brealm\b"
     ],
     "Isekai": [
         r"\breincarnat", r"\btransmigrat", r"\breborn\b", r"\btruck-kun\b",
@@ -83,20 +83,47 @@ ANCHOR_TERMS: dict[str, list[str]] = {
     "Mystery": [
         r"\binspector\b", r"\bdetective\b", r"\bcyanide\b", r"\bpoison\b",
         r"\bwhodunit\b", r"\bmurder victim\b", r"\bsuspect\b", r"\bforensic\b",
-        r"\bcrime scene\b", r"\bhomicide\b"
+        r"\bcrime scene\b", r"\bhomicide\b", r"\bwatson\b", r"\bholmes\b",
+        r"\bclue\b", r"\bcase\b", r"\binterrogat"
     ],
     "Sci-Fi": [
         r"\bspaceship\b", r"\bstarship\b", r"\bcybernetic\b", r"\bandroid\b",
         r"\bwarp drive\b", r"\balien\b", r"\bgalaxy\b", r"\bquantum\b",
-        r"\bcyberpunk\b", r"\bteleport\b"
+        r"\bcyberpunk\b", r"\bteleport\b", r"\bspacecraft\b", r"\binterstellar\b",
+        r"\bsci-fi\b", r"\bscience fiction\b"
     ],
     "Horror": [
         r"\bhaunted\b", r"\bdemonic\b", r"\bghost\b", r"\bspecter\b",
-        r"\bmacabre\b", r"\bpossession\b", r"\beeldritch\b", r"\bnightmare\b"
+        r"\bmacabre\b", r"\bpossession\b", r"\beeldritch\b", r"\bnightmare\b",
+        r"\bterrifying\b", r"\bcreepy\b"
     ],
     "Romance": [
         r"\bblush", r"\bheartbeat\b", r"\bconfession\b", r"\bfluster",
-        r"\bfirst kiss\b", r"\bsecret crush\b", r"\belope\b"
+        r"\bfirst kiss\b", r"\bsecret crush\b", r"\belope\b", r"\btrue love\b"
+    ],
+    "Action / Adventure": [
+        r"\bswordfight\b", r"\bbattlefield\b", r"\bambush\b", r"\bexpedition\b",
+        r"\bquest\b", r"\bcombat\b", r"\bblade\b", r"\bwarrior\b"
+    ],
+    "Drama": [
+        r"\btragedy\b", r"\bbetrayal\b", r"\bconflict\b", r"\bfamily feud\b",
+        r"\btearful\b", r"\bsorrow\b", r"\bheartbreak\b"
+    ],
+    "Comedy": [
+        r"\bhilarious\b", r"\blaugh\b", r"\babsurd\b", r"\bprank\b",
+        r"\bchuckle\b", r"\bparody\b", r"\bsarcastic\b"
+    ],
+    "Slice of Life": [
+        r"\bcozy\b", r"\bcafe\b", r"\btea shop\b", r"\beveryday\b",
+        r"\bpeaceful\b", r"\bneighborhood\b", r"\bschool life\b"
+    ],
+    "Historical": [
+        r"\bvictorian\b", r"\bmedieval\b", r"\bdynasty\b", r"\bempire\b",
+        r"\bmonarch\b", r"\bking\b", r"\bqueen\b", r"\bduke\b"
+    ],
+    "Supernatural": [
+        r"\bparanormal\b", r"\bspirit\b", r"\bphantom\b", r"\bcurse\b",
+        r"\bexorcist\b", r"\boccult\b"
     ]
 }
 
