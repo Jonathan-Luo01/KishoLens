@@ -190,6 +190,10 @@ def match_semantic(
     full_scan_text = f"{title or ''} {synopsis or ''} {text}".strip()
     anchor_boosts = scan_anchor_boosts(full_scan_text)
 
+    # Sigmoid confidence calibration function: maps mean-centered vector scores into realistic 0-1 confidence percentages
+    def _calibrate_confidence(s: float, k: float = 5.5) -> float:
+        return float(1.0 / (1.0 + np.exp(-k * s)))
+
     # Build sorted genre scores list
     genres = g_meta["genres"]
     genre_scores = []
@@ -199,10 +203,11 @@ def match_semantic(
         if val != val:
             val = 0.0
         val = val + anchor_boosts.get(g_name, 0.0)
-        val = max(-1.0, min(1.0, val))
+        calibrated_val = _calibrate_confidence(val)
         genre_scores.append({
             "genre": g_name,
-            "score": val,
+            "score": calibrated_val,
+            "raw_score": val,
         })
     genre_scores.sort(key=lambda x: x["score"], reverse=True)
 
@@ -213,10 +218,11 @@ def match_semantic(
         val = float(t_sims[i])
         if val != val:
             val = 0.0
-        val = max(-1.0, min(1.0, val))
+        calibrated_val = _calibrate_confidence(val)
         territory_scores.append({
             "territory": territories[i],
-            "score": val,
+            "score": calibrated_val,
+            "raw_score": val,
         })
     territory_scores.sort(key=lambda x: x["score"], reverse=True)
 
