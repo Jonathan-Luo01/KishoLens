@@ -1808,6 +1808,7 @@ import "../styles/global.css";
           });
 
           const pct = Math.round((m.similarity_score || 0) * 100);
+          const topGenres = (m.genre || 'Fiction').split(',').map(g => g.trim()).filter(Boolean).slice(0, 3).join(', ');
           const scoreColor = m.similarity_score > 0.9 ? '#38bdf8' : m.similarity_score > 0.8 ? '#818cf8' : '#94a3b8';
 
           item.innerHTML = `
@@ -1816,7 +1817,7 @@ import "../styles/global.css";
               <div class="doppelganger-info">
                 <h4 class="doppelganger-item-title">${m.title}</h4>
                 ${m.author ? `<span class="doppelganger-author">${m.author}</span>` : ''}
-                <span class="doppelganger-badge">${m.genre || 'Fiction'}</span>
+                <span class="doppelganger-badge">${topGenres}</span>
               </div>
             </div>
 
