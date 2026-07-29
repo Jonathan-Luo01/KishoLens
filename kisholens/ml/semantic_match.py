@@ -60,7 +60,7 @@ ANCHOR_TERMS: dict[str, list[str]] = {
         r"\barchmage\b", r"\bwizard\b", r"\bsorcerer\b", r"\belf\b", r"\belven\b",
         r"\bdragon\b", r"\bmagic\b", r"\bspell\b", r"\bspire\b", r"\bgoblin\b", r"\borc\b",
         r"\bkingdom\b", r"\bpaladin\b", r"\bhigh fantasy\b", r"\bmonolith\b", r"\bwyrm\b",
-        r"\bmana\b", r"\brealm\b"
+        r"\bmana\b", r"\brealm\b", r"\barcane\b"
     ],
     "Isekai": [
         r"\breincarnat", r"\btransmigrat", r"\breborn\b", r"\btruck-kun\b",
@@ -78,7 +78,7 @@ ANCHOR_TERMS: dict[str, list[str]] = {
         r"\bsystem notification\b", r"\blitrpg\b", r"\bstat screen\b",
         r"\bleveling\b", r"\bexperience points\b", r"\bexp\b", r"\bclass rank\b",
         r"\bweak to strong\b", r"\blevel system\b", r"\baccelerated growth\b",
-        r"\bvrmmo\b", r"\bvrmmorpg\b"
+        r"\bvrmmo\b", r"\bvrmmorpg\b", r"\blevel \d+\b", r"\bdivine stats\b"
     ],
     "Mystery": [
         r"\binspector\b", r"\bdetective\b", r"\bcyanide\b", r"\bpoison\b",
@@ -95,7 +95,7 @@ ANCHOR_TERMS: dict[str, list[str]] = {
     "Horror": [
         r"\bhaunted\b", r"\bdemonic\b", r"\bghost\b", r"\bspecter\b",
         r"\bmacabre\b", r"\bpossession\b", r"\beeldritch\b", r"\bnightmare\b",
-        r"\bterrifying\b", r"\bcreepy\b"
+        r"\bterrifying\b", r"\bcreepy\b", r"\bcorpse\b", r"\bvictim\b"
     ],
     "Romance": [
         r"\bblush", r"\bheartbeat\b", r"\bconfession\b", r"\bfluster",
@@ -103,11 +103,12 @@ ANCHOR_TERMS: dict[str, list[str]] = {
     ],
     "Action / Adventure": [
         r"\bswordfight\b", r"\bbattlefield\b", r"\bambush\b", r"\bexpedition\b",
-        r"\bquest\b", r"\bcombat\b", r"\bblade\b", r"\bwarrior\b"
+        r"\bquest\b", r"\bcombat\b", r"\bblade\b", r"\bwarrior\b", r"\berupted\b",
+        r"\bunleashed\b", r"\broar\b"
     ],
     "Drama": [
         r"\btragedy\b", r"\bbetrayal\b", r"\bconflict\b", r"\bfamily feud\b",
-        r"\btearful\b", r"\bsorrow\b", r"\bheartbreak\b"
+        r"\btearful\b", r"\bsorrow\b", r"\bheartbreak\b", r"\bvictim\b"
     ],
     "Comedy": [
         r"\bhilarious\b", r"\blaugh\b", r"\babsurd\b", r"\bprank\b",
@@ -123,7 +124,7 @@ ANCHOR_TERMS: dict[str, list[str]] = {
     ],
     "Supernatural": [
         r"\bparanormal\b", r"\bspirit\b", r"\bphantom\b", r"\bcurse\b",
-        r"\bexorcist\b", r"\boccult\b"
+        r"\bexorcist\b", r"\boccult\b", r"\barcane\b", r"\bmana\b", r"\bcrystal orb\b"
     ]
 }
 
@@ -164,11 +165,20 @@ def match_semantic(
         emb_norm = 1.0
     norm_emb = embedding / emb_norm
 
-    # 1. Genre similarity
+    # 1. Genre similarity with common-space mean centroid subtraction
     g_norms = np.linalg.norm(g_centroids, axis=1, keepdims=True)
     g_safe_norms = np.where(g_norms == 0, 1.0, g_norms)
     norm_g_centroids = g_centroids / g_safe_norms
-    g_sims = np.dot(norm_emb, norm_g_centroids.T)[0]
+
+    # Global mean centroid vector across all 17 genre centroids in g_centroids
+    g_mean = norm_g_centroids.mean(axis=0, keepdims=True)
+    g_sub = norm_g_centroids - g_mean
+
+    # Compute dot product against centered genre centroids
+    g_sims = np.dot(norm_emb, g_sub.T)[0]
+
+    # Baseline noise subtraction across 17 genre similarities so cross-genre noise drops below 0
+    g_sims = g_sims - np.mean(g_sims)
 
     # 2. Territory similarity
     t_norms = np.linalg.norm(t_centroids, axis=1, keepdims=True)

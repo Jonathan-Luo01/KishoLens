@@ -781,35 +781,35 @@ import "../styles/global.css";
         flex-shrink: 0;
       }
 
-      /* Tooltip for Radar Chart */
+      /* Hover Tooltips for Charts */
       .radar-tooltip {
-        background: rgba(10, 10, 20, 0.95);
-        border: 1px solid rgba(167, 139, 250, 0.35);
+        position: fixed;
+        pointer-events: none;
+        background: rgba(10, 10, 18, 0.95);
+        border: 1px solid rgba(124, 106, 255, 0.35);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
         backdrop-filter: blur(8px);
         border-radius: 8px;
-        padding: 0.65rem 0.9rem;
-        font-family: 'Inter', sans-serif;
-        color: #fff;
-        pointer-events: none;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+        padding: 0.65rem 0.85rem;
         font-size: 0.8rem;
-        line-height: 1.45;
-        transition: opacity 0.1s ease;
+        z-index: 1000;
+        display: none;
       }
       .radar-tooltip-title {
-        font-family: 'Outfit', sans-serif;
         font-weight: 700;
-        font-size: 0.85rem;
-        color: #7dd3fc;
-        margin-bottom: 0.25rem;
+        color: #ffffff;
+        margin-bottom: 0.35rem;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        padding-bottom: 0.25rem;
       }
       .radar-tooltip-row {
         display: flex;
         justify-content: space-between;
-        gap: 1.5rem;
-        margin-top: 0.15rem;
+        gap: 1rem;
+        margin-top: 0.2rem;
       }
       .radar-tooltip-val {
+        font-family: var(--font-display);
         font-weight: 600;
       }
     </style>
@@ -1351,6 +1351,7 @@ import "../styles/global.css";
       /* ── Radar chart (Canvas) ── */
       function drawRadar(stats, baseline) {
         const canvas = document.getElementById("radarChart");
+        if (!canvas) return;
         const dpr = window.devicePixelRatio || 1;
 
         const cssW = canvas.clientWidth  || 480;
@@ -1425,7 +1426,7 @@ import "../styles/global.css";
           ctx.beginPath();
           values.forEach((v, i) => {
             const angle = (2 * Math.PI * i / n) - Math.PI / 2;
-            const r = R * v;
+            const r = R * Math.max(0, Math.min(1, v));
             i === 0 ? ctx.moveTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle))
                     : ctx.lineTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
           });
@@ -1445,8 +1446,13 @@ import "../styles/global.css";
 
         const blColor = baseline === "web_novel" ? "#a78bfa" : "#fbbf24";
         const blRgb = baseline === "web_novel" ? "167,139,250" : "251,191,36";
+
+        const blVals = (stats.baselines && stats.baselines.radar && stats.baselines.radar[baseline])
+          ? stats.baselines.radar[baseline]
+          : RADAR_BASELINES[baseline];
+
         plotPolygon(
-          RADAR_BASELINES[baseline],
+          blVals,
           `rgba(${blRgb}, ${blOpacityStroke})`,
           `rgba(${blRgb}, ${blOpacityFill})`
         );
@@ -1470,7 +1476,7 @@ import "../styles/global.css";
         userVals.forEach((v, i) => {
           const isHovered = hoveredIndex === i;
           const angle = (2 * Math.PI * i / n) - Math.PI / 2;
-          const r = R * v;
+          const r = R * Math.max(0, Math.min(1, v));
           ctx.beginPath();
           
           if (isHovered) {
@@ -1491,9 +1497,9 @@ import "../styles/global.css";
         });
 
         if (hasHover) {
-          const blVal = RADAR_BASELINES[baseline][hoveredIndex];
+          const blVal = blVals[hoveredIndex];
           const angle = (2 * Math.PI * hoveredIndex / n) - Math.PI / 2;
-          const r = R * blVal;
+          const r = R * Math.max(0, Math.min(1, blVal));
           ctx.beginPath();
           ctx.shadowBlur = 8;
           ctx.shadowColor = blColor;
@@ -1524,6 +1530,7 @@ import "../styles/global.css";
       /* ── Kishōtenketsu arc (SVG) ── */
       function drawArc(arcData, baseline) {
         const svg = document.getElementById("arcChart");
+        if (!svg) return;
         svg.innerHTML = "";
         const W = 600, H = 420;
         const PAD = { top: 30, bottom: 48, left: 48, right: 48 };
@@ -1534,7 +1541,9 @@ import "../styles/global.css";
         const acts    = (arcData.quantiles && arcData.quantiles.length > 0)
           ? arcData.quantiles.map((v, i) => ({ sentiment: v, actIndex: i }))
           : arcData.acts;
-        const blVals  = arcData.baselines[baseline];
+        const blVals  = (arcData.baselines && arcData.baselines[baseline])
+          ? arcData.baselines[baseline]
+          : [0.0839, 0.0588, 0.1347, 0.1006];
         const blColor = baseline === "web_novel" ? "#a78bfa" : "#fbbf24";
         const blRgb   = baseline === "web_novel" ? "167,139,250" : "251,191,36";
 
@@ -1551,13 +1560,13 @@ import "../styles/global.css";
           let d = `M ${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
           for (let i = 0; i < pts.length - 1; i++) {
             const cpx = ((pts[i][0] + pts[i+1][0]) / 2).toFixed(1);
-            d += ` C ${cpx},${pts[i][1].toFixed(1)} ${cpx},${pts[i+1][1].toFixed(1)} ${pts[i+1][0].toFixed(1)},${pts[i+1][1].toFixed(1)}`;
+            d += ` C ${cpx},${pts[i][1].toFixed(1)} ${cpx},${pts[i+1][1].toFixed(1)} ${pts[i+1][0].toFixed(1)},${pts[i+1][0].toFixed(1)}`;
           }
           return d;
         }
 
         const xs      = acts.map((_, i) => actX(i));
-        const userYs  = acts.map(a => sentY(a.sentiment));
+        const userYs  = acts.map(a => sentY(typeof a === "number" ? a : a.sentiment));
         const blYs    = blVals.map(v => sentY(v));
         const pathD   = smoothPath(xs, userYs);
         const blPathD = smoothPath(xs, blYs);
@@ -1565,7 +1574,7 @@ import "../styles/global.css";
         const areaClose = (path, xArr) =>
           `${path} L ${xArr[xArr.length-1].toFixed(1)},${zeroY.toFixed(1)} L ${xArr[0].toFixed(1)},${zeroY.toFixed(1)} Z`;
 
-        const userAvgAbs = acts.reduce((s, a) => s + Math.abs(a.sentiment), 0) / acts.length;
+        const userAvgAbs = acts.reduce((s, a) => s + Math.abs(typeof a === "number" ? a : a.sentiment), 0) / acts.length;
         const blAvgAbs   = blVals.reduce((s, v) => s + Math.abs(v), 0) / blVals.length;
         const userIsInner = userAvgAbs <= blAvgAbs;
         const [innerPathD, outerPathD] = userIsInner ? [pathD, blPathD] : [blPathD, pathD];
@@ -1610,6 +1619,17 @@ import "../styles/global.css";
         clipPath.appendChild(clipShape);
         defs.appendChild(clipPath);
         svg.appendChild(defs);
+
+        // Vertical guide line when hovering
+        if (hoveredArcIndex >= 0 && hoveredArcIndex < acts.length) {
+          const hx = actX(hoveredArcIndex);
+          const vGuide = document.createElementNS(ns, "line");
+          vGuide.setAttribute("x1", hx); vGuide.setAttribute("y1", PAD.top);
+          vGuide.setAttribute("x2", hx); vGuide.setAttribute("y2", bottomY);
+          vGuide.setAttribute("stroke", "rgba(255,255,255,0.25)");
+          vGuide.setAttribute("stroke-dasharray", "3 3");
+          svg.appendChild(vGuide);
+        }
 
         /* ── Grid lines ── */
         [-1, -0.5, 0, 0.5, 1].forEach(val => {
@@ -1683,8 +1703,9 @@ import "../styles/global.css";
         blPath.setAttribute("d", blPathD);
         blPath.setAttribute("fill", "none");
         blPath.setAttribute("stroke", blColor);
-        blPath.setAttribute("stroke-width", "1.5");
-        blPath.setAttribute("stroke-dasharray", "5 3");
+        blPath.setAttribute("stroke-width", "1.75");
+        blPath.setAttribute("stroke-dasharray", "5 4");
+        blPath.setAttribute("opacity", "0.85");
         svg.appendChild(blPath);
 
         const userPath = document.createElementNS(ns, "path");
@@ -1694,62 +1715,35 @@ import "../styles/global.css";
         userPath.setAttribute("stroke-width", "2.5");
         svg.appendChild(userPath);
 
-        /* ── Hover Vertical Guide ── */
-        if (hoveredArcIndex !== -1) {
-          const hx = xs[hoveredArcIndex];
-          const hoverLine = document.createElementNS(ns, "line");
-          hoverLine.setAttribute("x1", hx.toFixed(1));
-          hoverLine.setAttribute("y1", String(PAD.top));
-          hoverLine.setAttribute("x2", hx.toFixed(1));
-          hoverLine.setAttribute("y2", String(bottomY));
-          hoverLine.setAttribute("stroke", "rgba(255,255,255,0.22)");
-          hoverLine.setAttribute("stroke-width", "1.5");
-          svg.appendChild(hoverLine);
-        }
-
         /* ── Dots ── */
-        acts.forEach((a, i) => {
-          const px = xs[i], py = userYs[i];
-          const isHovered = hoveredArcIndex === i;
+        xs.forEach((x, i) => {
+          const userDot = document.createElementNS(ns, "circle");
+          userDot.setAttribute("cx", x); userDot.setAttribute("cy", userYs[i]);
+          userDot.setAttribute("r", i === hoveredArcIndex ? "6" : "4");
+          userDot.setAttribute("fill", "#7dd3fc");
+          userDot.setAttribute("stroke", "#0a0a12");
+          userDot.setAttribute("stroke-width", "2");
+          svg.appendChild(userDot);
 
-          const circle = document.createElementNS(ns, "circle");
-          circle.setAttribute("cx", px); circle.setAttribute("cy", py);
-          circle.setAttribute("r", isHovered ? "6.5" : "4.5");
-          circle.setAttribute("fill", "#7dd3fc");
-          circle.setAttribute("stroke", "#0a0a12");
-          circle.setAttribute("stroke-width", isHovered ? "2.5" : "1.5");
-          svg.appendChild(circle);
-
-          if (isHovered) {
-            const blPy = blYs[i];
-            const blCircle = document.createElementNS(ns, "circle");
-            blCircle.setAttribute("cx", px); blCircle.setAttribute("cy", blPy);
-            blCircle.setAttribute("r", "6.5");
-            blCircle.setAttribute("fill", blColor);
-            blCircle.setAttribute("stroke", "#0a0a12");
-            blCircle.setAttribute("stroke-width", "2.5");
-            svg.appendChild(blCircle);
-          }
-
-          const lbl = document.createElementNS(ns, "text");
-          lbl.setAttribute("x", px); lbl.setAttribute("y", py - 11);
-          lbl.setAttribute("text-anchor", "middle");
-          lbl.setAttribute("fill", isHovered ? "#fff" : "rgba(255,255,255,0.7)");
-          lbl.setAttribute("font-size", isHovered ? "11" : "10");
-          lbl.setAttribute("font-family", "Inter, sans-serif");
-          lbl.setAttribute("font-weight", isHovered ? "bold" : "normal");
-          lbl.textContent = a.sentiment >= 0 ? `+${a.sentiment.toFixed(2)}` : a.sentiment.toFixed(2);
-          svg.appendChild(lbl);
+          const blDot = document.createElementNS(ns, "circle");
+          blDot.setAttribute("cx", x); blDot.setAttribute("cy", blYs[i]);
+          blDot.setAttribute("r", i === hoveredArcIndex ? "5" : "3.5");
+          blDot.setAttribute("fill", blColor);
+          blDot.setAttribute("stroke", "#0a0a12");
+          blDot.setAttribute("stroke-width", "1.5");
+          svg.appendChild(blDot);
         });
 
         const actLabels = document.getElementById("actLabels");
-        actLabels.innerHTML = "";
-        acts.forEach(a => {
-          const chip = document.createElement("div");
-          chip.className = "act-chip";
-          chip.innerHTML = `<span class="act-key">${a.act}</span><span class="act-name">${a.label}</span>`;
-          actLabels.appendChild(chip);
-        });
+        if (actLabels) {
+          actLabels.innerHTML = "";
+          acts.forEach(a => {
+            const chip = document.createElement("div");
+            chip.className = "act-chip";
+            chip.innerHTML = `<span class="act-key">${a.act || ''}</span><span class="act-name">${a.label || ''}</span>`;
+            actLabels.appendChild(chip);
+          });
+        }
       }
 
       /* ── Rhythmic Pacing (Paragraph Barcode) ── */
@@ -1838,172 +1832,186 @@ import "../styles/global.css";
       const canvasNode = document.getElementById("radarChart");
       const tooltipNode = document.getElementById("radarTooltip");
 
-      canvasNode.addEventListener("mousemove", (e) => {
-        if (!currentStats) return;
-        const rect = canvasNode.getBoundingClientRect();
-        const mx = e.clientX - rect.left;
-        const my = e.clientY - rect.top;
-        const cx = rect.width / 2;
-        const cy = rect.height / 2;
-        const dx = mx - cx;
-        const dy = my - cy;
-        const d = Math.sqrt(dx * dx + dy * dy);
-        let angle = Math.atan2(dy, dx);
+      if (canvasNode && tooltipNode) {
+        canvasNode.addEventListener("mousemove", (e) => {
+          if (!currentStats) return;
+          const rect = canvasNode.getBoundingClientRect();
+          const mx = e.clientX - rect.left;
+          const my = e.clientY - rect.top;
+          const cx = rect.width / 2;
+          const cy = rect.height / 2;
+          const dx = mx - cx;
+          const dy = my - cy;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          let angle = Math.atan2(dy, dx);
 
-        const R_css = Math.min(rect.width, rect.height) / 2 - 80;
-        const n = RADAR_DIMS.length;
-        let bestIndex = -1;
-        let minDiff = Infinity;
+          const labelPad = 75;
+          const R_css = Math.min(rect.width, rect.height) / 2 - labelPad;
+          const n = RADAR_DIMS.length;
+          let bestIndex = -1;
+          let minDiff = Infinity;
 
-        if (d <= R_css + 45 && d >= 12) {
-          for (let i = 0; i < n; i++) {
-            const spokeAngle = (2 * Math.PI * i / n) - Math.PI / 2;
-            let diff = Math.abs(angle - spokeAngle);
-            while (diff > Math.PI) {
-              diff = Math.abs(diff - 2 * Math.PI);
+          if (d <= R_css + 45 && d >= 12) {
+            for (let i = 0; i < n; i++) {
+              const spokeAngle = (2 * Math.PI * i / n) - Math.PI / 2;
+              let diff = Math.abs(angle - spokeAngle);
+              while (diff > Math.PI) {
+                diff = Math.abs(diff - 2 * Math.PI);
+              }
+              if (diff < minDiff) {
+                minDiff = diff;
+                bestIndex = i;
+              }
             }
-            if (diff < minDiff) {
-              minDiff = diff;
-              bestIndex = i;
+            if (minDiff > 0.35) {
+              bestIndex = -1;
             }
           }
-          if (minDiff > 0.35) {
-            bestIndex = -1;
+
+          if (bestIndex !== hoveredIndex) {
+            hoveredIndex = bestIndex;
+            renderAll();
           }
-        }
 
-        if (bestIndex !== hoveredIndex) {
-          hoveredIndex = bestIndex;
-          renderAll();
-        }
+          if (hoveredIndex !== -1) {
+            const dim = RADAR_DIMS[hoveredIndex];
+            const prefix = Object.keys(currentStats).find(k => k.startsWith("zh_")) ? "zh_" :
+                           Object.keys(currentStats).find(k => k.startsWith("ja_")) ? "ja_" : "en_";
+            const statsKey = dim.key.replace("en_", prefix);
 
-        if (hoveredIndex !== -1) {
-          const dim = RADAR_DIMS[hoveredIndex];
-          const prefix = Object.keys(currentStats).find(k => k.startsWith("zh_")) ? "zh_" :
-                         Object.keys(currentStats).find(k => k.startsWith("ja_")) ? "ja_" : "en_";
-          const statsKey = dim.key.replace("en_", prefix);
-          
-          const userVal  = (currentStats.normalized_radar && currentStats.normalized_radar[statsKey] !== undefined)
-            ? currentStats.normalized_radar[statsKey]
-            : norm(currentStats[statsKey] ?? 0, dim.min, dim.max);
-          const blVal    = RADAR_BASELINES[activeBaseline][hoveredIndex];
+            const userVal = (currentStats.normalized_radar && currentStats.normalized_radar[statsKey] !== undefined)
+              ? currentStats.normalized_radar[statsKey]
+              : norm(currentStats[statsKey] ?? 0, dim.min, dim.max);
+            
+            const blVals = (currentStats.baselines && currentStats.baselines.radar && currentStats.baselines.radar[activeBaseline])
+              ? currentStats.baselines.radar[activeBaseline]
+              : RADAR_BASELINES[activeBaseline];
+            const blVal = blVals ? blVals[hoveredIndex] : 0;
 
-          const userPct  = (userVal * 100).toFixed(0) + "%";
-          const blPct    = (blVal * 100).toFixed(0) + "%";
-          const baseName = activeBaseline === "web_novel" ? "Web Novel Baseline" : "Classic Lit Baseline";
+            const userPct = (userVal * 100).toFixed(0) + "%";
+            const blPct = (blVal * 100).toFixed(0) + "%";
+            const baseName = activeBaseline === "web_novel" ? "Web Novel Baseline" : "Classic Lit Baseline";
+            const blColor = activeBaseline === "web_novel" ? "#a78bfa" : "#fbbf24";
 
-          tooltipNode.innerHTML = `
-            <div class="radar-tooltip-title">${dim.label}</div>
-            <div class="radar-tooltip-row">
-              <span style="color: rgba(255,255,255,0.7)">Your Draft:</span>
-              <span class="radar-tooltip-val" style="color: #7dd3fc">${userPct}</span>
-            </div>
-            <div class="radar-tooltip-row">
-              <span style="color: rgba(255,255,255,0.7)">${baseName}:</span>
-              <span class="radar-tooltip-val" style="color: ${activeBaseline === 'web_novel' ? '#a78bfa' : '#fbbf24'}">${blPct}</span>
-            </div>
-          `;
-          tooltipNode.style.display = "block";
-          tooltipNode.style.left = (e.clientX + 15) + "px";
-          tooltipNode.style.top = (e.clientY + 15) + "px";
-        } else {
+            tooltipNode.innerHTML = `
+              <div class="radar-tooltip-title">${dim.label}</div>
+              <div class="radar-tooltip-row">
+                <span style="color: rgba(255,255,255,0.7)">Your Draft:</span>
+                <span class="radar-tooltip-val" style="color: #7dd3fc">${userPct}</span>
+              </div>
+              <div class="radar-tooltip-row">
+                <span style="color: rgba(255,255,255,0.7)">${baseName}:</span>
+                <span class="radar-tooltip-val" style="color: ${blColor}">${blPct}</span>
+              </div>
+            `;
+            tooltipNode.style.display = "block";
+            tooltipNode.style.left = (e.clientX + 15) + "px";
+            tooltipNode.style.top = (e.clientY + 15) + "px";
+          } else {
+            tooltipNode.style.display = "none";
+          }
+        });
+
+        canvasNode.addEventListener("mouseleave", () => {
+          if (hoveredIndex !== -1) {
+            hoveredIndex = -1;
+            renderAll();
+          }
           tooltipNode.style.display = "none";
-        }
-      });
-
-      canvasNode.addEventListener("mouseleave", () => {
-        if (hoveredIndex !== -1) {
-          hoveredIndex = -1;
-          renderAll();
-        }
-        tooltipNode.style.display = "none";
-      });
+        });
+      }
 
       /* ── Kishōtenketsu Sentiment Arc Mouse Hover & Tooltip Events ── */
       const svgNode = document.getElementById("arcChart");
       const arcTooltipNode = document.getElementById("arcTooltip");
 
-      svgNode.addEventListener("mousemove", (e) => {
-        try {
-          if (!currentArc) return;
-          const rect = svgNode.getBoundingClientRect();
-          if (rect.width === 0 || rect.height === 0) return;
-          
-          const svgX = (e.clientX - rect.left) * (600 / rect.width);
-          
-          const W = 600;
-          const PAD = { top: 30, bottom: 48, left: 48, right: 48 };
-          const plotW = W - PAD.left - PAD.right;
-          const acts = currentArc.acts;
-          
-          const actX = i => PAD.left + i * plotW / (acts.length - 1);
-          
-          let closestIdx = -1;
-          let minDiff = Infinity;
-          
-          for (let i = 0; i < acts.length; i++) {
-            const diff = Math.abs(svgX - actX(i));
-            if (diff < minDiff) {
-              minDiff = diff;
-              closestIdx = i;
+      if (svgNode && arcTooltipNode) {
+        svgNode.addEventListener("mousemove", (e) => {
+          try {
+            if (!currentArc) return;
+            const rect = svgNode.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) return;
+
+            const svgX = (e.clientX - rect.left) * (600 / rect.width);
+            const W = 600;
+            const PAD = { top: 30, bottom: 48, left: 48, right: 48 };
+            const plotW = W - PAD.left - PAD.right;
+            const acts = (currentArc.quantiles && currentArc.quantiles.length > 0)
+              ? currentArc.quantiles.map((v, i) => ({ sentiment: v, actIndex: i }))
+              : currentArc.acts;
+
+            const actX = i => PAD.left + i * plotW / (acts.length - 1);
+
+            let closestIdx = -1;
+            let minDiff = Infinity;
+
+            for (let i = 0; i < acts.length; i++) {
+              const diff = Math.abs(svgX - actX(i));
+              if (diff < minDiff) {
+                minDiff = diff;
+                closestIdx = i;
+              }
             }
-          }
-          
-          if (svgX < PAD.left - 25 || svgX > W - PAD.right + 25) {
-            closestIdx = -1;
-          }
 
-          if (closestIdx !== hoveredArcIndex) {
-            hoveredArcIndex = closestIdx;
-            drawArc(currentArc, activeBaseline);
-          }
+            if (svgX < PAD.left - 25 || svgX > W - PAD.right + 25) {
+              closestIdx = -1;
+            }
 
+            if (closestIdx !== hoveredArcIndex) {
+              hoveredArcIndex = closestIdx;
+              if (currentArc) drawArc(currentArc, activeBaseline);
+            }
+
+            if (hoveredArcIndex !== -1) {
+              const act = acts[hoveredArcIndex];
+              const userVal = typeof act === "number" ? act : act.sentiment;
+              const blVals = (currentArc.baselines && currentArc.baselines[activeBaseline])
+                ? currentArc.baselines[activeBaseline]
+                : [0.0839, 0.0588, 0.1347, 0.1006];
+              const blVal = blVals[hoveredArcIndex] || 0;
+
+              const labelMap = { "Introduction": "Intro", "Development": "Dev", "Twist": "Twist", "Resolution": "Res" };
+              const actNames = ["Ki (Intro)", "Shō (Dev)", "Ten (Twist)", "Ketsu (Res)"];
+              const titleFmt = actNames[hoveredArcIndex] || `${act.act || ''} (${labelMap[act.label] || act.label || ''})`;
+
+              const userFmt = userVal >= 0 ? `+${userVal.toFixed(2)}` : userVal.toFixed(2);
+              const blFmt = blVal >= 0 ? `+${blVal.toFixed(2)}` : blVal.toFixed(2);
+              const baseName = activeBaseline === "web_novel" ? "Web Novel Baseline" : "Classic Lit Baseline";
+              const blColor = activeBaseline === "web_novel" ? "#a78bfa" : "#fbbf24";
+
+              arcTooltipNode.innerHTML = `
+                <div class="radar-tooltip-title">${titleFmt}</div>
+                <div class="radar-tooltip-row">
+                  <span style="color: rgba(255,255,255,0.7)">Your Draft:</span>
+                  <span class="radar-tooltip-val" style="color: #7dd3fc">${userFmt}</span>
+                </div>
+                <div class="radar-tooltip-row">
+                  <span style="color: rgba(255,255,255,0.7)">${baseName}:</span>
+                  <span class="radar-tooltip-val" style="color: ${blColor}">${blFmt}</span>
+                </div>
+              `;
+
+              arcTooltipNode.style.display = "block";
+              arcTooltipNode.style.left = (e.clientX + 15) + "px";
+              arcTooltipNode.style.top = (e.clientY + 15) + "px";
+            } else {
+              arcTooltipNode.style.display = "none";
+            }
+          } catch (err) {
+            console.error("Error handling arc tooltip:", err);
+          }
+        });
+
+        svgNode.addEventListener("mouseleave", () => {
           if (hoveredArcIndex !== -1) {
-            const act = acts[hoveredArcIndex];
-            const userVal = typeof act === "number" ? act : act.sentiment;
-            const blVal = currentArc.baselines[activeBaseline][hoveredArcIndex] || 0;
-            
-            const labelMap = { "Introduction": "Intro", "Development": "Dev", "Twist": "Twist", "Resolution": "Res" };
-            const actNames = ["Ki (Intro)", "Shō (Dev)", "Ten (Twist)", "Ketsu (Res)"];
-            const titleFmt = actNames[hoveredArcIndex] || `${act.act || ''} (${labelMap[act.label] || act.label || ''})`;
-
-            const userFmt = userVal >= 0 ? `+${userVal.toFixed(2)}` : userVal.toFixed(2);
-            const blFmt = blVal >= 0 ? `+${blVal.toFixed(2)}` : blVal.toFixed(2);
-            const baseName = activeBaseline === "web_novel" ? "Web Novel Baseline" : "Classic Baseline";
-            const blColor = activeBaseline === "web_novel" ? "#a78bfa" : "#fbbf24";
-
-            arcTooltipNode.innerHTML = `
-              <div class="radar-tooltip-title">${titleFmt}</div>
-              <div class="radar-tooltip-row">
-                <span style="color: rgba(255,255,255,0.7)">Your Draft:</span>
-                <span class="radar-tooltip-val" style="color: #7dd3fc">${userFmt}</span>
-              </div>
-              <div class="radar-tooltip-row">
-                <span style="color: rgba(255,255,255,0.7)">${baseName}:</span>
-                <span class="radar-tooltip-val" style="color: ${blColor}">${blFmt}</span>
-              </div>
-            `;
-            
-            arcTooltipNode.style.display = "block";
-            arcTooltipNode.style.left = (e.clientX + 15) + "px";
-            arcTooltipNode.style.top = (e.clientY + 15) + "px";
-          } else {
-            arcTooltipNode.style.display = "none";
+            hoveredArcIndex = -1;
+            if (currentArc) drawArc(currentArc, activeBaseline);
           }
-        } catch (err) {
-          console.error("Arc hover error:", err);
-        }
-      });
-
-      svgNode.addEventListener("mouseleave", () => {
-        if (hoveredArcIndex !== -1) {
-          hoveredArcIndex = -1;
-          drawArc(currentArc, activeBaseline);
-        }
-        arcTooltipNode.style.display = "none";
-      });
+          arcTooltipNode.style.display = "none";
+        });
+      }
     </script>
-    <div id="radarTooltip" class="radar-tooltip" style="display: none; position: fixed; pointer-events: none; z-index: 9999;"></div>
-    <div id="arcTooltip" class="radar-tooltip" style="display: none; position: fixed; pointer-events: none; z-index: 9999;"></div>
+    <div id="radarTooltip" class="radar-tooltip"></div>
+    <div id="arcTooltip" class="radar-tooltip"></div>
   </body>
 </html>
