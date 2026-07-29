@@ -1855,20 +1855,15 @@ import "../styles/global.css";
             let bestIndex = -1;
             let minDiff = Infinity;
 
-            if (d <= R_css + 45 && d >= 12) {
-              for (let i = 0; i < n; i++) {
-                const spokeAngle = (2 * Math.PI * i / n) - Math.PI / 2;
-                let diff = Math.abs(angle - spokeAngle);
-                while (diff > Math.PI) {
-                  diff = Math.abs(diff - 2 * Math.PI);
-                }
-                if (diff < minDiff) {
-                  minDiff = diff;
-                  bestIndex = i;
-                }
+            for (let i = 0; i < n; i++) {
+              const spokeAngle = (2 * Math.PI * i / n) - Math.PI / 2;
+              let diff = Math.abs(angle - spokeAngle);
+              while (diff > Math.PI) {
+                diff = Math.abs(diff - 2 * Math.PI);
               }
-              if (minDiff > Math.PI / n) {
-                bestIndex = -1;
+              if (diff < minDiff) {
+                minDiff = diff;
+                bestIndex = i;
               }
             }
 
@@ -1924,7 +1919,7 @@ import "../styles/global.css";
           });
         }
 
-        const svgNode = document.getElementById("arcSvg");
+        const svgNode = document.getElementById("arcChart");
         const arcTooltipNode = document.getElementById("arcTooltip");
 
         if (svgNode && arcTooltipNode) {
@@ -1988,7 +1983,7 @@ import "../styles/global.css";
                   </div>
                   <div class="radar-tooltip-row">
                     <span style="color: rgba(255,255,255,0.7)">${baseName}:</span>
-                    <span class="radar-tooltip-val" style="color: ${blColor}">${blPct}</span>
+                    <span class="radar-tooltip-val" style="color: ${blColor}">${blFmt}</span>
                   </div>
                 `;
 
@@ -2013,9 +2008,11 @@ import "../styles/global.css";
         }
       }
 
-      document.addEventListener("DOMContentLoaded", () => {
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", setupChartHoverListeners);
+      } else {
         setupChartHoverListeners();
-      });
+      }
     </script>
     <div id="radarTooltip" class="radar-tooltip"></div>
     <div id="arcTooltip" class="radar-tooltip"></div>
