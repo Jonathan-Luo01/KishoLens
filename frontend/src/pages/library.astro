@@ -22,39 +22,41 @@ import "../styles/global.css";
       *, *::before, *::after { box-sizing: border-box; }
 
       body {
-        background: #0a0a12;
-        color: #e2e2f0;
-        font-family: 'Inter', sans-serif;
+        margin: 0;
+        padding: 0;
+        background: var(--color-bg);
+        color: var(--color-text);
+        font-family: var(--font-sans);
         min-height: 100vh;
       }
 
       .app-container {
-        max-width: 1280px;
+        max-width: 1200px;
         margin: 0 auto;
-        padding: 2rem 1.5rem 5rem;
+        padding: 2rem 1.5rem 4rem 1.5rem;
         display: flex;
         flex-direction: column;
-        gap: 1.75rem;
+        gap: 2rem;
       }
 
       header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        padding-bottom: 1.25rem;
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: 1.5rem;
       }
 
       .brand-title {
-        font-family: 'Outfit', sans-serif;
+        font-family: var(--font-display);
         font-size: 1.8rem;
         font-weight: 700;
         text-decoration: none;
-        color: #e2e2f0;
+        color: var(--color-text);
       }
 
       .brand-title span {
-        background: linear-gradient(135deg, #a78bfa, #f472b6);
+        background: linear-gradient(135deg, var(--color-accent), var(--color-accent-2));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -71,15 +73,16 @@ import "../styles/global.css";
         text-decoration: none;
         font-size: 0.9rem;
         font-weight: 500;
-        transition: color 0.2s;
-        display: inline-block;
+        transition: color 0.2s ease;
       }
 
       nav a + a {
         margin-left: 1.5rem;
       }
 
-      nav a:hover, nav a.active { color: #a78bfa; }
+      nav a:hover, nav a.active {
+        color: var(--color-accent);
+      }
 
       .dashboard-layout {
         display: grid;
