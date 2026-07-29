@@ -53,16 +53,16 @@ import "../styles/global.css";
           <div class="reader-header">
             <span class="reader-label">PROSE SAMPLE INTERACTIVE TEASER</span>
             <div class="reader-tabs" role="tablist">
-              <button class="reader-tab active" data-sample="xianxia" role="tab" aria-selected="true">Cultivation</button>
-              <button class="reader-tab" data-sample="gothic" role="tab" aria-selected="false">Classic Gothic</button>
-              <button class="reader-tab" data-sample="slice" role="tab" aria-selected="false">Slice of Life</button>
+              <button class="reader-tab active" data-sample="mystery" role="tab" aria-selected="true">Mystery</button>
+              <button class="reader-tab" data-sample="fantasy" role="tab" aria-selected="false">Fantasy</button>
+              <button class="reader-tab" data-sample="isekai" role="tab" aria-selected="false">Isekai</button>
             </div>
           </div>
 
           <!-- Excerpt Box -->
           <div class="excerpt-box">
             <p id="excerpt-text" class="excerpt-content">
-              "The spiritual energy of the golden core surged through his meridians as the ancient Daoist inscription glowed. He broke through the bottleneck of the Nascent Soul stage in a burst of celestial light."
+              "The victim left no signs of struggle, Inspector," Miller whispered, pointing to the unlatched study window. "Only a silver timepiece lying shattered on the mahogany desk, its hands frozen at midnight."
             </p>
           </div>
 
@@ -70,25 +70,25 @@ import "../styles/global.css";
           <div class="reader-metrics">
             <div class="metric-pill">
               <span class="pill-lbl">Syntactic Depth</span>
-              <span id="metric-depth" class="pill-val color-purple">4.8</span>
+              <span id="metric-depth" class="pill-val color-purple">4.5</span>
             </div>
             <div class="metric-pill">
               <span class="pill-lbl">Dialogue Ratio</span>
-              <span id="metric-dialogue" class="pill-val color-cyan">0.0%</span>
+              <span id="metric-dialogue" class="pill-val color-cyan">69.7%</span>
             </div>
             <div class="metric-pill">
               <span class="pill-lbl">Vocabulary TTR</span>
-              <span id="metric-ttr" class="pill-val color-emerald">0.85</span>
+              <span id="metric-ttr" class="pill-val color-emerald">0.88</span>
             </div>
             <div class="metric-pill">
               <span class="pill-lbl">Territory Match</span>
-              <span id="metric-territory" class="pill-val color-pink">Web Novel Territory</span>
+              <span id="metric-territory" class="pill-val color-pink">Classic Literature Territory</span>
             </div>
           </div>
 
           <!-- Reader Action Link to Analyze Page -->
           <div class="reader-action-row">
-            <a id="btn-open-in-analyzer" href="/analyze?text=%22The%20spiritual%20energy%20of%20the%20golden%20core%20surged%20through%20his%20meridians%20as%20the%20ancient%20Daoist%20inscription%20glowed.%20He%20broke%20through%20the%20bottleneck%20of%20the%20Nascent%20Soul%20stage%20in%20a%20burst%20of%20celestial%20light.%22" class="btn btn-sm btn-accent">
+            <a id="btn-open-in-analyzer" href="/analyze?text=%22The%20victim%20left%20no%20signs%20of%20struggle%2C%20Inspector%2C%22%20Miller%20whispered%2C%20pointing%20to%20the%20unlatched%20study%20window.%20%22Only%20a%20silver%20timepiece%20lying%20shattered%20on%20the%20mahogany%20desk%2C%20its%20hands%20frozen%20at%20midnight.%22" class="btn btn-sm btn-accent">
               Analyze This Excerpt in Tool &rarr;
             </a>
           </div>
@@ -164,25 +164,25 @@ import "../styles/global.css";
     <!-- Tab Interactivity Script -->
     <script>
       const SAMPLES = {
-        xianxia: {
-          text: '"The spiritual energy of the golden core surged through his meridians as the ancient Daoist inscription glowed. He broke through the bottleneck of the Nascent Soul stage in a burst of celestial light."',
-          depth: "4.8",
-          dialogue: "0.0%",
-          ttr: "0.85",
-          territory: "Web Novel Territory"
+        mystery: {
+          text: '"The victim left no signs of struggle, Inspector," Miller whispered, pointing to the unlatched study window. "Only a silver timepiece lying shattered on the mahogany desk, its hands frozen at midnight."',
+          depth: "4.5",
+          dialogue: "69.7%",
+          ttr: "0.88",
+          territory: "Classic Literature Territory"
         },
-        gothic: {
-          text: '"It was a dreary night of November that I beheld the accomplishment of my labours. With an anxiety that almost amounted to agony, I collected the instruments of life around me..."',
+        fantasy: {
+          text: '"Ancient runes of violet flame ignited along the obsidian archway, casting long shadows across the forgotten temple. Deep within the vault, the slumbering wyrm opened a single crimson eye."',
           depth: "5.2",
           dialogue: "0.0%",
           ttr: "0.90",
           territory: "Classic Literature Territory"
         },
-        slice: {
-          text: '"Good morning, grandmother!" she called out, setting down the fresh tea leaves. "The kettle is already simmering on the hearth."',
+        isekai: {
+          text: '"Status Open!" Haruto shouted in disbelief. A glowing blue system interface materialized before his eyes, displaying his reincarnated stats: Level 1 Villager with MAX Luck and Divine Alchemy.',
           depth: "4.2",
-          dialogue: "54.5%",
-          ttr: "0.82",
+          dialogue: "6.9%",
+          ttr: "0.86",
           territory: "Web Novel Territory"
         }
       };
