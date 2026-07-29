@@ -1006,7 +1006,34 @@ def post_analyze(request: AnalysisRequest):
     else:
         sents = [s.strip() for s in re.split(r'[。！？]+', request.text) if s.strip()]
 
-    arc_res = compute_kishotenketsu_quantile_arc(sents, lang)
+    # For short samples (< 4 sentences), split by clauses so 4 distinct acts render gracefully
+    if len(sents) < 4:
+        clause_pat = r'[,;:\.!\?\-\n]+' if lang == "en" else r'[，、；：。！？\n]+'
+        arc_units = [c.strip() for c in re.split(clause_pat, request.text) if len(c.strip()) > 3]
+        if not arc_units:
+            arc_units = sents
+    else:
+        arc_units = sents
+
+    arc_res = compute_kishotenketsu_quantile_arc(arc_units, lang)
+
+    # 4. Rhythmic Pacing (Paragraph / Sentence Barcode)
+    paragraphs = split_paragraphs(request.text)
+    pacing_bars = []
+    for p in paragraphs:
+        w_cnt = len(re.findall(r'\b\w+\b', p)) if lang == "en" else len([c for c in p if not c.isspace()])
+        if w_cnt > 0:
+            pacing_bars.append(w_cnt)
+
+    if len(pacing_bars) < 8:
+        # Short sample: generate sentence/clause-level word count bars so barcode populates 15-25 bars
+        units = [u.strip() for u in re.split(r'[,;\.!\?\n]+', request.text) if u.strip()]
+        unit_lengths = [len(re.findall(r'\b\w+\b', u)) if lang == "en" else len([c for c in u if not c.isspace()]) for u in units]
+        unit_lengths = [l for l in unit_lengths if l > 0]
+        if len(unit_lengths) >= len(pacing_bars):
+            pacing_bars = unit_lengths
+
+    agg["pacing"] = pacing_bars[:100]
 
     arc = {
         "title": request.title or "Untitled",
