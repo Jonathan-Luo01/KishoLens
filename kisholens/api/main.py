@@ -35,6 +35,10 @@ from kisholens.ml.similarity import find_top_matches
 
 DATA_CACHE_PATH = "data/stats_cache.json"
 VECTOR_CACHE_PATH = "data/vector_cache.json"
+ARC_CACHE_PATH = "data/arc_cache.json"
+
+_cached_novel_stats: Dict[int, Any] = {}
+_cached_novel_arcs: Dict[int, Any] = {}
 
 def _load_disk_cache():
     if os.path.exists(DATA_CACHE_PATH):
@@ -48,11 +52,54 @@ def _load_disk_cache():
             print(f"[CACHE WARN] Could not load disk cache: {e}")
 
 def _save_disk_cache():
+    if not _cached_novel_stats:
+        print("[CACHE WARN] Refusing to overwrite disk cache with empty dict.")
+        return
     try:
+        existing = {}
+        if os.path.exists(DATA_CACHE_PATH):
+            with open(DATA_CACHE_PATH, "r", encoding="utf-8") as f:
+                try:
+                    existing = json.load(f)
+                except Exception:
+                    existing = {}
+        for k, v in _cached_novel_stats.items():
+            existing[str(k)] = v
         with open(DATA_CACHE_PATH, "w", encoding="utf-8") as f:
-            json.dump(_cached_novel_stats, f, ensure_ascii=False)
+            json.dump(existing, f, ensure_ascii=False)
     except Exception as e:
         print(f"[CACHE WARN] Could not save disk cache: {e}")
+
+def _load_arc_disk_cache():
+    if os.path.exists(ARC_CACHE_PATH):
+        try:
+            with open(ARC_CACHE_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                for k, v in data.items():
+                    _cached_novel_arcs[int(k)] = v
+            print(f"[CACHE] Loaded {len(_cached_novel_arcs)} pre-computed novel arcs from disk cache.")
+        except Exception as e:
+            print(f"[CACHE WARN] Could not load arc disk cache: {e}")
+
+def _save_arc_disk_cache():
+    if not _cached_novel_arcs:
+        print("[CACHE WARN] Refusing to overwrite arc disk cache with empty dict.")
+        return
+    try:
+        existing = {}
+        if os.path.exists(ARC_CACHE_PATH):
+            with open(ARC_CACHE_PATH, "r", encoding="utf-8") as f:
+                try:
+                    existing = json.load(f)
+                except Exception:
+                    existing = {}
+        for k, v in _cached_novel_arcs.items():
+            existing[str(k)] = v
+        with open(ARC_CACHE_PATH, "w", encoding="utf-8") as f:
+            json.dump(existing, f, ensure_ascii=False)
+    except Exception as e:
+        print(f"[CACHE WARN] Could not save arc disk cache: {e}")
+
 
 def _load_vector_disk_cache():
     """Load pre-computed novel feature vectors into similarity._novel_vector_cache."""
@@ -96,6 +143,11 @@ def _save_novel_to_vector_cache(novel_id: int, title: str, author: str, genre: s
     except Exception as e:
         print(f"[CACHE WARN] Could not save vector cache entry: {e}")
 
+# Immediately load pre-computed disk caches upon module import
+_load_disk_cache()
+_load_arc_disk_cache()
+_load_vector_disk_cache()
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Asynchronously pre-load PyTorch, sentence-transformers, and spaCy models at server launch."""
@@ -105,6 +157,7 @@ async def lifespan(app: FastAPI):
             print("[WARMUP] Pre-loading spaCy, NLTK VADER, SentenceTransformers, and multi-lingual NLP pipelines...")
             _init_nlp_resources()
             _load_disk_cache()
+            _load_arc_disk_cache()
             _load_vector_disk_cache()
             sample_en = "This is a generic prose warmup sample for initializing spaCy, VADER, and sentence transformer models."
             extract_english_features(sample_en)
@@ -319,8 +372,6 @@ class IngestRequest(BaseModel):
     num_records: int
 
 
-_cached_novel_stats: Dict[int, Any] = {}
-
 @app.get("/api/novels/{novel_id}/stats")
 def get_novel_stats(novel_id: int):
     global _cached_novel_stats
@@ -438,6 +489,9 @@ def get_novel_stats(novel_id: int):
                         "top_genres": [{"genre": x["genre"], "confidence": x["score"]} for x in semantic["genre_scores"][:3]],
                         "top_territories": [{"territory": x["territory"], "confidence": x["score"]} for x in semantic["territory_scores"][:2]]
                     }
+                    if "taxonomy" in semantic:
+                        agg["taxonomy"] = semantic["taxonomy"]
+                        agg["archetype_match"]["taxonomy"] = semantic["taxonomy"]
                 else:
                     agg["archetype_match"] = {
                         "closest_trope": novel.genre or "Unknown",
@@ -451,7 +505,15 @@ def get_novel_stats(novel_id: int):
                 from kisholens.ml.similarity import extract_feature_vector
                 import numpy as np
                 feat_vec = extract_feature_vector(agg)
-                # Pre-populate the vector cache so future find_top_matches calls skip NLP recompute
+                agg["id"] = novel_id
+                agg["title"] = novel.title
+                agg["author"] = novel.author or "Unknown Author"
+                agg["genre"] = novel.genre
+                agg["territory"] = novel.territory or (semantic.get("territory") if semantic else "Unknown")
+                if semantic:
+                    agg["archetype"] = semantic["genre"]
+                    agg["archetype_percentages"] = semantic["genre_scores"]
+
                 _save_novel_to_vector_cache(
                     novel_id=novel_id,
                     title=novel.title,
@@ -481,8 +543,6 @@ def compute_4act_peak_arc(all_sentences: list[str], lang: str) -> list[dict]:
     arc_res = compute_kishotenketsu_quantile_arc(all_sentences, lang)
     return arc_res["acts"]
 
-
-_cached_novel_arcs: Dict[int, Any] = {}
 
 @app.get("/api/novels/{novel_id}/arc")
 def get_novel_arc(novel_id: int):
@@ -514,8 +574,15 @@ def get_novel_arc(novel_id: int):
                 elif getattr(first_ch, "text_zh", ""):
                     lang = "zh"
 
+        # Sample up to 16 evenly-spaced chapters across the novel for fast arc computation
+        if len(chapters) > 16:
+            step = (len(chapters) - 1) / 15.0
+            sampled_chapters = [chapters[int(round(i * step))] for i in range(16)]
+        else:
+            sampled_chapters = chapters
+
         all_sentences: list[str] = []
-        for ch in chapters:
+        for ch in sampled_chapters:
             if lang == "en":
                 text = ch.text_en or ""
                 sents = [s.strip() for s in re.split(r'[.!?]+', text) if s.strip()]
@@ -543,6 +610,7 @@ def get_novel_arc(novel_id: int):
             "baselines": compute_dynamic_baselines(lang)["arc"]
         }
         _cached_novel_arcs[novel_id] = arc_data
+        _save_arc_disk_cache()
         return arc_data
 
     except Exception as e:
