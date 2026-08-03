@@ -88,7 +88,7 @@ GENRE_TAXONOMY: dict[str, dict] = {
         "neutral_entities": ["vampire", "werewolf", "skeleton", "ghost", "specter", "undead", "reanimated"]
     },
     "Romance": {
-        "anchor_terms_en": ["romance", "otome", "harem", "love story", "contract marriage", "relationship", "rom-com", "romantic comedy", "reverse harem", "concubine", "fiancee", "fiancée", "bride", "wife", "lover", "heroine", "love", "romantic"],
+        "anchor_terms_en": ["romance", "otome", "harem", "love story", "contract marriage", "rom-com", "romantic comedy", "reverse harem", "concubine", "fiancee", "fiancée", "bride", "courtship", "dating", "flirting", "wooing"],
         "keywords_zh": ["恋爱", "甜文", "虐恋", "总裁", "豪门", "婚约", "契约婚姻", "纯爱", "言情", "傲娇"],
         "keywords_ja": ["恋愛", "溺愛", "婚約", "幼馴染", "ツンデレ", "乙女ゲーム", "ラブコメ", "伯爵夫人", "契約婚"]
     },
@@ -140,7 +140,7 @@ GENRE_TAXONOMY: dict[str, dict] = {
         "keywords_ja": ["伝奇", "あやかし", "妖", "陰陽師", "祓い屋", "現代ファンタジー", "異能"]
     },
     "Poetry": {
-        "anchor_terms_en": ["epic poem", "verse", "sonnet", "stanza", "poetic", "ballad", "canto", "lyric", "heav'n", "thou", "thy", "thee", "dost", "hath", "sing", "heavenly muse", "high song"],
+        "anchor_terms_en": ["epic poem", "verse", "sonnet", "stanza", "poetic", "ballad", "canto", "lyric", "poetic verse", "heavenly muse", "high song"],
         "keywords_zh": ["诗歌", "诗集", "词集", "赋", "韵文"],
         "keywords_ja": ["詩", "歌集", "俳句", "短歌", "叙情詩"]
     },
@@ -229,9 +229,9 @@ def scan_anchor_boosts(text: str, lang: Optional[str] = None) -> dict[str, float
         if any(w in low_text for w in ["reincarnat", "transmigrat", "truck-kun", "another world", "summoned", "otome"]):
             boosts["Isekai"] = boosts.get("Isekai", 0.0) + 0.30
 
-    # 5. Archaic Verse Poetry Boost
-    poetic_archaic = sum(1 for p in ["thou", "thy", "thee", "dost", "hath", "heav'n", "canto", "stanza", "verse", "poetic", "muses"] if re.search(r'\b' + re.escape(p) + r'\b', low_text))
-    if poetic_archaic >= 3:
+    # 5. Structural Verse Poetry Boost
+    poetic_verse = sum(1 for p in ["canto", "stanza", "sonnet", "epic poem", "ballad", "limerick", "haiku"] if re.search(r'\b' + re.escape(p) + r'\b', low_text))
+    if poetic_verse >= 2:
         boosts["Poetry"] = boosts.get("Poetry", 0.0) + 0.40
         boosts["Philosophy"] = boosts.get("Philosophy", 0.0) + 0.25
 
@@ -260,12 +260,14 @@ def match_semantic(
     world_primary = taxonomy["world_setting"]["primary"]
     world_score = taxonomy["world_setting"]["score"]
 
+    genre_scores = taxonomy.get("genre_scores", [{"genre": world_primary, "score": world_score, "raw_score": world_score}])
+
     return {
         "genre": world_primary,
         "genre_confidence": world_score,
         "territory": "Web Novel Territory",
         "territory_confidence": 0.95,
-        "genre_scores": [{"genre": world_primary, "score": world_score, "raw_score": world_score}],
+        "genre_scores": genre_scores,
         "territory_scores": [{"territory": "Web Novel Territory", "score": 0.95, "raw_score": 0.95}],
         "taxonomy": taxonomy,
     }

@@ -63,11 +63,16 @@ def analyze_prose(
             target_g = "Cultivation"
 
         idx = genres.index(target_g) if target_g in genres else 0
-        s_base = _calibrate(float(intro_sims[idx]) + anchor_boosts.get(target_g, 0.0))
-
+        
+        # Compute Base Score and Concept Density Score
+        raw_intro = float(intro_sims[idx]) + anchor_boosts.get(target_g, 0.0)
+        s_base = _calibrate(raw_intro)
         s_concept = float(np.dot(v_intro, concept_vec))
 
-        if s_concept > 0.20:
+        if raw_intro > 0.05 and s_concept > 0.20:
+            dynamic_boost = min(0.25, s_concept * 0.50)
+            final_score = round(min(0.99, s_base + dynamic_boost), 4)
+        elif s_concept > 0.35:
             dynamic_boost = min(0.25, s_concept * 0.50)
             final_score = round(min(0.99, s_base + dynamic_boost), 4)
         else:
@@ -78,10 +83,16 @@ def analyze_prose(
     inciting_results.sort(key=lambda x: x[1], reverse=True)
     best_inciting_name, best_inciting_score = inciting_results[0]
 
-    if best_inciting_score < 0.55:
+    # Fallback threshold check (< 0.60) to avoid false positive setup events on standard non-setup novels
+    if best_inciting_score < 0.60:
         inciting_payload = None
     else:
         inciting_payload = {"primary": best_inciting_name, "score": best_inciting_score}
+
+    # If Inciting Event is confirmed (e.g. Isekai & Regression), integrate into primary genre predictions
+    if inciting_payload:
+        inciting_g = "Isekai" if "Isekai" in inciting_payload["primary"] else ("Progression Fantasy" if "System" in inciting_payload["primary"] else "Cultivation")
+        sustained_scores[inciting_g] = round(max(sustained_scores.get(inciting_g, 0.0), inciting_payload["score"] + 0.10), 4)
 
     sorted_sustained = sorted(sustained_scores.items(), key=lambda x: x[1], reverse=True)
     world_gname, world_score = sorted_sustained[0]
@@ -94,9 +105,12 @@ def analyze_prose(
     display_parts.append(f"({plot_gname})")
     display_label = " ".join(display_parts)
 
+    genre_scores = [{"genre": gname, "score": score, "raw_score": score} for gname, score in sorted_sustained]
+
     return {
         "inciting_event": inciting_payload,
         "world_setting": {"primary": world_gname, "score": world_score},
         "narrative_plot": {"primary": plot_gname, "score": plot_score},
         "display_label": display_label,
+        "genre_scores": genre_scores,
     }
