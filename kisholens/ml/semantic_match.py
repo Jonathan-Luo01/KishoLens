@@ -57,7 +57,7 @@ import re
 
 GENRE_TAXONOMY: dict[str, dict] = {
     "Fantasy": {
-        "anchor_terms_en": ["archmage", "wizard", "sorcerer", "elf", "elven", "dragon", "magic", "spell", "spire", "goblin", "orc", "kingdom", "paladin", "high fantasy", "wyrm", "mana", "realm", "arcane", "fairy tale", "enchanted"],
+        "anchor_terms_en": ["archmage", "wizard", "sorcerer", "elf", "elven", "dragon", "magic", "spell", "spire", "goblin", "orc", "kingdom", "paladin", "high fantasy", "wyrm", "mana", "realm", "arcane", "fairy tale", "enchanted", "wonderland", "portal", "whimsical"],
         "keywords_en": ["mythology", "folklore", "legends", "epic fantasy", "sword and sorcery", "kingdom building", "academy", "cozy fantasy", "dungeon core"],
         "keywords_zh": ["奇幻", "玄幻", "魔法", "神话", "剑与魔法", "异界"],
         "keywords_ja": ["ファンタジー", "魔法", "魔王", "勇者", "ハイファンタジー", "ドラゴン", "エルフ", "異世界ファンタジー"]
@@ -88,7 +88,7 @@ GENRE_TAXONOMY: dict[str, dict] = {
         "neutral_entities": ["vampire", "werewolf", "skeleton", "ghost", "specter", "undead", "reanimated"]
     },
     "Romance": {
-        "anchor_terms_en": ["romance", "otome", "harem", "love story", "contract marriage", "rom-com", "romantic comedy", "reverse harem", "concubine", "fiancee", "fiancée", "bride", "courtship", "dating", "flirting", "wooing"],
+        "anchor_terms_en": ["romance", "otome", "harem", "love story", "contract marriage", "rom-com", "romantic comedy", "reverse harem", "concubine", "fiancee", "fiancée", "bride", "courtship", "dating", "flirting", "wooing", "marriage", "proposal", "suitor", "betrothal", "matrimony", "elopement", "bachelor", "wife", "husband"],
         "keywords_zh": ["恋爱", "甜文", "虐恋", "总裁", "豪门", "婚约", "契约婚姻", "纯爱", "言情", "傲娇"],
         "keywords_ja": ["恋愛", "溺愛", "婚約", "幼馴染", "ツンデレ", "乙女ゲーム", "ラブコメ", "伯爵夫人", "契約婚"]
     },
