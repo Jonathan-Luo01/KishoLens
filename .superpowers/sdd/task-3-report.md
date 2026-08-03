@@ -1,40 +1,25 @@
-# Task 3 Report: `semantic_match.py` — Live Inference Module
+# Task 3 Implementation Report: Independent Prose Analyzer
 
-## Steps Taken
+## Overview
+- **Module**: `kisholens/ml/analyzer.py`
+- **Tests**: `tests/ml/test_analyzer.py`
+- **Status**: Completed & Verified
 
-### Step 1: Write failing tests
-- Created `tests/ml/test_semantic_match.py` containing 7 test cases covering the matcher's structure, sorting, score range, confidence coherence, key presence, and correct territory mapping.
-- Ran tests to verify failure (yielded `ModuleNotFoundError` for `kisholens.ml.semantic_match`).
+## Key Changes
+1. **Created `kisholens/ml/analyzer.py`**:
+   - Implemented `analyze_prose(synopsis, ch1_text, ch10_text, ch20_text, title, data_dir)`.
+   - Dual-vector generation ($V_{\text{intro}}$, $V_{\text{sustained}}$) using `generate_dual_vectors`.
+   - Evaluates sustained similarity against world/narrative genre centroids.
+   - Evaluates introductory similarity combined with pure concept vector similarity (`get_inciting_concept_vectors()`).
+   - Dynamic Concept Density Multiplier applied when concept similarity $s_{\text{concept}} > 0.20$: `dynamic_boost = min(0.25, s_concept * 0.50)`.
+   - Inciting event fallback threshold: if top score $< 0.55$, `inciting_event` is set to `None`.
+   - Returns structured taxonomy dictionary containing `inciting_event`, `world_setting`, `narrative_plot`, and formatted `display_label`.
 
-### Step 2: Implement `semantic_match.py`
-- Implemented lazy loading of centroids using process cache (`_centroid_cache`).
-- Implemented `match_semantic()` using `embed_texts()` and `cosine_similarity` from `scikit-learn`.
-- Handled graceful degradation returning `None` if centroids have not been built yet.
-- Exposed `match_semantic` in `kisholens/ml/__init__.py`.
+2. **Created `tests/ml/test_analyzer.py`**:
+   - `test_analyze_prose_isekai_novel`: Tests high confidence inciting event classification and score calculation ($\ge 0.70$).
+   - `test_analyze_prose_fallback_threshold`: Tests fallback behavior when score $< 0.55$ (e.g. non-trope quiet prose).
+   - `test_analyze_prose_no_centroids`: Tests graceful error handling when centroids cannot be loaded from an invalid path.
 
-### Step 3: Run tests to verify they pass
-- Ran `uv run pytest tests/ml/test_semantic_match.py -v`.
-- Result: **7 passed** ✅.
-
----
-
-## Test Output
-
-```
-============================= test session starts ==============================
-platform darwin -- Python 3.14.6, pytest-9.1.1, pluggy-1.6.0
-rootdir: /Users/jonathan/Documents/KishoLens
-configfile: pyproject.toml
-plugins: anyio-4.14.1
-collecting ... collected 7 items
-
-tests/ml/test_semantic_match.py::test_match_semantic_returns_none_without_centroids PASSED [ 14%]
-tests/ml/test_semantic_match.py::test_match_semantic_structure PASSED    [ 28%]
-tests/ml/test_semantic_match.py::test_match_semantic_scores_sorted_descending PASSED [ 42%]
-tests/ml/test_semantic_match.py::test_match_semantic_scores_in_range PASSED [ 57%]
-tests/ml/test_semantic_match.py::test_match_semantic_top_genre_matches_confidence PASSED [ 71%]
-tests/ml/test_semantic_match.py::test_match_semantic_scores_have_all_keys PASSED [ 85%]
-tests/ml/test_semantic_match.py::test_match_semantic_territory_correct PASSED [100%]
-
-============================== 7 passed in 4.87s ===============================
-```
+## Verification
+- Unit test suite passed (3/3 tests passed in `tests/ml/test_analyzer.py`).
+- Full test suite passed (47/47 tests passed across all test modules).
