@@ -1,6 +1,7 @@
 import re
 import math
 import threading
+import numpy as np
 from typing import List, Dict, Any
 from collections import Counter
 from scipy.stats import percentileofscore
@@ -217,9 +218,13 @@ def compute_sentence_sentiment_normalized(sentence: str, lang: str) -> float:
                     return float(sum(scores) / len(scores))
             except Exception:
                 pass
-        pos = sum(s_clean.count(w) for w in ['嬉しい', '楽しい', '美しい', '素晴らしい', '愛する', '成功', '幸せ', '感謝', '満足', '喜ぶ', '希望', '勝利'])
-        neg = sum(s_clean.count(w) for w in ['悲しい', '苦しい', '怒る', '嫌い', '失敗', '痛い', '最悪', '残念', '孤独', '恐ろしい', '絶望', '憎い'])
-        return (pos - neg) / max(1.0, pos + neg)
+        ja_pos = ['嬉しい', '楽しい', '美しい', '素晴らしい', '愛する', '成功', '幸せ', '感謝', '満足', '喜ぶ', '希望', '勝利', '笑', '喜', '好', '幸', '美', '勝', '善', '優', '愛', '快', '願', '助け', '安心', '可愛い', '最高', '光', '輝く', '仲間', '笑顔', '微笑', '平和', '素直']
+        ja_neg = ['悲しい', '苦しい', '怒る', '嫌い', '失敗', '痛い', '最悪', '残念', '孤独', '恐ろしい', '絶望', '憎い', '怒', '恐', '痛', '死', '殺', '嫌', '害', '泣', '苦', '壊', '悪', '怖', '逃', '悲', '魔物', '敵', '倒す', '襲う', '闇', '絶望', '怪我', '暗い', '問題', '困る', '泣く', '悲傷', '涙', '残酷']
+        pos = sum(s_clean.count(w) for w in ja_pos)
+        neg = sum(s_clean.count(w) for w in ja_neg)
+        if pos + neg > 0:
+            return (pos - neg) / (pos + neg)
+        return 0.0
 
     return 0.0
 
@@ -838,6 +843,22 @@ def extract_chinese_features(text: str) -> Dict[str, Any]:
     }
 
 
+def extract_features(text: str, lang: str = "auto") -> Dict[str, Any]:
+    """
+    Unified entry point for multi-lingual feature extraction across English, Japanese, and Chinese.
+    Autodetects language if lang is 'auto' or unspecified, and dispatches to appropriate extractor.
+    """
+    _init_nlp_resources()
+    target_lang = lang.lower() if lang and lang != "auto" else detect_language(text)
+    if target_lang == "ja":
+        return extract_japanese_features(text)
+    elif target_lang == "zh":
+        return extract_chinese_features(text)
+    else:
+        return extract_english_features(text)
+
+
+
 # --- TASK 2: DATA-DRIVEN PERCENTILE NORMALIZATION STRATEGY ---
 
 HISTORICAL_CORPUS_DISTRIBUTIONS = {
@@ -847,29 +868,40 @@ HISTORICAL_CORPUS_DISTRIBUTIONS = {
     "dep_tree_depth": [1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5],
     "verb_ratio": [0.08, 0.10, 0.12, 0.14, 0.16, 0.18, 0.20, 0.22, 0.24, 0.26, 0.28, 0.30, 0.32, 0.34, 0.36],
     "avg_sentences_per_paragraph": [1.2, 1.8, 2.5, 3.2, 4.0, 5.0, 6.2, 7.5, 9.0, 11.0],
-    "compound_sentiment": [0.02, 0.05, 0.08, 0.12, 0.16, 0.20, 0.25, 0.30, 0.36, 0.42, 0.48, 0.55, 0.62, 0.70, 0.78],
+    "compound_sentiment": [-0.80, -0.50, -0.25, -0.10, 0.0, 0.10, 0.25, 0.40, 0.55, 0.70, 0.85, 0.95],
     "theme_explication_ratio": [0.0, 0.1, 0.3, 0.6, 1.0, 1.5, 2.2, 3.0, 4.0, 5.2, 6.5, 8.0, 10.0, 12.5, 15.0],
     "linearity_subversion_score": [0.001, 0.01, 0.03, 0.05, 0.08, 0.11, 0.14, 0.17, 0.20, 0.24, 0.28, 0.33, 0.38, 0.44, 0.50, 0.58, 0.68, 0.80, 0.95, 1.15, 1.40],
     "sensory_body_density": [0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.72, 0.78, 0.85, 0.90],
     "outside_world_engagement": [0.5, 0.8, 1.2, 1.6, 2.0, 2.5, 3.0, 3.6, 4.2, 5.0, 6.0, 7.2, 8.5, 10.0, 12.0],
-    "narrative_feature_diversity": [0.0, 0.11, 0.22, 0.33, 0.44, 0.55, 0.66, 0.77, 0.88, 1.0]
+    "narrative_feature_diversity": [0.0, 0.11, 0.22, 0.33, 0.44, 0.55, 0.66, 0.77, 0.88, 1.0],
+    "word_count": [500, 1500, 3000, 5000, 8000, 12000, 18000, 25000, 35000, 50000, 75000, 100000],
+    "sentence_count": [20, 50, 100, 200, 400, 700, 1000, 1500, 2200, 3000, 4500, 6000],
+    "avg_sentence_len": [5.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0, 23.0, 26.0, 30.0, 35.0],
+    "adj_ratio": [0.02, 0.04, 0.06, 0.08, 0.10, 0.12, 0.14, 0.16, 0.18, 0.20, 0.23, 0.26],
+    "pron_ratio": [0.02, 0.05, 0.08, 0.11, 0.14, 0.17, 0.20, 0.23, 0.26, 0.30, 0.34, 0.38],
+    "temporal_shift_score": [0.01, 0.03, 0.06, 0.10, 0.15, 0.20, 0.26, 0.33, 0.40, 0.50, 0.62, 0.75],
+    "entity_density": [0.01, 0.03, 0.05, 0.08, 0.11, 0.14, 0.18, 0.22, 0.27, 0.33, 0.40, 0.50],
+    "char_count": [1500, 4000, 8000, 15000, 25000, 40000, 60000, 90000, 130000, 180000],
+    "kanji_ratio": [0.10, 0.15, 0.20, 0.25, 0.28, 0.32, 0.35, 0.38, 0.42, 0.46, 0.50],
+    "particle_ratio": [0.10, 0.15, 0.18, 0.22, 0.25, 0.28, 0.31, 0.34, 0.37, 0.40]
 }
 
 def normalize_feature_percentile(key: str, raw_val: float) -> float:
     """
-    Task 2: Uses scipy.stats.percentileofscore with continuous mean interpolation
-    to score a raw metric value based on where it falls within the historical corpus distribution.
-    Ensures outputs are clean percentiles between 0.0 and 1.0.
+    Uses smooth continuous linear interpolation over historical corpus distributions
+    to score a raw metric value into a precise percentile between 0.01 and 0.99.
+    Strips language prefixes (en_, ja_, zh_) to match distribution keys cleanly.
     """
     if raw_val is None or raw_val != raw_val:
-        return 0.0
+        return 0.5
         
-    dist = HISTORICAL_CORPUS_DISTRIBUTIONS.get(key)
+    base_key = key.split("_", 1)[1] if (key.startswith("en_") or key.startswith("ja_") or key.startswith("zh_")) else key
+    dist = HISTORICAL_CORPUS_DISTRIBUTIONS.get(base_key)
     if not dist:
         return 0.5
         
-    pct = float(percentileofscore(dist, raw_val, kind='mean') / 100.0)
-    return max(0.0, min(1.0, pct))
+    pct = float(np.interp(raw_val, dist, np.linspace(0.05, 0.95, len(dist))))
+    return round(max(0.01, min(0.99, pct)), 4)
 
 
 # ARCHETYPE REFERENCE VECTORS
