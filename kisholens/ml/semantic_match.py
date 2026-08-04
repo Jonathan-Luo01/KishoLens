@@ -71,8 +71,8 @@ GENRE_TAXONOMY: dict[str, dict] = {
     "Cultivation": {
         "anchor_terms_en": ["dantian", "qi", "tribulation", "immortal", "dao", "xianxia", "wuxia", "breakthrough", "cultivat", "pill refining", "spirit herb", "meridian", "golden core", "nascent soul"],
         "keywords_en": ["cultivator", "spiritual root", "alchemy furnace", "elixir refining", "dan refining", "foundation building", "jianghu", "courting death", "acupoint", "spirit stone", "jade slip"],
-        "keywords_zh": ["修仙", "仙侠", "修真", "玄幻", "武侠", "功法", "宗门", "丹药", "金丹", "元婴", "道士", "灵石", "神通", "渡劫", "飞升", "筑基", "炼气", "江湖"],
-        "keywords_ja": ["仙侠", "武侠", "仙人", "修行", "気", "丹田", "道"]
+        "keywords_zh": ["修仙", "仙侠", "修真", "玄幻", "武侠", "功法", "宗门", "丹药", "金丹", "元婴", "道士", "灵石", "神通", "渡劫", "飞升", "筑基", "炼气", "江湖", "修道", "仙道", "悟道", "天道", "道法"],
+        "keywords_ja": ["仙侠", "武侠", "仙人", "修行", "気", "丹田"]
     },
     "Progression Fantasy": {
         "anchor_terms_en": ["status window", "stat point", "level up", "dungeon", "system notification", "litrpg", "stat screen", "leveling", "experience points", "exp", "class rank", "weak to strong", "level system", "accelerated growth", "vrmmo", "vrmmorpg", "divine stats"],
@@ -100,7 +100,7 @@ GENRE_TAXONOMY: dict[str, dict] = {
     },
     "Historical": {
         "anchor_terms_en": ["historical fiction", "victorian era", "regency era", "qing dynasty", "ming dynasty", "tang dynasty", "han dynasty", "song dynasty", "edo period", "sengoku", "french revolution", "american civil war", "ancient history", "medieval europe"],
-        "keywords_zh": ["历史", "宫斗", "朝堂", "穿越历史", "架空历史", "种田历史", "权谋"],
+        "keywords_zh": ["历史", "歷史", "宫斗", "宮鬥", "朝堂", "穿越历史", "穿越歷史", "架空历史", "架空歷史", "种田历史", "種田歷史", "权谋", "權謀", "汉朝", "漢朝", "三国", "三國", "朝代", "史记", "史記", "乱世", "亂世"],
         "keywords_ja": ["歴史", "時代劇", "江戸", "戦国", "大正", "昭和", "架空歴史", "宫廷"]
     },
     "Mystery": {
@@ -110,16 +110,16 @@ GENRE_TAXONOMY: dict[str, dict] = {
         "keywords_ja": ["推理", "ミステリー", "探偵", "密室", "刑事", "サスペンス", "犯人"]
     },
     "Action / Adventure": {
-        "anchor_terms_en": ["swordfight", "battlefield", "ambush", "expedition", "quest", "combat", "blade", "warrior", "erupted", "unleashed", "roar", "mercenary", "survival", "death game"],
+        "anchor_terms_en": ["swordfight", "battlefield", "ambush", "expedition", "quest", "combat", "blade", "warrior", "erupted", "unleashed", "roar", "mercenary", "survival", "death game", "warfare", "campaign", "uprising", "clash of arms", "warlord", "battles", "legion"],
         "keywords_en": ["martial arts", "hunting", "voyages", "travels", "pirates", "shipwreck"],
-        "keywords_zh": ["动作", "冒险", "兵王", "特种兵", "战神", "雇佣兵", "爽文"],
-        "keywords_ja": ["アクション", "バトル", "冒険", "海賊", "生き残り", "爽快"]
+        "keywords_zh": ["动作", "冒险", "兵王", "特种兵", "战神", "雇佣兵", "爽文", "起义", "討伐", "讨伐", "官軍", "官军", "廝殺", "厮杀", "交戰", "交战", "殺出", "杀出", "大敗", "大败", "兵馬", "兵马", "大軍", "大军", "破敵", "破敌", "出征", "黃巾", "黄巾", "分爭", "分争", "大將軍", "大将军", "交鋒", "交锋", "將士", "将士", "戎馬", "戎马"],
+        "keywords_ja": ["アクション", "バトル", "冒険", "海賊", "生き残り", "爽快", "合戦", "出陣", "討伐", "軍勢"]
     },
     "Drama": {
-        "anchor_terms_en": ["tragedy", "betrayal", "conflict", "family feud", "tearful", "sorrow", "heartbreak", "emotional", "social hierarchy"],
+        "anchor_terms_en": ["tragedy", "betrayal", "conflict", "family feud", "tearful", "sorrow", "heartbreak", "emotional", "social hierarchy", "stratagem", "court politics", "power struggle", "scheming", "coup", "conspiracy", "eunuchs", "factional", "dynastic", "statecraft"],
         "keywords_en": ["domestic drama", "social drama", "interpersonal relations", "psychological", "political intrigue"],
-        "keywords_zh": ["戏剧", "家庭", "伦理", "情感", "权谋", "狗血", "背叛"],
-        "keywords_ja": ["ドラマ", "内部抗争", "裏切り", "泥沼", "愛憎", "心理戦"]
+        "keywords_zh": ["戏剧", "家庭", "伦理", "情感", "权谋", "權謀", "狗血", "背叛", "謀略", "谋略", "朝堂", "朝政", "爭鬥", "争斗", "政變", "政变", "心計", "心计", "傾軋", "倾轧", "勾心鬥角", "勾心斗角", "密謀", "密谋", "權術", "权术", "帝王", "弄權", "弄权", "謀誅", "谋诛", "宦官", "權臣", "权臣", "天下", "三國", "三国", "結義", "结义", "社稷", "鼎立"],
+        "keywords_ja": ["ドラマ", "内部抗争", "裏切り", "泥沼", "愛憎", "心理戦", "権謀術数", "政変", "宮廷劇"]
     },
     "Comedy": {
         "anchor_terms_en": ["hilarious", "laugh", "absurd", "prank", "chuckle", "parody", "sarcastic", "slapstick", "funny protagonist", "misunderstandings"],

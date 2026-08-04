@@ -72,9 +72,6 @@ def analyze_prose(
         if raw_intro > 0.05 and s_concept > 0.20:
             dynamic_boost = min(0.25, s_concept * 0.50)
             final_score = round(min(0.99, s_base + dynamic_boost), 4)
-        elif s_concept > 0.35:
-            dynamic_boost = min(0.25, s_concept * 0.50)
-            final_score = round(min(0.99, s_base + dynamic_boost), 4)
         else:
             final_score = round(s_base, 4)
 
