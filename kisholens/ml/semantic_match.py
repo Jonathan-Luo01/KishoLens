@@ -72,10 +72,16 @@ def match_semantic(
     model_name: str = "all-MiniLM-L6-v2",
     data_dir: str = DEFAULT_DATA_DIR,
 ) -> Optional[dict]:
-    paragraphs = text.split("\n\n")
-    ch1 = paragraphs[0] if paragraphs else text
-    ch10 = paragraphs[len(paragraphs) // 2] if len(paragraphs) > 2 else None
-    ch20 = paragraphs[-1] if len(paragraphs) > 2 else None
+    paragraphs = [p for p in text.split("\n\n") if p.strip()]
+    if len(paragraphs) <= 3:
+        ch1 = paragraphs[0] if len(paragraphs) > 0 else text
+        ch10 = paragraphs[1] if len(paragraphs) > 1 else None
+        ch20 = paragraphs[2] if len(paragraphs) > 2 else None
+    else:
+        n = len(paragraphs)
+        ch1 = "\n\n".join(paragraphs[:n // 3])
+        ch10 = "\n\n".join(paragraphs[n // 3: 2 * n // 3])
+        ch20 = "\n\n".join(paragraphs[2 * n // 3:])
 
     taxonomy = analyze_prose(synopsis, ch1, ch10, ch20, title=title, data_dir=data_dir)
     if not taxonomy:

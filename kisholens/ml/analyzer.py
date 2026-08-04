@@ -93,7 +93,10 @@ def analyze_prose(
         inciting_g = "Isekai" if "Isekai" in inciting_payload["primary"] else ("Progression Fantasy" if "System" in inciting_payload["primary"] else "Cultivation")
         sustained_scores[inciting_g] = round(max(sustained_scores.get(inciting_g, 0.0), inciting_payload["score"] + 0.10), 4)
 
-    # Apply guardrail penalties/boosts for Scenario A (Pure Classical Epic)
+    # Apply guardrail penalties/boosts for Scenario A (Pure Classical Epic) and Scenario B (Hybrid Cultivation)
+    if guardrail.get("scenario") in ("A", "B"):
+        inciting_payload = None
+
     if guardrail.get("scenario") == "A":
         if "Cultivation" in sustained_scores:
             sustained_scores["Cultivation"] = round(max(0.01, sustained_scores["Cultivation"] - 0.40), 4)
@@ -105,14 +108,18 @@ def analyze_prose(
     plot_gname, plot_score = sorted_sustained[1] if len(sorted_sustained) > 1 else (world_gname, world_score)
 
     if guardrail.get("scenario") == "B":
+        display_plot_gname = "Cultivation"
         plot_gname = "Historical / Military"
         plot_score = sustained_scores.get("Historical / Military", sustained_scores.get("Historical", plot_score))
+    else:
+        display_plot_gname = plot_gname
 
     display_parts = []
     if inciting_payload:
         display_parts.append(inciting_payload["primary"])
     display_parts.append(world_gname)
     if guardrail.get("display_tag"):
+        display_parts.append(display_plot_gname)
         display_parts.append(guardrail["display_tag"])
     else:
         display_parts.append(f"({plot_gname})")
