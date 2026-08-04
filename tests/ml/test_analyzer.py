@@ -40,3 +40,27 @@ def test_analyze_prose_fallback_threshold():
 def test_analyze_prose_no_centroids():
     res = analyze_prose("Synopsis", "Chapter 1", data_dir="/invalid/directory/path")
     assert res == {}
+
+
+def test_analyze_prose_scenario_a_pure_classical_epic():
+    title = "The Great Dynasty War"
+    synopsis = "The emperor led his army and troops into battle against the rebellion."
+    ch1 = "General Zhao commanded the cavalry and ordered a siege on the rebel stronghold."
+    ch10 = "The imperial court debated military tactics while troops marched towards the border."
+    ch20 = "Warlord Li declared war under the mandate of heaven."
+
+    res = analyze_prose(synopsis, ch1, ch10, ch20, title=title)
+    assert "(Military Epic)" in res["display_label"]
+
+
+def test_analyze_prose_scenario_b_hybrid_cultivation():
+    title = "The Cultivator General"
+    synopsis = "An emperor and his army fought the rebellion using ancient martial arts."
+    ch1 = "General Zhao gathered troops while channeling energy through his dantian and meridian."
+    ch10 = "The general achieved a breakthrough during the siege."
+    ch20 = "Spirit stone resources supplied the imperial army."
+
+    res = analyze_prose(synopsis, ch1, ch10, ch20, title=title)
+    assert "(Kingdom Building / Military)" in res["display_label"]
+    assert res["narrative_plot"]["primary"] == "Historical / Military"
+

@@ -9,6 +9,7 @@ import numpy as np
 from kisholens.ml.embeddings import generate_dual_vectors
 from kisholens.ml.centroids import get_inciting_concept_vectors
 from kisholens.ml.semantic_match import _load_with_cache, DEFAULT_DATA_DIR, scan_anchor_boosts
+from kisholens.pipeline.taxonomy import evaluate_epic_cultivation_guardrail
 
 
 def analyze_prose(
@@ -39,8 +40,9 @@ def analyze_prose(
     intro_sims = np.dot(v_intro, g_sub.T)
     intro_sims = intro_sims - np.mean(intro_sims)
 
-    full_scan_text = f"{title or ''} {synopsis or ''} {ch1_text}".strip()
+    full_scan_text = f"{title or ''} {synopsis or ''} {ch1_text} {ch10_text or ''} {ch20_text or ''}".strip()
     anchor_boosts = scan_anchor_boosts(full_scan_text)
+    guardrail = evaluate_epic_cultivation_guardrail(full_scan_text)
 
     def _calibrate(s: float, k: float = 5.5) -> float:
         return float(1.0 / (1.0 + np.exp(-k * s)))
@@ -91,15 +93,29 @@ def analyze_prose(
         inciting_g = "Isekai" if "Isekai" in inciting_payload["primary"] else ("Progression Fantasy" if "System" in inciting_payload["primary"] else "Cultivation")
         sustained_scores[inciting_g] = round(max(sustained_scores.get(inciting_g, 0.0), inciting_payload["score"] + 0.10), 4)
 
+    # Apply guardrail penalties/boosts for Scenario A (Pure Classical Epic)
+    if guardrail.get("scenario") == "A":
+        if "Cultivation" in sustained_scores:
+            sustained_scores["Cultivation"] = round(max(0.01, sustained_scores["Cultivation"] - 0.40), 4)
+        if "Historical" in sustained_scores:
+            sustained_scores["Historical"] = round(min(0.99, sustained_scores["Historical"] + 0.20), 4)
+
     sorted_sustained = sorted(sustained_scores.items(), key=lambda x: x[1], reverse=True)
     world_gname, world_score = sorted_sustained[0]
     plot_gname, plot_score = sorted_sustained[1] if len(sorted_sustained) > 1 else (world_gname, world_score)
+
+    if guardrail.get("scenario") == "B":
+        plot_gname = "Historical / Military"
+        plot_score = sustained_scores.get("Historical / Military", sustained_scores.get("Historical", plot_score))
 
     display_parts = []
     if inciting_payload:
         display_parts.append(inciting_payload["primary"])
     display_parts.append(world_gname)
-    display_parts.append(f"({plot_gname})")
+    if guardrail.get("display_tag"):
+        display_parts.append(guardrail["display_tag"])
+    else:
+        display_parts.append(f"({plot_gname})")
     display_label = " ".join(display_parts)
 
     genre_scores = [{"genre": gname, "score": score, "raw_score": score} for gname, score in sorted_sustained]
@@ -111,3 +127,4 @@ def analyze_prose(
         "display_label": display_label,
         "genre_scores": genre_scores,
     }
+
