@@ -1561,6 +1561,8 @@ import "../styles/global.css";
         const blVals  = (arcData.baselines && arcData.baselines[baseline])
           ? arcData.baselines[baseline]
           : [0.0839, 0.0588, 0.1347, 0.1006];
+        const blColor = baseline === "web_novel" ? "#a78bfa" : "#fbbf24";
+        const blRgb   = baseline === "web_novel" ? "167,139,250" : "251,191,36";
         const sentY = s => {
           const clamped = Math.max(-1.0, Math.min(1.0, s));
           return PAD.top + plotH * (1 - (clamped + 1) / 2);
