@@ -12,6 +12,7 @@ Returns per-match breakdown so the frontend can explain WHY novels match.
 """
 
 import json
+import re
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Union
 import numpy as np
@@ -477,8 +478,6 @@ def find_top_matches(
         n_territory = n_meta.get("territory") or "Unknown"
         title_str = n_meta.get("title", "")
         author_str = n_meta.get("author", "")
-        title_lower = title_str.lower()
-        author_lower = author_str.lower()
 
         n_concept_emb = _get_concept_embedding(genre=cand_primary, territory=n_territory)
         n_norm = float(np.linalg.norm(n_concept_emb))
@@ -487,20 +486,17 @@ def find_top_matches(
         else:
             sem_raw = 0.40
 
-        # Entity/keyword relevance boost between query text and candidate title/author
-        entity_boost = 0.0
+        # Generic token overlap between candidate title/author words (>= 4 chars) and query text
         if query_text:
             q_lower = query_text.lower()
-            if "sherlock" in q_lower and "sherlock" in title_lower:
-                entity_boost += 0.25
-            if "holmes" in q_lower and ("holmes" in title_lower or "holmes" in author_lower):
-                entity_boost += 0.15
-            if ("doyle" in q_lower or "conan" in q_lower) and ("doyle" in author_lower or "conan" in author_lower):
-                entity_boost += 0.20
-            if ("watson" in q_lower or "lestrade" in q_lower or "baker street" in q_lower) and ("sherlock" in title_lower or "doyle" in author_lower):
-                entity_boost += 0.20
-
-        semantic_sim = float(np.clip(sem_raw + entity_boost, 0.0, 1.0))
+            title_tokens = [w for w in re.findall(r"\b[a-zA-Z]{4,}\b", title_str.lower()) if w not in {"with", "from", "that", "this", "into", "over", "about"}]
+            author_tokens = [w for w in re.findall(r"\b[a-zA-Z]{4,}\b", author_str.lower()) if w not in {"unknown", "author"}]
+            title_matches = sum(1 for w in set(title_tokens) if w in q_lower)
+            author_matches = sum(1 for w in set(author_tokens) if w in q_lower)
+            token_overlap = min(0.60, 0.30 * title_matches + 0.20 * author_matches)
+            semantic_sim = float(np.clip(0.40 * sem_raw + token_overlap, 0.0, 1.0))
+        else:
+            semantic_sim = float(np.clip(sem_raw, 0.0, 1.0))
 
         # ── Factor 4: Fine-grained Tag Overlap (5%) ──
         cand_tags = set([t.strip().lower() for t in (n_meta.get("tags") or "").split(",") if t.strip()])
@@ -521,16 +517,13 @@ def find_top_matches(
         else:
             territory_sim = 0.50
 
-        # ── Composite Score ──
-        # 30% style + 35% genre + 20% semantic + 5% tags + 10% territory + affinity boost
-        affinity_boost = min(0.10, entity_boost * 0.20)
+        # ── Composite Score (strictly normalized weights sum to 1.00) ──
         composite_score = (
             0.30 * style_sim
             + 0.35 * genre_sim
             + 0.20 * semantic_sim
             + 0.05 * tag_sim
             + 0.10 * territory_sim
-            + affinity_boost
         )
         score = round(min(0.99, max(0.01, composite_score)), 4)
 
