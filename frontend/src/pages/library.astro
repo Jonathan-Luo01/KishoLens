@@ -362,6 +362,38 @@ import "../styles/global.css";
         transition: width 0.4s ease-out;
       }
 
+      :global(.doppelganger-breakdown) {
+        display: flex;
+        gap: 6px;
+        margin-top: 4px;
+      }
+
+      :global(.doppelganger-factor) {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+      }
+
+      :global(.doppelganger-factor-label) {
+        font-size: 8px;
+        color: #64748b;
+        font-weight: 600;
+      }
+
+      :global(.doppelganger-factor-bar-bg) {
+        width: 16px;
+        height: 2px;
+        background: #1e293b;
+        border-radius: 1px;
+        overflow: hidden;
+      }
+
+      :global(.doppelganger-factor-bar-fill) {
+        height: 100%;
+        border-radius: 1px;
+      }
+
       .section-title {
         font-family: var(--font-display);
         font-size: 1.05rem;
@@ -1253,6 +1285,137 @@ import "../styles/global.css";
         font-weight: 700;
         color: #a78bfa;
       }
+
+      /* ── Skeleton Loading UI & Shimmer Keyframes ── */
+      @keyframes skeleton-shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+      }
+
+      @keyframes skeleton-pulse-glow {
+        0%, 100% {
+          border-color: rgba(148, 163, 184, 0.12);
+          box-shadow: 0 0 0 0 rgba(6, 182, 212, 0);
+        }
+        50% {
+          border-color: rgba(6, 182, 212, 0.35);
+          box-shadow: 0 0 20px rgba(6, 182, 212, 0.10);
+        }
+      }
+
+      @keyframes pulse-dot {
+        0%, 100% { transform: scale(1); opacity: 0.8; }
+        50% { transform: scale(1.3); opacity: 1; }
+      }
+
+      .skeleton-shimmer,
+      :global(.skeleton-shimmer) {
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.03) 0%,
+          rgba(255, 255, 255, 0.09) 50%,
+          rgba(255, 255, 255, 0.03) 100%
+        );
+        background-size: 200% 100%;
+        animation: skeleton-shimmer 1.8s infinite ease-in-out;
+      }
+
+      .skeleton-progress-container,
+      :global(.skeleton-progress-container) {
+        width: 100%;
+        margin-bottom: 1.25rem;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        backdrop-filter: blur(12px);
+      }
+
+      .skeleton-progress-bar-bg,
+      :global(.skeleton-progress-bar-bg) {
+        width: 100%;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 999px;
+        overflow: hidden;
+        margin-top: 0.75rem;
+      }
+
+      .skeleton-progress-bar-fill,
+      :global(.skeleton-progress-bar-fill) {
+        height: 100%;
+        width: 15%;
+        background: linear-gradient(90deg, #06b6d4, #a855f7, #10b981);
+        background-size: 200% 100%;
+        border-radius: 999px;
+        transition: width 0.4s ease-out;
+        animation: skeleton-shimmer 2s infinite linear;
+      }
+
+      .skeleton-stage-header,
+      :global(.skeleton-stage-header) {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      .skeleton-stage-pill,
+      :global(.skeleton-stage-pill) {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.1);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+      }
+
+      .skeleton-stage-dot,
+      :global(.skeleton-stage-dot) {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #38bdf8;
+        animation: pulse-dot 1.2s infinite ease-in-out;
+      }
+
+      .skeleton-card,
+      :global(.skeleton-card) {
+        background: rgba(15, 23, 42, 0.45);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        border-radius: 12px;
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .skeleton-chart-frame,
+      :global(.skeleton-chart-frame) {
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 14px;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        animation: skeleton-pulse-glow 3s infinite ease-in-out;
+      }
+
+      .fade-in-content,
+      :global(.fade-in-content) {
+        animation: fadeIn 0.35s ease-out forwards;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
     </style>
   </head>
   <body>
@@ -2059,9 +2222,10 @@ import "../styles/global.css";
             if (meta.category !== cat.id) return;
 
             const rawKey = `${langPrefix}${key}`;
-            if (stats[rawKey] === undefined && stats[key] === undefined) return;
-
-            const rawVal = stats[rawKey] !== undefined ? stats[rawKey] : stats[key];
+            let rawVal = stats[rawKey] !== undefined ? stats[rawKey] : stats[key];
+            if (rawVal === undefined || rawVal === null || (rawVal === 0 && key === "compound_sentiment")) {
+              rawVal = stats[`en_${key}`] ?? stats[`zh_${key}`] ?? stats[`ja_${key}`] ?? stats[key];
+            }
             if (rawVal === null || rawVal === undefined) return;
 
             let displayVal = meta.isPercent ? `${(rawVal * 100).toFixed(1)}%` :
@@ -2497,14 +2661,15 @@ import "../styles/global.css";
         const am = stats["archetype_match"];
         if (am) {
           if (am.top_genres && am.top_territories) {
-            const genresStr = am.top_genres.slice(0, 3).map(g => `${g.genre} (${(g.confidence * 100).toFixed(0)}%)`).join(", ");
+            const genresStr = am.top_genres.slice(0, 3).map(g => `${g.genre} (${Math.min(99, Math.max(1, Math.round(g.confidence * 100)))}%)`).join(", ");
             const territoryStr = am.top_territories[0].territory;
-            const maxConf = (am.confidence * 100).toFixed(0);
+            const maxConf = Math.min(99, Math.max(1, Math.round(am.confidence * 100)));
             document.getElementById("archetypeLabel").textContent =
               `${genresStr} · ${territoryStr} · ${maxConf}% match`;
           } else {
+            const tropeConf = Math.min(99, Math.max(1, Math.round(am.confidence * 100)));
             document.getElementById("archetypeLabel").textContent =
-              `${am.closest_trope} · ${am.territory} · ${(am.confidence * 100).toFixed(0)}% match`;
+              `${am.closest_trope} · ${am.territory} · ${tropeConf}% match`;
           }
         }
       }
@@ -2529,19 +2694,38 @@ import "../styles/global.css";
         const blColor = baseline === "web_novel" ? "#a78bfa" : "#fbbf24";
         const blRgb   = baseline === "web_novel" ? "167,139,250" : "251,191,36";
 
-        const sentY = s => PAD.top + plotH * (1 - (s + 1) / 2);
+        const sentY = s => {
+          const clamped = Math.max(-1.0, Math.min(1.0, s));
+          return PAD.top + plotH * (1 - (clamped + 1) / 2);
+        };
         const actX  = i => PAD.left + i * plotW / (acts.length - 1);
         const axisX  = actX(0);
         const endX   = actX(acts.length - 1);
         const bottomY = PAD.top + plotH;
         const zeroY   = sentY(0);
 
+        /* ── Smooth Catmull-Rom / Hermite Spline ── */
         function smoothPath(pts_x, pts_y) {
-          const pts = pts_x.map((x, i) => [x, pts_y[i]]);
-          let d = `M ${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
-          for (let i = 0; i < pts.length - 1; i++) {
-            const cpx = ((pts[i][0] + pts[i+1][0]) / 2).toFixed(1);
-            d += ` C ${cpx},${pts[i][1].toFixed(1)} ${cpx},${pts[i+1][1].toFixed(1)} ${pts[i+1][0].toFixed(1)},${pts[i+1][1].toFixed(1)}`;
+          const n = pts_x.length;
+          if (n === 0) return "";
+          if (n === 1) return `M ${pts_x[0].toFixed(1)},${pts_y[0].toFixed(1)}`;
+          let d = `M ${pts_x[0].toFixed(1)},${pts_y[0].toFixed(1)}`;
+          for (let i = 0; i < n - 1; i++) {
+            const x0 = pts_x[i === 0 ? 0 : i - 1];
+            const y0 = pts_y[i === 0 ? 0 : i - 1];
+            const x1 = pts_x[i];
+            const y1 = pts_y[i];
+            const x2 = pts_x[i + 1];
+            const y2 = pts_y[i + 1];
+            const x3 = pts_x[i + 2 >= n ? n - 1 : i + 2];
+            const y3 = pts_y[i + 2 >= n ? n - 1 : i + 2];
+
+            const cp1x = x1 + (x2 - x0) / 6;
+            const cp1y = y1 + (y2 - y0) / 6;
+            const cp2x = x2 - (x3 - x1) / 6;
+            const cp2y = y2 - (y3 - y1) / 6;
+
+            d += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}`;
           }
           return d;
         }
@@ -2598,7 +2782,6 @@ import "../styles/global.css";
         clipShape.setAttribute("clip-rule", "evenodd");
         clipPath.appendChild(clipShape);
         defs.appendChild(clipPath);
-
         svg.appendChild(defs);
 
         // Vertical guide line when hovering
@@ -2612,7 +2795,7 @@ import "../styles/global.css";
           svg.appendChild(vGuide);
         }
 
-        // Horizontal grid lines
+        /* ── Grid lines ── */
         [-1, -0.5, 0, 0.5, 1].forEach(val => {
           const y = sentY(val);
           const isZero = val === 0;
@@ -2796,9 +2979,32 @@ import "../styles/global.css";
 
             <div class="doppelganger-right">
               <span class="doppelganger-score" style="color: ${scoreColor}">${pct}%</span>
-              <div class="doppelganger-progress-bg">
-                <div class="doppelganger-progress-fill" style="width: ${pct}%; background-color: ${scoreColor}"></div>
-              </div>
+              ${m.breakdown ? `
+                <div class="doppelganger-breakdown">
+                  ${[
+                    { label: 'STY', val: m.breakdown.style },
+                    { label: 'GEN', val: m.breakdown.genre },
+                    { label: 'TAG', val: m.breakdown.tags },
+                    { label: 'TER', val: m.breakdown.territory },
+                    { label: 'SEM', val: m.breakdown.semantic }
+                  ].map(f => {
+                    const fPct = Math.round((f.val || 0) * 100);
+                    const fColor = f.val > 0.8 ? '#22d3ee' : '#64748b';
+                    return `
+                      <div class="doppelganger-factor">
+                        <span class="doppelganger-factor-label">${f.label}</span>
+                        <div class="doppelganger-factor-bar-bg">
+                          <div class="doppelganger-factor-bar-fill" style="width: ${fPct}%; background-color: ${fColor}"></div>
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              ` : `
+                <div class="doppelganger-progress-bg">
+                  <div class="doppelganger-progress-fill" style="width: ${pct}%; background-color: ${scoreColor}"></div>
+                </div>
+              `}
             </div>
           `;
           container.appendChild(item);
@@ -3106,10 +3312,27 @@ import "../styles/global.css";
         document.addEventListener("DOMContentLoaded", () => {
           renderGenreCheckboxes();
           fetchNovels();
+          checkUrlParams();
         });
       } else {
         renderGenreCheckboxes();
         fetchNovels();
+        checkUrlParams();
+      }
+
+      function checkUrlParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const linkedNovelId = urlParams.get('novelId');
+        if (linkedNovelId) {
+          setTimeout(() => {
+            const novelId = parseInt(linkedNovelId);
+            if (novelId) {
+              const novelCard = document.querySelector(`[data-novel-id="${novelId}"]`);
+              const title = novelCard ? novelCard.querySelector('.card-title')?.textContent : `Novel #${novelId}`;
+              selectNovel(novelId, title || `Novel #${novelId}`);
+            }
+          }, 1500);
+        }
       }
     </script>
   </body>
