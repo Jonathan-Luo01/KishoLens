@@ -1345,11 +1345,10 @@ import "../styles/global.css";
       :global(.skeleton-progress-bar-fill) {
         height: 100%;
         width: 15%;
-        background: linear-gradient(90deg, #06b6d4, #a855f7, #10b981);
-        background-size: 200% 100%;
+        background: linear-gradient(90deg, #0284c7, #38bdf8);
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
         border-radius: 999px;
         transition: width 0.4s ease-out;
-        animation: skeleton-shimmer 2s infinite linear;
       }
 
       .skeleton-stage-header,
@@ -2540,24 +2539,12 @@ import "../styles/global.css";
             // Step 2: Arc
             const pct = Math.min(80, 45 + ((elapsed - 3.0) / 4.0) * 35);
             if (progressFill) progressFill.style.width = `${pct}%`;
-            if (pillEl) {
-              pillEl.style.color = "#c084fc";
-              pillEl.style.background = "rgba(192, 132, 252, 0.1)";
-              pillEl.style.borderColor = "rgba(192, 132, 252, 0.25)";
-            }
-            if (dotEl) dotEl.style.background = "#c084fc";
             if (textEl) textEl.innerText = "Step 2/3: Mapping Kishotenketsu Arc...";
             if (subtextEl) subtextEl.innerText = "Calculating 4-phase quantile emotional trajectories across prose...";
           } else {
             // Step 3: Synthesis & Charts
             const pct = Math.min(96, 80 + ((elapsed - 7.0) / 5.0) * 16);
             if (progressFill) progressFill.style.width = `${pct}%`;
-            if (pillEl) {
-              pillEl.style.color = "#34d399";
-              pillEl.style.background = "rgba(52, 211, 153, 0.1)";
-              pillEl.style.borderColor = "rgba(52, 211, 153, 0.25)";
-            }
-            if (dotEl) dotEl.style.background = "#34d399";
             if (textEl) textEl.innerText = "Step 3/3: Synthesizing Archetype Radar...";
             if (subtextEl) subtextEl.innerText = "Extracting multi-factor similarity vectors and rendering visualizations...";
           }
