@@ -494,6 +494,38 @@ import "../styles/global.css";
         transition: width 0.4s ease-out;
       }
 
+      :global(.doppelganger-breakdown) {
+        display: flex;
+        gap: 6px;
+        margin-top: 4px;
+      }
+
+      :global(.doppelganger-factor) {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+      }
+
+      :global(.doppelganger-factor-label) {
+        font-size: 8px;
+        color: #64748b;
+        font-weight: 600;
+      }
+
+      :global(.doppelganger-factor-bar-bg) {
+        width: 16px;
+        height: 2px;
+        background: #1e293b;
+        border-radius: 1px;
+        overflow: hidden;
+      }
+
+      :global(.doppelganger-factor-bar-fill) {
+        height: 100%;
+        border-radius: 1px;
+      }
+
       svg#arcChart {
         width: 100%;
         height: auto;
@@ -875,13 +907,6 @@ import "../styles/global.css";
 
           <!-- State 3: Success -->
           <div id="results-container"></div>
-
-          <!-- Dashboard Link Action -->
-          <div id="visualize-link-container" style="margin-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 1.5rem; text-align: center; display: none;">
-            <a id="btn-visualize-link" href="#" class="btn btn--primary" style="display: inline-block; width: 100%; text-decoration: none; text-align: center;">
-              Visualize Stylistic & Pacing Signatures →
-            </a>
-          </div>
         </div>
       </div>
 
@@ -947,11 +972,11 @@ import "../styles/global.css";
             </div>
           </div>
 
-          <!-- Doppelgängers / Similar Novels Card (Full Width) -->
+          <!-- Similar Works / Stylistic Matches Card (Full Width) -->
           <div class="doppelganger-card">
-            <h3 class="doppelganger-title">Your Literary Doppelgängers</h3>
+            <h3 class="doppelganger-title">Similar Works &amp; Stylistic Matches</h3>
             <p class="doppelganger-subtitle">
-              The closest structural and semantic matches from our 17,000-book database.
+              The closest matching novels in the database based on prose style and semantic structure.
             </p>
             <div class="doppelganger-list" id="similarNovelsContainer">
               <div style="color: #64748b; font-size: 13px; margin: 0; padding: 12px;">No similar matches found.</div>
@@ -1002,7 +1027,6 @@ import "../styles/global.css";
         readyState.style.display = "none";
         resultsContainer.style.display = "none";
         document.getElementById("visualizations-container").style.display = "none";
-        document.getElementById("visualize-link-container").style.display = "none";
         loadingState.style.display = "flex";
 
         const title = document.getElementById("passage-title").value.trim() || "Untitled";
@@ -1031,16 +1055,7 @@ import "../styles/global.css";
             renderSimilarNovels(data.top_matches);
           }
           document.getElementById("visualizations-container").style.display = "flex";
-
           sessionStorage.setItem("custom_analysis", JSON.stringify(data));
-          const linkBtn = document.getElementById("btn-visualize-link");
-          if (linkBtn) {
-            linkBtn.href = `/library?novelId=custom`;
-          }
-          const linkContainer = document.getElementById("visualize-link-container");
-          if (linkContainer) {
-            linkContainer.style.display = "block";
-          }
         } catch (err) {
           loadingState.style.display = "none";
           errorBox.textContent = `Analysis error: ${err.message}`;
@@ -1148,9 +1163,10 @@ import "../styles/global.css";
             if (meta.category !== cat.id) return;
 
             const rawKey = `${langPrefix}${key}`;
-            if (stats[rawKey] === undefined && stats[key] === undefined) return;
-
-            const rawVal = stats[rawKey] !== undefined ? stats[rawKey] : stats[key];
+            let rawVal = stats[rawKey] !== undefined ? stats[rawKey] : stats[key];
+            if (rawVal === undefined || rawVal === null || (rawVal === 0 && key === "compound_sentiment")) {
+              rawVal = stats[`en_${key}`] ?? stats[`zh_${key}`] ?? stats[`ja_${key}`] ?? stats[key];
+            }
             if (rawVal === null || rawVal === undefined) return;
 
             let displayVal = meta.isPercent ? `${(rawVal * 100).toFixed(1)}%` :
@@ -1515,14 +1531,15 @@ import "../styles/global.css";
         const am = stats["archetype_match"];
         if (am) {
           if (am.top_genres && am.top_territories) {
-            const genresStr = am.top_genres.slice(0, 3).map(g => `${g.genre} (${(g.confidence * 100).toFixed(0)}%)`).join(", ");
+            const genresStr = am.top_genres.slice(0, 3).map(g => `${g.genre} (${Math.min(99, Math.max(1, Math.round(g.confidence * 100)))}%)`).join(", ");
             const territoryStr = am.top_territories[0].territory;
-            const maxConf = (am.confidence * 100).toFixed(0);
+            const maxConf = Math.min(99, Math.max(1, Math.round(am.confidence * 100)));
             document.getElementById("archetypeLabel").textContent =
               `${genresStr} · ${territoryStr} · ${maxConf}% match`;
           } else {
+            const tropeConf = Math.min(99, Math.max(1, Math.round(am.confidence * 100)));
             document.getElementById("archetypeLabel").textContent =
-              `${am.closest_trope} · ${am.territory} · ${(am.confidence * 100).toFixed(0)}% match`;
+              `${am.closest_trope} · ${am.territory} · ${tropeConf}% match`;
           }
         }
       }
@@ -1544,9 +1561,6 @@ import "../styles/global.css";
         const blVals  = (arcData.baselines && arcData.baselines[baseline])
           ? arcData.baselines[baseline]
           : [0.0839, 0.0588, 0.1347, 0.1006];
-        const blColor = baseline === "web_novel" ? "#a78bfa" : "#fbbf24";
-        const blRgb   = baseline === "web_novel" ? "167,139,250" : "251,191,36";
-
         const sentY = s => {
           const clamped = Math.max(-1.0, Math.min(1.0, s));
           return PAD.top + plotH * (1 - (clamped + 1) / 2);
@@ -1557,13 +1571,28 @@ import "../styles/global.css";
         const bottomY = PAD.top + plotH;
         const zeroY   = sentY(0);
 
-        /* ── Paths ── */
+        /* ── Smooth Catmull-Rom / Hermite Spline ── */
         function smoothPath(pts_x, pts_y) {
-          const pts = pts_x.map((x, i) => [x, pts_y[i]]);
-          let d = `M ${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
-          for (let i = 0; i < pts.length - 1; i++) {
-            const cpx = ((pts[i][0] + pts[i+1][0]) / 2).toFixed(1);
-            d += ` C ${cpx},${pts[i][1].toFixed(1)} ${cpx},${pts[i+1][1].toFixed(1)} ${pts[i+1][0].toFixed(1)},${pts[i+1][1].toFixed(1)}`;
+          const n = pts_x.length;
+          if (n === 0) return "";
+          if (n === 1) return `M ${pts_x[0].toFixed(1)},${pts_y[0].toFixed(1)}`;
+          let d = `M ${pts_x[0].toFixed(1)},${pts_y[0].toFixed(1)}`;
+          for (let i = 0; i < n - 1; i++) {
+            const x0 = pts_x[i === 0 ? 0 : i - 1];
+            const y0 = pts_y[i === 0 ? 0 : i - 1];
+            const x1 = pts_x[i];
+            const y1 = pts_y[i];
+            const x2 = pts_x[i + 1];
+            const y2 = pts_y[i + 1];
+            const x3 = pts_x[i + 2 >= n ? n - 1 : i + 2];
+            const y3 = pts_y[i + 2 >= n ? n - 1 : i + 2];
+
+            const cp1x = x1 + (x2 - x0) / 6;
+            const cp1y = y1 + (y2 - y0) / 6;
+            const cp2x = x2 - (x3 - x1) / 6;
+            const cp2y = y2 - (y3 - y1) / 6;
+
+            d += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}`;
           }
           return d;
         }
@@ -1823,9 +1852,32 @@ import "../styles/global.css";
 
             <div class="doppelganger-right">
               <span class="doppelganger-score" style="color: ${scoreColor}">${pct}%</span>
-              <div class="doppelganger-progress-bg">
-                <div class="doppelganger-progress-fill" style="width: ${pct}%; background-color: ${scoreColor}"></div>
-              </div>
+              ${m.breakdown ? `
+                <div class="doppelganger-breakdown">
+                  ${[
+                    { label: 'STY', val: m.breakdown.style },
+                    { label: 'GEN', val: m.breakdown.genre },
+                    { label: 'TAG', val: m.breakdown.tags },
+                    { label: 'TER', val: m.breakdown.territory },
+                    { label: 'SEM', val: m.breakdown.semantic }
+                  ].map(f => {
+                    const fPct = Math.round((f.val || 0) * 100);
+                    const fColor = f.val > 0.8 ? '#22d3ee' : '#64748b';
+                    return `
+                      <div class="doppelganger-factor">
+                        <span class="doppelganger-factor-label">${f.label}</span>
+                        <div class="doppelganger-factor-bar-bg">
+                          <div class="doppelganger-factor-bar-fill" style="width: ${fPct}%; background-color: ${fColor}"></div>
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              ` : `
+                <div class="doppelganger-progress-bg">
+                  <div class="doppelganger-progress-fill" style="width: ${pct}%; background-color: ${scoreColor}"></div>
+                </div>
+              `}
             </div>
           `;
           container.appendChild(item);
