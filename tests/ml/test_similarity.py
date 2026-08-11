@@ -2,6 +2,7 @@
 test_similarity.py — Unit tests for nearest neighbors vector search logic.
 """
 
+from kisholens.ml.features import extract_english_features
 from kisholens.ml.similarity import find_top_matches, _init_cache_from_disk, _novel_vector_cache
 
 
@@ -62,3 +63,22 @@ def test_find_top_matches_exclusion():
     for match in matches:
         assert match["id"] != 1
         assert "breakdown" in match
+
+
+def test_sherlock_holmes_mystery_matching():
+    text = """The rain beat against the fog-stained windowpanes of 221B Baker Street as Inspector Lestrade threw open the heavy oak door. His coat was drenched, and his eyes burned with anxiety. "Holmes, you must come at once," he gasped, resting his hands upon the polished mahogany table. "Lord Harrington lies motionless in his study, the doors locked from within and a shattered crystal decanter resting beside his chair."
+
+Sherlock Holmes did not rise immediately. He slowly lowered his pipe, allowing a dense ring of blue smoke to curl toward the ceiling before adjusting his magnifying lens. "A locked room, Lestrade? How delightfully elementary. And tell me, did you observe the faint scent of bitter almonds clinging to the victim's lips?" Lestrade blinked in astonishment. "Why, yes, Holmes—how could you possibly know?" Holmes turned to me with a faint smile. "A classic case of cyanide poisoning, Watson. Pack your bag; the hunt is afoot."""
+
+    feat = extract_english_features(text)
+    matches = find_top_matches(feat, query_text=text, top_k=5)
+
+    assert len(matches) == 5
+    matched_titles = [m["title"] for m in matches]
+    has_sherlock = any("Sherlock" in t for t in matched_titles)
+    assert has_sherlock, f"Expected Sherlock Holmes in top matches, got: {matched_titles}"
+
+    top_match = matches[0]
+    assert top_match["similarity_score"] >= 0.70
+    assert top_match["breakdown"]["genre"] >= 0.80
+
