@@ -82,3 +82,25 @@ Sherlock Holmes did not rise immediately. He slowly lowered his pipe, allowing a
     assert top_match["similarity_score"] >= 0.70
     assert top_match["breakdown"]["genre"] >= 0.80
 
+
+def test_isekai_fantasy_matching():
+    text = """I woke up in an unfamiliar stone chamber with a glowing blue interface hovering before my eyes. 
+[System Initialized. Welcome, User. Status: Level 1 Reincarnated Adventurer.]
+I grabbed my iron dagger and stepped out into the monster-infested dungeon."""
+    feat = extract_english_features(text)
+    matches = find_top_matches(feat, query_text=text, top_k=5)
+    assert len(matches) == 5
+    # Primary match should be Isekai / Fantasy / Web Novel
+    top_match = matches[0]
+    assert top_match["similarity_score"] >= 0.50
+
+
+def test_romance_matching():
+    text = """Elizabeth Bennett smiled gently across the drawing room, feeling her heart flutter as Mr. Darcy approached with quiet hesitation. His gaze was full of tender affection and unuttered promises of eternal love."""
+    feat = extract_english_features(text)
+    matches = find_top_matches(feat, query_text=text, top_k=5)
+    assert len(matches) == 5
+    top_match = matches[0]
+    assert top_match["similarity_score"] >= 0.50
+
+
