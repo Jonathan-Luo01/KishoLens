@@ -465,6 +465,24 @@ import "../styles/global.css";
         width: fit-content;
       }
 
+      :global(.doppelganger-reasons) {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 6px;
+      }
+
+      :global(.reason-pill) {
+        font-size: 11px;
+        font-weight: 500;
+        color: #94a3b8;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 4px;
+        padding: 2px 6px;
+        letter-spacing: 0.01em;
+      }
+
       :global(.doppelganger-right) {
         display: flex;
         flex-direction: column;
@@ -1849,6 +1867,11 @@ import "../styles/global.css";
                 <h4 class="doppelganger-item-title">${m.title}</h4>
                 ${m.author ? `<span class="doppelganger-author">${m.author}</span>` : ''}
                 <span class="doppelganger-badge">${topGenres}</span>
+                ${m.reasons && m.reasons.length > 0 ? `
+                  <div class="doppelganger-reasons">
+                    ${m.reasons.slice(0, 3).map(r => `<span class="reason-pill">${r}</span>`).join('')}
+                  </div>
+                ` : ''}
               </div>
             </div>
 
@@ -1857,16 +1880,16 @@ import "../styles/global.css";
               ${m.breakdown ? `
                 <div class="doppelganger-breakdown">
                   ${[
-                    { label: 'STY', val: m.breakdown.style },
-                    { label: 'GEN', val: m.breakdown.genre },
-                    { label: 'TAG', val: m.breakdown.tags },
-                    { label: 'TER', val: m.breakdown.territory },
-                    { label: 'SEM', val: m.breakdown.semantic }
+                    { label: 'STY', name: 'Prose Style', val: m.breakdown.style },
+                    { label: 'GEN', name: 'Genre', val: m.breakdown.genre },
+                    { label: 'TAG', name: 'Tags', val: m.breakdown.tags },
+                    { label: 'TER', name: 'Territory', val: m.breakdown.territory },
+                    { label: 'SEM', name: 'Semantic', val: m.breakdown.semantic }
                   ].map(f => {
                     const fPct = Math.round((f.val || 0) * 100);
                     const fColor = f.val > 0.8 ? '#22d3ee' : '#64748b';
                     return `
-                      <div class="doppelganger-factor">
+                      <div class="doppelganger-factor" title="${f.name}: ${fPct}%">
                         <span class="doppelganger-factor-label">${f.label}</span>
                         <div class="doppelganger-factor-bar-bg">
                           <div class="doppelganger-factor-bar-fill" style="width: ${fPct}%; background-color: ${fColor}"></div>
