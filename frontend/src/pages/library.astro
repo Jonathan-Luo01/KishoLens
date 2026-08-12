@@ -39,51 +39,6 @@ import "../styles/global.css";
         gap: 2rem;
       }
 
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid var(--color-border);
-        padding-bottom: 1.5rem;
-      }
-
-      .brand-title {
-        font-family: var(--font-display);
-        font-size: 1.8rem;
-        font-weight: 700;
-        text-decoration: none;
-        color: var(--color-text);
-      }
-
-      .brand-title span {
-        background: linear-gradient(135deg, var(--color-accent), var(--color-accent-2));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-
-      nav {
-        display: flex;
-        gap: 1.5rem;
-        align-items: center;
-      }
-
-      nav a {
-        color: rgba(255, 255, 255, 0.45);
-        text-decoration: none;
-        font-size: 0.9rem;
-        font-weight: 500;
-        transition: color 0.2s ease;
-      }
-
-      nav a + a {
-        margin-left: 1.5rem;
-      }
-
-      nav a:hover, nav a.active {
-        color: var(--color-accent);
-      }
-
       .dashboard-layout {
         display: grid;
         grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
