@@ -54,7 +54,7 @@ import "../styles/global.css";
       .card {
         background: rgba(255, 255, 255, 0.02);
         border: 1px solid var(--color-border);
-        border-radius: var(--radius);
+        border-radius: 16px;
         padding: 1.5rem;
         backdrop-filter: blur(12px);
         min-width: 0;
@@ -290,7 +290,7 @@ import "../styles/global.css";
       .chart-card {
         background: rgba(255,255,255,0.03);
         border: 1px solid rgba(255,255,255,0.07);
-        border-radius: 1.25rem;
+        border-radius: 16px;
         padding: 1.75rem;
         display: flex;
         flex-direction: column;
@@ -556,6 +556,15 @@ import "../styles/global.css";
       }
 
       @media (max-width: 600px) {
+        :global(.metrics-hero) {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+        }
+        .card, .chart-card, .doppelganger-card {
+          padding: 1.25rem 1rem;
+          border-radius: 16px;
+        }
         :global(.doppelganger-item) {
           flex-direction: column !important;
           align-items: flex-start !important;
@@ -589,10 +598,11 @@ import "../styles/global.css";
 
       @media (max-width: 480px) {
         .app-container {
-          padding: 1rem 0.65rem 3rem 0.65rem;
+          padding: 1rem 0.75rem 3rem 0.75rem;
         }
         .card, .chart-card, .doppelganger-card {
-          padding: 1rem 0.85rem;
+          padding: 1.25rem 1rem;
+          border-radius: 14px;
         }
       }
 
@@ -635,11 +645,11 @@ import "../styles/global.css";
 
       :global(.metrics-hero) {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-        gap: 0.6rem;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
         background: rgba(124, 106, 255, 0.05);
         border: 1px solid rgba(124, 106, 255, 0.2);
-        border-radius: 10px;
+        border-radius: 12px;
         padding: 0.85rem;
       }
 
@@ -665,21 +675,29 @@ import "../styles/global.css";
 
       :global(.metrics-category-tabs) {
         display: flex;
-        gap: 0.4rem;
+        gap: 8px;
         overflow-x: auto;
-        padding-bottom: 0.25rem;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 4px;
+      }
+
+      :global(.metrics-category-tabs::-webkit-scrollbar) {
+        display: none;
       }
 
       :global(.category-tab) {
         background: rgba(255, 255, 255, 0.04);
         border: 1px solid rgba(255, 255, 255, 0.1);
         color: var(--color-muted);
-        border-radius: 20px;
-        padding: 0.3rem 0.75rem;
-        font-size: 0.75rem;
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-size: 12px;
         font-weight: 500;
         cursor: pointer;
         white-space: nowrap;
+        flex-shrink: 0;
         transition: all 0.2s ease;
       }
 
@@ -1339,6 +1357,10 @@ import "../styles/global.css";
         };
 
         resultsContainer.innerHTML = renderEnhancedMetricsDashboard(statsObj);
+
+        if (window.innerWidth <= 768) {
+          setTimeout(() => resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+        }
 
         // Attach category tab filter event listener
         const tabBtns = resultsContainer.querySelectorAll(".category-tab");

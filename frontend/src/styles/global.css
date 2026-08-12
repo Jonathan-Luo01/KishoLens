@@ -167,6 +167,12 @@ header.site-header {
   border-bottom: 1px solid var(--color-border);
   padding: 1rem 1.5rem 1.25rem 1.5rem;
   width: 100%;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(2, 6, 23, 0.85);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .brand-title {
@@ -197,7 +203,11 @@ header.site-header {
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 500;
-  transition: color 0.2s ease;
+  padding: 8px 14px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.2s ease, background 0.2s ease;
 }
 
 .site-nav a:hover {
@@ -216,10 +226,11 @@ header.site-header {
     font-size: 1.5rem;
   }
   .site-nav {
-    gap: 1rem;
+    gap: 0.5rem;
   }
   .site-nav a {
     font-size: 0.85rem;
+    padding: 8px 14px;
   }
 }
 
@@ -263,18 +274,28 @@ header.site-header {
 
 .metrics-category-tabs {
   display: flex;
-  gap: 0.5rem;
+  gap: 8px;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 4px;
   margin-bottom: 1.5rem;
-  flex-wrap: wrap;
+}
+
+.metrics-category-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .category-tab {
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding: 6px 14px;
+  font-size: 12px;
+  border-radius: 999px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-line, rgba(255,255,255,0.07));
   color: #94a3b8;
-  padding: 0.45rem 0.9rem;
-  border-radius: 0.5rem;
-  font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
