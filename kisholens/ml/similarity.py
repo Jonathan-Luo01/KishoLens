@@ -527,6 +527,38 @@ def find_top_matches(
         )
         score = round(min(0.99, max(0.01, composite_score)), 4)
 
+        # Generate clean human-readable match reasons (no emojis)
+        reasons = []
+        if style_sim >= 0.88:
+            reasons.append("Similar prose style & sentence structure")
+        elif style_sim >= 0.75:
+            reasons.append("Comparable sentence cadence")
+
+        if q_primary_genre_lower and cand_primary and q_primary_genre_lower == cand_primary:
+            cand_primary_clean = n_meta.get("primary_genre") or n_meta.get("genre")
+            reasons.append(f"Matching primary archetype: {cand_primary_clean}")
+        elif q_primary_genre_lower and q_primary_genre_lower in cand_genres:
+            reasons.append(f"Shared genre: {q_primary_genre}")
+        elif genre_sim >= 0.60:
+            reasons.append("Strong genre overlap")
+
+        if semantic_sim >= 0.80:
+            reasons.append("Closely aligned plot premise & themes")
+        elif semantic_sim >= 0.65:
+            reasons.append("Thematic narrative overlap")
+
+        if territory_sim >= 0.85 and n_territory and n_territory != "Unknown":
+            if "classic" in n_territory.lower():
+                reasons.append("Shared Classic Literature tradition")
+            elif "web" in n_territory.lower():
+                reasons.append("Shared Web Novel territory")
+
+        if tag_sim >= 0.60:
+            reasons.append("Overlapping narrative tropes")
+
+        if not reasons:
+            reasons.append("Overall stylistic and structural affinity")
+
         candidates.append({
             "id": nid,
             "title": title_str,
@@ -534,6 +566,7 @@ def find_top_matches(
             "genre": n_meta.get("genre", ""),
             "territory": n_territory or "Unknown",
             "similarity_score": score,
+            "reasons": reasons,
             "breakdown": {
                 "style": round(style_sim, 3),
                 "semantic": round(semantic_sim, 3),

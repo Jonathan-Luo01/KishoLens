@@ -104,3 +104,20 @@ def test_romance_matching():
     assert top_match["similarity_score"] >= 0.50
 
 
+def test_match_reasons_generation():
+    text = """The rain beat against the fog-stained windowpanes of 221B Baker Street as Inspector Lestrade threw open the heavy oak door. "Holmes, you must come at once," he gasped."""
+    feat = extract_english_features(text)
+    matches = find_top_matches(feat, query_text=text, top_k=5)
+
+    assert len(matches) > 0
+    for m in matches:
+        assert "reasons" in m
+        assert isinstance(m["reasons"], list)
+        assert len(m["reasons"]) >= 1
+        for reason in m["reasons"]:
+            assert isinstance(reason, str)
+            # Confirm no emojis or icon characters
+            assert all(ord(c) < 128 or '\u4e00' <= c <= '\u9fff' or '\u3040' <= c <= '\u30ff' for c in reason), f"Found emoji or non-text char in reason: {reason}"
+
+
+

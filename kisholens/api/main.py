@@ -376,7 +376,11 @@ class IngestRequest(BaseModel):
 def get_novel_stats(novel_id: int):
     global _cached_novel_stats
     if novel_id in _cached_novel_stats:
-        return _cached_novel_stats[novel_id]
+        stats = _cached_novel_stats[novel_id]
+        if not stats.get("top_matches") or not any(m.get("reasons") for m in stats.get("top_matches", [])):
+            from kisholens.ml.similarity import find_top_matches
+            stats["top_matches"] = find_top_matches(stats, exclude_novel_id=novel_id, top_k=5)
+        return stats
     try:
         with Session(engine) as session:
             novel = session.get(Novel, novel_id)
