@@ -1524,6 +1524,48 @@ import "../styles/global.css";
         from { opacity: 0; transform: translateY(4px); }
         to { opacity: 1; transform: translateY(0); }
       }
+
+      @media (max-width: 640px) {
+        .territory-tabs {
+          display: flex !important;
+          gap: 6px !important;
+          overflow-x: auto !important;
+          flex-wrap: nowrap !important;
+          padding: 4px !important;
+          background: rgba(255, 255, 255, 0.03) !important;
+          border-radius: 12px !important;
+          scrollbar-width: none !important;
+          -webkit-overflow-scrolling: touch !important;
+          width: 100% !important;
+        }
+        .territory-tabs::-webkit-scrollbar {
+          display: none !important;
+        }
+        .t-tab, .territory-tab, .territory-tabs .t-tab, .territory-tabs .territory-tab {
+          white-space: nowrap !important;
+          flex: 1 0 auto !important;
+          text-align: center !important;
+          padding: 8px 14px !important;
+          font-size: 12px !important;
+          border-radius: 8px !important;
+        }
+        .genre-checkbox-grid, .genre-checkboxes, #genre-checkboxes-container {
+          display: grid !important;
+          grid-template-columns: 1fr 1fr !important;
+          gap: 6px 10px !important;
+        }
+        .genre-checkbox-item {
+          padding: 0.4rem 0.5rem !important;
+          font-size: 0.76rem !important;
+          gap: 0.4rem !important;
+        }
+        .app-container {
+          padding: 1rem 0.75rem 3rem 0.75rem !important;
+        }
+        .explorer-card, .dashboard-card, .chart-card, .doppelganger-card, .card {
+          padding: 1.25rem 1rem !important;
+        }
+      }
     </style>
   </head>
   <body>
