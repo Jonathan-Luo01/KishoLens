@@ -352,7 +352,7 @@ Sherlock Holmes did not rise immediately. He slowly lowered his pipe, allowing a
 
   .hero-title {
     font-family: var(--font-heading);
-    font-size: 3.4rem;
+    font-size: clamp(2.2rem, 7.5vw, 3.4rem);
     font-weight: 800;
     color: #ffffff;
     margin: 0 0 0.5rem;
@@ -361,7 +361,7 @@ Sherlock Holmes did not rise immediately. He slowly lowered his pipe, allowing a
 
   .hero-tagline {
     font-family: var(--font-heading);
-    font-size: 1.35rem;
+    font-size: clamp(1.1rem, 3.5vw, 1.35rem);
     font-weight: 500;
     color: #c4b5fd;
     margin: 0 0 1.25rem;
@@ -378,6 +378,24 @@ Sherlock Holmes did not rise immediately. He slowly lowered his pipe, allowing a
     display: flex;
     gap: 1rem;
     justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 480px) {
+    .page-container {
+      padding: 5rem 1rem 3rem;
+    }
+    .hero-actions {
+      flex-direction: column;
+      width: 100%;
+    }
+    .hero-actions .btn {
+      width: 100%;
+      justify-content: center;
+    }
+    .reader-metrics {
+      grid-template-columns: 1fr;
+    }
   }
 
   /* Sample Reader Widget */

@@ -208,6 +208,22 @@ header.site-header {
   color: var(--color-accent) !important;
 }
 
+@media (max-width: 600px) {
+  header.site-header {
+    padding: 0.85rem 1rem 1rem 1rem;
+  }
+  .brand-title {
+    font-size: 1.5rem;
+  }
+  .site-nav {
+    gap: 1rem;
+  }
+  .site-nav a {
+    font-size: 0.85rem;
+  }
+}
+
+
 /* ─── Shared Component Tokens: Tooltips & Category Tabs ─────────────── */
 .radar-tooltip {
   position: fixed;
