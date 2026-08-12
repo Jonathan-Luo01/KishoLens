@@ -115,3 +115,32 @@ def test_match_semantic_scores_have_all_keys():
     for s in result["territory_scores"]:
         assert "territory" in s
         assert "score" in s
+
+
+def test_mystery_sample_predicts_classic_literature_territory():
+    sample = (
+        "The rain beat against the fog-stained windowpanes of 221B Baker Street as Inspector Lestrade "
+        "threw open the heavy oak door. His coat was drenched, and his eyes burned with anxiety. "
+        "'Holmes, you must come at once,' he gasped, resting his hands upon the polished mahogany table. "
+        "'Lord Harrington lies motionless in his study, the doors locked from within and a shattered crystal "
+        "decanter resting beside his chair.' Sherlock Holmes did not rise immediately. A classic case of "
+        "cyanide poisoning, Watson. Pack your bag; the hunt is afoot."
+    )
+    result = match_semantic(sample)
+    assert result is not None
+    assert result["genre"] == "Mystery"
+    assert result["territory"] == "Classic Literature Territory"
+    assert result["territory_scores"][0]["territory"] == "Classic Literature Territory"
+
+
+def test_isekai_sample_predicts_web_novel_territory():
+    sample = (
+        "I died getting hit by a truck and woke up reincarnated in another world. "
+        "A blue status window appeared before my eyes with level up notifications and stat points."
+    )
+    result = match_semantic(sample)
+    assert result is not None
+    assert result["genre"] == "Isekai"
+    assert result["territory"] == "Web Novel Territory"
+    assert result["territory_scores"][0]["territory"] == "Web Novel Territory"
+

@@ -93,13 +93,41 @@ def match_semantic(
 
     genre_scores = taxonomy.get("genre_scores", [{"genre": world_primary, "score": world_score, "raw_score": world_score}])
 
+    from kisholens.ml.build_centroids import GENRE_TERRITORIES
+
+    territory_map: dict[str, list[float]] = {}
+    for g in genre_scores:
+        g_name = g.get("genre")
+        g_score = float(g.get("score", 0.0))
+        t_name = GENRE_TERRITORIES.get(g_name, "Classic Literature Territory")
+        if t_name not in territory_map:
+            territory_map[t_name] = []
+        territory_map[t_name].append(g_score)
+
+    primary_territory = GENRE_TERRITORIES.get(world_primary, "Classic Literature Territory")
+
+    territory_scores = []
+    for t_name in ["Classic Literature Territory", "Web Novel Territory"]:
+        scores = territory_map.get(t_name, [0.0])
+        t_score = max(scores) if scores else 0.0
+        territory_scores.append({
+            "territory": t_name,
+            "score": round(t_score, 4),
+            "raw_score": round(t_score, 4),
+        })
+
+    territory_scores.sort(key=lambda x: (x["territory"] == primary_territory, x["score"]), reverse=True)
+    top_territory = territory_scores[0]["territory"]
+    top_territory_confidence = territory_scores[0]["score"]
+
     return {
         "genre": world_primary,
         "genre_confidence": world_score,
-        "territory": "Web Novel Territory",
-        "territory_confidence": 0.95,
+        "territory": top_territory,
+        "territory_confidence": top_territory_confidence,
         "genre_scores": genre_scores,
-        "territory_scores": [{"territory": "Web Novel Territory", "score": 0.95, "raw_score": 0.95}],
+        "territory_scores": territory_scores,
         "taxonomy": taxonomy,
     }
+
 
