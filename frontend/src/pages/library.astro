@@ -109,7 +109,7 @@ import "../styles/global.css";
         flex-wrap: wrap;
       }
 
-      .t-tab {
+      .t-tab, .territory-tab {
         flex: 1 1 120px;
         background: transparent;
         border: none;
@@ -129,8 +129,8 @@ import "../styles/global.css";
         gap: 0.4rem;
       }
 
-      .t-tab:hover { color: var(--color-text); }
-      .t-tab.active {
+      .t-tab:hover, .territory-tab:hover { color: var(--color-text); }
+      .t-tab.active, .territory-tab.active {
         background: var(--color-accent);
         color: #ffffff;
       }
@@ -460,6 +460,36 @@ import "../styles/global.css";
         .app-container {
           padding: 1.25rem 1rem 3rem 1rem;
         }
+        .territory-tabs {
+          display: flex;
+          gap: 6px;
+          overflow-x: auto;
+          flex-wrap: nowrap;
+          padding: 4px;
+          background: rgba(255, 255, 255, 0.03);
+          border-radius: 12px;
+          scrollbar-width: none;
+          -webkit-overflow-scrolling: touch;
+        }
+        .territory-tabs::-webkit-scrollbar {
+          display: none;
+        }
+        .territory-tab, .t-tab, .territory-tabs .t-tab, .territory-tabs .territory-tab {
+          white-space: nowrap;
+          flex: 1;
+          text-align: center;
+          padding: 8px 12px;
+          font-size: 12px;
+          border-radius: 8px;
+        }
+        .genre-checkboxes, .genre-checkbox-grid, #genre-checkboxes-container {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 6px 12px;
+        }
+        .explorer-card, .dashboard-card, .chart-card, .doppelganger-card, .card {
+          padding: 1.25rem 1rem;
+        }
       }
 
       @media (max-width: 480px) {
@@ -467,7 +497,7 @@ import "../styles/global.css";
           padding: 1rem 0.65rem 3rem 0.65rem;
         }
         .card, .chart-card, .doppelganger-card, .explorer-card, .dashboard-card {
-          padding: 1rem 0.85rem;
+          padding: 1.25rem 1rem;
         }
       }
 
@@ -527,7 +557,7 @@ import "../styles/global.css";
         color: #ffffff;
       }
 
-      .genre-checkbox-grid {
+      .genre-checkbox-grid, .genre-checkboxes {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
         gap: 0.5rem;
@@ -2558,6 +2588,13 @@ import "../styles/global.css";
       async function selectNovel(id, title) {
         selectedNovelId = id;
         const loadId = ++currentLoadId;
+
+        if (window.innerWidth <= 768) {
+          setTimeout(() => {
+            const dash = document.getElementById('chartsGrid') || document.getElementById('loadingState');
+            if (dash) dash.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 150);
+        }
 
         if (currentLoadingTimer) {
           clearInterval(currentLoadingTimer);
