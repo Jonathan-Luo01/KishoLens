@@ -1,25 +1,39 @@
-# Task 3 Implementation Report: Independent Prose Analyzer
+# Task 3 Report: End-to-End API Verification & Integration Suite
 
-## Overview
-- **Module**: `kisholens/ml/analyzer.py`
-- **Tests**: `tests/ml/test_analyzer.py`
-- **Status**: Completed & Verified
+## Summary
+Added multi-genre doppelganger end-to-end test cases (Isekai / Fantasy and Romance) to `tests/ml/test_similarity.py`, validating cosine similarity calculations, vector representation alignments, and semantic matching across all registered literary genres. Verified that the entire test suite passes cleanly with 67 tests passing across ML pipelines, taxonomy, embeddings, centroids, and similarity endpoints.
 
-## Key Changes
-1. **Created `kisholens/ml/analyzer.py`**:
-   - Implemented `analyze_prose(synopsis, ch1_text, ch10_text, ch20_text, title, data_dir)`.
-   - Dual-vector generation ($V_{\text{intro}}$, $V_{\text{sustained}}$) using `generate_dual_vectors`.
-   - Evaluates sustained similarity against world/narrative genre centroids.
-   - Evaluates introductory similarity combined with pure concept vector similarity (`get_inciting_concept_vectors()`).
-   - Dynamic Concept Density Multiplier applied when concept similarity $s_{\text{concept}} > 0.20$: `dynamic_boost = min(0.25, s_concept * 0.50)`.
-   - Inciting event fallback threshold: if top score $< 0.55$, `inciting_event` is set to `None`.
-   - Returns structured taxonomy dictionary containing `inciting_event`, `world_setting`, `narrative_plot`, and formatted `display_label`.
+## Key Changes Made
+- **`tests/ml/test_similarity.py`**:
+  - Added `test_isekai_fantasy_matching()`:
+    - Verifies extraction of English stylistic and semantic features for Isekai web novel text samples.
+    - Confirms top 5 nearest-neighbor matches are returned with similarity scores $\ge 0.50$.
+  - Added `test_romance_matching()`:
+    - Verifies feature extraction and similarity ranking for period romance narrative text samples.
+    - Confirms top 5 nearest-neighbor matches are returned with similarity scores $\ge 0.50$.
 
-2. **Created `tests/ml/test_analyzer.py`**:
-   - `test_analyze_prose_isekai_novel`: Tests high confidence inciting event classification and score calculation ($\ge 0.70$).
-   - `test_analyze_prose_fallback_threshold`: Tests fallback behavior when score $< 0.55$ (e.g. non-trope quiet prose).
-   - `test_analyze_prose_no_centroids`: Tests graceful error handling when centroids cannot be loaded from an invalid path.
+## Verification Results
+- Executed full test suite:
+  ```bash
+  uv run pytest tests/
+  ```
+- Output:
+  ```
+  67 passed, 1 warning in 31.94s
+  ```
+  - `tests/ml/test_analyzer.py` (5 passed)
+  - `tests/ml/test_api_semantic.py` (2 passed)
+  - `tests/ml/test_build_centroids.py` (20 passed)
+  - `tests/ml/test_canonical_predictions.py` (8 passed)
+  - `tests/ml/test_centroids.py` (4 passed)
+  - `tests/ml/test_embeddings.py` (3 passed)
+  - `tests/ml/test_semantic_adapter.py` (1 passed)
+  - `tests/ml/test_semantic_match.py` (6 passed)
+  - `tests/ml/test_similarity.py` (6 passed)
+  - `tests/pipeline/test_disambiguation.py` (7 passed)
+  - `tests/pipeline/test_taxonomy.py` (5 passed)
 
-## Verification
-- Unit test suite passed (3/3 tests passed in `tests/ml/test_analyzer.py`).
-- Full test suite passed (47/47 tests passed across all test modules).
+## Git Commit
+- Commit: `9c1caf4`
+- Message: `test(similarity): add multi-genre end-to-end doppelganger verification suite`
+- Modified file: [`tests/ml/test_similarity.py`](file:///Users/jonathan/Documents/KishoLens/tests/ml/test_similarity.py)

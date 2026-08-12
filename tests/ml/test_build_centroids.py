@@ -17,11 +17,11 @@ from kisholens.ml.build_centroids import (
 
 
 def test_consolidate_genre_known_litrpg():
-    assert consolidate_genre(["litrpg", "adventure"]) == "LitRPG"
+    assert consolidate_genre(["litrpg", "adventure"]) == "Progression Fantasy"
 
 
 def test_consolidate_genre_known_system():
-    assert consolidate_genre(["system", "action"]) == "LitRPG"
+    assert consolidate_genre(["system", "action"]) == "Progression Fantasy"
 
 
 def test_consolidate_genre_known_isekai():
@@ -29,7 +29,7 @@ def test_consolidate_genre_known_isekai():
 
 
 def test_consolidate_genre_known_cultivation():
-    assert consolidate_genre(["cultivation", "action"]) == "Xianxia / Wuxia"
+    assert consolidate_genre(["cultivation", "action"]) == "Cultivation"
 
 
 def test_consolidate_genre_no_match():
@@ -46,20 +46,30 @@ def test_consolidate_genre_empty():
 
 def test_consolidate_genre_case_insensitive():
     assert consolidate_genre(["Isekai"]) == "Isekai"
-    assert consolidate_genre(["LITRPG"]) == "LitRPG"
+    assert consolidate_genre(["LITRPG"]) == "Progression Fantasy"
+
+
+def test_consolidate_genre_gutenberg_subjects():
+    assert consolidate_genre(["Sea stories", "Pirates -- Fiction"]) == "Action / Adventure"
+    assert consolidate_genre(["Humorous stories", "Satire"]) == "Comedy"
+    assert consolidate_genre(["Fairy tales", "Mythology"]) == "Fantasy"
+    assert consolidate_genre(["Horror tales", "Gothic fiction"]) == "Horror"
+    assert consolidate_genre(["Historical fiction", "Regency Fiction"]) == "Historical"
+    assert consolidate_genre(["Science fiction", "Time travel -- Fiction"]) == "Sci-Fi"
+    assert consolidate_genre(["Philosophical fiction", "Ethics -- Fiction"]) == "Philosophy"
+    assert consolidate_genre(["Detective and mystery stories"]) == "Mystery"
+    assert consolidate_genre(["Tragedies", "Fatalism"]) == "Tragedy"
+    assert consolidate_genre(["Supernatural -- Fiction", "Apparitions"]) == "Supernatural"
+    assert consolidate_genre(["Poetry", "Sonnets"]) == "Poetry"
+    assert consolidate_genre(["Romance fiction", "Love stories"]) == "Romance"
 
 
 def test_genre_tag_map_has_all_genres():
     expected = {
-        "LitRPG", "Isekai", "Xianxia / Wuxia", "Urban Romance",
-        "Cozy Fantasy", "Slice of Life", "Contemporary", "Villainess / Otome Game",
-        "Kingdom Building / Strategy", "Monster Protagonist / Evolution",
-        "Dungeon Core / Dungeon MC", "Urban Fantasy / Dungeons",
-        "Harem", "Girls Love / Boys Love",
-        "High Fantasy", "Hard Sci-Fi", "Modern Thriller",
-        "Victorian Novel", "Philosophical Fiction",
-        "Mystery", "Horror", "Romance", "Fantasy",
-        "Sci-Fi", "Action / Adventure", "Comedy"
+        "Action / Adventure", "Comedy", "Drama", "Fantasy", "Horror",
+        "Historical", "Sci-Fi", "Philosophy", "Mystery", "Tragedy",
+        "Supernatural", "Poetry", "Romance", "Slice of Life",
+        "Cultivation", "Isekai", "Progression Fantasy"
     }
     assert expected == set(GENRE_TAG_MAP.keys())
 
@@ -105,9 +115,9 @@ def test_compute_centroid_shape():
 def test_save_load_roundtrip():
     centroids = np.random.rand(3, 384).astype(np.float32)
     meta = {
-        "genres": ["LitRPG", "Isekai", "High Fantasy"],
-        "territories": ["Web Novel Territory", "Web Novel Territory", "Traditional Fiction Territory"],
-        "samples_used": {"LitRPG": 10, "Isekai": 10, "High Fantasy": 10}
+        "genres": ["Fantasy", "Isekai", "Cultivation"],
+        "territories": ["Classic Literature Territory", "Web Novel Territory", "Web Novel Territory"],
+        "samples_used": {"Fantasy": 10, "Isekai": 10, "Cultivation": 10}
     }
     with tempfile.TemporaryDirectory() as tmpdir:
         save_centroids(centroids, meta, filename_prefix="genre", data_dir=tmpdir)

@@ -23,4 +23,7 @@ data/raw_cache/
 data/*.db
 data/*.npy
 data/*_meta.json
+data/*_cache.json
+scratch/
+
 

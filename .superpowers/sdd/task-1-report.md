@@ -1,31 +1,33 @@
-# Task 1 Execution Report: Dual-Scope Vector Generator (`kisholens/ml/embeddings.py`)
+# Task 1 Completion Report: Vector Cache Disk Hydration in similarity.py
 
-## Executive Summary
-Task 1 has been completed successfully following strict Test-Driven Development (TDD) protocols. The module `kisholens/ml/embeddings.py` and its corresponding test suite `tests/ml/test_embeddings.py` have been created and verified.
+## Status: COMPLETE
 
-## Implementation Details
+### Overview
+Implemented `_init_cache_from_disk()` in `kisholens/ml/similarity.py` to auto-hydrate `_novel_vector_cache` on module load from `data/stats_cache.json`. This provides instant, in-memory access to pre-computed 8-dimensional normalized radar stylistic feature vectors, primary genres, top genres, territories, and metadata for all 10,320 indexed novels.
 
-### Module: `kisholens/ml/embeddings.py`
-- Implemented lazy loading of `SentenceTransformer("all-MiniLM-L6-v2")` model via `get_transformer_model()`.
-- Implemented `_normalize(vec)` to handle zero-vector and NaN edge cases and return normalized float32 unit vectors.
-- Implemented `embed_single_text(text: str) -> np.ndarray` returning 384-dimensional unit vector representations (or 384-dim zeros for empty inputs).
-- Implemented `generate_dual_vectors(synopsis, ch1_text, ch10_text, ch20_text) -> Tuple[np.ndarray, np.ndarray]`:
-  - **Scenario A (Synopsis Present)**:
-    - $V_{\text{intro}} = \text{Normalize}(0.60 \cdot V_{\text{synopsis}} + 0.40 \cdot V_{\text{Ch1}})$
-    - $V_{\text{sustained}} = \text{Normalize}(0.10 \cdot V_{\text{synopsis}} + 0.10 \cdot V_{\text{Ch1}} + 0.40 \cdot V_{\text{Ch10}} + 0.40 \cdot V_{\text{Ch20}})$
-  - **Scenario B (Synopsis Missing/Empty)**:
-    - $V_{\text{intro}} = \text{Normalize}(1.0 \cdot V_{\text{Ch1}})$
-    - $V_{\text{sustained}} = \text{Normalize}(0.20 \cdot V_{\text{Ch1}} + 0.40 \cdot V_{\text{Ch10}} + 0.40 \cdot V_{\text{Ch20}})$
+### TDD Execution Steps
+1. **Red (Failing Test)**:
+   - Added `test_cache_hydration_from_disk()` in `tests/ml/test_similarity.py`.
+   - Verified test failed on collection with `ImportError: cannot import name '_init_cache_from_disk'`.
 
-### Test Suite: `tests/ml/test_embeddings.py`
-1. `test_embed_single_text`: Verifies shape `(384,)`, type `np.ndarray`, and unit norm ($\approx 1.0$).
-2. `test_generate_dual_vectors_with_synopsis`: Tests dual-vector generation under Scenario A.
-3. `test_generate_dual_vectors_without_synopsis`: Tests dual-vector generation under Scenario B.
+2. **Green (Implementation)**:
+   - Implemented `_init_cache_from_disk(cache_path=None)` in `kisholens/ml/similarity.py`:
+     - Reads `data/stats_cache.json`.
+     - Iterates over all non-metadata entries (`k` not starting with `_`).
+     - Extracts 8D stylistic feature vector via `extract_feature_vector(item)`.
+     - Extracts `primary_genre`, `top_genres`, `territory`, `title`, `author`, and semantic metadata.
+     - Populates `_novel_vector_cache[nid]` keyed by integer novel ID.
+     - Added auto-hydration invocation `_init_cache_from_disk()` on module import.
+   - Ran `uv run pytest tests/ml/test_similarity.py -v`:
+     - `test_cache_hydration_from_disk` PASSED (cache size: 10,320 items; #235 "The Adventures of Sherlock Holmes", vector shape (8,), primary_genre "Mystery").
+     - `test_find_top_matches_basic` PASSED.
+     - `test_find_top_matches_exclusion` PASSED.
 
-## Verification & TDD Cycle
-1. **RED Stage**: Wrote `tests/ml/test_embeddings.py` and ran `uv run pytest tests/ml/test_embeddings.py`. Failed with `ModuleNotFoundError: No module named 'kisholens.ml.embeddings'`, confirming test was valid and non-trivial.
-2. **GREEN Stage**: Implemented `kisholens/ml/embeddings.py` and re-ran `uv run pytest tests/ml/test_embeddings.py`. All 3 tests passed in 4.40s.
-3. **Regression Testing**: Ran full ML test suite (`uv run pytest tests/ml/`). All 33 tests passed cleanly in 22.51s with 0 errors.
+3. **Refactor & Verification**:
+   - Ran GitNexus blast radius / impact analysis and detect changes verification.
+   - Committed changes with: `git commit -m "feat(similarity): hydrate novel vector cache from disk with 8D radar stylistics"`.
 
-## GitNexus Indexing
-Ran codebase re-indexing via `node .gitnexus/run.cjs analyze`. Successfully indexed 700 nodes, 1,412 edges, 18 clusters, and 47 flows.
+### Commit
+- Hash: `e3d3af1`
+- Message: `feat(similarity): hydrate novel vector cache from disk with 8D radar stylistics`
+- Files changed: `kisholens/ml/similarity.py`, `tests/ml/test_similarity.py`

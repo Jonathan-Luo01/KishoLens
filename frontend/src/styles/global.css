@@ -207,3 +207,71 @@ header.site-header {
 .site-nav a.active {
   color: var(--color-accent) !important;
 }
+
+/* ─── Shared Component Tokens: Tooltips & Category Tabs ─────────────── */
+.radar-tooltip {
+  position: fixed;
+  pointer-events: none;
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  color: #f8fafc;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.radar-tooltip-title {
+  font-weight: 700;
+  color: #38bdf8;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.72rem;
+}
+
+.radar-tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.radar-tooltip-val {
+  font-weight: 600;
+}
+
+.metrics-category-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.category-tab {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-line, rgba(255,255,255,0.07));
+  color: #94a3b8;
+  padding: 0.45rem 0.9rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-tab:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+
+.category-tab.active {
+  background: rgba(124, 106, 255, 0.15);
+  border-color: rgba(124, 106, 255, 0.4);
+  color: #c4b5fd;
+  font-weight: 600;
+}

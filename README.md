@@ -1,108 +1,145 @@
 # KishoLens
 
-> Stylistic pacing and prose archetype analysis for web novels and light fiction.
+> **Stylistic Pacing & Prose Archetype Analytics Engine for Web Fiction & Classical Literature**
 
-KishoLens is a dashboard for analyzing the structural and stylistic DNA of web novels — sentence pacing, vocabulary density, dialogue rhythm, and prose archetypes — across various sources of modern light/web novels and public domain corpora. 
+KishoLens is a NLP and ML analytics engine designed for dissecting the structural, syntactic, and emotional DNA of fiction — sentence pacing, vocabulary diversity (TTR), dialogue rhythm, multi-lingual dependency tree depth, and 17 canonical prose archetypes across **2,800+ web novels and classical literature works**.
 
-## Stack
+---
+
+## 🌟 Key Features
+
+- **📖 17 Canonical Prose Archetypes**: Zero-shot semantic genre classification powered by `sentence-transformers` (`all-MiniLM-L6-v2`), global mean centroid subtraction, and calibrated sigmoid confidence scoring.
+- **🏮 Kishōtenketsu 4-Act Sentiment Arcs**: Dynamic emotional polarity curve tracking across **Ki (起/Introduction)**, **Shō (承/Development)**, **Ten (転/Twist)**, and **Ketsu (結/Resolution)**.
+- **🌐 Tri-Language NLP Pipeline**: Native syntactic dependency tree parsing, POS tagging, and lexical density analysis for **English (spaCy)**, **Japanese (SudachiPy / Oseti)**, and **Chinese (spaCy / HanLP)**.
+- **📊 Interactive Visual Dashboard**:
+  - 8-Dimensional Archetype Radar Canvas with interactive spoke tooltips & baseline comparison (`Web Novel` vs `Classic Literature`).
+  - Rhythmic Pacing Barcodes displaying paragraph word-density variations.
+  - Categorized Metric Cards (Structure, Prose & Style, Theme & Emotion, Pacing) featuring percentile progress meters and benchmark chips (`+X% vs Avg`).
+- **🔍 Multi-Faceted Doppelgänger Search**: Cosine + L1 multi-vector similarity search identifying top stylistic twin novels across the 2,800+ novel database in **< 1 ms**.
+
+---
+
+## 🛠️ Stack & Technology
 
 | Layer | Technology |
 |---|---|
-| **Frontend** | Astro + React islands, Vanilla CSS |
-| **API** | FastAPI + Uvicorn |
-| **Tri-Language NLP** | spaCy & NLTK VADER (English), pkuseg/jieba & cntext (Chinese), SudachiPy & Oseti (Japanese) |
-| **Statistical ML** | scipy (percentileofscore rank normalization) |
-| **HTML Parsing** | lxml + BeautifulSoup4 |
-| **HTTP Client** | aiohttp (async) |
-| **Data layer** | SQLModel + SQLite, HuggingFace Datasets (streaming) |
-| **Python tooling** | Astral uv / venv |
-| **Node tooling** | npm + concurrently |
+| **Frontend** | Astro static/SSR, Vanilla CSS design tokens, HTML5 Canvas & SVG |
+| **API Backend** | FastAPI, Uvicorn, Async context manager lifecycle |
+| **Tri-Language NLP** | `spaCy` (`en_core_web_sm`, `zh_core_web_sm`), `NLTK VADER`, `SudachiPy`, `Oseti` |
+| **Machine Learning** | `sentence-transformers` (`all-MiniLM-L6-v2`), `numpy`, `scipy` |
+| **Database & Cache** | SQLModel (SQLite), pre-computed JSON disk vector caches (`vector_cache.json`) |
+| **Package Managers** | Astral `uv` (Python), `npm` (Node.js) |
 
-## Project Structure
+---
 
-```
-KishoLens/
-├── kisholens/              # All Python source
-│   ├── api/                # FastAPI server  →  uv run uvicorn kisholens.api.main:app --reload
-│   ├── ml/                 # NLP feature extraction
-│   └── pipeline/           # Scrapers + normalizers
-├── frontend/               # Astro + React dashboard
-│   └── src/
-│       ├── pages/          # Astro pages & routing
-│       ├── components/     # React islands (charts, viz)
-│       └── styles/         # CSS tokens & global styles
-├── data/                   # Local only — never committed
-│   ├── raw_cache/          # Cached HTML from scrapers
-│   └── kisholens.db        # SQLite (metadata + metrics)
-├── pyproject.toml          # Single uv package
-└── package.json            # npm dev runner
-```
-
-## Setup
+## 🚀 Quick Start Guide
 
 ### Prerequisites
 
-- Python ≥ 3.10 (3.13 recommended for NLP extras)
-- Node.js ≥ 22.12.0
-- [Astral uv](https://docs.astral.sh/uv/getting-started/installation/)
+- **Python**: $\ge 3.10$ (Python 3.13 or 3.14 supported)
+- **Node.js**: $\ge 18.0.0$
+- **Astral `uv`**: Installed (`curl -LsSf https://astral.sh/uv/install.sh | sh`)
 
-### Install
+### 1. Clone & Install Dependencies
 
 ```bash
-# Python deps (core)
-uv sync
+# 1. Clone the repository
+git clone https://github.com/Jonathan-Luo01/KishoLens.git
+cd KishoLens
 
-# NLP extras — requires Python ≤ 3.13 (spaCy wheels)
+# 2. Install Python dependencies (with NLP extras)
 uv sync --extra nlp
 
-# Node deps (frontend + dev runner)
+# 3. Download required spaCy models for English and Chinese NLP
+uv run python -m spacy download en_core_web_sm
+uv run python -m spacy download zh_core_web_sm
+
+# 4. Install Node dependencies for frontend
 npm install
 npm --prefix frontend install
 ```
 
-## Development
+### 2. Run Local Development Servers
+
+Run both the FastAPI backend and Astro frontend concurrently with a single command:
 
 ```bash
-# Start API + frontend concurrently
 npm run dev
-
-# Or individually
-npm run dev:backend    # FastAPI on http://localhost:8000
-npm run dev:frontend   # Astro on http://localhost:4321
-npm run dev:pipeline   # Run ingestion pipeline
-npm run dev:ml         # Run NLP analyzer
 ```
 
-Health check: `curl http://localhost:8000/health`
+Or launch each service individually in separate terminals:
 
-## Dataset Policy
+```bash
+# Terminal 1: Start FastAPI Backend (http://localhost:8000)
+uv run uvicorn kisholens.api.main:app --reload --port 8000
 
-Raw chapter text from modern web fiction platforms is **copyrighted by their authors** and is **never committed to this repository**.
+# Terminal 2: Start Astro Frontend (http://localhost:4321)
+npm --prefix frontend run dev
+```
 
-| Data | Status |
-|---|---|
-| Raw scraped chapter text | 🔒 Local only (`data/raw_cache/`) |
-| SQLite database | 🔒 Local only (`data/kisholens.db`) |
-| Computed prose metrics | ✅ Shareable (HuggingFace / Kaggle) |
-| Novel metadata | ✅ Shareable |
-| Public domain text (Aozora / Gutenberg) | ✅ Shareable |
+Visit **`http://localhost:4321`** in your browser to launch the KishoLens dashboard!
 
-## Sources
+---
 
-| Source | Language | Access method |
+## 📡 REST API Documentation
+
+The FastAPI backend exposes the following key endpoints on `http://localhost:8000`:
+
+| Method | Endpoint | Description |
 |---|---|---|
-| **Syosetu (Shousetsuka ni Narou)** | Japanese / Parallel English | HTML scraping / Hugging Face `ParallelFiction` (streaming) |
-| **ScribbleHub** | English | Hugging Face `ScribbleHub17K` (streaming) |
-| **Royal Road** | English | HTML scraping / Hugging Face `RoyalRoad-1.61M` (streaming) |
-| **Project Gutenberg** | English / Chinese | Gutenberg text down-loader (by book ID) |
-| **CNNovel** | Chinese | Hugging Face `CNNovel125K` (streaming) |
+| `GET` | `/health` | Server health check and NLP model status |
+| `POST` | `/api/analyze` | Real-time analysis of pasted prose (returns 20+ features, archetype, 4-act arc, pacing barcode, and doppelgänger matches) |
+| `GET` | `/api/novels` | List database novels with search query, genre, and territory filters |
+| `GET` | `/api/novels/{id}/stats` | Pre-computed aggregated statistics & benchmark percentages for a specific novel |
+| `GET` | `/api/novels/{id}/arc` | 4-act Kishōtenketsu sentiment arc array for a specific novel |
 
-## Architecture
+### Sample API Request (`POST /api/analyze`)
+
+```bash
+curl -X POST "http://localhost:8000/api/analyze" \
+     -H "Content-Type: application/json" \
+     -d '{"text": "Inspector Holmes knelt by the corpse, examining the faint scent of bitter almonds clinging to the victim lips.", "lang": "auto"}'
+```
+
+---
+
+## 🧪 Testing & Verification
+
+Run the full test suite to verify NLP feature extraction, semantic matchers, and API endpoints:
+
+```bash
+# Run Python backend unit test suite (37 tests)
+uv run pytest tests/
+
+# Verify Astro static build compilation
+npm --prefix frontend run build
+```
+
+---
+
+## 📁 Project Structure
 
 ```
-Scraper (pipeline/)  →  Normalizer  →  SQLite
-                                           ↓
-                              NLP Analyzer (ml/)
-                                           ↓
-                               FastAPI (api/)  →  Astro Dashboard
+KishoLens/
+├── kisholens/              # Python Backend Source
+│   ├── api/                # FastAPI application & REST routes (`main.py`)
+│   ├── ml/                 # NLP feature extraction, sentiment arcs, semantic match
+│   └── pipeline/           # Dataset ingestion pipelines & scrapers
+├── frontend/               # Astro Frontend Dashboard
+│   └── src/
+│       ├── pages/          # Astro pages (`index.astro`, `analyze.astro`, `library.astro`)
+│       └── styles/         # Global CSS tokens & themes (`global.css`)
+├── data/                   # Database & pre-computed disk caches
+│   ├── kisholens.db        # SQLite database (2,800+ novels)
+│   ├── stats_cache.json    # Pre-computed novel statistics cache
+│   └── vector_cache.json   # Pre-computed 8D feature vector cache
+├── tests/                  # PyTest suite (`test_api_semantic.py`, `test_similarity.py`, etc.)
+├── pyproject.toml          # Astral uv dependency manifest
+└── package.json            # Node.js dev scripts
 ```
+
+---
+
+## 🛡️ License & Dataset Policy
+
+Raw chapter texts from modern web fiction platforms are copyrighted by their respective authors and are **never committed to this repository**. All included database metrics, public domain Gutenberg texts, and model centroids are free for academic and non-commercial research use.

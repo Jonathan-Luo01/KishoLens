@@ -71,6 +71,7 @@ def match_semantic(
     synopsis: Optional[str] = None,
     model_name: str = "all-MiniLM-L6-v2",
     data_dir: str = DEFAULT_DATA_DIR,
+    use_regex_boost: bool = True,
 ) -> Optional[dict]:
     paragraphs = [p for p in text.split("\n\n") if p.strip()]
     if len(paragraphs) <= 3:
@@ -83,7 +84,7 @@ def match_semantic(
         ch10 = "\n\n".join(paragraphs[n // 3: 2 * n // 3])
         ch20 = "\n\n".join(paragraphs[2 * n // 3:])
 
-    taxonomy = analyze_prose(synopsis, ch1, ch10, ch20, title=title, data_dir=data_dir)
+    taxonomy = analyze_prose(synopsis, ch1, ch10, ch20, title=title, data_dir=data_dir, use_regex_boost=use_regex_boost)
     if not taxonomy:
         return None
 

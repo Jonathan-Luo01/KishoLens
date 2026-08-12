@@ -26,17 +26,15 @@ SYSTEM_INTERFACE_MARKERS = [
     "系统", "加点", "属性面板", "任务日志", "面板"
 ]
 
-# --- CULTIVATION ---
 CULTIVATION_CORE_MARKERS = [
-    "qi", "dantian", "cultivation", "cultivator", "cultivate", "dao", "sect",
-    "immortal ascension", "immortal cultivation", "immortal emperor", "immortal monarch",
-    "immortal cave", "tribulation", "meridian", "spiritual root", "alchemy furnace",
-    "pill refining", "elixir refining", "dan refining", "sutra",
+    "qi", "dantian", "cultivation", "cultivator", "sect",
+    "qi cultivation", "tribulation", "meridian", "meridians", "spiritual root", "alchemy furnace",
+    "pill refining", "elixir refining", "dan refining",
     "golden core", "foundation building", "jianghu", "courting death",
-    "young master of the clan", "young master of the sect", "yin", "yang",
-    "escort agency", "internal energy", "acupoint", "bottleneck", "impurities",
-    "nascent soul", "ginseng", "spirit stone", "jade slip", "heavenly tribulation",
-    "xianxia", "wuxia", "xuanhuan", "eastern fantasy",
+    "young master of the clan", "young master of the sect",
+    "escort agency", "internal energy", "acupoint", "bottleneck",
+    "nascent soul", "spirit stone", "jade slip", "heavenly tribulation",
+    "xianxia", "wuxia", "xuanhuan",
     "修仙", "仙侠", "修真", "玄幻", "武侠", "功法", "宗门", "丹药", "金丹", "元婴",
     "道士", "灵石", "神通", "渡劫", "掌门", "仙尊", "仙帝", "洪荒", "大罗", "炼丹",
     "飞升", "剑仙", "道尊", "神尊", "魔尊", "妖帝", "法宝", "筑基", "炼气", "真仙",
@@ -73,7 +71,8 @@ def disambiguate_and_rank_genres(
     text_sample: str = "",
     source: str = "",
     territory: str = "",
-    initial_genre: str = ""
+    initial_genre: str = "",
+    title: str = ""
 ) -> Dict[str, Any]:
     """
     Disambiguation and penalty/boost engine for cross-genre trope overlaps.
@@ -134,9 +133,15 @@ def disambiguate_and_rank_genres(
                 scores[g_name] += 1.5
 
     # Text-based Horror Boost (for classic/gothic horror works like Dracula and Frankenstein)
-    if fear_count >= 2 or (monster_count >= 1 and fear_count >= 1):
-        scores["Horror"] += 1.5
-        boosts.append(f"Horror Text Boost (+1.50): {fear_count} fear markers & {monster_count} monster markers found in text.")
+    if is_classic:
+        if fear_count >= 2 or (monster_count >= 1 and fear_count >= 1):
+            scores["Horror"] += 1.5
+            boosts.append(f"Horror Text Boost (+1.50): {fear_count} fear markers & {monster_count} monster markers found in text.")
+    else:
+        # Web novel: only boost horror if dominant fear atmosphere (fear_count >= 3 & fear_count > monster_count)
+        if fear_count >= 3 and fear_count > monster_count:
+            scores["Horror"] += 1.5
+            boosts.append(f"Horror Text Boost (+1.50): {fear_count} fear markers found in text.")
 
     # Skip trope penalties for classic literature
     if not is_classic:

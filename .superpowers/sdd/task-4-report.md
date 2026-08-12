@@ -1,34 +1,43 @@
-# Task 4 Report: API Integration — Add `semantic` Key to `POST /api/analyze`
+# Task 4 Report: End-to-End Verification & Database Cache Update
 
-## Steps Taken
+## Executed Work & Verification Summary
 
-### Step 1: Import match_semantic
-- Added `from kisholens.ml.semantic_match import match_semantic` at the top of `kisholens/api/main.py`.
+### 1. PyTest Unit Test Suite Execution
+- **Command:** `uv run pytest tests/`
+- **Result:** **55/55 passed** cleanly (0 failures, 1 deprecation warning) in 22.77s.
+- **Coverage:**
+  - `tests/ml/test_analyzer.py` (5/5 passed)
+  - `tests/ml/test_api_semantic.py` (2/2 passed)
+  - `tests/ml/test_build_centroids.py` (20/20 passed)
+  - `tests/ml/test_centroids.py` (4/4 passed)
+  - `tests/ml/test_embeddings.py` (3/3 passed)
+  - `tests/ml/test_semantic_adapter.py` (1/1 passed)
+  - `tests/ml/test_semantic_match.py` (6/6 passed)
+  - `tests/ml/test_similarity.py` (2/2 passed)
+  - `tests/pipeline/test_disambiguation.py` (7/7 passed)
+  - `tests/pipeline/test_taxonomy.py` (5/5 passed)
 
-### Step 2: Call match_semantic in post_analyze
-- Called `semantic = match_semantic(request.text)` after matching the stylistic pacing/archetype.
+### 2. Empirical Verification — Novel ID 231 (*Romance of the Three Kingdoms*)
+- **Input:** Database Novel ID 231 (Title: 三國志演義)
+- **Output:**
+  - `world_setting`: `{"primary": "Historical", "score": 0.99}`
+  - `narrative_plot`: `{"primary": "Action / Adventure", "score": 0.8994}`
+  - `inciting_event`: `None`
+  - `display_label`: `"Historical Action / Adventure (Military Epic)"`
+- **Verification:** `res["display_label"]` exactly equals `"Historical Action / Adventure (Military Epic)"`.
 
-### Step 3: Add `semantic` key to return dict
-- Additive modification to the return statement dictionary of `post_analyze()` to include the optional `"semantic"` key if centroids are present (otherwise gracefully omitted).
+### 3. Empirical Verification — Scenario B (Hybrid Kingdom Building Cultivation Sample)
+- **Input:** Sample text with military markers (emperor, army, general, siege) and cultivation markers (dantian, meridian, spirit stone).
+- **Output:**
+  - `world_setting`: `{"primary": "Historical"}`
+  - `narrative_plot`: `{"primary": "Historical / Military"}`
+  - `display_label`: `"Historical Cultivation (Kingdom Building / Military)"`
+- **Verification:** `res["display_label"]` exactly equals `"Historical Cultivation (Kingdom Building / Military)"`.
 
-### Step 4: Write tests & verify
-- Created `tests/ml/test_api_semantic.py` using FastAPI's `TestClient` to mock the presence/absence of centroids.
-- Verified both test cases passed successfully.
+### 4. Stats Cache Rebuild Script
+- **File:** `scratch/update_stats_cache.py`
+- **Verification:** Confirmed clean execution and version tracking (`_v: 2`) across all 2,813 novels in the database.
 
----
-
-## Test Output
-
-```
-============================= test session starts ==============================
-platform darwin -- Python 3.14.6, pytest-9.1.1, pluggy-1.6.0
-rootdir: /Users/jonathan/Documents/KishoLens
-configfile: pyproject.toml
-plugins: anyio-4.14.1
-collecting ... collected 2 items
-
-tests/ml/test_api_semantic.py::test_api_analyze_without_centroids PASSED [ 50%]
-tests/ml/test_api_semantic.py::test_api_analyze_with_centroids PASSED    [100%]
-
-========================= 2 passed, 1 warning in 3.02s =========================
-```
+### 5. Version Control Commit
+- **Command:** `git add scratch/update_stats_cache.py kisholens/ml/analyzer.py kisholens/ml/semantic_match.py && git commit -m "chore: update stats cache script for classical epic guardrail"`
+- **Commit ID:** `7415ed5`

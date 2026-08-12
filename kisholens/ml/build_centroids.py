@@ -108,8 +108,8 @@ COMMON_GENRES = {
     "Supernatural": [
         "supernatural", "occult", "paranormal", "spiritualism", "apparitions",
         "demonology", "metaphysical fiction", "urban fantasy", "modern magic",
-        "hunters", "necromancy", "vampires", "vampire", "werewolves", "exorcism", "gates",
-        "ghost", "ghosts", "witch", "witches", "witchcraft", "demon", "demons", "monster", "monsters", "spirit", "spirits",
+        "hunters", "necromancy", "vampires", "vampire", "werewolves", "exorcism",
+        "ghost", "ghosts", "witch", "witches", "witchcraft", "demon", "demons", "monster", "monsters", "evil spirit", "spirit world",
         "都市", "异能", "超能力", "风水", "阴阳", "捉鬼",
     ],
     "Poetry": [
@@ -124,11 +124,11 @@ COMMON_GENRES = {
         "种田", "日常", "美食", "神医", "养娃", "育儿", "直播", "客栈", "乡村", "农家",
     ],
     "Cultivation": [
-        "cultivation", "xianxia", "xuanhuan", "wuxia", "cultivator", "immortal cultivation", "qi cultivation",
+        "cultivation", "xianxia", "xuanhuan", "wuxia", "cultivator", "qi cultivation",
         "cultivation world", "cultivation novel", "cultivation system", "cultivation method",
-        "qi", "dantian", "immortal", "immortals", "immortality", "sects", "sect", "realm breakthrough",
-        "eastern fantasy", "daoist", "golden core", "foundation building", "internal energy",
-        "dao", "tao", "tribulation", "spirit stones", "martial peak", "douluo", "peerless cultivator",
+        "qi", "dantian", "meridian", "meridians", "sects", "sect", "daoist", "golden core",
+        "foundation building", "internal energy", "tribulation", "spirit stones", "peerless cultivator",
+        "nascent soul", "heavenly tribulation", "spiritual root", "alchemy furnace",
         "修仙", "仙侠", "修真", "功法", "宗门", "丹药", "金丹", "元婴", "道士", "灵石", "神通", "渡劫", "掌门", "仙尊", "仙帝", "洪荒", "大罗", "筑基", "炼气", "飞升", "武侠",
     ],
     "Isekai": [

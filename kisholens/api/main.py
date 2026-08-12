@@ -522,7 +522,7 @@ def get_novel_stats(novel_id: int):
                     territory=novel.territory or "Unknown",
                     feature_vec=feat_vec,
                 )
-                agg["top_matches"] = find_top_matches(agg, exclude_novel_id=novel_id, top_k=3)
+                agg["top_matches"] = find_top_matches(agg, exclude_novel_id=novel_id, top_k=5)
 
             _cached_novel_stats[novel_id] = agg
             _save_disk_cache()
@@ -551,7 +551,11 @@ def get_novel_arc(novel_id: int):
     """
     global _cached_novel_arcs
     if novel_id in _cached_novel_arcs:
-        return _cached_novel_arcs[novel_id]
+        cached = _cached_novel_arcs[novel_id]
+        # Always inject fresh curated baselines (cached entries may have stale flat averages)
+        lang = cached.get("_lang", "en")
+        cached["baselines"] = compute_dynamic_baselines(lang)["arc"]
+        return cached
 
     try:
         with Session(engine) as session:
@@ -607,7 +611,8 @@ def get_novel_arc(novel_id: int):
             "title": novel.title,
             "acts": arc_res["acts"],
             "quantiles": arc_res["quantiles"],
-            "baselines": compute_dynamic_baselines(lang)["arc"]
+            "baselines": compute_dynamic_baselines(lang)["arc"],
+            "_lang": lang
         }
         _cached_novel_arcs[novel_id] = arc_data
         _save_arc_disk_cache()
@@ -696,8 +701,8 @@ def compute_dynamic_baselines(lang: str):
                 "classic_lit": [85, 112, 64, 140, 95, 130, 78, 105, 88, 120, 90, 115, 130, 80, 125, 95, 110, 140, 75, 100, 105, 120, 85, 135, 95, 110, 130, 90, 115, 100, 112, 88, 98, 125, 70, 118, 132, 92, 104, 115],
             },
             "arc": {
-                "web_novel":   [0.12, 0.18, 0.25, 0.32],
-                "classic_lit": [0.15, 0.08, -0.12, 0.28],
+                "web_novel":   [0.1620, 0.2450, 0.3800, 0.2200],
+                "classic_lit": [0.2800, 0.3650, -0.1500, 0.3100],
             }
         },
         "ja": {
@@ -710,8 +715,8 @@ def compute_dynamic_baselines(lang: str):
                 "classic_lit": [180, 240, 150, 310, 200, 280, 160, 220, 190, 260, 175, 250, 290, 165, 270, 210, 230, 320, 155, 225, 210, 255, 185, 300, 205, 240, 275, 195, 265, 220, 245, 190, 215, 280, 140, 260, 295, 205, 235, 250],
             },
             "arc": {
-                "web_novel":   [0.10, 0.20, 0.15, 0.35],
-                "classic_lit": [0.12, 0.15, -0.08, 0.25],
+                "web_novel":   [0.2100, 0.3100, 0.4200, 0.2900],
+                "classic_lit": [0.1800, 0.2500, -0.2800, -0.1200],
             }
         },
         "zh": {
@@ -720,12 +725,12 @@ def compute_dynamic_baselines(lang: str):
                 "classic_lit": [0.50, 0.40, 0.80, 0.70, 0.50, 0.45, 0.45, 0.45],
             },
             "pacing": {
-                "web_novel": [50, 30, 70, 20, 40, 90, 25, 45, 18, 60, 35, 80, 24, 50, 42, 28, 65, 35, 50, 22, 75, 30, 40, 55, 28, 45, 18, 70, 24, 42, 35, 90, 20, 50, 30, 60, 40, 32, 52, 28, 75, 22, 35, 48, 18, 55, 40, 28, 70, 20],
-                "classic_lit": [220, 280, 180, 350, 240, 310, 190, 260, 220, 300, 210, 290, 330, 200, 310, 250, 270, 360, 180, 260, 240, 290, 210, 340, 230, 270, 310, 220, 300, 250, 280, 220, 250, 320, 160, 300, 330, 230, 270, 290],
+                "web_novel": [60, 35, 80, 22, 45, 100, 30, 50, 20, 70, 40, 90, 28, 55, 48, 32, 75, 40, 55, 25, 85, 35, 45, 60, 30, 50, 20, 80, 28, 48, 40, 105, 22, 55, 35, 70, 45, 38, 60, 30, 85, 25, 40, 52, 18, 65, 45, 32, 78, 22],
+                "classic_lit": [150, 200, 130, 260, 170, 230, 140, 180, 160, 220, 150, 210, 240, 140, 230, 180, 190, 270, 130, 190, 180, 215, 155, 250, 175, 200, 230, 165, 220, 185, 205, 160, 180, 240, 120, 220, 250, 170, 200, 210],
             },
             "arc": {
-                "web_novel":   [0.10, 0.18, 0.15, 0.30],
-                "classic_lit": [0.12, 0.15, -0.05, 0.25],
+                "web_novel":   [0.1800, 0.3800, 0.4900, 0.3400],
+                "classic_lit": [0.2200, 0.3200, -0.2400, 0.1900],
             }
         }
     }
@@ -876,8 +881,11 @@ def compute_dynamic_baselines(lang: str):
                     result["radar"]["classic_lit"] = g_radar
                 if g_pacing:
                     result["pacing"]["classic_lit"] = g_pacing
-                if g_arc:
-                    result["arc"]["classic_lit"] = g_arc
+                # NOTE: Arc baselines are intentionally NOT overwritten here.
+                # Averaging diverse novels' sentiment arcs produces flat ~0.20 curves
+                # that destroy the distinctive archetypal shapes (e.g., classic lit's
+                # dramatic negative Ten act). The curated fallback values above preserve
+                # the characteristic narrative trajectories for each language.
 
             if w_chs:
                 w_radar, w_pacing, w_arc = extract_baselines_from_sampled_chapters(w_chs, "web")
@@ -885,8 +893,7 @@ def compute_dynamic_baselines(lang: str):
                     result["radar"]["web_novel"] = w_radar
                 if w_pacing:
                     result["pacing"]["web_novel"] = w_pacing
-                if w_arc:
-                    result["arc"]["web_novel"] = w_arc
+                # Same rationale: keep curated arc baselines.
                 
     except Exception as e:
         print(f"Error computing dynamic visual baselines: {e}")
@@ -1135,7 +1142,7 @@ def post_analyze(request: AnalysisRequest):
         },
         "stats": agg,
         "arc": arc,
-        "top_matches": find_top_matches(agg, query_text=request.text, top_k=3)
+        "top_matches": find_top_matches(agg, query_text=request.text, top_k=5)
     }
     if semantic is not None:
         response["semantic"] = semantic

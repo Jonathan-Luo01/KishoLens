@@ -19,6 +19,7 @@ def analyze_prose(
     ch20_text: Optional[str] = None,
     title: Optional[str] = None,
     data_dir: str = DEFAULT_DATA_DIR,
+    use_regex_boost: bool = True,
 ) -> Dict[str, Any]:
     v_intro, v_sustained = generate_dual_vectors(synopsis, ch1_text, ch10_text, ch20_text)
     g_centroids, g_meta, t_centroids, t_meta = _load_with_cache(data_dir)
@@ -41,8 +42,8 @@ def analyze_prose(
     intro_sims = intro_sims - np.mean(intro_sims)
 
     full_scan_text = f"{title or ''} {synopsis or ''} {ch1_text} {ch10_text or ''} {ch20_text or ''}".strip()
-    anchor_boosts = scan_anchor_boosts(full_scan_text)
-    guardrail = evaluate_epic_cultivation_guardrail(full_scan_text)
+    anchor_boosts = scan_anchor_boosts(full_scan_text) if use_regex_boost else {}
+    guardrail = evaluate_epic_cultivation_guardrail(full_scan_text) if use_regex_boost else {}
 
     def _calibrate(s: float, k: float = 5.5) -> float:
         return float(1.0 / (1.0 + np.exp(-k * s)))
@@ -71,8 +72,12 @@ def analyze_prose(
         s_base = _calibrate(raw_intro)
         s_concept = float(np.dot(v_intro, concept_vec))
 
-        if raw_intro > 0.05 and s_concept > 0.20:
-            dynamic_boost = min(0.25, s_concept * 0.50)
+        # Capped inciting event multiplier: require BOTH strong genre centroid
+        # alignment (raw_intro > 0.10) AND high concept density (s_concept > 0.30)
+        # to prevent standard travel/departure scenes (Moby Dick, Odyssey) from
+        # triggering false Isekai/Cultivation detection.
+        if raw_intro > 0.10 and s_concept > 0.30:
+            dynamic_boost = min(0.15, s_concept * 0.35)
             final_score = round(min(0.99, s_base + dynamic_boost), 4)
         else:
             final_score = round(s_base, 4)
@@ -82,8 +87,8 @@ def analyze_prose(
     inciting_results.sort(key=lambda x: x[1], reverse=True)
     best_inciting_name, best_inciting_score = inciting_results[0]
 
-    # Fallback threshold check (< 0.60) to avoid false positive setup events on standard non-setup novels
-    if best_inciting_score < 0.60:
+    # Fallback threshold check (< 0.65) to avoid false positive setup events on standard non-setup novels
+    if best_inciting_score < 0.65:
         inciting_payload = None
     else:
         inciting_payload = {"primary": best_inciting_name, "score": best_inciting_score}
@@ -91,7 +96,7 @@ def analyze_prose(
     # If Inciting Event is confirmed (e.g. Isekai & Regression), integrate into primary genre predictions
     if inciting_payload:
         inciting_g = "Isekai" if "Isekai" in inciting_payload["primary"] else ("Progression Fantasy" if "System" in inciting_payload["primary"] else "Cultivation")
-        sustained_scores[inciting_g] = round(max(sustained_scores.get(inciting_g, 0.0), inciting_payload["score"] + 0.10), 4)
+        sustained_scores[inciting_g] = round(min(0.99, max(0.01, max(sustained_scores.get(inciting_g, 0.0), inciting_payload["score"] + 0.10))), 4)
 
     # Apply guardrail penalties/boosts for Scenario A (Pure Classical Epic) and Scenario B (Hybrid Cultivation)
     if guardrail.get("scenario") in ("A", "B"):
@@ -103,7 +108,7 @@ def analyze_prose(
         if "Historical" in sustained_scores:
             sustained_scores["Historical"] = round(min(0.99, sustained_scores["Historical"] + 0.20), 4)
 
-    sorted_sustained = sorted(sustained_scores.items(), key=lambda x: x[1], reverse=True)
+    sorted_sustained = [(g, round(min(0.99, max(0.01, s)), 4)) for g, s in sorted(sustained_scores.items(), key=lambda x: x[1], reverse=True)]
     world_gname, world_score = sorted_sustained[0]
     plot_gname, plot_score = sorted_sustained[1] if len(sorted_sustained) > 1 else (world_gname, world_score)
 
