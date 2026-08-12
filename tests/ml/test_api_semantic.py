@@ -6,7 +6,7 @@ def test_api_analyze_without_centroids():
     # Let's mock match_semantic to return None to simulate missing centroids.
     import kisholens.api.main as api_main
     original_match_semantic = api_main.match_semantic
-    api_main.match_semantic = lambda text: None
+    api_main.match_semantic = lambda text, *args, **kwargs: None
 
     try:
         client = TestClient(app)
@@ -41,7 +41,7 @@ def test_api_analyze_with_centroids():
             {"territory": "Web Novel Territory", "score": 0.90}
         ]
     }
-    api_main.match_semantic = lambda text: dummy_response
+    api_main.match_semantic = lambda text, *args, **kwargs: dummy_response
 
     try:
         client = TestClient(app)

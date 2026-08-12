@@ -65,10 +65,100 @@ from kisholens.pipeline.taxonomy import (
 from kisholens.ml.analyzer import analyze_prose
 
 
+def classify_territory(
+    text: str,
+    features: Optional[dict] = None,
+    world_genre: str = "Mystery",
+    lang: str = "en",
+    data_dir: str = DEFAULT_DATA_DIR,
+    model_name: str = "all-MiniLM-L6-v2",
+) -> dict:
+    """
+    Classifies Territory (Classic Literature Territory vs Web Novel Territory) using
+    a hybrid model: 60% Stylistic Syntax & Pacing, 30% 384D Territory Corpus Embedding,
+    and 10% Genre Affinity Prior.
+    """
+    from kisholens.ml.build_centroids import GENRE_TERRITORIES, embed_texts
+    from kisholens.ml.features import extract_english_features
+
+    if features is None:
+        if lang == "en":
+            features = extract_english_features(text)
+        else:
+            features = {}
+
+    # 1. Territory Corpus Embedding Signal (30%)
+    _, _, t_centroids, t_meta = _load_with_cache(data_dir)
+    if t_centroids is not None and len(t_centroids) >= 2:
+        emb = embed_texts([text], model_name=model_name)[0]
+        c_classic = t_centroids[0]
+        c_web = t_centroids[1]
+
+        norm_emb = float(np.linalg.norm(emb))
+        norm_c = float(np.linalg.norm(c_classic))
+        norm_w = float(np.linalg.norm(c_web))
+
+        sim_c = float(np.dot(emb, c_classic) / (norm_emb * norm_c)) if (norm_emb > 0 and norm_c > 0) else 0.0
+        sim_w = float(np.dot(emb, c_web) / (norm_emb * norm_w)) if (norm_emb > 0 and norm_w > 0) else 0.0
+
+        exp_c = float(np.exp(sim_c * 6.0))
+        exp_w = float(np.exp(sim_w * 6.0))
+        denom = exp_c + exp_w
+        emb_classic_prob = exp_c / denom if denom > 0 else 0.5
+        emb_web_prob = 1.0 - emb_classic_prob
+    else:
+        emb_classic_prob = 0.5
+        emb_web_prob = 0.5
+
+    # 2. Stylistic Syntax & Structure Signal (60%)
+    sl = float(features.get("avg_sentence_len", 15.0) or 15.0)
+    para_density = float(features.get("avg_sentences_per_paragraph", 2.0) or 2.0)
+    depth = float(features.get("dep_tree_depth", 3.5) or 3.5)
+
+    s_sl = max(0.0, min(1.0, (sl - 6.0) / 16.0))
+    s_para = max(0.0, min(1.0, (para_density - 1.5) / 3.0))
+    s_depth = max(0.0, min(1.0, (depth - 2.8) / 2.5))
+
+    style_classic_prob = 0.40 * s_para + 0.35 * s_depth + 0.25 * s_sl
+    style_web_prob = 1.0 - style_classic_prob
+
+    # 3. Genre Affinity Prior Signal (10%)
+    prior_territory = GENRE_TERRITORIES.get(world_genre, "Classic Literature Territory")
+    genre_classic_prob = 1.0 if prior_territory == "Classic Literature Territory" else 0.0
+    genre_web_prob = 1.0 - genre_classic_prob
+
+    # Composite Calculation: 60% Style + 30% Embedding + 10% Genre Prior
+    final_classic = float(0.60 * style_classic_prob + 0.30 * emb_classic_prob + 0.10 * genre_classic_prob)
+    final_web = float(1.0 - final_classic)
+
+    top_t = "Classic Literature Territory" if final_classic >= final_web else "Web Novel Territory"
+    top_conf = max(final_classic, final_web)
+
+    scores = [
+        {"territory": "Classic Literature Territory", "score": round(final_classic, 4), "raw_score": round(final_classic, 4)},
+        {"territory": "Web Novel Territory", "score": round(final_web, 4), "raw_score": round(final_web, 4)},
+    ] if final_classic >= final_web else [
+        {"territory": "Web Novel Territory", "score": round(final_web, 4), "raw_score": round(final_web, 4)},
+        {"territory": "Classic Literature Territory", "score": round(final_classic, 4), "raw_score": round(final_classic, 4)},
+    ]
+
+    return {
+        "territory": top_t,
+        "territory_confidence": round(top_conf, 4),
+        "territory_scores": scores,
+        "territory_breakdown": {
+            "stylistic": {"Classic Literature Territory": round(style_classic_prob, 4), "Web Novel Territory": round(style_web_prob, 4)},
+            "embedding": {"Classic Literature Territory": round(emb_classic_prob, 4), "Web Novel Territory": round(emb_web_prob, 4)},
+            "genre_prior": {"Classic Literature Territory": round(genre_classic_prob, 4), "Web Novel Territory": round(genre_web_prob, 4)},
+        },
+    }
+
+
 def match_semantic(
     text: str,
     title: Optional[str] = None,
     synopsis: Optional[str] = None,
+    features: Optional[dict] = None,
     model_name: str = "all-MiniLM-L6-v2",
     data_dir: str = DEFAULT_DATA_DIR,
     use_regex_boost: bool = True,
@@ -93,41 +183,25 @@ def match_semantic(
 
     genre_scores = taxonomy.get("genre_scores", [{"genre": world_primary, "score": world_score, "raw_score": world_score}])
 
-    from kisholens.ml.build_centroids import GENRE_TERRITORIES
-
-    territory_map: dict[str, list[float]] = {}
-    for g in genre_scores:
-        g_name = g.get("genre")
-        g_score = float(g.get("score", 0.0))
-        t_name = GENRE_TERRITORIES.get(g_name, "Classic Literature Territory")
-        if t_name not in territory_map:
-            territory_map[t_name] = []
-        territory_map[t_name].append(g_score)
-
-    primary_territory = GENRE_TERRITORIES.get(world_primary, "Classic Literature Territory")
-
-    territory_scores = []
-    for t_name in ["Classic Literature Territory", "Web Novel Territory"]:
-        scores = territory_map.get(t_name, [0.0])
-        t_score = max(scores) if scores else 0.0
-        territory_scores.append({
-            "territory": t_name,
-            "score": round(t_score, 4),
-            "raw_score": round(t_score, 4),
-        })
-
-    territory_scores.sort(key=lambda x: (x["territory"] == primary_territory, x["score"]), reverse=True)
-    top_territory = territory_scores[0]["territory"]
-    top_territory_confidence = territory_scores[0]["score"]
+    # Prose-driven multi-signal territory classification
+    t_res = classify_territory(
+        text=text,
+        features=features,
+        world_genre=world_primary,
+        data_dir=data_dir,
+        model_name=model_name,
+    )
 
     return {
         "genre": world_primary,
         "genre_confidence": world_score,
-        "territory": top_territory,
-        "territory_confidence": top_territory_confidence,
+        "territory": t_res["territory"],
+        "territory_confidence": t_res["territory_confidence"],
         "genre_scores": genre_scores,
-        "territory_scores": territory_scores,
+        "territory_scores": t_res["territory_scores"],
+        "territory_breakdown": t_res.get("territory_breakdown", {}),
         "taxonomy": taxonomy,
     }
+
 
 

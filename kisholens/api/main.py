@@ -1065,8 +1065,8 @@ def post_analyze(request: AnalysisRequest):
     }
 
     archetype = match_archetype(agg)
-    # Semantic genre matching is currently optimized for English text (all-MiniLM-L6-v2)
-    semantic = match_semantic(request.text) if lang == "en" else None
+    # Semantic genre & territory matching is currently optimized for English text (all-MiniLM-L6-v2)
+    semantic = match_semantic(request.text, features=features) if lang == "en" else None
     
     if semantic:
         agg["archetype_match"] = {

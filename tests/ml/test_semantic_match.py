@@ -144,3 +144,24 @@ def test_isekai_sample_predicts_web_novel_territory():
     assert result["territory"] == "Web Novel Territory"
     assert result["territory_scores"][0]["territory"] == "Web Novel Territory"
 
+
+def test_snappy_web_mystery_predicts_web_novel_territory():
+    sample = (
+        "I kicked the door open.\n\n"
+        "Blood was everywhere.\n\n"
+        "\"Hey, system,\" I whispered.\n\n"
+        "[Alert: Killer is nearby.]\n\n"
+        "I pulled my dagger out.\n\n"
+        "\"Where is he?\" I asked.\n\n"
+        "[Target is behind the bookshelf.]\n\n"
+        "I rushed forward and struck the inspector."
+    )
+    result = match_semantic(sample)
+    assert result is not None
+    assert result["territory"] == "Web Novel Territory"
+    assert result["territory_scores"][0]["territory"] == "Web Novel Territory"
+    assert "territory_breakdown" in result
+    assert "stylistic" in result["territory_breakdown"]
+    assert "embedding" in result["territory_breakdown"]
+
+
