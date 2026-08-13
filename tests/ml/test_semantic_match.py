@@ -165,3 +165,33 @@ def test_snappy_web_mystery_predicts_web_novel_territory():
     assert "embedding" in result["territory_breakdown"]
 
 
+def test_fantasy_archmage_sample_predicts_web_novel_territory():
+    sample = (
+        "High atop the ancient obsidian spire of the Archmage, Leylin channeled his mana into the glowing crystal orb. "
+        "Deep within the subterranean caverns of Eldoria, ancient runes began to flare with brilliant azure light. "
+        "Arcane lightning erupted across the stormy sky as the sky-thundering dragon unleashed a roar that shook the mortal realm. "
+        "\"Hold the warding barrier!\" shouted High Templar Valerius, raising his runic broadsword against the descending shadow. "
+        "Leylin closed his eyes, humming an incantation as the swirling vortex of raw magical energy converged upon his staff."
+    )
+    result = match_semantic(sample)
+    assert result is not None
+    assert result["territory"] == "Web Novel Territory"
+    assert result["territory_scores"][0]["territory"] == "Web Novel Territory"
+
+
+def test_homepage_isekai_sample_predicts_web_novel_territory():
+    sample = (
+        "Hit by Truck-kun while crossing the zebra zone after buying a limited-edition melon pan, Kazuma opened his eyes "
+        "to find himself floating in an endless sea of brilliant azure light. Before he could process his untimely demise, "
+        "a translucent holographic window materialized directly before his vision with a cheerful chime: [Reincarnated as Hero with Level 99 Divine Stats]. "
+        "\"Wait, is this really happening?\" Kazuma muttered, rubbing his eyes in disbelief as a glowing goddess in silver robes stepped forward. "
+        "\"Welcome, brave traveler from Earth. You have been chosen to overthrow the Demon King in the realm of Fantasia.\" "
+        "A wide grin spread across Kazuma's face as he clicked [Accept Cheat Skills]."
+    )
+    result = match_semantic(sample)
+    assert result is not None
+    assert result["territory"] == "Web Novel Territory"
+    assert result["territory_scores"][0]["territory"] == "Web Novel Territory"
+
+
+

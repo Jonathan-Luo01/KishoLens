@@ -87,7 +87,7 @@ def classify_territory(
         else:
             features = {}
 
-    # 1. Territory Corpus Embedding Signal (30%)
+    # 1. Territory Corpus Embedding Signal (45%)
     _, _, t_centroids, t_meta = _load_with_cache(data_dir)
     if t_centroids is not None and len(t_centroids) >= 2:
         emb = embed_texts([text], model_name=model_name)[0]
@@ -101,8 +101,8 @@ def classify_territory(
         sim_c = float(np.dot(emb, c_classic) / (norm_emb * norm_c)) if (norm_emb > 0 and norm_c > 0) else 0.0
         sim_w = float(np.dot(emb, c_web) / (norm_emb * norm_w)) if (norm_emb > 0 and norm_w > 0) else 0.0
 
-        exp_c = float(np.exp(sim_c * 6.0))
-        exp_w = float(np.exp(sim_w * 6.0))
+        exp_c = float(np.exp(sim_c * 8.0))
+        exp_w = float(np.exp(sim_w * 8.0))
         denom = exp_c + exp_w
         emb_classic_prob = exp_c / denom if denom > 0 else 0.5
         emb_web_prob = 1.0 - emb_classic_prob
@@ -110,25 +110,38 @@ def classify_territory(
         emb_classic_prob = 0.5
         emb_web_prob = 0.5
 
-    # 2. Stylistic Syntax & Structure Signal (60%)
+    # 2. Stylistic Syntax & Web Tropes Signal (40%)
     sl = float(features.get("avg_sentence_len", 15.0) or 15.0)
     para_density = float(features.get("avg_sentences_per_paragraph", 2.0) or 2.0)
-    depth = float(features.get("dep_tree_depth", 3.5) or 3.5)
+    depth = float(features.get("dep_tree_depth", 5.0) or 5.0)
 
-    s_sl = max(0.0, min(1.0, (sl - 6.0) / 16.0))
-    s_para = max(0.0, min(1.0, (para_density - 1.5) / 3.0))
-    s_depth = max(0.0, min(1.0, (depth - 2.8) / 2.5))
+    # Calibrated to corpus distributions: Classic ~21w, para ~7, depth ~6.4; Web Novel ~13w, para ~2, depth ~5.0
+    s_sl = max(0.0, min(1.0, (sl - 11.0) / 10.0))
+    s_para = max(0.0, min(1.0, (para_density - 1.5) / 4.5))
+    s_depth = max(0.0, min(1.0, (depth - 4.5) / 2.2))
 
-    style_classic_prob = 0.40 * s_para + 0.35 * s_depth + 0.25 * s_sl
+    base_style_classic = 0.35 * s_para + 0.35 * s_depth + 0.30 * s_sl
+
+    # Detect distinctive web fiction / serialized novel tropes and lexical patterns
+    text_lower = text.lower()
+    web_markers = [
+        "[", "]", "level ", "hp", "mp", "mana", "system", "reincarnat", "transmigrat",
+        "cheat skill", "stats", "cultivat", "dao", "sect", "dungeon", "truck-kun",
+        "archmage", "quest", "grimoire", "holographic"
+    ]
+    marker_hits = sum(1 for m in web_markers if m in text_lower)
+    web_marker_discount = min(0.45, marker_hits * 0.12)
+
+    style_classic_prob = max(0.05, min(0.95, base_style_classic - web_marker_discount))
     style_web_prob = 1.0 - style_classic_prob
 
-    # 3. Genre Affinity Prior Signal (10%)
+    # 3. Genre Affinity Prior Signal (15%)
     prior_territory = GENRE_TERRITORIES.get(world_genre, "Classic Literature Territory")
     genre_classic_prob = 1.0 if prior_territory == "Classic Literature Territory" else 0.0
     genre_web_prob = 1.0 - genre_classic_prob
 
-    # Composite Calculation: 60% Style + 30% Embedding + 10% Genre Prior
-    final_classic = float(0.60 * style_classic_prob + 0.30 * emb_classic_prob + 0.10 * genre_classic_prob)
+    # Composite Calculation: 45% Embedding + 40% Style + 15% Genre Prior
+    final_classic = float(0.45 * emb_classic_prob + 0.40 * style_classic_prob + 0.15 * genre_classic_prob)
     final_web = float(1.0 - final_classic)
 
     top_t = "Classic Literature Territory" if final_classic >= final_web else "Web Novel Territory"
