@@ -471,7 +471,7 @@ def get_novel_stats(novel_id: int):
                 text_end = ch_end.text_en or ch_end.text_ja or getattr(ch_end, "text_zh", "") or ""
                 text = text_beg + "\n\n" + text_mid + "\n\n" + text_end
 
-            semantic = match_semantic(text, title=novel.title, synopsis=getattr(novel, "synopsis", None)) if text else None
+            semantic = match_semantic(text, title=novel.title, synopsis=getattr(novel, "synopsis", None), features=agg) if text else None
 
             if agg:
                 # Detect language dynamically for baselines
