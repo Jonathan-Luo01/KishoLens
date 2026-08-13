@@ -2967,16 +2967,17 @@ import "../styles/global.css";
 
         const am = stats["archetype_match"];
         if (am) {
-          if (am.top_genres && am.top_territories) {
+          if (am.top_genres && am.top_territories && am.top_territories.length > 0) {
             const genresStr = am.top_genres.slice(0, 3).map(g => `${g.genre} (${Math.min(99, Math.max(1, Math.round(g.confidence * 100)))}%)`).join(", ");
-            const territoryStr = am.top_territories[0].territory;
-            const maxConf = Math.min(99, Math.max(1, Math.round(am.confidence * 100)));
-            document.getElementById("archetypeLabel").textContent =
-              `${genresStr} · ${territoryStr} · ${maxConf}% match`;
+            const tConf = am.top_territories[0].confidence !== undefined
+              ? ` (${Math.min(99, Math.max(1, Math.round(am.top_territories[0].confidence * 100)))}%)`
+              : "";
+            const territoryStr = `${am.top_territories[0].territory}${tConf}`;
+            document.getElementById("archetypeLabel").textContent = `${genresStr} · ${territoryStr}`;
           } else {
-            const tropeConf = Math.min(99, Math.max(1, Math.round(am.confidence * 100)));
+            const tropeConf = Math.min(99, Math.max(1, Math.round((am.confidence || 0.75) * 100)));
             document.getElementById("archetypeLabel").textContent =
-              `${am.closest_trope} · ${am.territory} · ${tropeConf}% match`;
+              `${am.closest_trope || 'Unknown'} (${tropeConf}%) · ${am.territory || 'Classic Literature Territory'}`;
           }
         }
       }
