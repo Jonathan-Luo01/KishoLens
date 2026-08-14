@@ -356,6 +356,28 @@ header.site-header {
   color: var(--color-text);
 }
 
+/* Chart Subtitle & Track Label Tokens */
+.chart-subtitle {
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  margin-top: -0.25rem;
+}
+[data-theme="light"] .chart-subtitle {
+  color: #64748b;
+}
+
+.pacing-track-label {
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+[data-theme="light"] .pacing-track-label {
+  color: #64748b;
+}
+
 .theme-toggle-btn svg {
   width: 18px;
   height: 18px;
@@ -531,15 +553,182 @@ header.site-header {
 }
 
 .category-tab.active {
-  background: rgba(124, 106, 255, 0.15);
-  border-color: rgba(124, 106, 255, 0.4);
-  color: #c4b5fd;
+  background: rgba(124, 106, 255, 0.18);
+  border-color: var(--color-accent);
+  color: #ffffff;
   font-weight: 600;
 }
 
 [data-theme="light"] .category-tab.active {
-  background: rgba(99, 102, 241, 0.12);
-  border-color: rgba(99, 102, 241, 0.4);
-  color: #4f46e5;
-  font-weight: 600;
+  background: #ffffff;
+  color: #0284c7;
+  border-color: #0284c7;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* ─── Universal Component Light Mode Overrides ───────────────────────── */
+[data-theme="light"] .metric-primary-val {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .metric-card-label {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .hero-chip-val {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .hero-chip-label,
+[data-theme="light"] .hero-chip-lbl {
+  color: #64748b !important;
+}
+
+[data-theme="light"] .benchmark-chip.higher {
+  background: rgba(34, 197, 94, 0.12) !important;
+  color: #16a34a !important;
+  border: 1px solid rgba(34, 197, 94, 0.25) !important;
+}
+
+[data-theme="light"] .benchmark-chip.lower {
+  background: rgba(239, 68, 68, 0.12) !important;
+  color: #dc2626 !important;
+  border: 1px solid rgba(239, 68, 68, 0.25) !important;
+}
+
+[data-theme="light"] .benchmark-chip.neutral {
+  background: rgba(100, 116, 139, 0.1) !important;
+  color: #475569 !important;
+  border: 1px solid rgba(100, 116, 139, 0.2) !important;
+}
+
+[data-theme="light"] .category-section-title.cat-structure { color: #0284c7 !important; }
+[data-theme="light"] .category-section-title.cat-prose     { color: #7c3aed !important; }
+[data-theme="light"] .category-section-title.cat-theme     { color: #db2777 !important; }
+[data-theme="light"] .category-section-title.cat-pacing    { color: #059669 !important; }
+
+[data-theme="light"] .genre-rank-name {
+  color: #334155 !important;
+}
+
+[data-theme="light"] .genre-rank-track {
+  background: #e2e8f0 !important;
+}
+
+[data-theme="light"] .pillar-tag {
+  color: #64748b !important;
+}
+
+[data-theme="light"] .pillar-name {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .pillar-score {
+  color: #4338ca !important;
+  background: rgba(99, 102, 241, 0.1) !important;
+}
+
+[data-theme="light"] .genre-affinity-pill.tier-vibrant {
+  background: rgba(99, 102, 241, 0.1) !important;
+  border-color: rgba(99, 102, 241, 0.35) !important;
+  color: #4338ca !important;
+}
+[data-theme="light"] .genre-affinity-pill.tier-vibrant .pill-pct {
+  color: #4338ca !important;
+}
+
+[data-theme="light"] .genre-affinity-pill.tier-cyan {
+  background: rgba(2, 132, 199, 0.1) !important;
+  border-color: rgba(2, 132, 199, 0.35) !important;
+  color: #0369a1 !important;
+}
+[data-theme="light"] .genre-affinity-pill.tier-cyan .pill-pct {
+  color: #0369a1 !important;
+}
+
+[data-theme="light"] .genre-affinity-pill.tier-emerald {
+  background: rgba(5, 150, 105, 0.1) !important;
+  border-color: rgba(5, 150, 105, 0.35) !important;
+  color: #047857 !important;
+}
+[data-theme="light"] .genre-affinity-pill.tier-emerald .pill-pct {
+  color: #047857 !important;
+}
+
+[data-theme="light"] .db-genre-chip {
+  background: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+[data-theme="light"] .db-genre-count {
+  background: #e2e8f0 !important;
+  color: #475569 !important;
+}
+
+[data-theme="light"] .db-source-chip {
+  background: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+[data-theme="light"] .doppelganger-card {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06) !important;
+}
+
+[data-theme="light"] .doppelganger-title {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .doppelganger-subtitle {
+  color: #64748b !important;
+}
+
+[data-theme="light"] .doppelganger-item {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .doppelganger-item:hover {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .doppelganger-rank {
+  background: #e2e8f0 !important;
+  color: #475569 !important;
+}
+
+[data-theme="light"] .doppelganger-score {
+  color: #0284c7 !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="light"] .doppelganger-item-title {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .doppelganger-author {
+  color: #64748b !important;
+}
+
+[data-theme="light"] .doppelganger-badge {
+  background: #e2e8f0 !important;
+  color: #475569 !important;
+}
+
+[data-theme="light"] .reason-pill {
+  background: rgba(99, 102, 241, 0.08) !important;
+  border: 1px solid rgba(99, 102, 241, 0.25) !important;
+  color: #4338ca !important;
+}
+
+[data-theme="light"] .doppelganger-factor-label {
+  color: #64748b !important;
+}
+
+[data-theme="light"] .doppelganger-factor-bar-bg {
+  background: #e2e8f0 !important;
 }

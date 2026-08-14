@@ -864,7 +864,7 @@ import "../styles/global.css";
         font-family: var(--font-display);
         font-size: 1.1rem;
         font-weight: 700;
-        color: #ffffff;
+        color: var(--color-text);
       }
 
       :global(.metrics-category-tabs) {
@@ -1024,7 +1024,7 @@ import "../styles/global.css";
         font-family: var(--font-display);
         font-size: 1.1rem;
         font-weight: 700;
-        color: #f8fafc;
+        color: var(--color-text);
       }
 
       :global(.percentile-bar-bg) {
@@ -1169,120 +1169,120 @@ import "../styles/global.css";
       }
 
       /* ─── Light Mode Styles for analyze.astro ─── */
-      [data-theme="light"] .card {
+      :global([data-theme="light"]) .card {
         background: #ffffff;
         border: 1px solid rgba(0, 0, 0, 0.08);
         box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
       }
 
-      [data-theme="light"] label {
+      :global([data-theme="light"]) label {
         color: #1e293b;
       }
 
-      [data-theme="light"] input[type="text"],
-      [data-theme="light"] select,
-      [data-theme="light"] textarea {
+      :global([data-theme="light"]) input[type="text"],
+      :global([data-theme="light"]) select,
+      :global([data-theme="light"]) textarea {
         background: #ffffff;
         border: 1px solid #cbd5e1;
         color: #0f172a;
         box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
       }
 
-      [data-theme="light"] input[type="text"]:focus,
-      [data-theme="light"] select:focus,
-      [data-theme="light"] textarea:focus {
+      :global([data-theme="light"]) input[type="text"]:focus,
+      :global([data-theme="light"]) select:focus,
+      :global([data-theme="light"]) textarea:focus {
         border-color: var(--color-accent);
         box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
       }
 
-      [data-theme="light"] .sample-btn {
+      :global([data-theme="light"]) .sample-btn {
         background: rgba(0, 0, 0, 0.04);
         border: 1px solid rgba(0, 0, 0, 0.12);
         color: #475569;
       }
 
-      [data-theme="light"] .sample-btn:hover {
+      :global([data-theme="light"]) .sample-btn:hover {
         background: rgba(99, 102, 241, 0.1);
         border-color: var(--color-accent);
         color: var(--color-accent);
       }
 
-      [data-theme="light"] .sample-btn.active {
+      :global([data-theme="light"]) .sample-btn.active {
         background: rgba(99, 102, 241, 0.15);
         border-color: var(--color-accent);
         color: #4338ca;
       }
 
-      [data-theme="light"] .counter-row {
+      :global([data-theme="light"]) .counter-row {
         color: #64748b;
       }
 
-      [data-theme="light"] .placeholder-text {
+      :global([data-theme="light"]) .placeholder-text {
         color: #64748b;
       }
 
-      [data-theme="light"] .error-alert {
+      :global([data-theme="light"]) .error-alert {
         background: rgba(239, 68, 68, 0.08);
         border: 1px solid rgba(239, 68, 68, 0.25);
         color: #b91c1c;
       }
 
-      [data-theme="light"] .loading-container p {
+      :global([data-theme="light"]) .loading-container p {
         color: #64748b;
       }
 
-      [data-theme="light"] .spinner {
+      :global([data-theme="light"]) .spinner {
         border: 3px solid rgba(99, 102, 241, 0.15);
         border-top: 3px solid var(--color-accent);
       }
 
       /* Archetype Banner */
-      [data-theme="light"] .archetype-banner {
+      :global([data-theme="light"]) .archetype-banner {
         background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.04));
         border: 1px solid rgba(99, 102, 241, 0.3);
         box-shadow: 0 4px 15px rgba(99, 102, 241, 0.08);
       }
 
-      [data-theme="light"] .archetype-name {
+      :global([data-theme="light"]) .archetype-name {
         color: #0f172a;
       }
 
-      [data-theme="light"] .archetype-confidence {
+      :global([data-theme="light"]) .archetype-confidence {
         color: #7c3aed;
         background: rgba(124, 58, 237, 0.1);
       }
 
-      [data-theme="light"] .archetype-description {
+      :global([data-theme="light"]) .archetype-description {
         color: #334155;
       }
 
       /* 2x2 Metric Hero Chips Grid */
-      [data-theme="light"] :global(.metrics-hero) {
+      :global([data-theme="light"]) .metrics-hero {
         background: rgba(99, 102, 241, 0.05);
         border: 1px solid rgba(99, 102, 241, 0.2);
       }
 
-      [data-theme="light"] :global(.hero-chip-label) {
+      :global([data-theme="light"]) .hero-chip-label {
         color: #64748b;
       }
 
-      [data-theme="light"] :global(.hero-chip-val) {
+      :global([data-theme="light"]) .hero-chip-val {
         color: #0f172a;
       }
 
       /* Category Tabs Track */
-      [data-theme="light"] :global(.category-tab) {
+      :global([data-theme="light"]) .category-tab {
         background: rgba(0, 0, 0, 0.04);
         border: 1px solid rgba(0, 0, 0, 0.08);
         color: #475569;
       }
 
-      [data-theme="light"] :global(.category-tab:hover) {
+      :global([data-theme="light"]) .category-tab:hover {
         background: rgba(0, 0, 0, 0.08);
         color: #0f172a;
       }
 
-      [data-theme="light"] :global(.category-tab.active) {
+      :global([data-theme="light"]) .category-tab.active {
         background: rgba(99, 102, 241, 0.14);
         border-color: rgba(99, 102, 241, 0.5);
         color: #4f46e5;
@@ -1290,278 +1290,294 @@ import "../styles/global.css";
       }
 
       /* Metric Cards */
-      [data-theme="light"] :global(.metric-card) {
+      :global([data-theme="light"]) .metric-card {
         background: #ffffff;
         border: 1px solid rgba(0, 0, 0, 0.08);
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
       }
 
-      [data-theme="light"] :global(.metric-card:hover) {
+      :global([data-theme="light"]) .metric-card:hover {
         border-color: rgba(99, 102, 241, 0.35);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
       }
 
-      [data-theme="light"] :global(.metric-card-label) {
+      :global([data-theme="light"]) .metric-card-label {
         color: #475569;
       }
 
-      [data-theme="light"] :global(.metric-primary-val) {
+      :global([data-theme="light"]) .metric-primary-val {
         color: #0f172a;
       }
 
-      [data-theme="light"] :global(.percentile-bar-bg) {
+      :global([data-theme="light"]) .percentile-bar-bg {
         background: rgba(0, 0, 0, 0.06);
       }
 
-      [data-theme="light"] :global(.metric-info-icon) {
+      :global([data-theme="light"]) .metric-info-icon {
         background: rgba(99, 102, 241, 0.1);
         border: 1px solid rgba(99, 102, 241, 0.25);
         color: #4f46e5;
       }
 
-      [data-theme="light"] :global(.metric-info-icon:hover),
-      [data-theme="light"] :global(.metric-info-icon.active) {
+      :global([data-theme="light"]) .metric-info-icon:hover,
+      :global([data-theme="light"]) .metric-info-icon.active {
         background: rgba(99, 102, 241, 0.2);
         border-color: #6366f1;
         color: #4338ca;
       }
 
-      [data-theme="light"] :global(.metric-tooltip-box) {
+      :global([data-theme="light"]) .metric-tooltip-box {
         background: #ffffff;
         border: 1px solid rgba(0, 0, 0, 0.12);
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.06);
         color: #1e293b;
       }
 
-      [data-theme="light"] :global(.metric-baseline-item) {
+      :global([data-theme="light"]) .metric-baseline-item {
         color: #64748b;
       }
 
-      [data-theme="light"] :global(.benchmark-chip.higher) {
+      :global([data-theme="light"]) .benchmark-chip.higher {
         background: rgba(34, 197, 94, 0.12);
         color: #16a34a;
         border: 1px solid rgba(34, 197, 94, 0.25);
       }
 
-      [data-theme="light"] :global(.benchmark-chip.lower) {
+      :global([data-theme="light"]) .benchmark-chip.lower {
         background: rgba(239, 68, 68, 0.12);
         color: #dc2626;
         border: 1px solid rgba(239, 68, 68, 0.25);
       }
 
-      [data-theme="light"] :global(.benchmark-chip.neutral) {
+      :global([data-theme="light"]) .benchmark-chip.neutral {
         background: rgba(100, 116, 139, 0.1);
         color: #475569;
         border: 1px solid rgba(100, 116, 139, 0.2);
       }
 
       /* Category Titles */
-      [data-theme="light"] :global(.category-section-title.cat-structure) { color: #0284c7; }
-      [data-theme="light"] :global(.category-section-title.cat-prose)     { color: #7c3aed; }
-      [data-theme="light"] :global(.category-section-title.cat-theme)     { color: #db2777; }
-      [data-theme="light"] :global(.category-section-title.cat-pacing)    { color: #059669; }
+      :global([data-theme="light"]) .category-section-title.cat-structure { color: #0284c7; }
+      :global([data-theme="light"]) .category-section-title.cat-prose     { color: #7c3aed; }
+      :global([data-theme="light"]) .category-section-title.cat-theme     { color: #db2777; }
+      :global([data-theme="light"]) .category-section-title.cat-pacing    { color: #059669; }
 
       /* Visualizer Chart Card Styles */
-      [data-theme="light"] .chart-card {
+      :global([data-theme="light"]) .chart-card {
         background: #ffffff;
         border: 1px solid rgba(0, 0, 0, 0.08);
         box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
       }
 
-      [data-theme="light"] .chart-card:hover {
+      :global([data-theme="light"]) .chart-card:hover {
         border-color: rgba(99, 102, 241, 0.25);
       }
 
-      [data-theme="light"] .chart-title {
+      :global([data-theme="light"]) .chart-title {
         color: #0f172a;
       }
 
-      [data-theme="light"] .baseline-group span {
+      :global([data-theme="light"]) .baseline-group span {
         color: #64748b;
       }
 
-      [data-theme="light"] .baseline-btn {
+      :global([data-theme="light"]) .baseline-btn {
         background: rgba(0, 0, 0, 0.04);
         border: 1px solid rgba(0, 0, 0, 0.1);
         color: #475569;
       }
 
-      [data-theme="light"] .baseline-btn:hover {
+      :global([data-theme="light"]) .baseline-btn:hover {
         border-color: #6366f1;
         color: #6366f1;
       }
 
-      [data-theme="light"] .baseline-btn.active {
+      :global([data-theme="light"]) .baseline-btn.active {
         background: rgba(99, 102, 241, 0.12);
         border-color: #6366f1;
         color: #4f46e5;
       }
 
-      [data-theme="light"] .legend-item {
+      :global([data-theme="light"]) .legend-item {
         color: #64748b;
       }
 
-      [data-theme="light"] .legend-dot.user {
+      :global([data-theme="light"]) .legend-dot.user {
         background: #0284c7;
       }
 
-      [data-theme="light"] .legend-dot.baseline {
+      :global([data-theme="light"]) .legend-dot.baseline {
         border: 1.5px dashed rgba(0, 0, 0, 0.4);
       }
 
-      [data-theme="light"] .archetype-label {
+      :global([data-theme="light"]) .archetype-label {
         color: #475569;
       }
 
       /* 3-Pillar Taxonomy Badges */
-      [data-theme="light"] :global(.archetype-taxonomy-container) {
+      :global([data-theme="light"]) .archetype-taxonomy-container {
         border-top: 1px solid rgba(0, 0, 0, 0.08);
       }
 
-      [data-theme="light"] :global(.pillar-card) {
+      :global([data-theme="light"]) .pillar-card {
         background: rgba(0, 0, 0, 0.02);
         border: 1px solid rgba(0, 0, 0, 0.08);
       }
 
-      [data-theme="light"] :global(.pillar-card:hover) {
+      :global([data-theme="light"]) .pillar-card:hover {
         border-color: rgba(0, 0, 0, 0.15);
         background: rgba(0, 0, 0, 0.04);
       }
 
-      [data-theme="light"] :global(.pillar-tag) {
+      :global([data-theme="light"]) .pillar-tag {
         color: #64748b;
       }
 
-      [data-theme="light"] :global(.pillar-name) {
+      :global([data-theme="light"]) .pillar-name {
         color: #0f172a;
       }
 
-      [data-theme="light"] :global(.pillar-score) {
+      :global([data-theme="light"]) .pillar-score {
         color: #4f46e5;
         background: rgba(99, 102, 241, 0.1);
       }
 
       /* Dynamic Genre Affinities Track */
-      [data-theme="light"] :global(.affinities-title) {
+      :global([data-theme="light"]) .affinities-title {
         color: #64748b;
       }
 
-      [data-theme="light"] :global(.genre-affinity-pill.tier-vibrant) {
+      :global([data-theme="light"]) .genre-affinity-pill.tier-vibrant {
         background: rgba(99, 102, 241, 0.1);
-        border: 1px solid rgba(99, 102, 241, 0.3);
-        color: #4f46e5;
+        border: 1px solid rgba(99, 102, 241, 0.35);
+        color: #4338ca;
+      }
+      :global([data-theme="light"]) .genre-affinity-pill.tier-vibrant .pill-pct {
+        color: #4338ca;
       }
 
-      [data-theme="light"] :global(.genre-affinity-pill.tier-cyan) {
+      :global([data-theme="light"]) .genre-affinity-pill.tier-cyan {
         background: rgba(2, 132, 199, 0.1);
-        border: 1px solid rgba(2, 132, 199, 0.3);
-        color: #0284c7;
+        border: 1px solid rgba(2, 132, 199, 0.35);
+        color: #0369a1;
+      }
+      :global([data-theme="light"]) .genre-affinity-pill.tier-cyan .pill-pct {
+        color: #0369a1;
       }
 
-      [data-theme="light"] :global(.genre-affinity-pill.tier-emerald) {
+      :global([data-theme="light"]) .genre-affinity-pill.tier-emerald {
         background: rgba(5, 150, 105, 0.1);
-        border: 1px solid rgba(5, 150, 105, 0.3);
-        color: #059669;
+        border: 1px solid rgba(5, 150, 105, 0.35);
+        color: #047857;
+      }
+      :global([data-theme="light"]) .genre-affinity-pill.tier-emerald .pill-pct {
+        color: #047857;
       }
 
       /* 17-Genre Drawer */
-      [data-theme="light"] :global(.toggle-all-genres-btn) {
+      :global([data-theme="light"]) .toggle-all-genres-btn {
         border: 1px solid rgba(0, 0, 0, 0.12);
         color: #475569;
       }
 
-      [data-theme="light"] :global(.toggle-all-genres-btn:hover) {
+      :global([data-theme="light"]) .toggle-all-genres-btn:hover {
         background: rgba(0, 0, 0, 0.04);
         border-color: rgba(0, 0, 0, 0.2);
         color: #0f172a;
       }
 
-      [data-theme="light"] :global(.all-genres-drawer) {
+      :global([data-theme="light"]) .all-genres-drawer {
         background: rgba(0, 0, 0, 0.03);
         border: 1px solid rgba(0, 0, 0, 0.08);
       }
 
-      [data-theme="light"] :global(.genre-rank-name) {
+      :global([data-theme="light"]) .genre-rank-name {
         color: #334155;
       }
 
-      [data-theme="light"] :global(.genre-rank-track) {
+      :global([data-theme="light"]) .genre-rank-track {
         background: rgba(0, 0, 0, 0.08);
       }
 
       /* Act Labels */
-      [data-theme="light"] .act-key {
+      :global([data-theme="light"]) .act-key {
         color: #4f46e5;
       }
 
-      [data-theme="light"] .act-name {
+      :global([data-theme="light"]) .act-name {
         color: #64748b;
       }
 
       /* Pacing Barcode Labels */
-      [data-theme="light"] #pacingDraftLabel,
-      [data-theme="light"] #pacingBaselineLabel {
+      :global([data-theme="light"]) #pacingDraftLabel,
+      :global([data-theme="light"]) #pacingBaselineLabel {
         color: #475569 !important;
       }
 
       /* Doppelgängers Card */
-      [data-theme="light"] .doppelganger-card {
+      :global([data-theme="light"]) .doppelganger-card {
         background: #ffffff;
         border: 1px solid rgba(0, 0, 0, 0.08);
         box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
       }
 
-      [data-theme="light"] .doppelganger-title {
+      :global([data-theme="light"]) .doppelganger-title {
         color: #0f172a;
       }
 
-      [data-theme="light"] .doppelganger-subtitle {
+      :global([data-theme="light"]) .doppelganger-subtitle {
         color: #64748b;
       }
 
-      [data-theme="light"] :global(.doppelganger-item) {
+      :global([data-theme="light"]) .doppelganger-item {
         background: #f8fafc;
         border: 1px solid rgba(0, 0, 0, 0.08);
       }
 
-      [data-theme="light"] :global(.doppelganger-item):hover {
+      :global([data-theme="light"]) .doppelganger-item:hover {
         background: #f1f5f9;
         border-color: rgba(0, 0, 0, 0.16);
       }
 
-      [data-theme="light"] :global(.doppelganger-rank) {
-        color: #94a3b8;
+      :global([data-theme="light"]) .doppelganger-rank {
+        color: #475569;
+        background: #e2e8f0;
       }
 
-      [data-theme="light"] :global(.doppelganger-item-title) {
+      :global([data-theme="light"]) .doppelganger-score {
+        color: #0284c7;
+        font-weight: 700;
+      }
+
+      :global([data-theme="light"]) .doppelganger-item-title {
         color: #0f172a;
       }
 
-      [data-theme="light"] :global(.doppelganger-author) {
+      :global([data-theme="light"]) .doppelganger-author {
         color: #64748b;
       }
 
-      [data-theme="light"] :global(.doppelganger-badge) {
+      :global([data-theme="light"]) .doppelganger-badge {
         background: rgba(0, 0, 0, 0.05);
         color: #475569;
       }
 
-      [data-theme="light"] :global(.reason-pill) {
+      :global([data-theme="light"]) .reason-pill {
         background: rgba(99, 102, 241, 0.08);
         border: 1px solid rgba(99, 102, 241, 0.25);
         color: #4f46e5;
       }
 
-      [data-theme="light"] :global(.doppelganger-progress-bg) {
-        background: rgba(0, 0, 0, 0.08);
+      :global([data-theme="light"]) .doppelganger-progress-bg {
+        background: rgba(0, 0, 0, 0.06);
       }
 
-      [data-theme="light"] :global(.doppelganger-factor-label) {
+      :global([data-theme="light"]) .doppelganger-factor-label {
         color: #64748b;
       }
 
-      [data-theme="light"] :global(.doppelganger-factor-bar-bg) {
+      :global([data-theme="light"]) .doppelganger-factor-bar-bg {
         background: rgba(0, 0, 0, 0.08);
+      }nd: rgba(0, 0, 0, 0.08);
       }
 
       /* Tooltips */
@@ -1707,7 +1723,7 @@ import "../styles/global.css";
                 <span class="legend-item"><span class="legend-dot baseline" id="arcBaselineLegendDot"></span><span id="baselineLegendLabel">Web Novel</span></span>
               </div>
             </div>
-            <p style="color: rgba(255,255,255,0.4); font-size: 0.8rem; line-height: 1.4; margin-top: -0.25rem;">
+            <p class="chart-subtitle">
               Tracks emotional polarity across the 4 acts (Ki, Shō, Ten, Ketsu). Notice the "Tidy Resolution" spike.
             </p>
             <svg id="arcChart" viewBox="0 0 600 420" preserveAspectRatio="xMidYMid meet"></svg>
@@ -1723,17 +1739,17 @@ import "../styles/global.css";
                 <span class="legend-item"><span class="legend-dot baseline" id="pacingBaselineLegendDot"></span><span id="pacingBaselineLegendLabel">Web Novel</span></span>
               </div>
             </div>
-            <p style="color: rgba(255,255,255,0.45); font-size: 0.8rem; line-height: 1.45;">
+            <p class="chart-subtitle">
               Each block represents a paragraph. Height/opacity represents word or character count. Web Novels rely on rapid, fragmented lines for mobile scrolling, while classics use dense text blocks.
             </p>
             
             <div style="margin-top: 1rem;">
-              <h4 style="color: rgba(255,255,255,0.5); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;" id="pacingDraftLabel">Your Draft (Highly Fragmented)</h4>
+              <h4 class="pacing-track-label" id="pacingDraftLabel">Your Draft (Highly Fragmented)</h4>
               <div id="pacingBarcodeUser" style="display: flex; height: 60px; align-items: stretch; gap: 2px; background: rgba(0,0,0,0.25); padding: 4px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);"></div>
             </div>
             
             <div style="margin-top: 1.25rem;">
-              <h4 style="color: rgba(255,255,255,0.5); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;" id="pacingBaselineLabel">Web Novel Baseline</h4>
+              <h4 class="pacing-track-label" id="pacingBaselineLabel">Web Novel Baseline</h4>
               <div id="pacingBarcodeBaseline" style="display: flex; height: 60px; align-items: stretch; gap: 2px; background: rgba(0,0,0,0.25); padding: 4px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);"></div>
             </div>
           </div>
@@ -2497,9 +2513,10 @@ import "../styles/global.css";
           `;
           normalizedScores.forEach(g => {
             const pct = Math.min(99, Math.max(1, Math.round(g.score * 100)));
-            let barColor = pct >= 80 ? "#a78bfa" :
-                           pct >= 65 ? "#38bdf8" :
-                           pct >= 45 ? "#34d399" : (document.documentElement.getAttribute("data-theme") === "light" ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.25)");
+            const isLightMode = document.documentElement.getAttribute("data-theme") === "light";
+            let barColor = isLightMode
+              ? (pct >= 80 ? "#6366f1" : pct >= 65 ? "#0284c7" : pct >= 45 ? "#059669" : "#64748b")
+              : (pct >= 80 ? "#a78bfa" : pct >= 65 ? "#38bdf8" : pct >= 45 ? "#34d399" : "rgba(255,255,255,0.25)");
             drawerHtml += `
               <div class="genre-rank-row">
                 <div class="genre-rank-info">
