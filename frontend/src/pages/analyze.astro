@@ -1127,6 +1127,455 @@ import "../styles/global.css";
         font-family: var(--font-display);
         font-weight: 600;
       }
+
+      /* Sample Buttons */
+      .sample-pills-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.25rem;
+      }
+      .sample-label {
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-muted);
+      }
+      .sample-btn {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--color-border);
+        border-radius: 999px;
+        padding: 0.35rem 0.8rem;
+        font-size: 0.78rem;
+        font-weight: 500;
+        font-family: var(--font-sans);
+        color: var(--color-text-subtle, #94a3b8);
+        cursor: pointer;
+        transition: all var(--transition);
+      }
+      .sample-btn:hover {
+        background: rgba(124, 106, 255, 0.15);
+        border-color: var(--color-accent);
+        color: #ffffff;
+        transform: translateY(-1px);
+      }
+      .sample-btn.active {
+        background: rgba(124, 106, 255, 0.25);
+        border-color: var(--color-accent);
+        color: #ffffff;
+        font-weight: 600;
+      }
+
+      /* ─── Light Mode Styles for analyze.astro ─── */
+      [data-theme="light"] .card {
+        background: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+      }
+
+      [data-theme="light"] label {
+        color: #1e293b;
+      }
+
+      [data-theme="light"] input[type="text"],
+      [data-theme="light"] select,
+      [data-theme="light"] textarea {
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        color: #0f172a;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      }
+
+      [data-theme="light"] input[type="text"]:focus,
+      [data-theme="light"] select:focus,
+      [data-theme="light"] textarea:focus {
+        border-color: var(--color-accent);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+      }
+
+      [data-theme="light"] .sample-btn {
+        background: rgba(0, 0, 0, 0.04);
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        color: #475569;
+      }
+
+      [data-theme="light"] .sample-btn:hover {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: var(--color-accent);
+        color: var(--color-accent);
+      }
+
+      [data-theme="light"] .sample-btn.active {
+        background: rgba(99, 102, 241, 0.15);
+        border-color: var(--color-accent);
+        color: #4338ca;
+      }
+
+      [data-theme="light"] .counter-row {
+        color: #64748b;
+      }
+
+      [data-theme="light"] .placeholder-text {
+        color: #64748b;
+      }
+
+      [data-theme="light"] .error-alert {
+        background: rgba(239, 68, 68, 0.08);
+        border: 1px solid rgba(239, 68, 68, 0.25);
+        color: #b91c1c;
+      }
+
+      [data-theme="light"] .loading-container p {
+        color: #64748b;
+      }
+
+      [data-theme="light"] .spinner {
+        border: 3px solid rgba(99, 102, 241, 0.15);
+        border-top: 3px solid var(--color-accent);
+      }
+
+      /* Archetype Banner */
+      [data-theme="light"] .archetype-banner {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.04));
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.08);
+      }
+
+      [data-theme="light"] .archetype-name {
+        color: #0f172a;
+      }
+
+      [data-theme="light"] .archetype-confidence {
+        color: #7c3aed;
+        background: rgba(124, 58, 237, 0.1);
+      }
+
+      [data-theme="light"] .archetype-description {
+        color: #334155;
+      }
+
+      /* 2x2 Metric Hero Chips Grid */
+      [data-theme="light"] :global(.metrics-hero) {
+        background: rgba(99, 102, 241, 0.05);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+      }
+
+      [data-theme="light"] :global(.hero-chip-label) {
+        color: #64748b;
+      }
+
+      [data-theme="light"] :global(.hero-chip-val) {
+        color: #0f172a;
+      }
+
+      /* Category Tabs Track */
+      [data-theme="light"] :global(.category-tab) {
+        background: rgba(0, 0, 0, 0.04);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        color: #475569;
+      }
+
+      [data-theme="light"] :global(.category-tab:hover) {
+        background: rgba(0, 0, 0, 0.08);
+        color: #0f172a;
+      }
+
+      [data-theme="light"] :global(.category-tab.active) {
+        background: rgba(99, 102, 241, 0.14);
+        border-color: rgba(99, 102, 241, 0.5);
+        color: #4f46e5;
+        font-weight: 600;
+      }
+
+      /* Metric Cards */
+      [data-theme="light"] :global(.metric-card) {
+        background: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      }
+
+      [data-theme="light"] :global(.metric-card:hover) {
+        border-color: rgba(99, 102, 241, 0.35);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      }
+
+      [data-theme="light"] :global(.metric-card-label) {
+        color: #475569;
+      }
+
+      [data-theme="light"] :global(.metric-primary-val) {
+        color: #0f172a;
+      }
+
+      [data-theme="light"] :global(.percentile-bar-bg) {
+        background: rgba(0, 0, 0, 0.06);
+      }
+
+      [data-theme="light"] :global(.metric-info-icon) {
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.25);
+        color: #4f46e5;
+      }
+
+      [data-theme="light"] :global(.metric-info-icon:hover),
+      [data-theme="light"] :global(.metric-info-icon.active) {
+        background: rgba(99, 102, 241, 0.2);
+        border-color: #6366f1;
+        color: #4338ca;
+      }
+
+      [data-theme="light"] :global(.metric-tooltip-box) {
+        background: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.06);
+        color: #1e293b;
+      }
+
+      [data-theme="light"] :global(.metric-baseline-item) {
+        color: #64748b;
+      }
+
+      [data-theme="light"] :global(.benchmark-chip.higher) {
+        background: rgba(34, 197, 94, 0.12);
+        color: #16a34a;
+        border: 1px solid rgba(34, 197, 94, 0.25);
+      }
+
+      [data-theme="light"] :global(.benchmark-chip.lower) {
+        background: rgba(239, 68, 68, 0.12);
+        color: #dc2626;
+        border: 1px solid rgba(239, 68, 68, 0.25);
+      }
+
+      [data-theme="light"] :global(.benchmark-chip.neutral) {
+        background: rgba(100, 116, 139, 0.1);
+        color: #475569;
+        border: 1px solid rgba(100, 116, 139, 0.2);
+      }
+
+      /* Category Titles */
+      [data-theme="light"] :global(.category-section-title.cat-structure) { color: #0284c7; }
+      [data-theme="light"] :global(.category-section-title.cat-prose)     { color: #7c3aed; }
+      [data-theme="light"] :global(.category-section-title.cat-theme)     { color: #db2777; }
+      [data-theme="light"] :global(.category-section-title.cat-pacing)    { color: #059669; }
+
+      /* Visualizer Chart Card Styles */
+      [data-theme="light"] .chart-card {
+        background: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
+      }
+
+      [data-theme="light"] .chart-card:hover {
+        border-color: rgba(99, 102, 241, 0.25);
+      }
+
+      [data-theme="light"] .chart-title {
+        color: #0f172a;
+      }
+
+      [data-theme="light"] .baseline-group span {
+        color: #64748b;
+      }
+
+      [data-theme="light"] .baseline-btn {
+        background: rgba(0, 0, 0, 0.04);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        color: #475569;
+      }
+
+      [data-theme="light"] .baseline-btn:hover {
+        border-color: #6366f1;
+        color: #6366f1;
+      }
+
+      [data-theme="light"] .baseline-btn.active {
+        background: rgba(99, 102, 241, 0.12);
+        border-color: #6366f1;
+        color: #4f46e5;
+      }
+
+      [data-theme="light"] .legend-item {
+        color: #64748b;
+      }
+
+      [data-theme="light"] .legend-dot.user {
+        background: #0284c7;
+      }
+
+      [data-theme="light"] .legend-dot.baseline {
+        border: 1.5px dashed rgba(0, 0, 0, 0.4);
+      }
+
+      [data-theme="light"] .archetype-label {
+        color: #475569;
+      }
+
+      /* 3-Pillar Taxonomy Badges */
+      [data-theme="light"] :global(.archetype-taxonomy-container) {
+        border-top: 1px solid rgba(0, 0, 0, 0.08);
+      }
+
+      [data-theme="light"] :global(.pillar-card) {
+        background: rgba(0, 0, 0, 0.02);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+      }
+
+      [data-theme="light"] :global(.pillar-card:hover) {
+        border-color: rgba(0, 0, 0, 0.15);
+        background: rgba(0, 0, 0, 0.04);
+      }
+
+      [data-theme="light"] :global(.pillar-tag) {
+        color: #64748b;
+      }
+
+      [data-theme="light"] :global(.pillar-name) {
+        color: #0f172a;
+      }
+
+      [data-theme="light"] :global(.pillar-score) {
+        color: #4f46e5;
+        background: rgba(99, 102, 241, 0.1);
+      }
+
+      /* Dynamic Genre Affinities Track */
+      [data-theme="light"] :global(.affinities-title) {
+        color: #64748b;
+      }
+
+      [data-theme="light"] :global(.genre-affinity-pill.tier-vibrant) {
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        color: #4f46e5;
+      }
+
+      [data-theme="light"] :global(.genre-affinity-pill.tier-cyan) {
+        background: rgba(2, 132, 199, 0.1);
+        border: 1px solid rgba(2, 132, 199, 0.3);
+        color: #0284c7;
+      }
+
+      [data-theme="light"] :global(.genre-affinity-pill.tier-emerald) {
+        background: rgba(5, 150, 105, 0.1);
+        border: 1px solid rgba(5, 150, 105, 0.3);
+        color: #059669;
+      }
+
+      /* 17-Genre Drawer */
+      [data-theme="light"] :global(.toggle-all-genres-btn) {
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        color: #475569;
+      }
+
+      [data-theme="light"] :global(.toggle-all-genres-btn:hover) {
+        background: rgba(0, 0, 0, 0.04);
+        border-color: rgba(0, 0, 0, 0.2);
+        color: #0f172a;
+      }
+
+      [data-theme="light"] :global(.all-genres-drawer) {
+        background: rgba(0, 0, 0, 0.03);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+      }
+
+      [data-theme="light"] :global(.genre-rank-name) {
+        color: #334155;
+      }
+
+      [data-theme="light"] :global(.genre-rank-track) {
+        background: rgba(0, 0, 0, 0.08);
+      }
+
+      /* Act Labels */
+      [data-theme="light"] .act-key {
+        color: #4f46e5;
+      }
+
+      [data-theme="light"] .act-name {
+        color: #64748b;
+      }
+
+      /* Pacing Barcode Labels */
+      [data-theme="light"] #pacingDraftLabel,
+      [data-theme="light"] #pacingBaselineLabel {
+        color: #475569 !important;
+      }
+
+      /* Doppelgängers Card */
+      [data-theme="light"] .doppelganger-card {
+        background: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
+      }
+
+      [data-theme="light"] .doppelganger-title {
+        color: #0f172a;
+      }
+
+      [data-theme="light"] .doppelganger-subtitle {
+        color: #64748b;
+      }
+
+      [data-theme="light"] :global(.doppelganger-item) {
+        background: #f8fafc;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+      }
+
+      [data-theme="light"] :global(.doppelganger-item):hover {
+        background: #f1f5f9;
+        border-color: rgba(0, 0, 0, 0.16);
+      }
+
+      [data-theme="light"] :global(.doppelganger-rank) {
+        color: #94a3b8;
+      }
+
+      [data-theme="light"] :global(.doppelganger-item-title) {
+        color: #0f172a;
+      }
+
+      [data-theme="light"] :global(.doppelganger-author) {
+        color: #64748b;
+      }
+
+      [data-theme="light"] :global(.doppelganger-badge) {
+        background: rgba(0, 0, 0, 0.05);
+        color: #475569;
+      }
+
+      [data-theme="light"] :global(.reason-pill) {
+        background: rgba(99, 102, 241, 0.08);
+        border: 1px solid rgba(99, 102, 241, 0.25);
+        color: #4f46e5;
+      }
+
+      [data-theme="light"] :global(.doppelganger-progress-bg) {
+        background: rgba(0, 0, 0, 0.08);
+      }
+
+      [data-theme="light"] :global(.doppelganger-factor-label) {
+        color: #64748b;
+      }
+
+      [data-theme="light"] :global(.doppelganger-factor-bar-bg) {
+        background: rgba(0, 0, 0, 0.08);
+      }
+
+      /* Tooltips */
+      [data-theme="light"] .radar-tooltip {
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        color: #0f172a;
+      }
+
+      [data-theme="light"] .radar-tooltip-title {
+        color: #0f172a;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      }
     </style>
   </head>
   <body>
@@ -1163,6 +1612,13 @@ import "../styles/global.css";
         <div class="card">
           <h2 style="font-family: var(--font-display); margin-bottom: 1.5rem;">Input Passage</h2>
           <form id="analyze-form">
+
+            <div class="sample-pills-row">
+              <span class="sample-label">Try sample:</span>
+              <button type="button" class="sample-btn" data-sample="mystery">Classic Mystery</button>
+              <button type="button" class="sample-btn" data-sample="fantasy">Epic Fantasy</button>
+              <button type="button" class="sample-btn" data-sample="isekai">Web Novel / Isekai</button>
+            </div>
 
             <div class="form-group">
               <label for="passage-title">Passage Title (Optional)</label>
@@ -1321,11 +1777,47 @@ import "../styles/global.css";
       const readyState = document.getElementById("ready-state");
       const loadingState = document.getElementById("loading-state");
       const resultsContainer = document.getElementById("results-container");
+      let lastAnalysisData = null;
       let currentStats = null;
       let currentArc   = null;
       let activeBaseline = "web_novel";
       let hoveredIndex = -1;
       let hoveredArcIndex = -1;
+
+      // Sample prose snippets
+      const SAMPLE_PROSE = {
+        mystery: {
+          title: "The Adventure of the Cyanide Decanter",
+          lang: "en",
+          text: `The rain beat against the fog-stained windowpanes of 221B Baker Street as Inspector Lestrade threw open the heavy oak door. His coat was drenched, and his eyes burned with anxiety. "Holmes, you must come at once," he gasped, resting his hands upon the polished mahogany table. "Lord Harrington lies motionless in his study, the doors locked from within and a shattered crystal decanter resting beside his chair."\n\nSherlock Holmes did not rise immediately. He slowly lowered his pipe, allowing a dense ring of blue smoke to curl toward the ceiling before adjusting his magnifying lens. "A locked room, Lestrade? How delightfully elementary. And tell me, did you observe the faint scent of bitter almonds clinging to the victim's lips?" Lestrade blinked in astonishment. "Why, yes, Holmes—how could you possibly know?" Holmes turned to me with a faint smile. "A classic case of cyanide poisoning, Watson. Pack your bag; the hunt is afoot."`
+        },
+        fantasy: {
+          title: "The Archmage's Obsidian Spire",
+          lang: "en",
+          text: `High atop the ancient obsidian spire of the Archmage, Leylin channeled his mana into the glowing crystal orb. Deep within the subterranean caverns of Eldoria, ancient runes began to flare with brilliant azure light. Arcane lightning erupted across the stormy sky as the sky-thundering dragon unleashed a roar that shook the foundations of the mortal realm.\n\n"Hold the warding barrier!" shouted High Templar Valerius, raising his runic broadsword against the descending shadow. The wind howled through the ruined ramparts, carrying the stench of ozone and scorched stone. Leylin closed his eyes, humming a forgotten incantation as the swirling vortex of raw magical energy converged upon his staff.`
+        },
+        isekai: {
+          title: "Reincarnated with Divine Stats",
+          lang: "en",
+          text: `Hit by Truck-kun while crossing the zebra zone after buying a limited-edition melon pan, Kazuma opened his eyes to find himself floating in an endless sea of brilliant azure light. Before he could process his untimely demise, a translucent holographic window materialized directly before his vision with a cheerful chime: [Reincarnated as Hero with Level 99 Divine Stats].\n\n"Wait, is this really happening?" Kazuma muttered, rubbing his eyes in disbelief as a glowing goddess in silver robes stepped forward from the ethereal fog. "Welcome, brave traveler from Earth. You have been chosen to overthrow the Demon King in the realm of Fantasia." A wide grin spread across Kazuma's face as he clicked [Accept Cheat Skills].`
+        }
+      };
+
+      document.querySelectorAll(".sample-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const sampleKey = btn.dataset.sample;
+          const sample = SAMPLE_PROSE[sampleKey];
+          if (sample) {
+            document.getElementById("passage-title").value = sample.title;
+            document.getElementById("passage-lang").value = sample.lang;
+            textarea.value = sample.text;
+            textarea.dispatchEvent(new Event("input"));
+            
+            document.querySelectorAll(".sample-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+          }
+        });
+      });
 
       // 1. Text Area character and word counter
       textarea.addEventListener("input", () => {
@@ -1371,6 +1863,7 @@ import "../styles/global.css";
           }
 
           const data = await res.json();
+          lastAnalysisData = data;
           currentStats = data.stats;
           currentArc   = data.arc;
           renderResults(data);
@@ -1384,6 +1877,19 @@ import "../styles/global.css";
           loadingState.style.display = "none";
           errorBox.textContent = `Analysis error: ${err.message}`;
           errorBox.style.display = "block";
+        }
+      });
+
+      // 3. Theme change event listener: reactive chart re-rendering
+      window.addEventListener("themechange", () => {
+        if (lastAnalysisData) {
+          renderResults(lastAnalysisData);
+        }
+        if (currentStats && currentArc) {
+          renderAll();
+          if (lastAnalysisData && lastAnalysisData.top_matches) {
+            renderSimilarNovels(lastAnalysisData.top_matches);
+          }
         }
       });
 
@@ -1442,11 +1948,11 @@ import "../styles/global.css";
           <div class="metrics-hero">
             <div class="hero-chip">
               <span class="hero-chip-label">Archetype</span>
-              <span class="hero-chip-val" style="color: #a78bfa;">${stats.archetype_match?.closest_trope || stats.archetype?.closest_trope || 'Unknown'}</span>
+              <span class="hero-chip-val" style="color: var(--color-accent);">${stats.archetype_match?.closest_trope || stats.archetype?.closest_trope || 'Unknown'}</span>
             </div>
             <div class="hero-chip">
               <span class="hero-chip-label">Territory</span>
-              <span class="hero-chip-val" style="color: #38bdf8;">${stats.archetype_match?.territory || stats.archetype?.territory || 'Web Novel'}</span>
+              <span class="hero-chip-val" style="color: var(--color-accent-cyan, #38bdf8);">${stats.archetype_match?.territory || stats.archetype?.territory || 'Web Novel'}</span>
             </div>
             <div class="hero-chip">
               <span class="hero-chip-label">Word Count</span>
@@ -1454,7 +1960,7 @@ import "../styles/global.css";
             </div>
             <div class="hero-chip">
               <span class="hero-chip-label">Lexical Richness</span>
-              <span class="hero-chip-val" style="color: #34d399;">${(stats[`${langPrefix}ttr`] || stats.ttr || 0).toFixed(2)}</span>
+              <span class="hero-chip-val" style="color: var(--color-accent-emerald, #34d399);">${(stats[`${langPrefix}ttr`] || stats.ttr || 0).toFixed(2)}</span>
             </div>
           </div>
         `;
@@ -1663,6 +2169,27 @@ import "../styles/global.css";
       }
 
       function renderAll() {
+        const isLight = document.documentElement.getAttribute("data-theme") === "light";
+        const isWeb = activeBaseline === "web_novel";
+        const labelText = isWeb ? "Web Novel" : "Classic Lit";
+        const dotColor = isWeb
+          ? (isLight ? "#7c3aed" : "#a78bfa")
+          : (isLight ? "#d97706" : "#fbbf24");
+        
+        const radarLbl = document.getElementById("radarBaselineLegendLabel");
+        const arcLbl = document.getElementById("baselineLegendLabel");
+        const paceLbl = document.getElementById("pacingBaselineLegendLabel");
+        if (radarLbl) radarLbl.textContent = labelText;
+        if (arcLbl) arcLbl.textContent = labelText;
+        if (paceLbl) paceLbl.textContent = labelText;
+        
+        const radarDot = document.getElementById("radarBaselineLegendDot");
+        const arcDot = document.getElementById("arcBaselineLegendDot");
+        const paceDot = document.getElementById("pacingBaselineLegendDot");
+        if (radarDot) radarDot.style.backgroundColor = dotColor;
+        if (arcDot) arcDot.style.backgroundColor = dotColor;
+        if (paceDot) paceDot.style.backgroundColor = dotColor;
+
         drawRadar(currentStats, activeBaseline);
         drawArc(currentArc, activeBaseline);
         drawPacing(currentStats, activeBaseline);
@@ -1675,19 +2202,6 @@ import "../styles/global.css";
           btn.classList.add("active");
           activeBaseline = btn.dataset.baseline;
           
-          // Update legends dynamically
-          const isWeb = activeBaseline === "web_novel";
-          const labelText = isWeb ? "Web Novel" : "Classic Lit";
-          const dotColor = isWeb ? "#a78bfa" : "#fbbf24";
-          
-          document.getElementById("radarBaselineLegendLabel").textContent = labelText;
-          document.getElementById("baselineLegendLabel").textContent = labelText;
-          document.getElementById("pacingBaselineLegendLabel").textContent = labelText;
-          
-          document.getElementById("radarBaselineLegendDot").style.backgroundColor = dotColor;
-          document.getElementById("arcBaselineLegendDot").style.backgroundColor = dotColor;
-          document.getElementById("pacingBaselineLegendDot").style.backgroundColor = dotColor;
-          
           if (currentStats && currentArc) renderAll();
         });
       });
@@ -1696,6 +2210,7 @@ import "../styles/global.css";
       function drawRadar(stats, baseline) {
         const canvas = document.getElementById("radarChart");
         if (!canvas) return;
+        const isLight = document.documentElement.getAttribute("data-theme") === "light";
         const dpr = window.devicePixelRatio || 1;
 
         const cssW = canvas.clientWidth  || 480;
@@ -1716,7 +2231,7 @@ import "../styles/global.css";
         ctx.clearRect(0, 0, W, H);
 
         /* Grid rings */
-        for (let ring = 1; ring <= 5; ring++) {
+        for (let ring = 5; ring >= 1; ring--) {
           ctx.beginPath();
           for (let i = 0; i < n; i++) {
             const angle = (2 * Math.PI * i / n) - Math.PI / 2;
@@ -1726,11 +2241,15 @@ import "../styles/global.css";
             i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
           }
           ctx.closePath();
-          ctx.strokeStyle = "rgba(255,255,255,0.07)";
+          if (ring % 2 === 1) {
+            ctx.fillStyle = isLight ? "rgba(241, 245, 249, 0.6)" : "rgba(255, 255, 255, 0.015)";
+            ctx.fill();
+          }
+          ctx.strokeStyle = isLight ? "rgba(15, 23, 42, 0.10)" : "rgba(255, 255, 255, 0.10)";
           ctx.lineWidth = 1;
           ctx.stroke();
 
-          ctx.fillStyle = "rgba(255,255,255,0.18)";
+          ctx.fillStyle = isLight ? "rgba(15, 23, 42, 0.45)" : "rgba(255, 255, 255, 0.18)";
           ctx.font = "10px Inter, sans-serif";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
@@ -1745,7 +2264,9 @@ import "../styles/global.css";
           ctx.moveTo(cx, cy);
           ctx.lineTo(cx + R * Math.cos(angle), cy + R * Math.sin(angle));
           
-          ctx.strokeStyle = isHovered ? "rgba(255,255,255,0.38)" : "rgba(255,255,255,0.10)";
+          ctx.strokeStyle = isLight
+            ? (isHovered ? "rgba(15, 23, 42, 0.40)" : "rgba(15, 23, 42, 0.15)")
+            : (isHovered ? "rgba(255, 255, 255, 0.38)" : "rgba(255, 255, 255, 0.15)");
           ctx.lineWidth = isHovered ? 2.5 : 1;
           ctx.stroke();
 
@@ -1754,7 +2275,9 @@ import "../styles/global.css";
           const ly = cy + labelR * Math.sin(angle);
 
           const words = dim.label.split(" ");
-          ctx.fillStyle = isHovered ? "#7dd3fc" : "rgba(255,255,255,0.58)";
+          ctx.fillStyle = isHovered
+            ? (isLight ? "#0284c7" : "#7dd3fc")
+            : (isLight ? "#334155" : "#cbd5e1");
           ctx.font = isHovered ? "bold 11px Inter, sans-serif" : "bold 10px Inter, sans-serif";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
@@ -1783,15 +2306,23 @@ import "../styles/global.css";
         }
 
         const hasHover = hoveredIndex !== -1;
-        const blOpacityStroke = hasHover ? 0.35 : 0.8;
-        const blOpacityFill   = hasHover ? 0.04 : 0.12;
-        const userOpacityStroke = hasHover ? 0.40 : 0.85;
-        const userOpacityFill   = hasHover ? 0.03 : 0.10;
+        const blOpacityStroke = hasHover ? (isLight ? 0.45 : 0.35) : (isLight ? 0.90 : 0.8);
+        const blOpacityFill   = hasHover ? (isLight ? 0.08 : 0.04) : (isLight ? 0.18 : 0.12);
+        const userOpacityStroke = hasHover ? (isLight ? 0.50 : 0.40) : (isLight ? 0.95 : 0.85);
+        const userOpacityFill   = hasHover ? (isLight ? 0.08 : 0.03) : (isLight ? 0.18 : 0.10);
 
-        const blColor = baseline === "web_novel" ? "#a78bfa" : "#fbbf24";
-        const blRgb = baseline === "web_novel" ? "167,139,250" : "251,191,36";
+        const isWeb = baseline === "web_novel";
+        const blColor = isWeb
+          ? (isLight ? "#7c3aed" : "#a78bfa")
+          : (isLight ? "#d97706" : "#fbbf24");
+        const blRgb = isWeb
+          ? (isLight ? "124, 58, 237" : "167, 139, 250")
+          : (isLight ? "217, 119, 6" : "251, 191, 36");
 
-        const blVals = (stats.baselines && stats.baselines.radar && stats.baselines.radar[baseline])
+        const userColor = isLight ? "#0284c7" : "#7dd3fc";
+        const userRgb   = isLight ? "2, 132, 199" : "125, 211, 252";
+
+        const blVals = (stats && stats.baselines && stats.baselines.radar && stats.baselines.radar[baseline])
           ? stats.baselines.radar[baseline]
           : RADAR_BASELINES[baseline];
 
@@ -1801,62 +2332,64 @@ import "../styles/global.css";
           `rgba(${blRgb}, ${blOpacityFill})`
         );
 
-        const prefix = Object.keys(stats).find(k => k.startsWith("zh_")) ? "zh_" :
-                       Object.keys(stats).find(k => k.startsWith("ja_")) ? "ja_" : "en_";
-        const userVals = RADAR_DIMS.map(d => {
-          const statsKey = d.key.replace("en_", prefix);
-          if (stats.normalized_radar && stats.normalized_radar[statsKey] !== undefined) {
-            return stats.normalized_radar[statsKey];
-          }
-          return norm(stats[statsKey] ?? 0, d.min, d.max);
-        });
-        plotPolygon(
-          userVals,
-          `rgba(125,211,252, ${userOpacityStroke})`,
-          `rgba(125,211,252, ${userOpacityFill})`
-        );
+        if (stats) {
+          const prefix = Object.keys(stats).find(k => k.startsWith("zh_")) ? "zh_" :
+                         Object.keys(stats).find(k => k.startsWith("ja_")) ? "ja_" : "en_";
+          const userVals = RADAR_DIMS.map(d => {
+            const statsKey = d.key.replace("en_", prefix);
+            if (stats.normalized_radar && stats.normalized_radar[statsKey] !== undefined) {
+              return stats.normalized_radar[statsKey];
+            }
+            return norm(stats[statsKey] ?? 0, d.min, d.max);
+          });
+          plotPolygon(
+            userVals,
+            `rgba(${userRgb}, ${userOpacityStroke})`,
+            `rgba(${userRgb}, ${userOpacityFill})`
+          );
 
-        /* Dot on each axis */
-        userVals.forEach((v, i) => {
-          const isHovered = hoveredIndex === i;
-          const angle = (2 * Math.PI * i / n) - Math.PI / 2;
-          const r = R * Math.max(0, Math.min(1, v));
-          ctx.beginPath();
-          
-          if (isHovered) {
+          /* Dot on each axis */
+          userVals.forEach((v, i) => {
+            const isHovered = hoveredIndex === i;
+            const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+            const r = R * Math.max(0, Math.min(1, v));
+            ctx.beginPath();
+            
+            if (isHovered) {
+              ctx.shadowBlur = 8;
+              ctx.shadowColor = userColor;
+              ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 6, 0, 2 * Math.PI);
+              ctx.fillStyle = userColor;
+              ctx.fill();
+              ctx.strokeStyle = isLight ? "#ffffff" : "rgba(255,255,255,0.95)";
+              ctx.lineWidth = 2.5;
+              ctx.stroke();
+              ctx.shadowBlur = 0;
+            } else {
+              ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 3.5, 0, 2 * Math.PI);
+              ctx.fillStyle = hasHover ? `rgba(${userRgb}, 0.4)` : userColor;
+              ctx.fill();
+            }
+          });
+
+          if (hasHover) {
+            const blVal = blVals[hoveredIndex];
+            const angle = (2 * Math.PI * hoveredIndex / n) - Math.PI / 2;
+            const r = R * Math.max(0, Math.min(1, blVal));
+            ctx.beginPath();
             ctx.shadowBlur = 8;
-            ctx.shadowColor = "#7dd3fc";
+            ctx.shadowColor = blColor;
             ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 6, 0, 2 * Math.PI);
-            ctx.fillStyle = "#7dd3fc";
+            ctx.fillStyle = blColor;
             ctx.fill();
-            ctx.strokeStyle = "rgba(255,255,255,0.95)";
+            ctx.strokeStyle = isLight ? "#ffffff" : "rgba(255,255,255,0.95)";
             ctx.lineWidth = 2.5;
             ctx.stroke();
             ctx.shadowBlur = 0;
-          } else {
-            ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 3.5, 0, 2 * Math.PI);
-            ctx.fillStyle = hasHover ? "rgba(125,211,252,0.4)" : "#7dd3fc";
-            ctx.fill();
           }
-        });
 
-        if (hasHover) {
-          const blVal = blVals[hoveredIndex];
-          const angle = (2 * Math.PI * hoveredIndex / n) - Math.PI / 2;
-          const r = R * Math.max(0, Math.min(1, blVal));
-          ctx.beginPath();
-          ctx.shadowBlur = 8;
-          ctx.shadowColor = blColor;
-          ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 6, 0, 2 * Math.PI);
-          ctx.fillStyle = blColor;
-          ctx.fill();
-          ctx.strokeStyle = "rgba(255,255,255,0.95)";
-          ctx.lineWidth = 2.5;
-          ctx.stroke();
-          ctx.shadowBlur = 0;
+          renderArchetypeTaxonomy(stats);
         }
-
-        renderArchetypeTaxonomy(stats);
       }
 
       function renderArchetypeTaxonomy(stats) {
@@ -1966,7 +2499,7 @@ import "../styles/global.css";
             const pct = Math.min(99, Math.max(1, Math.round(g.score * 100)));
             let barColor = pct >= 80 ? "#a78bfa" :
                            pct >= 65 ? "#38bdf8" :
-                           pct >= 45 ? "#34d399" : "rgba(255,255,255,0.25)";
+                           pct >= 45 ? "#34d399" : (document.documentElement.getAttribute("data-theme") === "light" ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.25)");
             drawerHtml += `
               <div class="genre-rank-row">
                 <div class="genre-rank-info">
@@ -1999,7 +2532,8 @@ import "../styles/global.css";
       /* ── Kishōtenketsu arc (SVG) ── */
       function drawArc(arcData, baseline) {
         const svg = document.getElementById("arcChart");
-        if (!svg) return;
+        if (!svg || !arcData) return;
+        const isLight = document.documentElement.getAttribute("data-theme") === "light";
         svg.innerHTML = "";
         const W = 600, H = 420;
         const PAD = { top: 30, bottom: 48, left: 48, right: 48 };
@@ -2009,12 +2543,22 @@ import "../styles/global.css";
 
         const acts    = (arcData.quantiles && arcData.quantiles.length > 0)
           ? arcData.quantiles.map((v, i) => ({ sentiment: v, actIndex: i }))
-          : arcData.acts;
+          : arcData.acts || [];
+        if (acts.length === 0) return;
+
         const blVals  = (arcData.baselines && arcData.baselines[baseline])
           ? arcData.baselines[baseline]
           : [0.0839, 0.0588, 0.1347, 0.1006];
-        const blColor = baseline === "web_novel" ? "#a78bfa" : "#fbbf24";
-        const blRgb   = baseline === "web_novel" ? "167,139,250" : "251,191,36";
+        const isWeb   = baseline === "web_novel";
+        const blColor = isWeb
+          ? (isLight ? "#7c3aed" : "#a78bfa")
+          : (isLight ? "#d97706" : "#fbbf24");
+        const blRgb   = isWeb
+          ? (isLight ? "124, 58, 237" : "167, 139, 250")
+          : (isLight ? "217, 119, 6" : "251, 191, 36");
+        const userColor = isLight ? "#0284c7" : "#7dd3fc";
+        const userRgb   = isLight ? "2, 132, 199" : "125, 211, 252";
+
         const sentY = s => {
           const clamped = Math.max(-1.0, Math.min(1.0, s));
           return PAD.top + plotH * (1 - (clamped + 1) / 2);
@@ -2077,7 +2621,7 @@ import "../styles/global.css";
           g.setAttribute("x1", "0"); g.setAttribute("y1", String(PAD.top));
           g.setAttribute("x2", "0"); g.setAttribute("y2", String(bottomY));
           const pct = p => `${(Math.max(0, Math.min(1, p)) * 100).toFixed(1)}%`;
-          const minA = (alpha * 0.40).toFixed(3);
+          const minA = (alpha * (isLight ? 0.35 : 0.40)).toFixed(3);
           [
             [0,   `rgba(${rgb},${alpha})`],
             [zf,  `rgba(${rgb},${minA})`],
@@ -2091,8 +2635,8 @@ import "../styles/global.css";
           return g;
         };
 
-        defs.appendChild(makeGrad("arcUserGrad",     "125,211,252", 0.80));
-        defs.appendChild(makeGrad("arcBaselineGrad", blRgb,         0.75));
+        defs.appendChild(makeGrad("arcUserGrad",     userRgb, isLight ? 0.35 : 0.80));
+        defs.appendChild(makeGrad("arcBaselineGrad", blRgb,   isLight ? 0.30 : 0.75));
 
         const clipPath = document.createElementNS(ns, "clipPath");
         clipPath.setAttribute("id", "outerFillClip");
@@ -2112,7 +2656,7 @@ import "../styles/global.css";
           const vGuide = document.createElementNS(ns, "line");
           vGuide.setAttribute("x1", hx); vGuide.setAttribute("y1", PAD.top);
           vGuide.setAttribute("x2", hx); vGuide.setAttribute("y2", bottomY);
-          vGuide.setAttribute("stroke", "rgba(255,255,255,0.25)");
+          vGuide.setAttribute("stroke", isLight ? "rgba(15, 23, 42, 0.25)" : "rgba(255, 255, 255, 0.25)");
           vGuide.setAttribute("stroke-dasharray", "3 3");
           svg.appendChild(vGuide);
         }
@@ -2127,14 +2671,16 @@ import "../styles/global.css";
           line.setAttribute("y1", y);
           line.setAttribute("x2", String(endX));
           line.setAttribute("y2", y);
-          line.setAttribute("stroke", isZero ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.055)");
+          line.setAttribute("stroke", isZero
+            ? (isLight ? "#94a3b8" : "rgba(255, 255, 255, 0.3)")
+            : (isLight ? "rgba(15, 23, 42, 0.08)" : "rgba(255, 255, 255, 0.055)"));
           if (!isZero) line.setAttribute("stroke-dasharray", "4 5");
           svg.appendChild(line);
 
           const lbl = document.createElementNS(ns, "text");
           lbl.setAttribute("x", String(axisX - 8));
           lbl.setAttribute("y", y + 3.5);
-          lbl.setAttribute("fill", "rgba(255,255,255,0.3)");
+          lbl.setAttribute("fill", isLight ? "#64748b" : "rgba(255, 255, 255, 0.3)");
           lbl.setAttribute("font-size", "9");
           lbl.setAttribute("font-family", "Inter, sans-serif");
           lbl.setAttribute("text-anchor", "end");
@@ -2145,13 +2691,13 @@ import "../styles/global.css";
         const yAxis = document.createElementNS(ns, "line");
         yAxis.setAttribute("x1", String(axisX)); yAxis.setAttribute("y1", String(PAD.top));
         yAxis.setAttribute("x2", String(axisX)); yAxis.setAttribute("y2", String(bottomY));
-        yAxis.setAttribute("stroke", "rgba(255,255,255,0.22)");
+        yAxis.setAttribute("stroke", isLight ? "#cbd5e1" : "rgba(255, 255, 255, 0.15)");
         svg.appendChild(yAxis);
 
         const xAxis = document.createElementNS(ns, "line");
         xAxis.setAttribute("x1", String(axisX)); xAxis.setAttribute("y1", String(bottomY));
         xAxis.setAttribute("x2", String(endX));  xAxis.setAttribute("y2", String(bottomY));
-        xAxis.setAttribute("stroke", "rgba(255,255,255,0.22)");
+        xAxis.setAttribute("stroke", isLight ? "#cbd5e1" : "rgba(255, 255, 255, 0.15)");
         svg.appendChild(xAxis);
 
         ["Ki (Intro)", "Shō (Dev)", "Ten (Twist)", "Ketsu (Res)"].forEach((label, i) => {
@@ -2159,12 +2705,12 @@ import "../styles/global.css";
           const tick = document.createElementNS(ns, "line");
           tick.setAttribute("x1", lx); tick.setAttribute("y1", bottomY);
           tick.setAttribute("x2", lx); tick.setAttribute("y2", bottomY + 4);
-          tick.setAttribute("stroke", "rgba(255,255,255,0.2)");
+          tick.setAttribute("stroke", isLight ? "#e2e8f0" : "rgba(255, 255, 255, 0.07)");
           svg.appendChild(tick);
 
           const txt = document.createElementNS(ns, "text");
           txt.setAttribute("x", lx); txt.setAttribute("y", bottomY + 16);
-          txt.setAttribute("fill", "rgba(255,255,255,0.45)");
+          txt.setAttribute("fill", isLight ? "#64748b" : "rgba(255, 255, 255, 0.45)");
           txt.setAttribute("font-size", "10"); txt.setAttribute("font-weight", "600");
           txt.setAttribute("font-family", "Inter, sans-serif");
           txt.setAttribute("text-anchor", "middle");
@@ -2191,13 +2737,13 @@ import "../styles/global.css";
         blPath.setAttribute("stroke", blColor);
         blPath.setAttribute("stroke-width", "1.75");
         blPath.setAttribute("stroke-dasharray", "5 4");
-        blPath.setAttribute("opacity", "0.85");
+        blPath.setAttribute("opacity", isLight ? "0.95" : "0.85");
         svg.appendChild(blPath);
 
         const userPath = document.createElementNS(ns, "path");
         userPath.setAttribute("d", pathD);
         userPath.setAttribute("fill", "none");
-        userPath.setAttribute("stroke", "#7dd3fc");
+        userPath.setAttribute("stroke", userColor);
         userPath.setAttribute("stroke-width", "2.5");
         svg.appendChild(userPath);
 
@@ -2206,8 +2752,8 @@ import "../styles/global.css";
           const userDot = document.createElementNS(ns, "circle");
           userDot.setAttribute("cx", x); userDot.setAttribute("cy", userYs[i]);
           userDot.setAttribute("r", i === hoveredArcIndex ? "6" : "4");
-          userDot.setAttribute("fill", "#7dd3fc");
-          userDot.setAttribute("stroke", "#0a0a12");
+          userDot.setAttribute("fill", userColor);
+          userDot.setAttribute("stroke", isLight ? "#ffffff" : "#0a0a12");
           userDot.setAttribute("stroke-width", "2");
           svg.appendChild(userDot);
 
@@ -2215,7 +2761,7 @@ import "../styles/global.css";
           blDot.setAttribute("cx", x); blDot.setAttribute("cy", blYs[i]);
           blDot.setAttribute("r", i === hoveredArcIndex ? "5" : "3.5");
           blDot.setAttribute("fill", blColor);
-          blDot.setAttribute("stroke", "#0a0a12");
+          blDot.setAttribute("stroke", isLight ? "#ffffff" : "#0a0a12");
           blDot.setAttribute("stroke-width", "1.5");
           svg.appendChild(blDot);
         });
@@ -2234,9 +2780,14 @@ import "../styles/global.css";
 
       /* ── Rhythmic Pacing (Paragraph Barcode) ── */
       function drawPacing(stats, baseline) {
+        if (!stats) return;
+        const isLight = document.documentElement.getAttribute("data-theme") === "light";
         const userPacing = stats.pacing || [];
         const isWeb = baseline === "web_novel";
-        const baselineColor = isWeb ? "#a78bfa" : "#fbbf24";
+        const baselineColor = isWeb
+          ? (isLight ? "#7c3aed" : "#a78bfa")
+          : (isLight ? "#d97706" : "#fbbf24");
+        const userColor = isLight ? "#0284c7" : "#7dd3fc";
         const baselineData = PACING_BASELINES[baseline];
 
         const userAvg = userPacing.length > 0 ? (userPacing.reduce((a,b)=>a+b,0)/userPacing.length).toFixed(1) : 0;
@@ -2245,16 +2796,24 @@ import "../styles/global.css";
         document.getElementById("pacingDraftLabel").textContent = `Your Draft (Average Paragraph Length: ${userAvg} words/chars)`;
         document.getElementById("pacingBaselineLabel").textContent = `${isWeb ? "Web Novel" : "Classic Lit"} Baseline (Average Paragraph Length: ${baseAvg.toFixed(1)} words/chars)`;
 
-        renderBarcode("pacingBarcodeUser", userPacing, "#7dd3fc");
+        renderBarcode("pacingBarcodeUser", userPacing, userColor);
         renderBarcode("pacingBarcodeBaseline", baselineData, baselineColor);
+      }
+
+      function drawBarcode(features) {
+        drawPacing(features, activeBaseline);
       }
 
       function renderBarcode(containerId, data, color) {
         const container = document.getElementById(containerId);
+        if (!container) return;
+        const isLight = document.documentElement.getAttribute("data-theme") === "light";
         container.innerHTML = "";
+        container.style.background = isLight ? "rgba(241, 245, 249, 0.8)" : "rgba(0, 0, 0, 0.3)";
+        container.style.border = `1px solid ${isLight ? "rgba(15, 23, 42, 0.08)" : "rgba(255, 255, 255, 0.05)"}`;
         
         if (!data || data.length === 0) {
-          container.innerHTML = "<div style='color:rgba(255,255,255,0.3); font-size:0.8rem; padding: 1rem; width:100%; text-align:center;'>No paragraph pacing data available</div>";
+          container.innerHTML = `<div style='color: ${isLight ? "#64748b" : "rgba(255, 255, 255, 0.3)"}; font-size:0.8rem; padding: 1rem; width:100%; text-align:center;'>No paragraph pacing data available</div>`;
           return;
         }
 
@@ -2292,7 +2851,12 @@ import "../styles/global.css";
 
           const pct = Math.round((m.similarity_score || 0) * 100);
           const topGenres = (m.genre || 'Fiction').split(',').map(g => g.trim()).filter(Boolean).slice(0, 3).join(', ');
-          const scoreColor = m.similarity_score > 0.9 ? '#38bdf8' : m.similarity_score > 0.8 ? '#818cf8' : '#94a3b8';
+          const isLight = document.documentElement.getAttribute("data-theme") === "light";
+          const scoreColor = m.similarity_score > 0.9
+            ? (isLight ? '#0284c7' : '#38bdf8')
+            : m.similarity_score > 0.8
+              ? (isLight ? '#6366f1' : '#818cf8')
+              : '#94a3b8';
 
           item.innerHTML = `
             <div class="doppelganger-left">
@@ -2321,7 +2885,7 @@ import "../styles/global.css";
                     { label: 'SEM', name: 'Semantic', val: m.breakdown.semantic }
                   ].map(f => {
                     const fPct = Math.round((f.val || 0) * 100);
-                    const fColor = f.val > 0.8 ? '#22d3ee' : '#64748b';
+                    const fColor = f.val > 0.8 ? (isLight ? '#0284c7' : '#22d3ee') : '#64748b';
                     return `
                       <div class="doppelganger-factor" title="${f.name}: ${fPct}%">
                         <span class="doppelganger-factor-label">${f.label}</span>
@@ -2399,19 +2963,24 @@ import "../styles/global.css";
                 : RADAR_BASELINES[activeBaseline];
               const blVal = blVals ? blVals[hoveredIndex] : 0.5;
 
+              const isLight = document.documentElement.getAttribute("data-theme") === "light";
               const userPct = Math.round(Math.max(0, Math.min(1, userVal)) * 100) + "%";
               const blPct = Math.round(Math.max(0, Math.min(1, blVal)) * 100) + "%";
               const baseName = activeBaseline === "web_novel" ? "Web Novel Baseline" : "Classic Lit Baseline";
-              const blColor = activeBaseline === "web_novel" ? "#a78bfa" : "#fbbf24";
+              const blColor = activeBaseline === "web_novel"
+                ? (isLight ? "#7c3aed" : "#a78bfa")
+                : (isLight ? "#d97706" : "#fbbf24");
+              const userColor = isLight ? "#0284c7" : "#7dd3fc";
+              const labelColor = isLight ? "#64748b" : "rgba(255,255,255,0.7)";
 
               tooltipNode.innerHTML = `
                 <div class="radar-tooltip-title">${dim.label}</div>
                 <div class="radar-tooltip-row">
-                  <span style="color: rgba(255,255,255,0.7)">Your Draft:</span>
-                  <span class="radar-tooltip-val" style="color: #7dd3fc">${userPct}</span>
+                  <span style="color: ${labelColor}">Your Draft:</span>
+                  <span class="radar-tooltip-val" style="color: ${userColor}">${userPct}</span>
                 </div>
                 <div class="radar-tooltip-row">
-                  <span style="color: rgba(255,255,255,0.7)">${baseName}:</span>
+                  <span style="color: ${labelColor}">${baseName}:</span>
                   <span class="radar-tooltip-val" style="color: ${blColor}">${blPct}</span>
                 </div>
               `;
@@ -2448,7 +3017,8 @@ import "../styles/global.css";
 
               const acts = currentArc.quantiles
                 ? currentArc.quantiles.map((v, i) => ({ sentiment: v, actIndex: i }))
-                : currentArc.acts;
+                : currentArc.acts || [];
+              if (acts.length === 0) return;
 
               const actX = i => PAD.left + i * plotW / (acts.length - 1);
 
@@ -2484,19 +3054,24 @@ import "../styles/global.css";
                 const actNames = ["Ki (Intro)", "Shō (Dev)", "Ten (Twist)", "Ketsu (Res)"];
                 const titleFmt = actNames[hoveredArcIndex] || `${act.act || ''} (${labelMap[act.label] || act.label || ''})`;
 
+                const isLight = document.documentElement.getAttribute("data-theme") === "light";
                 const userFmt = userVal >= 0 ? `+${userVal.toFixed(2)}` : userVal.toFixed(2);
                 const blFmt = blVal >= 0 ? `+${blVal.toFixed(2)}` : blVal.toFixed(2);
                 const baseName = activeBaseline === "web_novel" ? "Web Novel Baseline" : "Classic Lit Baseline";
-                const blColor = activeBaseline === "web_novel" ? "#a78bfa" : "#fbbf24";
+                const blColor = activeBaseline === "web_novel"
+                  ? (isLight ? "#7c3aed" : "#a78bfa")
+                  : (isLight ? "#d97706" : "#fbbf24");
+                const userColor = isLight ? "#0284c7" : "#7dd3fc";
+                const labelColor = isLight ? "#64748b" : "rgba(255,255,255,0.7)";
 
                 arcTooltipNode.innerHTML = `
                   <div class="radar-tooltip-title">${titleFmt}</div>
                   <div class="radar-tooltip-row">
-                    <span style="color: rgba(255,255,255,0.7)">Your Draft:</span>
-                    <span class="radar-tooltip-val" style="color: #7dd3fc">${userFmt}</span>
+                    <span style="color: ${labelColor}">Your Draft:</span>
+                    <span class="radar-tooltip-val" style="color: ${userColor}">${userFmt}</span>
                   </div>
                   <div class="radar-tooltip-row">
-                    <span style="color: rgba(255,255,255,0.7)">${baseName}:</span>
+                    <span style="color: ${labelColor}">${baseName}:</span>
                     <span class="radar-tooltip-val" style="color: ${blColor}">${blFmt}</span>
                   </div>
                 `;
