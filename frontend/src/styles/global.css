@@ -60,6 +60,14 @@ body {
   transition: background-color var(--transition), color var(--transition);
 }
 
+/* Instantaneous theme toggle - bypass laggy multi-element CSS transitions */
+.theme-transitioning,
+.theme-transitioning *,
+.theme-transitioning *::before,
+.theme-transitioning *::after {
+  transition: none !important;
+}
+
 /* ─── Hero ───────────────────────────────────────────────────────── */
 .hero {
   position: relative;

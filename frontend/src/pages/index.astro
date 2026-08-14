@@ -233,19 +233,32 @@ const INITIAL_MYSTERY_TEXT = `The autumn rain lashed against the fog-stained win
         }
       };
 
-      document.addEventListener("astro:page-load", () => {
-        // Theme toggle
-        const themeToggleBtn = document.getElementById("themeToggleBtn");
-        if (themeToggleBtn) {
-          themeToggleBtn.addEventListener("click", () => {
-            const current = document.documentElement.getAttribute("data-theme") || "dark";
-            const next = current === "light" ? "dark" : "light";
-            document.documentElement.setAttribute("data-theme", next);
-            try {
-              localStorage.setItem("kisholens-theme", next);
-            } catch (e) {}
-            window.dispatchEvent(new CustomEvent("themechange", { detail: { theme: next } }));
+      function toggleTheme() {
+        const current = document.documentElement.getAttribute("data-theme") || "dark";
+        const next = current === "light" ? "dark" : "light";
+        
+        // Temporarily disable CSS transitions to prevent multi-element frame drops
+        document.documentElement.classList.add("theme-transitioning");
+        document.documentElement.setAttribute("data-theme", next);
+        try {
+          localStorage.setItem("kisholens-theme", next);
+        } catch (e) {}
+
+        window.dispatchEvent(new CustomEvent("themechange", { detail: { theme: next } }));
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            document.documentElement.classList.remove("theme-transitioning");
           });
+        });
+      }
+
+      document.addEventListener("astro:page-load", () => {
+        // Theme toggle with single-binding guard
+        const themeToggleBtn = document.getElementById("themeToggleBtn");
+        if (themeToggleBtn && !themeToggleBtn.dataset.themeBound) {
+          themeToggleBtn.dataset.themeBound = "true";
+          themeToggleBtn.addEventListener("click", toggleTheme);
         }
 
         const tabs = document.querySelectorAll(".reader-tab");

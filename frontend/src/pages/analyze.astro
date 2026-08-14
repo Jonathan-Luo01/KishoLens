@@ -1807,19 +1807,32 @@ import { ClientRouter } from 'astro:transitions';
         }
       };
 
-      document.addEventListener("astro:page-load", () => {
-        // Theme Toggle Initialization
-        const themeToggleBtn = document.getElementById("themeToggleBtn");
-        if (themeToggleBtn) {
-          themeToggleBtn.addEventListener("click", () => {
-            const current = document.documentElement.getAttribute("data-theme") || "dark";
-            const next = current === "light" ? "dark" : "light";
-            document.documentElement.setAttribute("data-theme", next);
-            try {
-              localStorage.setItem("kisholens-theme", next);
-            } catch (e) {}
-            window.dispatchEvent(new CustomEvent("themechange", { detail: { theme: next } }));
+      function toggleTheme() {
+        const current = document.documentElement.getAttribute("data-theme") || "dark";
+        const next = current === "light" ? "dark" : "light";
+        
+        // Temporarily disable CSS transitions to prevent multi-element frame drops
+        document.documentElement.classList.add("theme-transitioning");
+        document.documentElement.setAttribute("data-theme", next);
+        try {
+          localStorage.setItem("kisholens-theme", next);
+        } catch (e) {}
+
+        window.dispatchEvent(new CustomEvent("themechange", { detail: { theme: next } }));
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            document.documentElement.classList.remove("theme-transitioning");
           });
+        });
+      }
+
+      document.addEventListener("astro:page-load", () => {
+        // Theme Toggle Initialization with single-binding guard
+        const themeToggleBtn = document.getElementById("themeToggleBtn");
+        if (themeToggleBtn && !themeToggleBtn.dataset.themeBound) {
+          themeToggleBtn.dataset.themeBound = "true";
+          themeToggleBtn.addEventListener("click", toggleTheme);
         }
 
         const form = document.getElementById("analyze-form") || document.getElementById("analyzeForm");
@@ -1951,18 +1964,23 @@ import { ClientRouter } from 'astro:transitions';
         }
       });
 
-      // Reactive Theme Change Listener
-      window.addEventListener("themechange", () => {
-        if (lastAnalysisData) {
-          renderResults(lastAnalysisData);
-        }
-        if (currentStats && currentArc) {
-          renderAll();
-          if (lastAnalysisData && lastAnalysisData.top_matches) {
-            renderSimilarNovels(lastAnalysisData.top_matches);
-          }
-        }
-      });
+      // Reactive Theme Change Listener (Guarded & frame-batched)
+      if (!window._analyzeThemeChangeBound) {
+        window._analyzeThemeChangeBound = true;
+        window.addEventListener("themechange", () => {
+          requestAnimationFrame(() => {
+            if (lastAnalysisData) {
+              renderResults(lastAnalysisData);
+            }
+            if (currentStats && currentArc) {
+              renderAll();
+              if (lastAnalysisData && lastAnalysisData.top_matches) {
+                renderSimilarNovels(lastAnalysisData.top_matches);
+              }
+            }
+          });
+        });
+      }
 
       const METRIC_METADATA = {
         // Structure & Volume
