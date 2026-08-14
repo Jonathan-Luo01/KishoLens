@@ -2154,8 +2154,11 @@ import { ClientRouter } from 'astro:transitions';
       }
 
       function renderResults(data) {
-        loadingState.style.display = "none";
-        resultsContainer.style.display = "block";
+        const loadingState = document.getElementById("loading-state");
+        const resultsContainer = document.getElementById("results-container");
+        if (loadingState) loadingState.style.display = "none";
+        if (resultsContainer) resultsContainer.style.display = "block";
+        if (!resultsContainer) return;
 
         const statsObj = data.stats || {
           ...data.features,
