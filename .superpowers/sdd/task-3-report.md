@@ -1,54 +1,81 @@
-# Task 3 Report: Analyze Prose Page Light Mode & Dynamic Canvas Theming (`analyze.astro`)
+# Task 3 Report: ClientRouter Lifecycle Integration (`astro:page-load`) Across All Pages
 
-## Summary
-- **Target**: `frontend/src/pages/analyze.astro`
-- **Status**: Completed (Passes build cleanly with 0 errors)
-- **Commit**: `6d4ed34` (`feat(analyze): implement light mode styling and adaptive canvas chart re-rendering`)
-
----
-
-## Key Implementations
-
-### 1. Dynamic Reactive Canvas & SVG Chart Theming
-- **Radar Chart (`drawRadar`)**:
-  - Dynamically checks `const isLight = document.documentElement.getAttribute("data-theme") === "light";`.
-  - Configured spoke rings: `isLight ? "rgba(15, 23, 42, 0.10)" : "rgba(255, 255, 255, 0.10)"`.
-  - Alternating ring fill: `isLight ? "rgba(241, 245, 249, 0.6)" : "rgba(255, 255, 255, 0.015)"`.
-  - Spoke axis lines: `isLight ? (isHovered ? "rgba(15, 23, 42, 0.40)" : "rgba(15, 23, 42, 0.15)") : (isHovered ? "rgba(255, 255, 255, 0.38)" : "rgba(255, 255, 255, 0.15)")`.
-  - Dimension text labels: `isLight ? (isHovered ? "#0284c7" : "#334155") : (isHovered ? "#7dd3fc" : "#cbd5e1")`.
-  - Percentage labels: `isLight ? "rgba(15, 23, 42, 0.45)" : "rgba(255, 255, 255, 0.18)"`.
-  - Polygons & Dot Accents: Adaptive stroke, fill opacity, and light theme border highlights.
-
-- **Kishōtenketsu Sentiment Arc (`drawArc`)**:
-  - Dynamically checks `isLight`.
-  - Axis lines: `stroke="${isLight ? '#cbd5e1' : 'rgba(255,255,255,0.15)'}"`.
-  - Zero baseline: `stroke="${isLight ? '#94a3b8' : 'rgba(255,255,255,0.3)'}"`.
-  - Grid lines & ticks: `stroke="${isLight ? 'rgba(15, 23, 42, 0.08)' : 'rgba(255,255,255,0.055)'}"` and `stroke="${isLight ? '#e2e8f0' : 'rgba(255,255,255,0.07)'}"`.
-  - Act text labels: `fill="${isLight ? '#64748b' : 'rgba(255,255,255,0.45)'}"`.
-  - Gradient fills and spline strokes updated with high contrast light mode palette.
-
-- **Rhythmic Pacing Barcodes (`drawPacing` / `drawBarcode` / `renderBarcode`)**:
-  - Dynamically sets container background: `isLight ? "rgba(241, 245, 249, 0.8)" : "rgba(0, 0, 0, 0.3)"`.
-  - Border: `isLight ? "rgba(15, 23, 42, 0.08)" : "rgba(255, 255, 255, 0.05)"`.
-  - Dynamic user and baseline colors for web novel / classic lit modes.
-
-### 2. Reactive Theme-Change Re-rendering
-- Stores latest analysis in `lastAnalysisData`.
-- Listens to `window.addEventListener('themechange', () => { ... })` and automatically triggers `renderResults(lastAnalysisData)` and `renderAll()`.
-
-### 3. Light Mode CSS System & Sample Snippets
-- Added `.sample-pills-row` with instant sample loaders (Classic Mystery, Epic Fantasy, Web Novel / Isekai).
-- Styled all components under `[data-theme="light"]`:
-  - Form inputs, textareas, selects, labels, and counter rows.
-  - Archetype banner and 2x2 metric hero summary grid.
-  - Metrics category tabs track and individual metric cards with hover states.
-  - 3-pillar taxonomy badges and dynamic genre affinity pills.
-  - Expandable 17-genre drawer and score tracks.
-  - Full-width Doppelgänger cards with breakdown bars and hover effects.
-  - Radar and Arc tooltip styles with crisp light theme contrast.
+**Status**: DONE  
+**Date**: 2026-08-13  
+**Commit**: `d79e22d` (`feat(lifecycle): attach client handlers to astro:page-load for seamless SPA navigation`)  
 
 ---
 
-## Verification
-- `cd frontend && npm run build` &rarr; 0 errors, built in 134ms.
-- Git commit created on master: `6d4ed34`.
+## 1. Executive Summary
+With Astro's `<ClientRouter />` integrated across the application, client-side SPA navigations now transition smoothly without full document reloads. To ensure that all interactive widgets, chart visualizers, filters, sample switchers, form submissions, and theme toggles initialize idempotently on both initial hard loads and subsequent SPA page transitions, all client scripts across `frontend/src/pages/index.astro`, `frontend/src/pages/analyze.astro`, and `frontend/src/pages/library.astro` have been refactored to attach their DOM bindings to the `astro:page-load` lifecycle event.
+
+---
+
+## 2. Implementation Details
+
+### A. `frontend/src/pages/index.astro`
+- Migrated DOM startup listener from `DOMContentLoaded` to `document.addEventListener("astro:page-load", () => { ... })`.
+- Attached the `#themeToggleBtn` click handler on `astro:page-load` to enable theme toggles across navigations.
+- Re-queried and bound `.reader-tab` event listeners to dynamically update the live prose inspector excerpt, sentence metrics, dialogue %, TTR %, and "Open in Analyzer" URL link.
+- Initialized the `IntersectionObserver` on the `#capabilities` section on `astro:page-load`.
+
+### B. `frontend/src/pages/analyze.astro`
+- Converted `<script is:inline>` to `<script>` module bundling to prevent duplicate script evaluation across navigations.
+- Wrapped all interactive initialization logic inside `document.addEventListener("astro:page-load", () => { ... })`:
+  - **Form Submission**: `#analyze-form` (and `#analyzeForm`) submission handler bound to submit text to `${API_URL}/api/analyze` and render metric dashboard + radar/arc/pacing visualizers.
+  - **Sample Prose Snippets**: `.sample-btn` click listeners attached to populate title, language, and passage text.
+  - **Textarea Character & Word Counters**: Input event listener bound to `#passage-text`.
+  - **URL Parameter Pre-filling**: Automatically parses `?text=` query parameter (e.g. from homepage reader widget) and dispatches input event.
+  - **Baseline Switchers**: `.baseline-btn` click listeners bound to toggle between Web Novel and Classic Literature baselines and re-render visualizers.
+  - **Chart Tooltip & Hover Listeners**: `setupChartHoverListeners()` bound to the active `#radarChart` (canvas) and `#arcChart` (svg) elements.
+  - **State Restoration**: Automatically re-renders results and visualizers if previous session or memory analysis data is present upon navigating back.
+- Attached `window.addEventListener("themechange", ...)` to redraw charts dynamically whenever the light/dark theme is toggled.
+
+### C. `frontend/src/pages/library.astro`
+- Converted `<script is:inline>` to `<script>` module bundling.
+- Wrapped full explorer startup into `initExplorer()`, called on `document.addEventListener("astro:page-load", () => { ... })`:
+  - **Search & Filters**: `#novel-search-input` input listener, `#novelSelect` dropdown change listener, and `.btn-reset-filters` click listener.
+  - **Territory Tabs**: `#territory-selector .t-tab` click listeners bound to switch between "All Genres", "Classic Literature Territory", and "Web Novel Territory".
+  - **Baseline Switchers**: `.baseline-btn` click listeners bound to toggle active baselines.
+  - **Dataset Ingestion**: `#ingest-form` submission and polling logic attached.
+  - **Chart Hover Listeners**: `setupChartHoverListeners()` bound to `#radarChart` and `#arcChart`.
+  - **Data Fetching**: `renderGenreCheckboxes()`, `fetchNovels()`, `fetchDbStats()`, and `checkUrlParams()` (for deep links like `?novelId=123`).
+- Global functions (`selectTerritory`, `handleGenreItemClick`, `toggleIncludeGenre`, `toggleExcludeGenre`, `resetGenreFilters`, `selectNovel`) safely exported to `window`.
+- Attached `window.addEventListener("themechange", ...)` to re-render charts and similar novel cards reactively when toggling light/dark theme.
+
+---
+
+## 3. Verification & Build Confirmation
+
+- **Build Execution**: `cd frontend && npm run build`
+- **Result**:
+  - `3 page(s) built in 158ms`
+  - Routes generated: `/index.html`, `/analyze/index.html`, `/library/index.html`
+  - 0 compilation or linting errors.
+
+---
+
+## 4. Git Commit
+```bash
+git add frontend/src/pages/index.astro frontend/src/pages/analyze.astro frontend/src/pages/library.astro
+git commit -m "feat(lifecycle): attach client handlers to astro:page-load for seamless SPA navigation"
+```
+Commit hash: `d79e22d`
+
+---
+
+## 5. Review Findings & Fixes
+
+**Status**: DONE  
+**Date**: 2026-08-13  
+**Commit**: `370f433` (`fix(library): correct arc tooltip variable references and deduplicate tooltip listeners`)
+
+### Issues Addressed
+1. **Arc Tooltip Variable References (`frontend/src/pages/library.astro`)**:
+   - Fixed undefined variable references in `arcTooltipNode.innerHTML` by replacing `${userPct}` and `${blPct}` with formatted signed values `${userFmt}` and `${blFmt}`.
+2. **Tooltip Document Click Listener Deduplication (`frontend/src/pages/analyze.astro`)**:
+   - Moved the `document.addEventListener("click", ...)` handler out of `renderResults(data)` and into the `astro:page-load` initialization block to prevent duplicate listener accumulation on successive analyses or theme changes.
+
+### Verification
+- Executed `cd frontend && npm run build` (0 errors, 3 pages built in 165ms).
+

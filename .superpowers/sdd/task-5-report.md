@@ -1,88 +1,75 @@
-# Task 5 Report: Mobile Viewport Audit & Full End-to-End Test Suite
+# Task 5 Report: End-to-End Build, Verification & Visual Navigation Testing
 
-## Executive Summary
-- **Target**: Cross-Platform E2E Verification & Viewport Responsiveness Audit
-- **Status**: Completed (All 73 backend tests passing, 0 frontend build errors, 100% viewport & theme verification)
-- **Commit**: `be89eb5` (`chore: verify platform-wide light mode toggle and mobile responsiveness`)
-
----
-
-## 1. Frontend Build & Static Generation
-Executed `cd frontend && npm run build`:
-- **Build tool**: Astro v5 + Vite
-- **Output Mode**: Static (`frontend/dist/`)
-- **Generated Routes**:
-  - `├─ /analyze/index.html`
-  - `├─ /library/index.html`
-  - `└─ /index.html`
-- **Result**: Complete in **162ms** with **0 build errors** and **0 type warnings**.
+**Status**: DONE  
+**Timestamp**: 2026-08-14T06:34:30Z  
+**Commit**: `99b9fa9` (`chore: verify light mode ui polish, high-visibility tab bar, and sliding navigation`)
 
 ---
 
-## 2. Backend Test Suite Verification
-Executed `uv run pytest tests/`:
-- **Test Framework**: Pytest 9.1.1 on Python 3.14.6 (Darwin)
-- **Test Results**: **73 passed** in 32.58s
-- **Breakdown**:
-  - `tests/ml/test_analyzer.py`: 5 passed
-  - `tests/ml/test_api_semantic.py`: 2 passed
-  - `tests/ml/test_build_centroids.py`: 20 passed
-  - `tests/ml/test_canonical_predictions.py`: 8 passed
-  - `tests/ml/test_centroids.py`: 4 passed
-  - `tests/ml/test_embeddings.py`: 3 passed
-  - `tests/ml/test_semantic_adapter.py`: 1 passed
-  - `tests/ml/test_semantic_match.py`: 11 passed
-  - `tests/ml/test_similarity.py`: 7 passed
-  - `tests/pipeline/test_disambiguation.py`: 7 passed
-  - `tests/pipeline/test_taxonomy.py`: 5 passed
+## 1. Executive Summary
+
+Task 5 has successfully verified the end-to-end build, test suite integrity, and visual/interactive performance of KishoLens across light and dark themes. Automated visual testing using `agent-browser` confirmed proper navigation bar visibility, seamless active tab pill transitions between `/`, `/analyze`, and `/library`, robust chart rendering (Archetype Radar, Kishōtenketsu Sentiment Arc, Rhythmic Pacing, Similar Works Doppelgängers), and dynamic library exploration.
 
 ---
 
-## 3. End-to-End Browser Audit via `agent-browser`
+## 2. Verification Results
 
-### A. Landing Page (`http://localhost:4321/`)
-| Check | Viewport | Mode | Result | Notes |
-|---|---|---|---|---|
-| **Theme Toggle** | Desktop (1280x800) | Light &rarr; Dark | Pass | `bg: rgb(7, 9, 15)`, `text: rgb(232, 234, 240)` |
-| **Theme Toggle** | Desktop (1280x800) | Dark &rarr; Light | Pass | `bg: rgb(248, 250, 252)`, `text: rgb(15, 23, 42)` (WCAG AAA Contrast > 15:1) |
-| **Layout & Scroll** | Mobile (375x667) | Light | Pass | `scrollWidth: 375`, `hasHorizontalOverflow: false` |
-| **Hero & CTAs** | Mobile (375x667) | Light | Pass | Hero title, "Analyze Prose &rarr;", "Explore Library Database", "Open Full Breakdown" all fully visible |
-| **Prose Reader Tabs**| Mobile (375x667) | Light | Pass | Interactive switching between Mystery, Fantasy, and Isekai previews smoothly renders dynamic excerpts |
+### A. Frontend Static Build
+- **Command**: `cd frontend && npm run build`
+- **Result**: **0 errors, 0 warnings**
+- **Artifacts**: 3 static routes generated in 159ms:
+  - `/index.html` (Homepage + live prose widget)
+  - `/analyze/index.html` (Prose analyzer workspace)
+  - `/library/index.html` (Library & database explorer)
 
-### B. Analyze Page (`http://localhost:4321/analyze`)
-| Check | Viewport | Mode | Result | Notes |
-|---|---|---|---|---|
-| **Sample Passage Analysis** | Desktop (1280x800) | Light | Pass | Selected "Classic Mystery", submitted & received full ML inference |
-| **8D Radar Canvas** | Desktop & Mobile | Light & Dark | Pass | Renders 480x480 canvas, dynamically switches axis spoke fills, strokes, and polygon colors |
-| **Kishōtenketsu Sentiment Arc** | Desktop & Mobile | Light & Dark | Pass | 33 SVG child nodes, 8 act anchor dots, dynamic spline stroke (`#7c3aed` light vs `#a78bfa` dark) |
-| **Rhythmic Pacing Barcode** | Desktop & Mobile | Light & Dark | Pass | 26 user sentence bars (`#0284c7`) vs 50 baseline bars |
-| **3-Pillar Taxonomy Badges** | Desktop & Mobile | Light & Dark | Pass | Displays World Setting (Mystery 95%), Narrative Plot (Action/Adventure 77%), Inciting Catalyst |
-| **17-Genre Ranked Drawer** | Desktop & Mobile | Light & Dark | Pass | `#toggleAllGenresBtn` opens smooth animated drawer with all 17 ranked genres |
-| **Doppelgänger Cards** | Desktop & Mobile | Light & Dark | Pass | 5 matching novels loaded (*The Adventures of Sherlock Holmes*, etc.) |
-| **Dynamic Theme Adaptation** | Desktop & Mobile | Instant Flip | Pass | Theme toggle triggers `themechange` event & re-draws canvas/SVG charts without page reload |
-| **Mobile Responsiveness** | Mobile (375x667) | Light & Dark | Pass | `scrollWidth: 375`, `hasHorizontalOverflow: false`, radar/arc/barcode width `317px` fit container |
-
-### C. Library Page (`http://localhost:4321/library`)
-| Check | Viewport | Mode | Result | Notes |
-|---|---|---|---|---|
-| **Novel Selection & Search** | Desktop (1280x800) | Light | Pass | Selected novel ID 1 (*Noble Reincarnation*), loaded from 10,320 novel database |
-| **Visualizations** | Desktop & Mobile | Light & Dark | Pass | 8D radar canvas, 8-dot sentiment arc, 100 user pacing bars vs 40 baseline bars |
-| **Taxonomy & Archetypes** | Desktop & Mobile | Light & Dark | Pass | Isekai & Regression 95%, World Setting Isekai 99%, Narrative Plot Romance 85% |
-| **Doppelgänger Cards** | Desktop & Mobile | Light & Dark | Pass | 5 style matches (*At the Northern Fort*, *I Got a New Skill*, *Allrounders!!*, etc.) |
-| **Mobile Responsiveness** | Mobile (375x667) | Light & Dark | Pass | `scrollWidth: 375`, `hasHorizontalOverflow: false`, cards and charts scale to `317px` |
-
-### D. LocalStorage Persistence
-- **Reload Persistence**: Switched theme to `dark` on `/library`, reloaded page &rarr; immediately loaded with `data-theme="dark"` and `bg: rgb(7, 9, 15)`.
-- **Cross-Route Navigation**:
-  - Navigated from `/library` &rarr; `/` (Landing) &rarr; remained `dark`.
-  - Navigated from `/` &rarr; `/analyze` &rarr; remained `dark`.
-  - Toggled to `light` on `/analyze`, reloaded &rarr; remained `light` (`bg: rgb(248, 250, 252)`).
-  - Navigated to `/` &rarr; remained `light`.
+### B. Backend Pytest Suite
+- **Command**: `uv run pytest tests/`
+- **Result**: **73 / 73 tests passed** (100% pass rate) in 33.31s
+  - `tests/ml/test_analyzer.py` (5 passed)
+  - `tests/ml/test_api_semantic.py` (2 passed)
+  - `tests/ml/test_build_centroids.py` (20 passed)
+  - `tests/ml/test_canonical_predictions.py` (8 passed)
+  - `tests/ml/test_centroids.py` (4 passed)
+  - `tests/ml/test_embeddings.py` (3 passed)
+  - `tests/ml/test_semantic_adapter.py` (1 passed)
+  - `tests/ml/test_semantic_match.py` (11 passed)
+  - `tests/ml/test_similarity.py` (7 passed)
+  - `tests/pipeline/test_disambiguation.py` (7 passed)
+  - `tests/pipeline/test_taxonomy.py` (5 passed)
 
 ---
 
-## 4. Verification Verdict
-- **Frontend Quality**: 100% Pass (0 console errors, 0 build failures)
-- **Backend Quality**: 100% Pass (73/73 tests passing)
-- **Responsive Design**: 100% Pass across Desktop (1280px), Tablet, and Mobile (375px) viewports
-- **Theme Adaptability**: 100% Pass with reactive instant re-renders and persistent state
+## 3. Visual & Interactive Verification with `agent-browser`
+
+### 1. Light Mode Navigation Header & Sliding Pill Capsule
+- Tested header tab bar across `/`, `/analyze`, and `/library` in Light Mode (`data-theme="light"`).
+- Verified high-visibility segmented container (`background: #f1f5f9`, border `#cbd5e1`) with crisp dark text for inactive items and vibrant purple capsule (`background: #4f46e5`, color `#ffffff`) for the active tab.
+- Observed smooth tab selection changes between `/analyze` and `/library` without layout shifts or flashes.
+
+### 2. Interactive Analysis on `/analyze`
+- Loaded sample prose ("Classic Mystery" — *The Adventure of the Cyanide Decanter*).
+- Submitted analysis against backend API (`POST /api/analyze`).
+- Verified complete rendering of:
+  - **Metrics Dashboard**: Word count (155), Lexical Richness (0.74), Dialogue Ratio (47.7%), Syntactic Depth (4.57), Sentence metrics with benchmark comparison pills.
+  - **Archetype Radar**: 8-dimension polygon chart with baseline comparison overlay (`Web Novel` vs `Classic Lit`).
+  - **Kishōtenketsu Sentiment Arc**: Multi-act emotional polarity curve (*Ki*, *Shō*, *Ten*, *Ketsu*).
+  - **Rhythmic Pacing**: Paragraph density heatmap comparisons.
+  - **Similar Works (Doppelgängers)**: Ranked matches (*The Adventures of Sherlock Holmes* 79% style match) with 5-factor breakdown bars.
+
+### 3. Interactive Database & Prose Explorer on `/library`
+- Verified database overview displaying **10,320 indexed novels** (6,853 Web Novels / 3,467 Classic Lit).
+- Tested territory tab switching (`Classic Literature Territory` filtered to 3,467 works; `Web Novel Territory` filtered to 6,853 works).
+- Selected *Pride and Prejudice* by Jane Austen to trigger stylistic DNA extraction.
+- Verified live rendering of *Pride and Prejudice Metrics* panel and archetype radar/pacing graphs.
+
+---
+
+## 4. Minor Fixes Applied During Testing
+
+- **`frontend/src/pages/analyze.astro`**: Resolved element scoping in `renderResults(data)` by ensuring `loadingState` and `resultsContainer` are obtained safely via `document.getElementById` to prevent runtime `ReferenceError`.
+
+---
+
+## 5. Status & Next Steps
+
+All verification tasks are **100% complete and validated**. The repository is ready for production deployment.

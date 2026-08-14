@@ -1,72 +1,60 @@
-# Task 4 Report: Library Explorer Light Mode & Dynamic Visualizations (`library.astro`)
+# Task 4 Implementation Report: Light Mode Card Elevation, Surface Tokens & Visual Hierarchy
 
-## Summary
-- **Target**: `frontend/src/pages/library.astro`
-- **Status**: Completed (Passes Astro build cleanly with 0 errors)
-- **Commit**: `577753a` (`feat(library): refine library explorer, skeleton states, and charts for light mode`)
-
----
-
-## Key Implementations
-
-### 1. Dynamic Reactive Canvas & SVG Chart Theming
-- **Radar Chart (`drawRadar`)**:
-  - Dynamically checks `const isLight = document.documentElement.getAttribute("data-theme") === "light";`.
-  - Spoke rings: alternating fill `isLight ? "rgba(241, 245, 249, 0.6)" : "rgba(255, 255, 255, 0.015)"`, stroke `isLight ? "rgba(15, 23, 42, 0.10)" : "rgba(255, 255, 255, 0.10)"`.
-  - Spoke axis lines: `isLight ? (isHovered ? "rgba(15, 23, 42, 0.40)" : "rgba(15, 23, 42, 0.15)") : (isHovered ? "rgba(255, 255, 255, 0.38)" : "rgba(255, 255, 255, 0.15)")`.
-  - Axis labels: `isLight ? (isHovered ? "#0284c7" : "#334155") : (isHovered ? "#7dd3fc" : "#cbd5e1")`.
-  - Percentage labels: `isLight ? "rgba(15, 23, 42, 0.45)" : "rgba(255, 255, 255, 0.18)"`.
-  - Polygons & Dot Accents: Adaptive stroke (`#0284c7` user, `#7c3aed`/`#d97706` baseline), fill opacities, and light theme white dot borders.
-
-- **Kishōtenketsu Sentiment Arc (`drawArc`)**:
-  - Dynamically checks `isLight`.
-  - Spline stroke: User curve `#0284c7` (light) vs `#7dd3fc` (dark); Web novel `#7c3aed` vs `#a78bfa`; Classic lit `#d97706` vs `#fbbf24`.
-  - Gradients: Minimum opacity `0.35` in light mode for crystal-clear readability.
-  - Zero baseline: `stroke="${isLight ? '#94a3b8' : 'rgba(255, 255, 255, 0.3)'}"`.
-  - Grid lines & ticks: `stroke="${isLight ? 'rgba(15, 23, 42, 0.08)' : 'rgba(255, 255, 255, 0.055)'}"` and `stroke="${isLight ? '#e2e8f0' : 'rgba(255, 255, 255, 0.07)'}"`.
-  - Act text labels: `fill="${isLight ? '#64748b' : 'rgba(255, 255, 255, 0.45)'}"`.
-  - Hover guide & tooltips: Crisp slate contrast on translucent white background.
-
-- **Rhythmic Pacing Barcode (`drawPacing` / `renderBarcode`)**:
-  - Container background: `isLight ? "rgba(241, 245, 249, 0.8)" : "rgba(0, 0, 0, 0.25)"`.
-  - Container border: `isLight ? "rgba(15, 23, 42, 0.08)" : "rgba(255, 255, 255, 0.06)"`.
-  - Adaptive bar colors: `#0284c7` (user), `#7c3aed` (web novel), `#d97706` (classic lit).
-  - Pacing labels update with high-contrast text `#475569`.
-
-- **Doppelgänger / Similar Works Renderer (`renderSimilarNovels`)**:
-  - Light mode similarity score color tiering (`#0284c7`, `#6366f1`, `#64748b`).
-  - Factor breakdown bars background `#e2e8f0` and fill `#0284c7` / `#94a3b8`.
-
-### 2. Reactive Theme-Change Re-rendering
-- Listens to `window.addEventListener("themechange", () => { ... })`.
-- Re-executes `renderAll()` and `renderSimilarNovels(currentStats.top_matches)` immediately when switching light/dark theme.
-
-### 3. Light Mode CSS System & Component Styling
-- **Search & Territory Selector**:
-  - `#novel-search-input` with `#f8fafc` background, `#cbd5e1` border, `#0f172a` text, and `#0284c7` focus ring.
-  - `.territory-tabs` track `#f1f5f9` with active `.t-tab` `#ffffff` card shadow.
-- **Prose Genre Checkboxes & Tips**:
-  - `.tip-badge.tip-include` and `.tip-badge.tip-exclude` light theme backgrounds and badges.
-  - `.btn-reset-filters` light theme background and hover states.
-  - `.genre-checkbox-item` light theme styling with clear included (blue) and excluded (red) states.
-- **Ingested Novel Cards**:
-  - `.card-novel` with `#f8fafc` background, `#0f172a` title, `#64748b` meta, and `#0284c7` active ring.
-- **Skeleton Loading & Multi-Stage Progress**:
-  - `.skeleton-card` & `.skeleton-chart-frame` with `#f8fafc` surface and `#e2e8f0` border.
-  - `.skeleton-shimmer` light-mode gradient shimmer.
-  - `.skeleton-stage-pill` `#f1f5f9` pill with dark slate text.
-- **Dashboard Metrics & Taxonomy**:
-  - 2x2 metric hero summary grid with light gradient surface.
-  - Category tabs track `#f1f5f9` and metric cards `#f8fafc`.
-  - 3-pillar taxonomy cards (inciting catalyst, world setting, narrative plot) with light mode cards.
-  - 17-genre expandable drawer with `#e2e8f0` tracks.
-- **Database Overview & KPI Tiles**:
-  - Database overview card `#ffffff` with light mode KPI tiles (`#f8fafc`) and source chips (`#f1f5f9`).
-- **Controls Bar & Baselines**:
-  - Controls bar `#ffffff` with light borders and `#0284c7` active baseline buttons.
+**Date**: 2026-08-13  
+**Status**: DONE  
+**Commit**: `bcb388d feat(ui): elevate card surfaces, pillar cards, and visualizer containers in light mode`
 
 ---
 
-## Verification
-- `cd frontend && npm run build` &rarr; 3 static routes generated cleanly in 134ms with 0 errors.
-- Git commit created on master: `577753a`.
+## 1. Overview & Objectives
+
+Task 4 focused on elevating card surfaces, container boundaries, tactile borders, pillar cards, and visualizer frames across the entire website in Light Mode. The goal was to eliminate dull/flat containers by applying crisp contrast, subtle multi-stop drop shadows, and clean visual hierarchy across all core views.
+
+---
+
+## 2. Changes Made
+
+### A. Global Design Tokens & Card Elevation (`frontend/src/styles/global.css`)
+- **Light Theme Shadow Tokens**:
+  - `--card-shadow`: `0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04)`
+  - `--card-shadow-hover`: `0 10px 30px -4px rgba(15, 23, 42, 0.1), 0 4px 10px -2px rgba(15, 23, 42, 0.05)`
+- **Universal Elevated Card Overrides**:
+  - Elevated surfaces for `.card`, `.explorer-card`, `.chart-card`, `.doppelganger-card`, `.db-stats-card`, and `.excerpt-card` with crisp `#ffffff` background, `1px solid #e2e8f0` border, and `var(--card-shadow)`.
+  - Interactive hover elevation for `.card:hover`, `.explorer-card:hover`, `.chart-card:hover`, and `.doppelganger-card:hover` with border `#cbd5e1` and `var(--card-shadow-hover)`.
+- **Pillar Card Elevation**:
+  - Elevated `.pillar-card` with `#ffffff` background, `1px solid #cbd5e1`, and `0 1px 3px rgba(15, 23, 42, 0.04)` shadow.
+  - Hover state with `#94a3b8` border and `0 4px 12px rgba(15, 23, 42, 0.08)` shadow.
+
+### B. Landing Page Harmonization (`frontend/src/pages/index.astro`)
+- Updated `.sample-reader` and `.excerpt-card` to cleanly inherit the `#ffffff` elevated card surface, `#e2e8f0` border, and `var(--card-shadow)` token in light mode.
+
+### C. Analyzer Page Harmonization (`frontend/src/pages/analyze.astro`)
+- Replaced scoped card styles for `.card`, `.chart-card`, and `.pillar-card` with the elevated tokens, eliminating old dull/greyish background overrides (`rgba(0, 0, 0, 0.02)`).
+
+### D. Library Page Harmonization (`frontend/src/pages/library.astro`)
+- Harmonized `.card`, `.explorer-card`, `.chart-card`, `.doppelganger-card`, `.db-stats-card`, and `.pillar-card` to use unified light mode surface tokens and hover states.
+
+---
+
+## 3. Verification & Build Results
+
+Ran production build check:
+```bash
+cd frontend && npm run build
+```
+
+**Result**:
+- Complete static build succeeded with 0 errors:
+  - `/analyze/index.html`
+  - `/library/index.html`
+  - `/index.html`
+- Total build time: ~167ms.
+
+---
+
+## 4. Summary of Files Changed & Committed
+
+1. `frontend/src/styles/global.css`
+2. `frontend/src/pages/index.astro`
+3. `frontend/src/pages/analyze.astro`
+4. `frontend/src/pages/library.astro`
