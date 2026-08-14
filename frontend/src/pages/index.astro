@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { ClientRouter } from 'astro:transitions';
 
 const INITIAL_MYSTERY_TEXT = `The rain beat against the fog-stained windowpanes of 221B Baker Street as Inspector Lestrade threw open the heavy oak door. His coat was drenched, and his eyes burned with anxiety. "Holmes, you must come at once," he gasped, resting his hands upon the polished mahogany table. "Lord Harrington lies motionless in his study, the doors locked from within and a shattered crystal decanter resting beside his chair."
 
@@ -35,6 +36,7 @@ Sherlock Holmes did not rise immediately. He slowly lowered his pipe, allowing a
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
+    <ClientRouter />
   </head>
   <body>
     <div class="hero__glow" aria-hidden="true"></div>

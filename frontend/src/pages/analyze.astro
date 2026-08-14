@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { ClientRouter } from 'astro:transitions';
 ---
 
 <html lang="en">
@@ -1593,6 +1594,7 @@ import "../styles/global.css";
         border-bottom: 1px solid rgba(0, 0, 0, 0.08);
       }
     </style>
+    <ClientRouter />
   </head>
   <body>
     <div class="hero__glow" aria-hidden="true"></div>

@@ -302,12 +302,25 @@ header.site-header {
   background: rgba(124, 106, 255, 0.25) !important;
   border-color: rgba(124, 106, 255, 0.4) !important;
   font-weight: 600;
+  view-transition-name: active-nav-pill;
 }
 
 [data-theme="light"] .site-nav a.active {
   color: #ffffff !important;
   background: var(--color-accent) !important;
   border-color: var(--color-accent) !important;
+}
+
+/* ─── Astro View Transitions & Shared Nav Indicator ─────────────────── */
+::view-transition-group(active-nav-pill) {
+  animation-duration: 0.3s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.22s;
+  animation-timing-function: ease-in-out;
 }
 
 .nav-text-short {
