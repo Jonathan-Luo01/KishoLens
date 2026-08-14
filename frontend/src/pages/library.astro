@@ -679,12 +679,16 @@ import { ClientRouter } from 'astro:transitions';
       }
 
       /* Scrollbar styling */
-      .novel-list::-webkit-scrollbar {
+      .novel-list::-webkit-scrollbar, .stats-content-scroll::-webkit-scrollbar {
         width: 6px;
       }
-      .novel-list::-webkit-scrollbar-thumb {
+      .novel-list::-webkit-scrollbar-thumb, .stats-content-scroll::-webkit-scrollbar-thumb {
         background: rgba(255, 255, 255, 0.12);
         border-radius: 4px;
+      }
+      :global([data-theme="light"]) .novel-list::-webkit-scrollbar-thumb,
+      :global([data-theme="light"]) .stats-content-scroll::-webkit-scrollbar-thumb {
+        background: rgba(203, 213, 225, 0.85);
       }
 
       /* Stats panel styling */
@@ -695,8 +699,9 @@ import { ClientRouter } from 'astro:transitions';
       }
 
       .stats-content-scroll {
-        /* No inner scroll — content flows into page scroll */
-        overflow: visible;
+        max-height: 520px;
+        overflow-y: auto;
+        padding-right: 0.35rem;
       }
 
       .stat-grid {
