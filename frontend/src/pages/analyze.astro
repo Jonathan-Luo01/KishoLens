@@ -703,16 +703,16 @@ import { ClientRouter } from 'astro:transitions';
       }
 
       :global(.doppelganger-progress-bg) {
-        width: 80px;
-        height: 4px;
+        width: 70px;
+        height: 6px;
         background: #1e293b;
-        border-radius: 2px;
+        border-radius: 3px;
         overflow: hidden;
       }
 
       :global(.doppelganger-progress-fill) {
         height: 100%;
-        border-radius: 2px;
+        border-radius: 3px;
         transition: width 0.4s ease-out;
       }
 
@@ -730,22 +730,23 @@ import { ClientRouter } from 'astro:transitions';
       }
 
       :global(.doppelganger-factor-label) {
-        font-size: 8px;
-        color: #64748b;
-        font-weight: 600;
+        font-size: 9px;
+        color: #94a3b8;
+        font-weight: 700;
+        letter-spacing: 0.02em;
       }
 
       :global(.doppelganger-factor-bar-bg) {
-        width: 16px;
-        height: 2px;
+        width: 20px;
+        height: 4px;
         background: #1e293b;
-        border-radius: 1px;
+        border-radius: 2px;
         overflow: hidden;
       }
 
       :global(.doppelganger-factor-bar-fill) {
         height: 100%;
-        border-radius: 1px;
+        border-radius: 2px;
       }
 
       @media (max-width: 600px) {
@@ -1572,16 +1573,21 @@ import { ClientRouter } from 'astro:transitions';
       }
 
       :global([data-theme="light"]) .doppelganger-progress-bg {
-        background: rgba(0, 0, 0, 0.06);
+        background: #cbd5e1;
+        height: 6px;
+        border-radius: 3px;
       }
 
       :global([data-theme="light"]) .doppelganger-factor-label {
-        color: #64748b;
+        color: #334155;
+        font-weight: 700;
       }
 
       :global([data-theme="light"]) .doppelganger-factor-bar-bg {
-        background: rgba(0, 0, 0, 0.08);
-      }nd: rgba(0, 0, 0, 0.08);
+        background: #cbd5e1;
+        height: 4px;
+        width: 20px;
+        border-radius: 2px;
       }
 
       /* Tooltips */
@@ -2878,7 +2884,7 @@ import { ClientRouter } from 'astro:transitions';
           const bar = document.createElement("div");
           bar.style.flex = "1";
           bar.style.backgroundColor = color;
-          bar.style.opacity = Math.max(0.18, intensity);
+          bar.style.opacity = Math.max(isLight ? 0.45 : 0.20, intensity);
           bar.style.borderRadius = "2px";
           bar.style.transition = "all 0.3s ease";
           bar.title = `${val} words/characters`;
@@ -2929,7 +2935,12 @@ import { ClientRouter } from 'astro:transitions';
             </div>
 
             <div class="doppelganger-right">
-              <span class="doppelganger-score" style="color: ${scoreColor}">${pct}%</span>
+              <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
+                <span class="doppelganger-score" style="color: ${scoreColor}">${pct}%</span>
+                <div class="doppelganger-progress-bg">
+                  <div class="doppelganger-progress-fill" style="width: ${pct}%; background-color: ${scoreColor}"></div>
+                </div>
+              </div>
               ${m.breakdown ? `
                 <div class="doppelganger-breakdown">
                   ${[
@@ -2940,7 +2951,7 @@ import { ClientRouter } from 'astro:transitions';
                     { label: 'SEM', name: 'Semantic', val: m.breakdown.semantic }
                   ].map(f => {
                     const fPct = Math.round((f.val || 0) * 100);
-                    const fColor = f.val > 0.8 ? (isLight ? '#0284c7' : '#22d3ee') : '#64748b';
+                    const fColor = f.val > 0.8 ? (isLight ? '#0284c7' : '#38bdf8') : (isLight ? '#64748b' : '#94a3b8');
                     return `
                       <div class="doppelganger-factor" title="${f.name}: ${fPct}%">
                         <span class="doppelganger-factor-label">${f.label}</span>
@@ -2951,11 +2962,7 @@ import { ClientRouter } from 'astro:transitions';
                     `;
                   }).join('')}
                 </div>
-              ` : `
-                <div class="doppelganger-progress-bg">
-                  <div class="doppelganger-progress-fill" style="width: ${pct}%; background-color: ${scoreColor}"></div>
-                </div>
-              `}
+              ` : ''}
             </div>
           `;
           container.appendChild(item);
