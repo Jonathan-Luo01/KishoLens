@@ -2,9 +2,7 @@
 import "../styles/global.css";
 import { ClientRouter } from 'astro:transitions';
 
-const INITIAL_MYSTERY_TEXT = `The rain beat against the fog-stained windowpanes of 221B Baker Street as Inspector Lestrade threw open the heavy oak door. His coat was drenched, and his eyes burned with anxiety. "Holmes, you must come at once," he gasped, resting his hands upon the polished mahogany table. "Lord Harrington lies motionless in his study, the doors locked from within and a shattered crystal decanter resting beside his chair."
-
-Sherlock Holmes did not rise immediately. He slowly lowered his pipe, allowing a dense ring of blue smoke to curl toward the ceiling before adjusting his magnifying lens. "A locked room, Lestrade? How delightfully elementary. And tell me, did you observe the faint scent of bitter almonds clinging to the victim's lips?" Lestrade blinked in astonishment. "Why, yes, Holmes—how could you possibly know?" Holmes turned to me with a faint smile. "A classic case of cyanide poisoning, Watson. Pack your bag; the hunt is afoot."`;
+const INITIAL_MYSTERY_TEXT = `The autumn rain lashed against the fog-stained windowpanes of 221B Baker Street as Inspector Lestrade threw open the heavy oak door. His greatcoat was drenched, and his eyes burned with feverish urgency. "Holmes, you must come at once," he gasped, steadying himself against the polished mahogany table. "Lord Harrington lies motionless in his locked study, with a shattered crystal decanter resting beside his chair."\n\nSherlock Holmes did not rise immediately. He slowly set down his briar pipe, watching a slender ring of blue smoke drift toward the ceiling before adjusting his magnifying glass. "A locked room, Lestrade? How delightfully elementary. Tell me, did you detect the faint scent of bitter almonds upon the victim's lips?" Lestrade blinked in astonishment. "Why, yes, Holmes—how could you possibly know?" Holmes turned to me with a calm, razor-thin smile. "A classic case of cyanide poisoning, Watson. Pack your bag; the game is afoot."`;
 ---
 
 <html lang="en">
@@ -98,7 +96,6 @@ Sherlock Holmes did not rise immediately. He slowly lowered his pipe, allowing a
           <div class="excerpt-box excerpt-card">
             <p id="excerpt-text" class="excerpt-content">{INITIAL_MYSTERY_TEXT}</p>
           </div>
-
           <!-- Live Metrics Bar -->
           <div class="reader-metrics">
             <div class="metric-pill">
@@ -108,9 +105,9 @@ Sherlock Holmes did not rise immediately. He slowly lowered his pipe, allowing a
             <div class="metric-pill">
               <span class="pill-lbl">Dialogue</span>
               <div class="pill-bar-row">
-                <span id="metric-dialogue" class="pill-val color-cyan">39%</span>
+                <span id="metric-dialogue" class="pill-val color-cyan">35%</span>
                 <div class="mini-bar-track">
-                  <div id="metric-dialogue-bar" class="mini-bar mini-bar-cyan" style="width: 39%"></div>
+                  <div id="metric-dialogue-bar" class="mini-bar mini-bar-cyan" style="width: 35%"></div>
                 </div>
               </div>
             </div>
@@ -119,7 +116,7 @@ Sherlock Holmes did not rise immediately. He slowly lowered his pipe, allowing a
               <div class="pill-bar-row">
                 <span id="metric-ttr" class="pill-val color-emerald">High</span>
                 <div class="mini-bar-track">
-                  <div id="metric-ttr-bar" class="mini-bar mini-bar-emerald" style="width: 74%"></div>
+                  <div id="metric-ttr-bar" class="mini-bar mini-bar-emerald" style="width: 77%"></div>
                 </div>
               </div>
             </div>
@@ -131,7 +128,7 @@ Sherlock Holmes did not rise immediately. He slowly lowered his pipe, allowing a
 
           <!-- Reader Action Link to Analyze Page -->
           <div class="reader-action-row">
-            <a id="btn-open-in-analyzer" href="/analyze?text=The%20rain%20beat%20against%20the%20fog-stained%20windowpanes%20of%20221B%20Baker%20Street%20as%20Inspector%20Lestrade%20threw%20open%20the%20heavy%20oak%20door.%20His%20coat%20was%20drenched%2C%20and%20his%20eyes%20burned%20with%20anxiety.%20%22Holmes%2C%20you%20must%20come%20at%20once%2C%22%20he%20gasped%2C%20resting%20his%20hands%20upon%20the%20polished%20mahogany%20table.%20%22Lord%20Harrington%20lies%20motionless%20in%20his%20study%2C%20the%20doors%20locked%20from%20within%20and%20a%20shattered%20crystal%20decanter%20resting%20beside%20his%20chair.%22%0A%0ASherlock%20Holmes%20did%20not%20rise%20immediately.%20He%20slowly%20lowered%20his%20pipe%2C%20allowing%20a%20dense%20ring%20of%20blue%20smoke%20to%20curl%20toward%20the%20ceiling%20before%20adjusting%20his%20magnifying%20lens.%20%22A%20locked%20room%2C%20Lestrade%3F%20How%20delightfully%20elementary.%20And%20tell%20me%2C%20did%20you%20observe%20the%20faint%20scent%20of%20bitter%20almonds%20clinging%20to%20the%20victim%27s%20lips%3F%22%20Lestrade%20blinked%20in%20astonishment.%20%22Why%2C%20yes%2C%20Holmes%E2%80%94how%20could%20you%20possibly%20know%3F%22%20Holmes%20turned%20to%20me%20with%20a%20faint%20smile.%20%22A%20classic%20case%20of%20cyanide%20poisoning%2C%20Watson.%20Pack%20your%20bag%3B%20the%20hunt%20is%20afoot.%22" class="btn btn-sm btn-accent">
+            <a id="btn-open-in-analyzer" href="/analyze?text=The%20autumn%20rain%20lashed%20against%20the%20fog-stained%20windowpanes%20of%20221B%20Baker%20Street%20as%20Inspector%20Lestrade%20threw%20open%20the%20heavy%20oak%20door.%20His%20greatcoat%20was%20drenched%2C%20and%20his%20eyes%20burned%20with%20feverish%20urgency.%20%22Holmes%2C%20you%20must%20come%20at%20once%2C%22%20he%20gasped%2C%20steadying%20himself%20against%20the%20polished%20mahogany%20table.%20%22Lord%20Harrington%20lies%20motionless%20in%20his%20locked%20study%2C%20with%20a%20shattered%20crystal%20decanter%20resting%20beside%20his%20chair.%22%0A%0ASherlock%20Holmes%20did%20not%20rise%20immediately.%20He%20slowly%20set%20down%20his%20briar%20pipe%2C%20watching%20a%20slender%20ring%20of%20blue%20smoke%20drift%20toward%20the%20ceiling%20before%20adjusting%20his%20magnifying%20glass.%20%22A%20locked%20room%2C%20Lestrade%3F%20How%20delightfully%20elementary.%20Tell%20me%2C%20did%20you%20detect%20the%20faint%20scent%20of%20bitter%20almonds%20upon%20the%20victim%27s%20lips%3F%22%20Lestrade%20blinked%20in%20astonishment.%20%22Why%2C%20yes%2C%20Holmes%E2%80%94how%20could%20you%20possibly%20know%3F%22%20Holmes%20turned%20to%20me%20with%20a%20calm%2C%20razor-thin%20smile.%20%22A%20classic%20case%20of%20cyanide%20poisoning%2C%20Watson.%20Pack%20your%20bag%3B%20the%20game%20is%20afoot.%22" class="btn btn-sm btn-accent">
               Open Full Breakdown in Analyzer &rarr;
             </a>
           </div>
@@ -208,36 +205,30 @@ Sherlock Holmes did not rise immediately. He slowly lowered his pipe, allowing a
     <script>
       const SAMPLES = {
         mystery: {
-          text: `The rain beat against the fog-stained windowpanes of 221B Baker Street as Inspector Lestrade threw open the heavy oak door. His coat was drenched, and his eyes burned with anxiety. "Holmes, you must come at once," he gasped, resting his hands upon the polished mahogany table. "Lord Harrington lies motionless in his study, the doors locked from within and a shattered crystal decanter resting beside his chair."
-
-Sherlock Holmes did not rise immediately. He slowly lowered his pipe, allowing a dense ring of blue smoke to curl toward the ceiling before adjusting his magnifying lens. "A locked room, Lestrade? How delightfully elementary. And tell me, did you observe the faint scent of bitter almonds clinging to the victim's lips?" Lestrade blinked in astonishment. "Why, yes, Holmes—how could you possibly know?" Holmes turned to me with a faint smile. "A classic case of cyanide poisoning, Watson. Pack your bag; the hunt is afoot."`,
+          text: `The autumn rain lashed against the fog-stained windowpanes of 221B Baker Street as Inspector Lestrade threw open the heavy oak door. His greatcoat was drenched, and his eyes burned with feverish urgency. "Holmes, you must come at once," he gasped, steadying himself against the polished mahogany table. "Lord Harrington lies motionless in his locked study, with a shattered crystal decanter resting beside his chair."\n\nSherlock Holmes did not rise immediately. He slowly set down his briar pipe, watching a slender ring of blue smoke drift toward the ceiling before adjusting his magnifying glass. "A locked room, Lestrade? How delightfully elementary. Tell me, did you detect the faint scent of bitter almonds upon the victim's lips?" Lestrade blinked in astonishment. "Why, yes, Holmes—how could you possibly know?" Holmes turned to me with a calm, razor-thin smile. "A classic case of cyanide poisoning, Watson. Pack your bag; the game is afoot."`,
           sentlen: "~11 words",
-          dialogue: "39%",
-          dialoguePct: 39,
+          dialogue: "35%",
+          dialoguePct: 35,
           ttr: "High",
-          ttrPct: 74,
+          ttrPct: 77,
           territory: "classic"
         },
         fantasy: {
-          text: `High atop the ancient obsidian spire of the Archmage, Leylin channeled his mana into the glowing crystal orb. Deep within the subterranean caverns of Eldoria, ancient runes began to flare with brilliant azure light. Arcane lightning erupted across the stormy sky as the sky-thundering dragon unleashed a roar that shook the foundations of the mortal realm.
-
-"Hold the warding barrier!" shouted High Templar Valerius, raising his runic broadsword against the descending shadow. The wind howled through the ruined ramparts, carrying the stench of ozone and scorched stone. Leylin closed his eyes, humming a forgotten incantation as the swirling vortex of raw magical energy converged upon his staff.`,
-          sentlen: "~15 words",
+          text: `High atop the obsidian spire of the Archmage, Leylin channeled raw mana into the glowing celestial orb. Deep within the subterranean vaults beneath the citadel, dormant runes flared with incandescent azure fire. Arcane lightning tore through the stormy firmament as the tempest dragon circled overhead, its deafening roar rattling the stone foundations of the valley.\n\n"Hold the warding barrier!" shouted High Templar Valerius, raising his enchanted broadsword against the descending shadow. Bitter wind howled across the ruined parapets, thick with the stench of ozone and scorched ash. Leylin closed his eyes, whispering an ancient incantation as the swirling vortex of arcane energy converged at the tip of his staff.`,
+          sentlen: "~16 words",
           dialogue: "4%",
           dialoguePct: 4,
           ttr: "High",
-          ttrPct: 76,
+          ttrPct: 77,
           territory: "web"
         },
         isekai: {
-          text: `Hit by Truck-kun while crossing the zebra zone after buying a limited-edition melon pan, Kazuma opened his eyes to find himself floating in an endless sea of brilliant azure light. Before he could process his untimely demise, a translucent holographic window materialized directly before his vision with a cheerful chime: [Reincarnated as Hero with Level 99 Divine Stats].
-
-"Wait, is this really happening?" Kazuma muttered, rubbing his eyes in disbelief as a glowing goddess in silver robes stepped forward from the ethereal fog. "Welcome, brave traveler from Earth. You have been chosen to overthrow the Demon King in the realm of Fantasia." A wide grin spread across Kazuma's face as he clicked [Accept Cheat Skills].`,
-          sentlen: "~17 words",
-          dialogue: "20%",
-          dialoguePct: 20,
+          text: `Blindsided by an out-of-control truck while crossing the street outside the convenience store, Ren opened his eyes to find himself floating in a boundless sea of starlight. Before he could grasp his untimely demise, a translucent holographic window chimed into existence before his eyes: [Hero Reincarnation Initialized: Level 99 Divine Blessing].\n\n"Wait, did I actually get isekai'd?" Ren muttered, blinking in disbelief as a celestial goddess draped in shimmering silk stepped out from the radiance. "Welcome, chosen soul from Earth. You have been summoned to save the realm of Astralis from the Demon Sovereign." A triumphant grin spread across Ren's face as his finger pressed [Accept Cheat Skills].`,
+          sentlen: "~16 words",
+          dialogue: "23%",
+          dialoguePct: 23,
           ttr: "Very High",
-          ttrPct: 80,
+          ttrPct: 79,
           territory: "web"
         }
       };
