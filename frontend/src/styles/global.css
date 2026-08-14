@@ -343,9 +343,15 @@ header.site-header,
 }
 
 ::view-transition-group(active-nav-pill) {
-  animation-duration: 0.22s;
+  animation-duration: 0.2s;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 1001;
+}
+
+::view-transition-old(active-nav-pill),
+::view-transition-new(active-nav-pill) {
+  animation-duration: 0.16s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 ::view-transition-old(root),
