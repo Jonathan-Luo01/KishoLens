@@ -1709,6 +1709,9 @@ import "../styles/global.css";
           -webkit-overflow-scrolling: touch !important;
           width: 100% !important;
         }
+        html[data-theme="light"] .territory-tabs {
+          background: rgba(0, 0, 0, 0.03) !important;
+        }
         .territory-tabs::-webkit-scrollbar {
           display: none !important;
         }
@@ -1736,6 +1739,447 @@ import "../styles/global.css";
         .explorer-card, .dashboard-card, .chart-card, .doppelganger-card, .card {
           padding: 1.25rem 1rem !important;
         }
+        :global(.metrics-hero) {
+          grid-template-columns: repeat(2, 1fr) !important;
+        }
+        html[data-theme="light"] :global(.doppelganger-right) {
+          border-top-color: rgba(0, 0, 0, 0.06);
+        }
+      }
+
+      /* =========================================================================
+         LIGHT MODE STYLES & OVERRIDES
+         ========================================================================= */
+      html[data-theme="light"] {
+        --color-bg-base: #f8fafc;
+        --color-bg-surface: #ffffff;
+        --color-bg-elevated: #f1f5f9;
+        --color-bg-card: #ffffff;
+        --color-text: #0f172a;
+        --color-muted: #64748b;
+        --color-border: #e2e8f0;
+        --color-border-subtle: #cbd5e1;
+        --color-primary: #0284c7;
+        --color-primary-hover: #0369a1;
+        --color-accent-1: #6366f1;
+        --color-accent-2: #0284c7;
+        --color-success: #059669;
+        --color-warning: #d97706;
+        --color-danger: #dc2626;
+      }
+
+      /* Global resets & typography for light mode */
+      html[data-theme="light"] body {
+        background-color: var(--color-bg-base);
+        color: var(--color-text);
+      }
+
+      html[data-theme="light"] .hero__glow {
+        background: radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.08) 0%, transparent 70%);
+      }
+
+      /* Header & Navigation */
+      html[data-theme="light"] .brand-title {
+        color: #0f172a;
+      }
+      html[data-theme="light"] .site-nav {
+        background: #f1f5f9;
+        border-color: #e2e8f0;
+      }
+      html[data-theme="light"] .site-nav a {
+        color: #64748b;
+      }
+      html[data-theme="light"] .site-nav a.active {
+        background: #ffffff;
+        color: #0284c7;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      }
+      html[data-theme="light"] .theme-toggle-btn {
+        background: #f1f5f9;
+        border-color: #e2e8f0;
+        color: #475569;
+      }
+      html[data-theme="light"] .theme-toggle-btn:hover {
+        background: #e2e8f0;
+        color: #0f172a;
+      }
+
+      /* Cards & Containers */
+      html[data-theme="light"] .card,
+      html[data-theme="light"] .explorer-card,
+      html[data-theme="light"] .chart-card,
+      html[data-theme="light"] .doppelganger-card,
+      html[data-theme="light"] .db-stats-card {
+        background: #ffffff;
+        border-color: #e2e8f0;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03);
+      }
+
+      /* Search & Filters */
+      html[data-theme="light"] .search-input-wrapper {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+      }
+      html[data-theme="light"] .search-input-wrapper:focus-within {
+        border-color: #0284c7;
+        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+      }
+      html[data-theme="light"] .search-input-wrapper svg {
+        color: #64748b;
+      }
+      html[data-theme="light"] #novel-search-input {
+        color: #0f172a;
+      }
+      html[data-theme="light"] #novel-search-input::placeholder {
+        color: #94a3b8;
+      }
+
+      /* Territory Tabs */
+      html[data-theme="light"] .territory-tabs {
+        background: #f1f5f9;
+        border-color: #e2e8f0;
+      }
+      html[data-theme="light"] .t-tab {
+        color: #64748b;
+      }
+      html[data-theme="light"] .t-tab:hover {
+        color: #0f172a;
+      }
+      html[data-theme="light"] .t-tab.active {
+        background: #ffffff;
+        color: #0284c7;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      }
+      html[data-theme="light"] .territory-desc-card {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+        color: #64748b;
+      }
+
+      /* Genre Checkboxes & Tips */
+      html[data-theme="light"] .explorer-section-title {
+        color: #475569;
+        border-bottom-color: #e2e8f0;
+      }
+      html[data-theme="light"] .tip-badge.tip-include {
+        background: rgba(2, 132, 199, 0.08);
+        border-color: rgba(2, 132, 199, 0.25);
+        color: #0284c7;
+      }
+      html[data-theme="light"] .tip-badge.tip-exclude {
+        background: rgba(220, 38, 38, 0.08);
+        border-color: rgba(220, 38, 38, 0.25);
+        color: #dc2626;
+      }
+      html[data-theme="light"] .btn-reset-filters {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #64748b;
+      }
+      html[data-theme="light"] .btn-reset-filters:hover {
+        background: #e2e8f0;
+        color: #0f172a;
+      }
+      html[data-theme="light"] .genre-checkbox-item {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+        color: #334155;
+      }
+      html[data-theme="light"] .genre-checkbox-item:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #0f172a;
+      }
+      html[data-theme="light"] .genre-checkbox-item.included {
+        background: rgba(2, 132, 199, 0.08);
+        border-color: #0284c7;
+        color: #0284c7;
+      }
+      html[data-theme="light"] .genre-checkbox-item.excluded {
+        background: rgba(220, 38, 38, 0.08);
+        border-color: #dc2626;
+        color: #dc2626;
+      }
+
+      /* Ingested Novel List */
+      html[data-theme="light"] .card-novel {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+      }
+      html[data-theme="light"] .card-novel:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+      }
+      html[data-theme="light"] .card-novel.active {
+        background: #ffffff;
+        border-color: #0284c7;
+        box-shadow: 0 0 0 1px #0284c7, 0 2px 8px rgba(2, 132, 199, 0.12);
+      }
+      html[data-theme="light"] .card-novel .card__title {
+        color: #0f172a;
+      }
+      html[data-theme="light"] .card-novel .card__meta {
+        color: #64748b;
+      }
+      html[data-theme="light"] .count-badge {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #475569;
+      }
+
+      /* Forms & Controls */
+      html[data-theme="light"] .form-group label {
+        color: #475569;
+      }
+      html[data-theme="light"] .form-group input,
+      html[data-theme="light"] .form-group select,
+      html[data-theme="light"] select#novelSelect {
+        background: #ffffff;
+        border-color: #cbd5e1;
+        color: #0f172a;
+      }
+      html[data-theme="light"] .controls-bar {
+        background: #ffffff;
+        border-color: #e2e8f0;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+      }
+      html[data-theme="light"] .selector-group label,
+      html[data-theme="light"] .baseline-group span {
+        color: #475569;
+      }
+      html[data-theme="light"] .baseline-btn {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #475569;
+      }
+      html[data-theme="light"] .baseline-btn:hover {
+        background: #e2e8f0;
+        color: #0f172a;
+      }
+      html[data-theme="light"] .baseline-btn.active {
+        background: #0284c7;
+        border-color: #0284c7;
+        color: #ffffff;
+      }
+
+      /* DB Stats Overview */
+      html[data-theme="light"] .db-stats-card h3 {
+        color: #0f172a !important;
+      }
+      html[data-theme="light"] .db-kpi-tile {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+      }
+      html[data-theme="light"] .db-kpi-val {
+        color: #0f172a;
+      }
+      html[data-theme="light"] .db-kpi-lbl {
+        color: #64748b;
+      }
+      html[data-theme="light"] .db-source-chip {
+        background: #f1f5f9;
+        border-color: #e2e8f0;
+        color: #334155;
+      }
+      html[data-theme="light"] .db-genre-chip {
+        background: #f1f5f9;
+        border-color: #e2e8f0;
+        color: #334155;
+      }
+      html[data-theme="light"] .db-genre-count {
+        background: #e2e8f0;
+        color: #475569;
+      }
+
+      /* Dynamic Enhanced Metrics Dashboard (:global) */
+      html[data-theme="light"] :global(.metrics-hero) {
+        background: linear-gradient(135deg, rgba(2, 132, 199, 0.04) 0%, rgba(99, 102, 241, 0.04) 100%);
+        border-color: #e2e8f0;
+      }
+      html[data-theme="light"] :global(.hero-chip) {
+        background: #ffffff;
+        border-color: #e2e8f0;
+      }
+      html[data-theme="light"] :global(.hero-chip-val) {
+        color: #0f172a;
+      }
+      html[data-theme="light"] :global(.hero-chip-lbl) {
+        color: #64748b;
+      }
+      html[data-theme="light"] :global(.category-tabs-track) {
+        background: #f1f5f9;
+        border-color: #e2e8f0;
+      }
+      html[data-theme="light"] :global(.category-tab) {
+        color: #64748b;
+      }
+      html[data-theme="light"] :global(.category-tab:hover) {
+        color: #0f172a;
+      }
+      html[data-theme="light"] :global(.category-tab.active) {
+        background: #ffffff;
+        color: #0284c7;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      }
+      html[data-theme="light"] :global(.metric-card) {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+      }
+      html[data-theme="light"] :global(.metric-card:hover) {
+        background: #ffffff;
+        border-color: #cbd5e1;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      }
+      html[data-theme="light"] :global(.metric-card-label) {
+        color: #64748b;
+      }
+      html[data-theme="light"] :global(.metric-card-value) {
+        color: #0f172a;
+      }
+      html[data-theme="light"] :global(.category-section-title) {
+        color: #334155;
+      }
+      html[data-theme="light"] :global(.metric-tooltip-box) {
+        background: #0f172a;
+        color: #f8fafc;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+      }
+
+      /* 3-Pillar Taxonomy & 17 Genres Drawer */
+      html[data-theme="light"] .archetype-label {
+        color: #0284c7;
+      }
+      html[data-theme="light"] :global(.pillar-card) {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+      }
+      html[data-theme="light"] :global(.pillar-name) {
+        color: #0f172a;
+      }
+      html[data-theme="light"] :global(.pillar-score) {
+        color: #64748b;
+      }
+      html[data-theme="light"] :global(.affinities-title) {
+        color: #475569;
+      }
+      html[data-theme="light"] :global(.toggle-all-genres-btn) {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #475569;
+      }
+      html[data-theme="light"] :global(.toggle-all-genres-btn:hover) {
+        background: #e2e8f0;
+        color: #0f172a;
+      }
+      html[data-theme="light"] :global(.all-genres-drawer) {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+      }
+      html[data-theme="light"] :global(.genre-rank-name) {
+        color: #334155;
+      }
+      html[data-theme="light"] :global(.genre-rank-track) {
+        background: #e2e8f0;
+      }
+
+      /* Charts Cards & Tooltips */
+      html[data-theme="light"] .chart-title {
+        color: #0f172a;
+      }
+      html[data-theme="light"] .legend-item {
+        color: #64748b;
+      }
+      html[data-theme="light"] .legend-dot.user {
+        background: #0284c7;
+        box-shadow: 0 0 6px rgba(2, 132, 199, 0.4);
+      }
+      html[data-theme="light"] .legend-dot.baseline,
+      html[data-theme="light"] .legend-dot.wn {
+        background: #7c3aed;
+        box-shadow: 0 0 6px rgba(124, 58, 237, 0.4);
+      }
+      html[data-theme="light"] .radar-tooltip {
+        background: rgba(255, 255, 255, 0.95);
+        border-color: #e2e8f0;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        color: #0f172a;
+      }
+      html[data-theme="light"] .radar-tooltip-title {
+        color: #0f172a;
+      }
+
+      /* Doppelgänger / Similar Works Cards */
+      html[data-theme="light"] .doppelganger-title {
+        color: #0f172a;
+      }
+      html[data-theme="light"] .doppelganger-subtitle {
+        color: #64748b;
+      }
+      html[data-theme="light"] :global(.doppelganger-item) {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+      }
+      html[data-theme="light"] :global(.doppelganger-item:hover) {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      }
+      html[data-theme="light"] :global(.doppelganger-rank) {
+        background: #e2e8f0;
+        color: #475569;
+      }
+      html[data-theme="light"] :global(.doppelganger-item-title) {
+        color: #0f172a;
+      }
+      html[data-theme="light"] :global(.doppelganger-author) {
+        color: #64748b;
+      }
+      html[data-theme="light"] :global(.doppelganger-badge) {
+        background: #e2e8f0;
+        color: #475569;
+      }
+      html[data-theme="light"] :global(.reason-pill) {
+        background: #f1f5f9;
+        border-color: #e2e8f0;
+        color: #475569;
+      }
+      html[data-theme="light"] :global(.doppelganger-progress-bg) {
+        background: #e2e8f0;
+      }
+      html[data-theme="light"] :global(.doppelganger-factor-label) {
+        color: #64748b;
+      }
+      html[data-theme="light"] :global(.doppelganger-factor-bar-bg) {
+        background: #e2e8f0;
+      }
+
+      /* Skeleton Loading Components */
+      html[data-theme="light"] :global(.skeleton-card),
+      html[data-theme="light"] :global(.skeleton-chart-frame) {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+      }
+      html[data-theme="light"] :global(.skeleton-shimmer) {
+        background: linear-gradient(90deg, rgba(226, 232, 240, 0.5) 0%, rgba(241, 245, 249, 0.9) 50%, rgba(226, 232, 240, 0.5) 100%);
+      }
+      html[data-theme="light"] :global(.skeleton-progress-container) {
+        background: #ffffff;
+        border-color: #e2e8f0;
+      }
+      html[data-theme="light"] :global(.skeleton-stage-pill) {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #334155;
+      }
+      html[data-theme="light"] :global(.skeleton-elapsed) {
+        color: #64748b;
+      }
+      html[data-theme="light"] :global(.skeleton-subtext) {
+        color: #64748b;
+      }
+      html[data-theme="light"] :global(.skeleton-progress-track) {
+        background: #e2e8f0;
       }
     </style>
   </head>
@@ -3023,6 +3467,27 @@ import "../styles/global.css";
 
       function renderAll() {
         if (!currentStats) return;
+        const isLight = document.documentElement.getAttribute("data-theme") === "light";
+        const isWeb = activeBaseline === "web_novel";
+        const labelText = isWeb ? "Web Novel" : "Classic Lit";
+        const dotColor = isWeb
+          ? (isLight ? "#7c3aed" : "#a78bfa")
+          : (isLight ? "#d97706" : "#fbbf24");
+        
+        const rLbl = document.getElementById("radarBaselineLegendLabel");
+        const aLbl = document.getElementById("baselineLegendLabel");
+        const pLbl = document.getElementById("pacingBaselineLegendLabel");
+        if (rLbl) rLbl.textContent = labelText;
+        if (aLbl) aLbl.textContent = labelText;
+        if (pLbl) pLbl.textContent = labelText;
+        
+        const rDot = document.getElementById("radarBaselineLegendDot");
+        const aDot = document.getElementById("arcBaselineLegendDot");
+        const pDot = document.getElementById("pacingBaselineLegendDot");
+        if (rDot) rDot.style.backgroundColor = dotColor;
+        if (aDot) aDot.style.backgroundColor = dotColor;
+        if (pDot) pDot.style.backgroundColor = dotColor;
+
         drawRadar(currentStats, activeBaseline);
         if (currentArc) drawArc(currentArc, activeBaseline);
         drawPacing(currentStats, activeBaseline);
@@ -3034,27 +3499,7 @@ import "../styles/global.css";
           document.querySelectorAll(".baseline-btn").forEach(b => b.classList.remove("active"));
           btn.classList.add("active");
           activeBaseline = btn.dataset.baseline;
-          
-          // Update legends dynamically
-          const isWeb = activeBaseline === "web_novel";
-          const labelText = isWeb ? "Web Novel" : "Classic Lit";
-          const dotColor = isWeb ? "#a78bfa" : "#fbbf24";
-          
-          const rLbl = document.getElementById("radarBaselineLegendLabel");
-          const aLbl = document.getElementById("baselineLegendLabel");
-          const pLbl = document.getElementById("pacingBaselineLegendLabel");
-          if (rLbl) rLbl.textContent = labelText;
-          if (aLbl) aLbl.textContent = labelText;
-          if (pLbl) pLbl.textContent = labelText;
-          
-          const rDot = document.getElementById("radarBaselineLegendDot");
-          const aDot = document.getElementById("arcBaselineLegendDot");
-          const pDot = document.getElementById("pacingBaselineLegendDot");
-          if (rDot) rDot.style.backgroundColor = dotColor;
-          if (aDot) aDot.style.backgroundColor = dotColor;
-          if (pDot) pDot.style.backgroundColor = dotColor;
-          
-          if (currentStats && currentArc) renderAll();
+          if (currentStats) renderAll();
         });
       });
 
@@ -3062,6 +3507,7 @@ import "../styles/global.css";
       function drawRadar(stats, baseline) {
         const canvas = document.getElementById("radarChart");
         if (!canvas) return;
+        const isLight = document.documentElement.getAttribute("data-theme") === "light";
         const dpr = window.devicePixelRatio || 1;
 
         const cssW = canvas.clientWidth  || 480;
@@ -3082,7 +3528,7 @@ import "../styles/global.css";
         ctx.clearRect(0, 0, W, H);
 
         /* Grid rings */
-        for (let ring = 1; ring <= 5; ring++) {
+        for (let ring = 5; ring >= 1; ring--) {
           ctx.beginPath();
           for (let i = 0; i < n; i++) {
             const angle = (2 * Math.PI * i / n) - Math.PI / 2;
@@ -3092,11 +3538,15 @@ import "../styles/global.css";
             i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
           }
           ctx.closePath();
-          ctx.strokeStyle = "rgba(255,255,255,0.07)";
+          if (ring % 2 === 1) {
+            ctx.fillStyle = isLight ? "rgba(241, 245, 249, 0.6)" : "rgba(255, 255, 255, 0.015)";
+            ctx.fill();
+          }
+          ctx.strokeStyle = isLight ? "rgba(15, 23, 42, 0.10)" : "rgba(255, 255, 255, 0.10)";
           ctx.lineWidth = 1;
           ctx.stroke();
 
-          ctx.fillStyle = "rgba(255,255,255,0.18)";
+          ctx.fillStyle = isLight ? "rgba(15, 23, 42, 0.45)" : "rgba(255, 255, 255, 0.18)";
           ctx.font = "10px Inter, sans-serif";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
@@ -3111,16 +3561,20 @@ import "../styles/global.css";
           ctx.moveTo(cx, cy);
           ctx.lineTo(cx + R * Math.cos(angle), cy + R * Math.sin(angle));
           
-          ctx.strokeStyle = isHovered ? "rgba(255,255,255,0.38)" : "rgba(255,255,255,0.10)";
+          ctx.strokeStyle = isLight
+            ? (isHovered ? "rgba(15, 23, 42, 0.40)" : "rgba(15, 23, 42, 0.15)")
+            : (isHovered ? "rgba(255, 255, 255, 0.38)" : "rgba(255, 255, 255, 0.15)");
           ctx.lineWidth = isHovered ? 2.5 : 1;
           ctx.stroke();
 
-          const labelR = R + 36;
+          const labelR = R + 38;
           const lx = cx + labelR * Math.cos(angle);
           const ly = cy + labelR * Math.sin(angle);
 
           const words = dim.label.split(" ");
-          ctx.fillStyle = isHovered ? "#7dd3fc" : "rgba(255,255,255,0.58)";
+          ctx.fillStyle = isHovered
+            ? (isLight ? "#0284c7" : "#7dd3fc")
+            : (isLight ? "#334155" : "#cbd5e1");
           ctx.font = isHovered ? "bold 11px Inter, sans-serif" : "bold 10px Inter, sans-serif";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
@@ -3149,15 +3603,23 @@ import "../styles/global.css";
         }
 
         const hasHover = hoveredIndex !== -1;
-        const blOpacityStroke = hasHover ? 0.35 : 0.8;
-        const blOpacityFill   = hasHover ? 0.04 : 0.12;
-        const userOpacityStroke = hasHover ? 0.40 : 0.85;
-        const userOpacityFill   = hasHover ? 0.03 : 0.10;
+        const blOpacityStroke = hasHover ? (isLight ? 0.45 : 0.35) : (isLight ? 0.90 : 0.8);
+        const blOpacityFill   = hasHover ? (isLight ? 0.08 : 0.04) : (isLight ? 0.18 : 0.12);
+        const userOpacityStroke = hasHover ? (isLight ? 0.50 : 0.40) : (isLight ? 0.95 : 0.85);
+        const userOpacityFill   = hasHover ? (isLight ? 0.08 : 0.03) : (isLight ? 0.18 : 0.10);
 
-        const blColor = baseline === "web_novel" ? "#a78bfa" : "#fbbf24";
-        const blRgb = baseline === "web_novel" ? "167,139,250" : "251,191,36";
+        const isWeb = baseline === "web_novel";
+        const blColor = isWeb
+          ? (isLight ? "#7c3aed" : "#a78bfa")
+          : (isLight ? "#d97706" : "#fbbf24");
+        const blRgb = isWeb
+          ? (isLight ? "124, 58, 237" : "167, 139, 250")
+          : (isLight ? "217, 119, 6" : "251, 191, 36");
 
-        const blVals = (stats.baselines && stats.baselines.radar && stats.baselines.radar[baseline])
+        const userColor = isLight ? "#0284c7" : "#7dd3fc";
+        const userRgb   = isLight ? "2, 132, 199" : "125, 211, 252";
+
+        const blVals = (stats && stats.baselines && stats.baselines.radar && stats.baselines.radar[baseline])
           ? stats.baselines.radar[baseline]
           : RADAR_BASELINES[baseline];
 
@@ -3167,67 +3629,70 @@ import "../styles/global.css";
           `rgba(${blRgb}, ${blOpacityFill})`
         );
 
-        const prefix = Object.keys(stats).find(k => k.startsWith("zh_")) ? "zh_" :
-                       Object.keys(stats).find(k => k.startsWith("ja_")) ? "ja_" : "en_";
-        const userVals = RADAR_DIMS.map(d => {
-          const statsKey = d.key.replace("en_", prefix);
-          if (stats.normalized_radar && stats.normalized_radar[statsKey] !== undefined) {
-            return stats.normalized_radar[statsKey];
-          }
-          return norm(stats[statsKey] ?? 0, d.min, d.max);
-        });
-        plotPolygon(
-          userVals,
-          `rgba(125,211,252, ${userOpacityStroke})`,
-          `rgba(125,211,252, ${userOpacityFill})`
-        );
+        if (stats) {
+          const prefix = Object.keys(stats).find(k => k.startsWith("zh_")) ? "zh_" :
+                         Object.keys(stats).find(k => k.startsWith("ja_")) ? "ja_" : "en_";
+          const userVals = RADAR_DIMS.map(d => {
+            const statsKey = d.key.replace("en_", prefix);
+            if (stats.normalized_radar && stats.normalized_radar[statsKey] !== undefined) {
+              return stats.normalized_radar[statsKey];
+            }
+            return norm(stats[statsKey] ?? 0, d.min, d.max);
+          });
+          plotPolygon(
+            userVals,
+            `rgba(${userRgb}, ${userOpacityStroke})`,
+            `rgba(${userRgb}, ${userOpacityFill})`
+          );
 
-        /* Dot on each axis */
-        userVals.forEach((v, i) => {
-          const isHovered = hoveredIndex === i;
-          const angle = (2 * Math.PI * i / n) - Math.PI / 2;
-          const r = R * Math.max(0, Math.min(1, v));
-          ctx.beginPath();
-          
-          if (isHovered) {
+          /* Dot on each axis */
+          userVals.forEach((v, i) => {
+            const isHovered = hoveredIndex === i;
+            const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+            const r = R * Math.max(0, Math.min(1, v));
+            ctx.beginPath();
+            
+            if (isHovered) {
+              ctx.shadowBlur = 8;
+              ctx.shadowColor = userColor;
+              ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 6, 0, 2 * Math.PI);
+              ctx.fillStyle = userColor;
+              ctx.fill();
+              ctx.strokeStyle = isLight ? "#ffffff" : "rgba(255,255,255,0.95)";
+              ctx.lineWidth = 2.5;
+              ctx.stroke();
+              ctx.shadowBlur = 0;
+            } else {
+              ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 3.5, 0, 2 * Math.PI);
+              ctx.fillStyle = hasHover ? `rgba(${userRgb}, 0.4)` : userColor;
+              ctx.fill();
+            }
+          });
+
+          if (hasHover) {
+            const blVal = blVals[hoveredIndex];
+            const angle = (2 * Math.PI * hoveredIndex / n) - Math.PI / 2;
+            const r = R * Math.max(0, Math.min(1, blVal));
+            ctx.beginPath();
             ctx.shadowBlur = 8;
-            ctx.shadowColor = "#7dd3fc";
+            ctx.shadowColor = blColor;
             ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 6, 0, 2 * Math.PI);
-            ctx.fillStyle = "#7dd3fc";
+            ctx.fillStyle = blColor;
             ctx.fill();
-            ctx.strokeStyle = "rgba(255,255,255,0.95)";
+            ctx.strokeStyle = isLight ? "#ffffff" : "rgba(255,255,255,0.95)";
             ctx.lineWidth = 2.5;
             ctx.stroke();
             ctx.shadowBlur = 0;
-          } else {
-            ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 3.5, 0, 2 * Math.PI);
-            ctx.fillStyle = hasHover ? "rgba(125,211,252,0.4)" : "#7dd3fc";
-            ctx.fill();
           }
-        });
 
-        if (hasHover) {
-          const blVal = blVals[hoveredIndex];
-          const angle = (2 * Math.PI * hoveredIndex / n) - Math.PI / 2;
-          const r = R * Math.max(0, Math.min(1, blVal));
-          ctx.beginPath();
-          ctx.shadowBlur = 8;
-          ctx.shadowColor = blColor;
-          ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 6, 0, 2 * Math.PI);
-          ctx.fillStyle = blColor;
-          ctx.fill();
-          ctx.strokeStyle = "rgba(255,255,255,0.95)";
-          ctx.lineWidth = 2.5;
-          ctx.stroke();
-          ctx.shadowBlur = 0;
+          renderArchetypeTaxonomy(stats);
         }
-
-        renderArchetypeTaxonomy(stats);
       }
 
       function renderArchetypeTaxonomy(stats) {
         const am = stats["archetype_match"] || {};
         const tax = stats["taxonomy"] || am.taxonomy || {};
+        const isLight = document.documentElement.getAttribute("data-theme") === "light";
 
         // 1. Primary Archetype & Territory Header Label
         const labelEl = document.getElementById("archetypeLabel");
@@ -3332,7 +3797,7 @@ import "../styles/global.css";
             const pct = Math.min(99, Math.max(1, Math.round(g.score * 100)));
             let barColor = pct >= 80 ? "#a78bfa" :
                            pct >= 65 ? "#38bdf8" :
-                           pct >= 45 ? "#34d399" : "rgba(255,255,255,0.25)";
+                           pct >= 45 ? "#34d399" : (isLight ? "rgba(0,0,0,0.25)" : "rgba(255,255,255,0.25)");
             drawerHtml += `
               <div class="genre-rank-row">
                 <div class="genre-rank-info">
@@ -3365,7 +3830,8 @@ import "../styles/global.css";
       /* ── Kishōtenketsu arc (SVG) ── */
       function drawArc(arcData, baseline) {
         const svg = document.getElementById("arcChart");
-        if (!svg) return;
+        if (!svg || !arcData) return;
+        const isLight = document.documentElement.getAttribute("data-theme") === "light";
         svg.innerHTML = "";
         const W = 600, H = 420;
         const PAD = { top: 30, bottom: 48, left: 48, right: 48 };
@@ -3375,12 +3841,21 @@ import "../styles/global.css";
 
         const acts    = (arcData.quantiles && arcData.quantiles.length > 0)
           ? arcData.quantiles.map((v, i) => ({ sentiment: v, actIndex: i }))
-          : arcData.acts;
+          : arcData.acts || [];
+        if (acts.length === 0) return;
+
         const blVals  = (arcData.baselines && arcData.baselines[baseline])
           ? arcData.baselines[baseline]
           : [0.0839, 0.0588, 0.1347, 0.1006];
-        const blColor = baseline === "web_novel" ? "#a78bfa" : "#fbbf24";
-        const blRgb   = baseline === "web_novel" ? "167,139,250" : "251,191,36";
+        const isWeb   = baseline === "web_novel";
+        const blColor = isWeb
+          ? (isLight ? "#7c3aed" : "#a78bfa")
+          : (isLight ? "#d97706" : "#fbbf24");
+        const blRgb   = isWeb
+          ? (isLight ? "124, 58, 237" : "167, 139, 250")
+          : (isLight ? "217, 119, 6" : "251, 191, 36");
+        const userColor = isLight ? "#0284c7" : "#7dd3fc";
+        const userRgb   = isLight ? "2, 132, 199" : "125, 211, 252";
 
         const sentY = s => {
           const clamped = Math.max(-1.0, Math.min(1.0, s));
@@ -3433,6 +3908,7 @@ import "../styles/global.css";
         const [innerPathD, outerPathD] = userIsInner ? [pathD, blPathD] : [blPathD, pathD];
         const [innerGrad,  outerGrad]  = userIsInner ? ["arcUserGrad", "arcBaselineGrad"] : ["arcBaselineGrad", "arcUserGrad"];
 
+        /* ── Gradients Defs ── */
         const defs = document.createElementNS(ns, "defs");
         const zf = (zeroY - PAD.top) / plotH;
 
@@ -3443,7 +3919,7 @@ import "../styles/global.css";
           g.setAttribute("x1", "0"); g.setAttribute("y1", String(PAD.top));
           g.setAttribute("x2", "0"); g.setAttribute("y2", String(bottomY));
           const pct = p => `${(Math.max(0, Math.min(1, p)) * 100).toFixed(1)}%`;
-          const minA = (alpha * 0.40).toFixed(3);
+          const minA = (alpha * (isLight ? 0.35 : 0.40)).toFixed(3);
           [
             [0,   `rgba(${rgb},${alpha})`],
             [zf,  `rgba(${rgb},${minA})`],
@@ -3457,8 +3933,8 @@ import "../styles/global.css";
           return g;
         };
 
-        defs.appendChild(makeGrad("arcUserGrad",     "125,211,252", 0.80));
-        defs.appendChild(makeGrad("arcBaselineGrad", blRgb,         0.75));
+        defs.appendChild(makeGrad("arcUserGrad",     userRgb, isLight ? 0.35 : 0.80));
+        defs.appendChild(makeGrad("arcBaselineGrad", blRgb,   isLight ? 0.30 : 0.75));
 
         const clipPath = document.createElementNS(ns, "clipPath");
         clipPath.setAttribute("id", "outerFillClip");
@@ -3478,7 +3954,7 @@ import "../styles/global.css";
           const vGuide = document.createElementNS(ns, "line");
           vGuide.setAttribute("x1", hx); vGuide.setAttribute("y1", PAD.top);
           vGuide.setAttribute("x2", hx); vGuide.setAttribute("y2", bottomY);
-          vGuide.setAttribute("stroke", "rgba(255,255,255,0.25)");
+          vGuide.setAttribute("stroke", isLight ? "rgba(15, 23, 42, 0.25)" : "rgba(255, 255, 255, 0.25)");
           vGuide.setAttribute("stroke-dasharray", "3 3");
           svg.appendChild(vGuide);
         }
@@ -3493,14 +3969,16 @@ import "../styles/global.css";
           line.setAttribute("y1", y);
           line.setAttribute("x2", String(endX));
           line.setAttribute("y2", y);
-          line.setAttribute("stroke", isZero ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.055)");
+          line.setAttribute("stroke", isZero
+            ? (isLight ? "#94a3b8" : "rgba(255, 255, 255, 0.3)")
+            : (isLight ? "rgba(15, 23, 42, 0.08)" : "rgba(255, 255, 255, 0.055)"));
           if (!isZero) line.setAttribute("stroke-dasharray", "4 5");
           svg.appendChild(line);
 
           const lbl = document.createElementNS(ns, "text");
           lbl.setAttribute("x", String(axisX - 8));
           lbl.setAttribute("y", y + 3.5);
-          lbl.setAttribute("fill", "rgba(255,255,255,0.3)");
+          lbl.setAttribute("fill", isLight ? "#64748b" : "rgba(255, 255, 255, 0.3)");
           lbl.setAttribute("font-size", "9");
           lbl.setAttribute("font-family", "Inter, sans-serif");
           lbl.setAttribute("text-anchor", "end");
@@ -3512,14 +3990,14 @@ import "../styles/global.css";
         const yAxis = document.createElementNS(ns, "line");
         yAxis.setAttribute("x1", String(axisX)); yAxis.setAttribute("y1", String(PAD.top));
         yAxis.setAttribute("x2", String(axisX)); yAxis.setAttribute("y2", String(bottomY));
-        yAxis.setAttribute("stroke", "rgba(255,255,255,0.22)");
+        yAxis.setAttribute("stroke", isLight ? "#cbd5e1" : "rgba(255, 255, 255, 0.15)");
         svg.appendChild(yAxis);
 
         // X-axis line & labels
         const xAxis = document.createElementNS(ns, "line");
         xAxis.setAttribute("x1", String(axisX)); xAxis.setAttribute("y1", String(bottomY));
         xAxis.setAttribute("x2", String(endX));  xAxis.setAttribute("y2", String(bottomY));
-        xAxis.setAttribute("stroke", "rgba(255,255,255,0.22)");
+        xAxis.setAttribute("stroke", isLight ? "#cbd5e1" : "rgba(255, 255, 255, 0.15)");
         svg.appendChild(xAxis);
 
         ["Ki (Intro)", "Shō (Dev)", "Ten (Twist)", "Ketsu (Res)"].forEach((label, i) => {
@@ -3527,12 +4005,12 @@ import "../styles/global.css";
           const tick = document.createElementNS(ns, "line");
           tick.setAttribute("x1", lx); tick.setAttribute("y1", bottomY);
           tick.setAttribute("x2", lx); tick.setAttribute("y2", bottomY + 4);
-          tick.setAttribute("stroke", "rgba(255,255,255,0.2)");
+          tick.setAttribute("stroke", isLight ? "#e2e8f0" : "rgba(255, 255, 255, 0.07)");
           svg.appendChild(tick);
 
           const txt = document.createElementNS(ns, "text");
           txt.setAttribute("x", lx); txt.setAttribute("y", bottomY + 16);
-          txt.setAttribute("fill", "rgba(255,255,255,0.45)");
+          txt.setAttribute("fill", isLight ? "#64748b" : "rgba(255, 255, 255, 0.45)");
           txt.setAttribute("font-size", "10"); txt.setAttribute("font-weight", "600");
           txt.setAttribute("font-family", "Inter, sans-serif");
           txt.setAttribute("text-anchor", "middle");
@@ -3560,14 +4038,14 @@ import "../styles/global.css";
         blPath.setAttribute("stroke", blColor);
         blPath.setAttribute("stroke-width", "1.75");
         blPath.setAttribute("stroke-dasharray", "5 4");
-        blPath.setAttribute("opacity", "0.85");
+        blPath.setAttribute("opacity", isLight ? "0.95" : "0.85");
         svg.appendChild(blPath);
 
         // User stroke
         const userPath = document.createElementNS(ns, "path");
         userPath.setAttribute("d", pathD);
         userPath.setAttribute("fill", "none");
-        userPath.setAttribute("stroke", "#7dd3fc");
+        userPath.setAttribute("stroke", userColor);
         userPath.setAttribute("stroke-width", "2.5");
         svg.appendChild(userPath);
 
@@ -3576,8 +4054,8 @@ import "../styles/global.css";
           const userDot = document.createElementNS(ns, "circle");
           userDot.setAttribute("cx", x); userDot.setAttribute("cy", userYs[i]);
           userDot.setAttribute("r", i === hoveredArcIndex ? "6" : "4");
-          userDot.setAttribute("fill", "#7dd3fc");
-          userDot.setAttribute("stroke", "#0a0a12");
+          userDot.setAttribute("fill", userColor);
+          userDot.setAttribute("stroke", isLight ? "#ffffff" : "#0a0a12");
           userDot.setAttribute("stroke-width", "2");
           svg.appendChild(userDot);
 
@@ -3585,7 +4063,7 @@ import "../styles/global.css";
           blDot.setAttribute("cx", x); blDot.setAttribute("cy", blYs[i]);
           blDot.setAttribute("r", i === hoveredArcIndex ? "5" : "3.5");
           blDot.setAttribute("fill", blColor);
-          blDot.setAttribute("stroke", "#0a0a12");
+          blDot.setAttribute("stroke", isLight ? "#ffffff" : "#0a0a12");
           blDot.setAttribute("stroke-width", "1.5");
           svg.appendChild(blDot);
         });
@@ -3593,9 +4071,14 @@ import "../styles/global.css";
 
       /* ── Rhythmic Pacing (Paragraph Barcode) ── */
       function drawPacing(stats, baseline) {
+        if (!stats) return;
+        const isLight = document.documentElement.getAttribute("data-theme") === "light";
         const userPacing = stats.pacing || [];
         const isWeb = baseline === "web_novel";
-        const baselineColor = isWeb ? "#a78bfa" : "#fbbf24";
+        const baselineColor = isWeb
+          ? (isLight ? "#7c3aed" : "#a78bfa")
+          : (isLight ? "#d97706" : "#fbbf24");
+        const userColor = isLight ? "#0284c7" : "#7dd3fc";
         const baselineData = (stats.baselines && stats.baselines.pacing)
           ? stats.baselines.pacing[baseline]
           : PACING_BASELINES[baseline];
@@ -3605,20 +4088,29 @@ import "../styles/global.css";
 
         const draftLabel = document.getElementById("pacingDraftLabel");
         const baseLabel  = document.getElementById("pacingBaselineLabel");
-        if (draftLabel) draftLabel.textContent = `Selected Novel (Average Paragraph Length: ${userAvg} words/chars)`;
-        if (baseLabel) baseLabel.textContent = `${isWeb ? "Web Novel" : "Classic Lit"} Baseline (Average Paragraph Length: ${baseAvg} words/chars)`;
+        if (draftLabel) {
+          draftLabel.textContent = `Selected Novel (Average Paragraph Length: ${userAvg} words/chars)`;
+          draftLabel.style.color = isLight ? "#475569" : "rgba(255,255,255,0.5)";
+        }
+        if (baseLabel) {
+          baseLabel.textContent = `${isWeb ? "Web Novel" : "Classic Lit"} Baseline (Average Paragraph Length: ${baseAvg} words/chars)`;
+          baseLabel.style.color = isLight ? "#475569" : "rgba(255,255,255,0.5)";
+        }
 
-        renderBarcode("pacingBarcodeUser", userPacing, "#7dd3fc");
+        renderBarcode("pacingBarcodeUser", userPacing, userColor);
         renderBarcode("pacingBarcodeBaseline", baselineData, baselineColor);
       }
 
       function renderBarcode(containerId, data, color) {
         const container = document.getElementById(containerId);
         if (!container) return;
+        const isLight = document.documentElement.getAttribute("data-theme") === "light";
         container.innerHTML = "";
+        container.style.background = isLight ? "rgba(241, 245, 249, 0.8)" : "rgba(0, 0, 0, 0.25)";
+        container.style.border = `1px solid ${isLight ? "rgba(15, 23, 42, 0.08)" : "rgba(255, 255, 255, 0.06)"}`;
 
         if (!data || data.length === 0) {
-          container.innerHTML = "<div style='color:rgba(255,255,255,0.3); font-size:0.8rem; padding: 1rem; width:100%; text-align:center;'>No paragraph pacing data available</div>";
+          container.innerHTML = `<div style='color: ${isLight ? "#64748b" : "rgba(255,255,255,0.3)"}; font-size:0.8rem; padding: 1rem; width:100%; text-align:center;'>No paragraph pacing data available</div>`;
           return;
         }
 
@@ -3628,7 +4120,7 @@ import "../styles/global.css";
           const bar = document.createElement("div");
           bar.style.flex = "1";
           bar.style.backgroundColor = color;
-          bar.style.opacity = (0.2 + intensity * 0.8).toFixed(2);
+          bar.style.opacity = Math.max(0.18, intensity).toFixed(2);
           bar.style.borderRadius = "2px";
           bar.title = `${val} words/chars`;
           container.appendChild(bar);
@@ -3639,6 +4131,7 @@ import "../styles/global.css";
       function renderSimilarNovels(matches) {
         const container = document.getElementById("similarNovelsContainer");
         if (!container) return;
+        const isLight = document.documentElement.getAttribute("data-theme") === "light";
         container.innerHTML = "";
 
         if (!matches || matches.length === 0) {
@@ -3653,7 +4146,11 @@ import "../styles/global.css";
 
           const pct = Math.round((m.similarity_score || 0) * 100);
           const topGenres = (m.genre || 'Fiction').split(',').map(g => g.trim()).filter(Boolean).slice(0, 3).join(', ');
-          const scoreColor = m.similarity_score > 0.9 ? '#38bdf8' : m.similarity_score > 0.8 ? '#818cf8' : '#94a3b8';
+          const scoreColor = m.similarity_score > 0.9
+            ? (isLight ? '#0284c7' : '#38bdf8')
+            : m.similarity_score > 0.8
+              ? (isLight ? '#6366f1' : '#818cf8')
+              : (isLight ? '#64748b' : '#94a3b8');
 
           item.innerHTML = `
             <div class="doppelganger-left">
@@ -3682,7 +4179,7 @@ import "../styles/global.css";
                     { label: 'SEM', name: 'Semantic', val: m.breakdown.semantic }
                   ].map(f => {
                     const fPct = Math.round((f.val || 0) * 100);
-                    const fColor = f.val > 0.8 ? '#22d3ee' : '#64748b';
+                    const fColor = f.val > 0.8 ? (isLight ? '#0284c7' : '#22d3ee') : (isLight ? '#94a3b8' : '#64748b');
                     return `
                       <div class="doppelganger-factor" title="${f.name}: ${fPct}%">
                         <span class="doppelganger-factor-label">${f.label}</span>
@@ -3777,19 +4274,24 @@ import "../styles/global.css";
               : RADAR_BASELINES[activeBaseline];
             const blVal = blVals ? blVals[hoveredIndex] : 0;
 
+            const isLight = document.documentElement.getAttribute("data-theme") === "light";
             const userPct = (userVal * 100).toFixed(0) + "%";
             const blPct = (blVal * 100).toFixed(0) + "%";
             const baseName = activeBaseline === "web_novel" ? "Web Novel Baseline" : "Classic Lit Baseline";
-            const blColor = activeBaseline === "web_novel" ? "#a78bfa" : "#fbbf24";
+            const blColor = activeBaseline === "web_novel"
+              ? (isLight ? "#7c3aed" : "#a78bfa")
+              : (isLight ? "#d97706" : "#fbbf24");
+            const userColor = isLight ? "#0284c7" : "#7dd3fc";
+            const labelColor = isLight ? "#64748b" : "rgba(255,255,255,0.7)";
 
             tooltipNode.innerHTML = `
               <div class="radar-tooltip-title">${dim.label}</div>
               <div class="radar-tooltip-row">
-                <span style="color: rgba(255,255,255,0.7)">Selected Novel:</span>
-                <span class="radar-tooltip-val" style="color: #7dd3fc">${userPct}</span>
+                <span style="color: ${labelColor}">Selected Novel:</span>
+                <span class="radar-tooltip-val" style="color: ${userColor}">${userPct}</span>
               </div>
               <div class="radar-tooltip-row">
-                <span style="color: rgba(255,255,255,0.7)">${baseName}:</span>
+                <span style="color: ${labelColor}">${baseName}:</span>
                 <span class="radar-tooltip-val" style="color: ${blColor}">${blPct}</span>
               </div>
             `;
@@ -3863,19 +4365,24 @@ import "../styles/global.css";
               const actNames = ["Ki (Intro)", "Shō (Dev)", "Ten (Twist)", "Ketsu (Res)"];
               const titleFmt = actNames[hoveredArcIndex] || `${act.act || ''} (${labelMap[act.label] || act.label || ''})`;
 
+              const isLight = document.documentElement.getAttribute("data-theme") === "light";
               const userFmt = userVal >= 0 ? `+${userVal.toFixed(2)}` : userVal.toFixed(2);
               const blFmt = blVal >= 0 ? `+${blVal.toFixed(2)}` : blVal.toFixed(2);
               const baseName = activeBaseline === "web_novel" ? "Web Novel Baseline" : "Classic Lit Baseline";
-              const blColor = activeBaseline === "web_novel" ? "#a78bfa" : "#fbbf24";
+              const blColor = activeBaseline === "web_novel"
+                ? (isLight ? "#7c3aed" : "#a78bfa")
+                : (isLight ? "#d97706" : "#fbbf24");
+              const userColor = isLight ? "#0284c7" : "#7dd3fc";
+              const labelColor = isLight ? "#64748b" : "rgba(255,255,255,0.7)";
 
               arcTooltipNode.innerHTML = `
                 <div class="radar-tooltip-title">${titleFmt}</div>
                 <div class="radar-tooltip-row">
-                  <span style="color: rgba(255,255,255,0.7)">Selected Novel:</span>
-                  <span class="radar-tooltip-val" style="color: #7dd3fc">${userFmt}</span>
+                  <span style="color: ${labelColor}">Selected Novel:</span>
+                  <span class="radar-tooltip-val" style="color: ${userColor}">${userFmt}</span>
                 </div>
                 <div class="radar-tooltip-row">
-                  <span style="color: rgba(255,255,255,0.7)">${baseName}:</span>
+                  <span style="color: ${labelColor}">${baseName}:</span>
                   <span class="radar-tooltip-val" style="color: ${blColor}">${blFmt}</span>
                 </div>
               `;
@@ -4027,6 +4534,14 @@ import "../styles/global.css";
           }, 1500);
         }
       }
+
+      // Reactive Theme Change Listener
+      window.addEventListener("themechange", () => {
+        if (currentStats) renderAll();
+        if (currentStats && currentStats.top_matches) {
+          renderSimilarNovels(currentStats.top_matches);
+        }
+      });
     </script>
   </body>
 </html>
