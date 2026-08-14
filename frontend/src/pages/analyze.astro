@@ -1770,31 +1770,8 @@ import { ClientRouter } from 'astro:transitions';
       </div>
     </div>
 
-    <script is:inline>
-      // Theme Toggle Initialization
-      const themeToggleBtn = document.getElementById("themeToggleBtn");
-      if (themeToggleBtn) {
-        themeToggleBtn.addEventListener("click", () => {
-          const current = document.documentElement.getAttribute("data-theme") || "dark";
-          const next = current === "light" ? "dark" : "light";
-          document.documentElement.setAttribute("data-theme", next);
-          try {
-            localStorage.setItem("kisholens-theme", next);
-          } catch (e) {}
-          window.dispatchEvent(new CustomEvent("themechange", { detail: { theme: next } }));
-        });
-      }
-
+    <script>
       const API_URL = "http://127.0.0.1:8000";
-      const textarea = document.getElementById("passage-text");
-      const charCounter = document.getElementById("char-counter");
-      const wordCounter = document.getElementById("word-counter");
-      const form = document.getElementById("analyze-form");
-      const errorBox = document.getElementById("error-box");
-      
-      const readyState = document.getElementById("ready-state");
-      const loadingState = document.getElementById("loading-state");
-      const resultsContainer = document.getElementById("results-container");
       let lastAnalysisData = null;
       let currentStats = null;
       let currentArc   = null;
@@ -1821,84 +1798,143 @@ import { ClientRouter } from 'astro:transitions';
         }
       };
 
-      document.querySelectorAll(".sample-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const sampleKey = btn.dataset.sample;
-          const sample = SAMPLE_PROSE[sampleKey];
-          if (sample) {
-            document.getElementById("passage-title").value = sample.title;
-            document.getElementById("passage-lang").value = sample.lang;
-            textarea.value = sample.text;
-            textarea.dispatchEvent(new Event("input"));
-            
-            document.querySelectorAll(".sample-btn").forEach(b => b.classList.remove("active"));
+      document.addEventListener("astro:page-load", () => {
+        // Theme Toggle Initialization
+        const themeToggleBtn = document.getElementById("themeToggleBtn");
+        if (themeToggleBtn) {
+          themeToggleBtn.addEventListener("click", () => {
+            const current = document.documentElement.getAttribute("data-theme") || "dark";
+            const next = current === "light" ? "dark" : "light";
+            document.documentElement.setAttribute("data-theme", next);
+            try {
+              localStorage.setItem("kisholens-theme", next);
+            } catch (e) {}
+            window.dispatchEvent(new CustomEvent("themechange", { detail: { theme: next } }));
+          });
+        }
+
+        const form = document.getElementById("analyze-form") || document.getElementById("analyzeForm");
+        const textarea = document.getElementById("passage-text");
+        if (!form || !textarea) return;
+
+        const charCounter = document.getElementById("char-counter");
+        const wordCounter = document.getElementById("word-counter");
+        const errorBox = document.getElementById("error-box");
+        const readyState = document.getElementById("ready-state");
+        const loadingState = document.getElementById("loading-state");
+        const resultsContainer = document.getElementById("results-container");
+        const visualizationsContainer = document.getElementById("visualizations-container");
+
+        // Sample button listeners
+        document.querySelectorAll(".sample-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const sampleKey = btn.dataset.sample;
+            const sample = SAMPLE_PROSE[sampleKey];
+            if (sample) {
+              const titleEl = document.getElementById("passage-title");
+              const langEl = document.getElementById("passage-lang");
+              if (titleEl) titleEl.value = sample.title;
+              if (langEl) langEl.value = sample.lang;
+              textarea.value = sample.text;
+              textarea.dispatchEvent(new Event("input"));
+              
+              document.querySelectorAll(".sample-btn").forEach(b => b.classList.remove("active"));
+              btn.classList.add("active");
+            }
+          });
+        });
+
+        // Text Area character and word counter
+        textarea.addEventListener("input", () => {
+          const text = textarea.value;
+          if (charCounter) charCounter.textContent = `${text.length} characters`;
+          const words = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
+          if (wordCounter) wordCounter.textContent = `${words} words`;
+        });
+
+        // Pre-fill text if passed via URL parameter (e.g. from homepage reader widget)
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlText = urlParams.get("text");
+        if (urlText && textarea) {
+          textarea.value = urlText;
+          textarea.dispatchEvent(new Event("input"));
+        }
+
+        // Baseline switch click handlers
+        document.querySelectorAll(".baseline-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            document.querySelectorAll(".baseline-btn").forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
+            activeBaseline = btn.dataset.baseline;
+            if (currentStats && currentArc) renderAll();
+          });
+        });
+
+        // Submit form to API
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          if (errorBox) errorBox.style.display = "none";
+          if (readyState) readyState.style.display = "none";
+          if (resultsContainer) resultsContainer.style.display = "none";
+          if (visualizationsContainer) visualizationsContainer.style.display = "none";
+          if (loadingState) loadingState.style.display = "flex";
+
+          const title = (document.getElementById("passage-title")?.value || "").trim() || "Untitled";
+          const lang = document.getElementById("passage-lang")?.value || "en";
+          const text = textarea.value;
+
+          try {
+            // Perform stylistic analysis
+            const res = await fetch(`${API_URL}/api/analyze`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ title, lang, text })
+            });
+
+            if (!res.ok) {
+              const errData = await res.json();
+              throw new Error(errData.detail || "Server failed to process analysis");
+            }
+
+            const data = await res.json();
+            lastAnalysisData = data;
+            currentStats = data.stats;
+            currentArc   = data.arc;
+            renderResults(data);
+            renderAll();
+            if (data.top_matches) {
+              renderSimilarNovels(data.top_matches);
+            }
+            if (visualizationsContainer) visualizationsContainer.style.display = "flex";
+            try {
+              sessionStorage.setItem("custom_analysis", JSON.stringify(data));
+            } catch (e) {}
+          } catch (err) {
+            if (loadingState) loadingState.style.display = "none";
+            if (errorBox) {
+              errorBox.textContent = `Analysis error: ${err.message}`;
+              errorBox.style.display = "block";
+            }
           }
         });
-      });
 
-      // 1. Text Area character and word counter
-      textarea.addEventListener("input", () => {
-        const text = textarea.value;
-        charCounter.textContent = `${text.length} characters`;
-        
-        const words = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
-        wordCounter.textContent = `${words} words`;
-      });
+        // Setup Chart Hover Listeners
+        setupChartHoverListeners();
 
-      // Pre-fill text if passed via URL parameter (e.g. from homepage reader widget)
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlText = urlParams.get("text");
-      if (urlText && textarea) {
-        textarea.value = urlText;
-        textarea.dispatchEvent(new Event("input"));
-      }
-
-      // 2. Submit form to API
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        errorBox.style.display = "none";
-        readyState.style.display = "none";
-        resultsContainer.style.display = "none";
-        document.getElementById("visualizations-container").style.display = "none";
-        loadingState.style.display = "flex";
-
-        const title = document.getElementById("passage-title").value.trim() || "Untitled";
-        const lang = document.getElementById("passage-lang").value;
-        const text = textarea.value;
-
-        try {
-          // Perform stylistic analysis
-          const res = await fetch(`${API_URL}/api/analyze`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ title, lang, text })
-          });
-
-          if (!res.ok) {
-            const errData = await res.json();
-            throw new Error(errData.detail || "Server failed to process analysis");
-          }
-
-          const data = await res.json();
-          lastAnalysisData = data;
-          currentStats = data.stats;
-          currentArc   = data.arc;
-          renderResults(data);
+        // Restore previous analysis state if available
+        if (lastAnalysisData) {
+          renderResults(lastAnalysisData);
           renderAll();
-          if (data.top_matches) {
-            renderSimilarNovels(data.top_matches);
+          if (lastAnalysisData.top_matches) {
+            renderSimilarNovels(lastAnalysisData.top_matches);
           }
-          document.getElementById("visualizations-container").style.display = "flex";
-          sessionStorage.setItem("custom_analysis", JSON.stringify(data));
-        } catch (err) {
-          loadingState.style.display = "none";
-          errorBox.textContent = `Analysis error: ${err.message}`;
-          errorBox.style.display = "block";
+          if (readyState) readyState.style.display = "none";
+          if (resultsContainer) resultsContainer.style.display = "flex";
+          if (visualizationsContainer) visualizationsContainer.style.display = "flex";
         }
       });
 
-      // 3. Theme change event listener: reactive chart re-rendering
+      // Reactive Theme Change Listener
       window.addEventListener("themechange", () => {
         if (lastAnalysisData) {
           renderResults(lastAnalysisData);
@@ -2213,16 +2249,7 @@ import { ClientRouter } from 'astro:transitions';
         drawPacing(currentStats, activeBaseline);
       }
 
-      /* ── Baseline Switch Click Handlers ── */
-      document.querySelectorAll(".baseline-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          document.querySelectorAll(".baseline-btn").forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-          activeBaseline = btn.dataset.baseline;
-          
-          if (currentStats && currentArc) renderAll();
-        });
-      });
+
 
       /* ── Radar chart (Canvas) ── */
       function drawRadar(stats, baseline) {
@@ -3116,11 +3143,7 @@ import { ClientRouter } from 'astro:transitions';
         }
       }
 
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", setupChartHoverListeners);
-      } else {
-        setupChartHoverListeners();
-      }
+
     </script>
     <div id="radarTooltip" class="radar-tooltip"></div>
     <div id="arcTooltip" class="radar-tooltip"></div>

@@ -2593,21 +2593,7 @@ import { ClientRouter } from 'astro:transitions';
     <div id="arcTooltip" class="radar-tooltip"></div>
 
     <!-- Client-side Logic -->
-    <script is:inline>
-      // Theme Toggle Initialization
-      const themeToggleBtn = document.getElementById("themeToggleBtn");
-      if (themeToggleBtn) {
-        themeToggleBtn.addEventListener("click", () => {
-          const current = document.documentElement.getAttribute("data-theme") || "dark";
-          const next = current === "light" ? "dark" : "light";
-          document.documentElement.setAttribute("data-theme", next);
-          try {
-            localStorage.setItem("kisholens-theme", next);
-          } catch (e) {}
-          window.dispatchEvent(new CustomEvent("themechange", { detail: { theme: next } }));
-        });
-      }
-
+    <script>
       const API_URL = "http://localhost:8000";
 
       let allNovels = [];
@@ -3569,15 +3555,6 @@ import { ClientRouter } from 'astro:transitions';
         drawPacing(currentStats, activeBaseline);
       }
 
-      /* ── Baseline Switch Click Handlers ── */
-      document.querySelectorAll(".baseline-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          document.querySelectorAll(".baseline-btn").forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-          activeBaseline = btn.dataset.baseline;
-          if (currentStats) renderAll();
-        });
-      });
 
       /* ── Radar chart (Canvas) ── */
       function drawRadar(stats, baseline) {
@@ -4277,253 +4254,7 @@ import { ClientRouter } from 'astro:transitions';
         });
       }
 
-      // 4. Dropdown Selector Listener
-      document.getElementById("novelSelect").addEventListener("change", (e) => {
-        const id = parseInt(e.target.value);
-        if (!id) return;
-        const novel = allNovels.find(n => n.id === id);
-        if (novel) {
-          selectNovel(novel.id, novel.title);
-        }
-      });
-
-      // 5. Search Bar Listener
-      document.getElementById("novel-search-input").addEventListener("input", filterNovels);
-
-      // 6. Archetype Radar Mouse Hover & Tooltip Events
-      const canvasNode = document.getElementById("radarChart");
-      const tooltipNode = document.getElementById("radarTooltip");
-
-      if (canvasNode && tooltipNode) {
-        canvasNode.addEventListener("mousemove", (e) => {
-          if (!currentStats) return;
-          const rect = canvasNode.getBoundingClientRect();
-          const mx = e.clientX - rect.left;
-          const my = e.clientY - rect.top;
-          const cx = rect.width / 2;
-          const cy = rect.height / 2;
-          const dx = mx - cx;
-          const dy = my - cy;
-          const d = Math.sqrt(dx * dx + dy * dy);
-          let angle = Math.atan2(dy, dx);
-
-          const labelPad = 75;
-          const R_css = Math.min(rect.width, rect.height) / 2 - labelPad;
-          const n = RADAR_DIMS.length;
-          let bestIndex = -1;
-          let minDiff = Infinity;
-
-          if (d <= R_css + 45 && d >= 12) {
-            for (let i = 0; i < n; i++) {
-              const spokeAngle = (2 * Math.PI * i / n) - Math.PI / 2;
-              let diff = Math.abs(angle - spokeAngle);
-              while (diff > Math.PI) {
-                diff = Math.abs(diff - 2 * Math.PI);
-              }
-              if (diff < minDiff) {
-                minDiff = diff;
-                bestIndex = i;
-              }
-            }
-            if (minDiff > 0.35) {
-              bestIndex = -1;
-            }
-          }
-
-          if (bestIndex !== hoveredIndex) {
-            hoveredIndex = bestIndex;
-            renderAll();
-          }
-
-          if (hoveredIndex !== -1) {
-            const dim = RADAR_DIMS[hoveredIndex];
-            const prefix = Object.keys(currentStats).find(k => k.startsWith("zh_")) ? "zh_" :
-                           Object.keys(currentStats).find(k => k.startsWith("ja_")) ? "ja_" : "en_";
-            const statsKey = dim.key.replace("en_", prefix);
-
-            const userVal = (currentStats.normalized_radar && currentStats.normalized_radar[statsKey] !== undefined)
-              ? currentStats.normalized_radar[statsKey]
-              : norm(currentStats[statsKey] ?? 0, dim.min, dim.max);
-            
-            const blVals = (currentStats.baselines && currentStats.baselines.radar && currentStats.baselines.radar[activeBaseline])
-              ? currentStats.baselines.radar[activeBaseline]
-              : RADAR_BASELINES[activeBaseline];
-            const blVal = blVals ? blVals[hoveredIndex] : 0;
-
-            const isLight = document.documentElement.getAttribute("data-theme") === "light";
-            const userPct = (userVal * 100).toFixed(0) + "%";
-            const blPct = (blVal * 100).toFixed(0) + "%";
-            const baseName = activeBaseline === "web_novel" ? "Web Novel Baseline" : "Classic Lit Baseline";
-            const blColor = activeBaseline === "web_novel"
-              ? (isLight ? "#7c3aed" : "#a78bfa")
-              : (isLight ? "#d97706" : "#fbbf24");
-            const userColor = isLight ? "#0284c7" : "#7dd3fc";
-            const labelColor = isLight ? "#64748b" : "rgba(255,255,255,0.7)";
-
-            tooltipNode.innerHTML = `
-              <div class="radar-tooltip-title">${dim.label}</div>
-              <div class="radar-tooltip-row">
-                <span style="color: ${labelColor}">Selected Novel:</span>
-                <span class="radar-tooltip-val" style="color: ${userColor}">${userPct}</span>
-              </div>
-              <div class="radar-tooltip-row">
-                <span style="color: ${labelColor}">${baseName}:</span>
-                <span class="radar-tooltip-val" style="color: ${blColor}">${blPct}</span>
-              </div>
-            `;
-            tooltipNode.style.display = "block";
-            tooltipNode.style.left = (e.clientX + 15) + "px";
-            tooltipNode.style.top = (e.clientY + 15) + "px";
-          } else {
-            tooltipNode.style.display = "none";
-          }
-        });
-
-        canvasNode.addEventListener("mouseleave", () => {
-          if (hoveredIndex !== -1) {
-            hoveredIndex = -1;
-            renderAll();
-          }
-          tooltipNode.style.display = "none";
-        });
-      }
-
-      // 7. Kishōtenketsu Sentiment Arc Mouse Hover & Tooltip Events
-      const svgNode = document.getElementById("arcChart");
-      const arcTooltipNode = document.getElementById("arcTooltip");
-
-      if (svgNode && arcTooltipNode) {
-        svgNode.addEventListener("mousemove", (e) => {
-          try {
-            if (!currentArc) return;
-            const rect = svgNode.getBoundingClientRect();
-            if (rect.width === 0 || rect.height === 0) return;
-
-            const svgX = (e.clientX - rect.left) * (600 / rect.width);
-            const W = 600;
-            const PAD = { top: 30, bottom: 48, left: 48, right: 48 };
-            const plotW = W - PAD.left - PAD.right;
-            const acts = (currentArc.quantiles && currentArc.quantiles.length > 0)
-              ? currentArc.quantiles.map((v, i) => ({ sentiment: v, actIndex: i }))
-              : currentArc.acts;
-
-            const actX = i => PAD.left + i * plotW / (acts.length - 1);
-
-            let closestIdx = -1;
-            let minDiff = Infinity;
-
-            for (let i = 0; i < acts.length; i++) {
-              const diff = Math.abs(svgX - actX(i));
-              if (diff < minDiff) {
-                minDiff = diff;
-                closestIdx = i;
-              }
-            }
-
-            if (svgX < PAD.left - 25 || svgX > W - PAD.right + 25) {
-              closestIdx = -1;
-            }
-
-            if (closestIdx !== hoveredArcIndex) {
-              hoveredArcIndex = closestIdx;
-              if (currentArc) drawArc(currentArc, activeBaseline);
-            }
-
-            if (hoveredArcIndex !== -1) {
-              const act = acts[hoveredArcIndex];
-              const userVal = typeof act === "number" ? act : act.sentiment;
-              const blVals = (currentArc.baselines && currentArc.baselines[activeBaseline])
-                ? currentArc.baselines[activeBaseline]
-                : [0.0839, 0.0588, 0.1347, 0.1006];
-              const blVal = blVals[hoveredArcIndex] || 0;
-
-              const labelMap = { "Introduction": "Intro", "Development": "Dev", "Twist": "Twist", "Resolution": "Res" };
-              const actNames = ["Ki (Intro)", "Shō (Dev)", "Ten (Twist)", "Ketsu (Res)"];
-              const titleFmt = actNames[hoveredArcIndex] || `${act.act || ''} (${labelMap[act.label] || act.label || ''})`;
-
-              const isLight = document.documentElement.getAttribute("data-theme") === "light";
-              const userFmt = userVal >= 0 ? `+${userVal.toFixed(2)}` : userVal.toFixed(2);
-              const blFmt = blVal >= 0 ? `+${blVal.toFixed(2)}` : blVal.toFixed(2);
-              const baseName = activeBaseline === "web_novel" ? "Web Novel Baseline" : "Classic Lit Baseline";
-              const blColor = activeBaseline === "web_novel"
-                ? (isLight ? "#7c3aed" : "#a78bfa")
-                : (isLight ? "#d97706" : "#fbbf24");
-              const userColor = isLight ? "#0284c7" : "#7dd3fc";
-              const labelColor = isLight ? "#64748b" : "rgba(255,255,255,0.7)";
-
-              arcTooltipNode.innerHTML = `
-                <div class="radar-tooltip-title">${titleFmt}</div>
-                <div class="radar-tooltip-row">
-                  <span style="color: ${labelColor}">Selected Novel:</span>
-                  <span class="radar-tooltip-val" style="color: ${userColor}">${userFmt}</span>
-                </div>
-                <div class="radar-tooltip-row">
-                  <span style="color: ${labelColor}">${baseName}:</span>
-                  <span class="radar-tooltip-val" style="color: ${blColor}">${blFmt}</span>
-                </div>
-              `;
-
-              arcTooltipNode.style.display = "block";
-              arcTooltipNode.style.left = (e.clientX + 15) + "px";
-              arcTooltipNode.style.top = (e.clientY + 15) + "px";
-            } else {
-              arcTooltipNode.style.display = "none";
-            }
-          } catch (err) {
-            console.error("Error handling arc tooltip:", err);
-          }
-        });
-
-        svgNode.addEventListener("mouseleave", () => {
-          if (hoveredArcIndex !== -1) {
-            hoveredArcIndex = -1;
-            if (currentArc) drawArc(currentArc, activeBaseline);
-          }
-          arcTooltipNode.style.display = "none";
-        });
-      }
-
-      // 8. Ingestion Form & Job Polling
-      const ingestForm = document.getElementById("ingest-form");
-      const ingestSubmitBtn = document.getElementById("ingest-submit");
-
-      if (ingestForm) {
-        ingestForm.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const datasetName = document.getElementById("dataset_name").value.trim();
-          const numRecords = parseInt(document.getElementById("num_records").value, 10);
-
-          if (!datasetName) return;
-
-          ingestSubmitBtn.disabled = true;
-          ingestSubmitBtn.innerText = "Submitting Job...";
-
-          try {
-            const resp = await fetch(`${API_URL}/api/pipeline/ingest`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ dataset_name: datasetName, num_records: numRecords })
-            });
-
-            if (!resp.ok) {
-              const errData = await resp.json();
-              throw new Error(errData.detail || "Failed to schedule ingestion job");
-            }
-
-            const data = await resp.json();
-            const jobId = data.job_id;
-
-            showIngestStatusCard(jobId, datasetName);
-            pollIngestJobStatus(jobId);
-
-          } catch (err) {
-            alert(`Ingestion Error: ${err.message}`);
-            ingestSubmitBtn.disabled = false;
-            ingestSubmitBtn.innerText = "Schedule Ingest";
-          }
-        });
-      }
-
+      // 4. Ingestion Status Display & Job Polling
       function showIngestStatusCard(jobId, datasetName) {
         const card = document.getElementById("ingest-status-card");
         const badge = document.getElementById("ingest-status-badge");
@@ -4532,16 +4263,19 @@ import { ClientRouter } from 'astro:transitions';
         const detail = document.getElementById("ingest-status-detail");
         const iconContainer = document.getElementById("ingest-status-icon");
 
-        card.style.display = "block";
-        badge.className = "status-pill status-pill--running";
-        badge.innerText = "Processing";
-        dataset.innerText = datasetName;
-        message.innerText = "Fetching records, extracting features, and parsing chapters...";
-        detail.style.display = "none";
-        iconContainer.innerHTML = '<div class="status-spinner"></div>';
+        if (card) card.style.display = "block";
+        if (badge) {
+          badge.className = "status-pill status-pill--running";
+          badge.innerText = "Processing";
+        }
+        if (dataset) dataset.innerText = datasetName;
+        if (message) message.innerText = "Fetching records, extracting features, and parsing chapters...";
+        if (detail) detail.style.display = "none";
+        if (iconContainer) iconContainer.innerHTML = '<div class="status-spinner"></div>';
       }
 
       function pollIngestJobStatus(jobId) {
+        const ingestSubmitBtn = document.getElementById("ingest-submit");
         const interval = setInterval(async () => {
           try {
             const resp = await fetch(`${API_URL}/api/pipeline/ingest/status/${jobId}`);
@@ -4555,27 +4289,37 @@ import { ClientRouter } from 'astro:transitions';
 
             if (data.status === "completed") {
               clearInterval(interval);
-              badge.className = "status-pill status-pill--completed";
-              badge.innerText = "Completed";
-              message.innerText = "Ingestion complete! Successfully indexed records into library.";
-              iconContainer.innerHTML = '<div class="status-icon--success">✓</div>';
+              if (badge) {
+                badge.className = "status-pill status-pill--completed";
+                badge.innerText = "Completed";
+              }
+              if (message) message.innerText = "Ingestion complete! Successfully indexed records into library.";
+              if (iconContainer) iconContainer.innerHTML = '<div class="status-icon--success">✓</div>';
 
-              ingestSubmitBtn.disabled = false;
-              ingestSubmitBtn.innerText = "Schedule Ingest";
+              if (ingestSubmitBtn) {
+                ingestSubmitBtn.disabled = false;
+                ingestSubmitBtn.innerText = "Schedule Ingest";
+              }
 
               fetchNovels();
 
             } else if (data.status === "failed") {
               clearInterval(interval);
-              badge.className = "status-pill status-pill--failed";
-              badge.innerText = "Failed";
-              message.innerText = "Ingestion failed during processing.";
-              detail.style.display = "block";
-              detail.innerText = data.error || "Unknown error encountered.";
-              iconContainer.innerHTML = '<div class="status-icon--error">✕</div>';
+              if (badge) {
+                badge.className = "status-pill status-pill--failed";
+                badge.innerText = "Failed";
+              }
+              if (message) message.innerText = "Ingestion failed during processing.";
+              if (detail) {
+                detail.style.display = "block";
+                detail.innerText = data.error || "Unknown error encountered.";
+              }
+              if (iconContainer) iconContainer.innerHTML = '<div class="status-icon--error">✕</div>';
 
-              ingestSubmitBtn.disabled = false;
-              ingestSubmitBtn.innerText = "Schedule Ingest";
+              if (ingestSubmitBtn) {
+                ingestSubmitBtn.disabled = false;
+                ingestSubmitBtn.innerText = "Schedule Ingest";
+              }
             }
           } catch (err) {
             console.error("Error polling job status:", err);
@@ -4583,19 +4327,245 @@ import { ClientRouter } from 'astro:transitions';
         }, 2000);
       }
 
-      // Initial Load with DOMContentLoaded safety
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", () => {
-          renderGenreCheckboxes();
-          fetchNovels();
-          checkUrlParams();
-        });
-      } else {
-        renderGenreCheckboxes();
-        fetchNovels();
-        checkUrlParams();
+      // 5. Ingestion Form Setup
+      function setupIngestionForm() {
+        const ingestForm = document.getElementById("ingest-form");
+        const ingestSubmitBtn = document.getElementById("ingest-submit");
+
+        if (ingestForm && ingestSubmitBtn) {
+          ingestForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const datasetName = (document.getElementById("dataset_name")?.value || "").trim();
+            const numRecordsInput = document.getElementById("num_records");
+            const numRecords = numRecordsInput ? parseInt(numRecordsInput.value, 10) : 50;
+
+            if (!datasetName) return;
+
+            ingestSubmitBtn.disabled = true;
+            ingestSubmitBtn.innerText = "Submitting Job...";
+
+            try {
+              const resp = await fetch(`${API_URL}/api/pipeline/ingest`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ dataset_name: datasetName, num_records: numRecords })
+              });
+
+              if (!resp.ok) {
+                const errData = await resp.json();
+                throw new Error(errData.detail || "Failed to schedule ingestion job");
+              }
+
+              const data = await resp.json();
+              const jobId = data.job_id;
+
+              showIngestStatusCard(jobId, datasetName);
+              pollIngestJobStatus(jobId);
+
+            } catch (err) {
+              alert(`Ingestion Error: ${err.message}`);
+              ingestSubmitBtn.disabled = false;
+              ingestSubmitBtn.innerText = "Schedule Ingest";
+            }
+          });
+        }
       }
 
+      // 6. Archetype Radar & Arc Chart Hover & Tooltip Events
+      function setupChartHoverListeners() {
+        const canvasNode = document.getElementById("radarChart");
+        const tooltipNode = document.getElementById("radarTooltip");
+
+        if (canvasNode && tooltipNode) {
+          canvasNode.addEventListener("mousemove", (e) => {
+            if (!currentStats) return;
+            const rect = canvasNode.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            const cx = rect.width / 2;
+            const cy = rect.height / 2;
+            const dx = mx - cx;
+            const dy = my - cy;
+            const d = Math.sqrt(dx * dx + dy * dy);
+            let angle = Math.atan2(dy, dx);
+
+            const labelPad = 75;
+            const R_css = Math.min(rect.width, rect.height) / 2 - labelPad;
+            const n = RADAR_DIMS.length;
+            let bestIndex = -1;
+            let minDiff = Infinity;
+
+            if (d <= R_css + 45 && d >= 12) {
+              for (let i = 0; i < n; i++) {
+                const spokeAngle = (2 * Math.PI * i / n) - Math.PI / 2;
+                let diff = Math.abs(angle - spokeAngle);
+                while (diff > Math.PI) {
+                  diff = Math.abs(diff - 2 * Math.PI);
+                }
+                if (diff < minDiff) {
+                  minDiff = diff;
+                  bestIndex = i;
+                }
+              }
+              if (minDiff > 0.35) {
+                bestIndex = -1;
+              }
+            }
+
+            if (bestIndex !== hoveredIndex) {
+              hoveredIndex = bestIndex;
+              renderAll();
+            }
+
+            if (hoveredIndex !== -1) {
+              const dim = RADAR_DIMS[hoveredIndex];
+              const prefix = Object.keys(currentStats).find(k => k.startsWith("zh_")) ? "zh_" :
+                             Object.keys(currentStats).find(k => k.startsWith("ja_")) ? "ja_" : "en_";
+              const statsKey = dim.key.replace("en_", prefix);
+
+              const userVal = (currentStats.normalized_radar && currentStats.normalized_radar[statsKey] !== undefined)
+                ? currentStats.normalized_radar[statsKey]
+                : norm(currentStats[statsKey] ?? 0, dim.min, dim.max);
+              
+              const blVals = (currentStats.baselines && currentStats.baselines.radar && currentStats.baselines.radar[activeBaseline])
+                ? currentStats.baselines.radar[activeBaseline]
+                : RADAR_BASELINES[activeBaseline];
+              const blVal = blVals ? blVals[hoveredIndex] : 0;
+
+              const isLight = document.documentElement.getAttribute("data-theme") === "light";
+              const userPct = (userVal * 100).toFixed(0) + "%";
+              const blPct = (blVal * 100).toFixed(0) + "%";
+              const baseName = activeBaseline === "web_novel" ? "Web Novel Baseline" : "Classic Lit Baseline";
+              const blColor = activeBaseline === "web_novel"
+                ? (isLight ? "#7c3aed" : "#a78bfa")
+                : (isLight ? "#d97706" : "#fbbf24");
+              const userColor = isLight ? "#0284c7" : "#7dd3fc";
+              const labelColor = isLight ? "#64748b" : "rgba(255,255,255,0.7)";
+
+              tooltipNode.innerHTML = `
+                <div class="radar-tooltip-title">${dim.label}</div>
+                <div class="radar-tooltip-row">
+                  <span style="color: ${labelColor}">Selected Novel:</span>
+                  <span class="radar-tooltip-val" style="color: ${userColor}">${userPct}</span>
+                </div>
+                <div class="radar-tooltip-row">
+                  <span style="color: ${labelColor}">${baseName}:</span>
+                  <span class="radar-tooltip-val" style="color: ${blColor}">${blPct}</span>
+                </div>
+              `;
+              tooltipNode.style.display = "block";
+              tooltipNode.style.left = (e.clientX + 15) + "px";
+              tooltipNode.style.top = (e.clientY + 15) + "px";
+            } else {
+              tooltipNode.style.display = "none";
+            }
+          });
+
+          canvasNode.addEventListener("mouseleave", () => {
+            if (hoveredIndex !== -1) {
+              hoveredIndex = -1;
+              renderAll();
+            }
+            tooltipNode.style.display = "none";
+          });
+        }
+
+        const svgNode = document.getElementById("arcChart");
+        const arcTooltipNode = document.getElementById("arcTooltip");
+
+        if (svgNode && arcTooltipNode) {
+          svgNode.addEventListener("mousemove", (e) => {
+            try {
+              if (!currentArc) return;
+              const rect = svgNode.getBoundingClientRect();
+              if (rect.width === 0 || rect.height === 0) return;
+
+              const svgX = (e.clientX - rect.left) * (600 / rect.width);
+              const W = 600;
+              const PAD = { top: 30, bottom: 48, left: 48, right: 48 };
+              const plotW = W - PAD.left - PAD.right;
+              const acts = (currentArc.quantiles && currentArc.quantiles.length > 0)
+                ? currentArc.quantiles.map((v, i) => ({ sentiment: v, actIndex: i }))
+                : currentArc.acts;
+
+              const actX = i => PAD.left + i * plotW / (acts.length - 1);
+
+              let closestIdx = -1;
+              let minDiff = Infinity;
+
+              for (let i = 0; i < acts.length; i++) {
+                const diff = Math.abs(svgX - actX(i));
+                if (diff < minDiff) {
+                  minDiff = diff;
+                  closestIdx = i;
+                }
+              }
+
+              if (svgX < PAD.left - 25 || svgX > W - PAD.right + 25) {
+                closestIdx = -1;
+              }
+
+              if (closestIdx !== hoveredArcIndex) {
+                hoveredArcIndex = closestIdx;
+                if (currentArc) drawArc(currentArc, activeBaseline);
+              }
+
+              if (hoveredArcIndex !== -1) {
+                const act = acts[hoveredArcIndex];
+                const userVal = typeof act === "number" ? act : act.sentiment;
+                const blVals = (currentArc.baselines && currentArc.baselines[activeBaseline])
+                  ? currentArc.baselines[activeBaseline]
+                  : [0.0839, 0.0588, 0.1347, 0.1006];
+                const blVal = blVals[hoveredArcIndex] || 0;
+
+                const labelMap = { "Introduction": "Intro", "Development": "Dev", "Twist": "Twist", "Resolution": "Res" };
+                const actNames = ["Ki (Intro)", "Shō (Dev)", "Ten (Twist)", "Ketsu (Res)"];
+                const titleFmt = actNames[hoveredArcIndex] || `${act.act || ''} (${labelMap[act.label] || act.label || ''})`;
+
+                const isLight = document.documentElement.getAttribute("data-theme") === "light";
+                const userFmt = userVal >= 0 ? `+${userVal.toFixed(2)}` : userVal.toFixed(2);
+                const blFmt = blVal >= 0 ? `+${blVal.toFixed(2)}` : blVal.toFixed(2);
+                const baseName = activeBaseline === "web_novel" ? "Web Novel Baseline" : "Classic Lit Baseline";
+                const blColor = activeBaseline === "web_novel"
+                  ? (isLight ? "#7c3aed" : "#a78bfa")
+                  : (isLight ? "#d97706" : "#fbbf24");
+                const userColor = isLight ? "#0284c7" : "#7dd3fc";
+                const labelColor = isLight ? "#64748b" : "rgba(255,255,255,0.7)";
+
+                arcTooltipNode.innerHTML = `
+                  <div class="radar-tooltip-title">${titleFmt}</div>
+                  <div class="radar-tooltip-row">
+                    <span style="color: ${labelColor}">Selected Novel:</span>
+                    <span class="radar-tooltip-val" style="color: ${userColor}">${userPct}</span>
+                  </div>
+                  <div class="radar-tooltip-row">
+                    <span style="color: ${labelColor}">${baseName}:</span>
+                    <span class="radar-tooltip-val" style="color: ${blColor}">${blPct}</span>
+                  </div>
+                `;
+
+                arcTooltipNode.style.display = "block";
+                arcTooltipNode.style.left = (e.clientX + 15) + "px";
+                arcTooltipNode.style.top = (e.clientY + 15) + "px";
+              } else {
+                arcTooltipNode.style.display = "none";
+              }
+            } catch (err) {
+              console.error("Error handling arc tooltip:", err);
+            }
+          });
+
+          svgNode.addEventListener("mouseleave", () => {
+            if (hoveredArcIndex !== -1) {
+              hoveredArcIndex = -1;
+              if (currentArc) drawArc(currentArc, activeBaseline);
+            }
+            arcTooltipNode.style.display = "none";
+          });
+        }
+      }
+
+      // 7. Check URL Search Parameters
       function checkUrlParams() {
         const urlParams = new URLSearchParams(window.location.search);
         const linkedNovelId = urlParams.get('novelId');
@@ -4610,6 +4580,92 @@ import { ClientRouter } from 'astro:transitions';
           }, 1500);
         }
       }
+
+      // 8. Main Library Explorer Initializer
+      function initExplorer() {
+        const searchInput = document.getElementById("novel-search-input");
+        const novelSelect = document.getElementById("novelSelect");
+        const resetBtn = document.querySelector(".btn-reset-filters");
+
+        if (searchInput) {
+          searchInput.addEventListener("input", filterNovels);
+        }
+
+        if (novelSelect) {
+          novelSelect.addEventListener("change", (e) => {
+            const id = parseInt(e.target.value);
+            if (!id) return;
+            const novel = allNovels.find(n => n.id === id);
+            if (novel) {
+              selectNovel(novel.id, novel.title);
+            }
+          });
+        }
+
+        // Territory tabs click listeners
+        document.querySelectorAll("#territory-selector .t-tab").forEach(tab => {
+          tab.addEventListener("click", () => {
+            const territory = tab.getAttribute("data-territory");
+            if (territory) selectTerritory(territory);
+          });
+        });
+
+        // Baseline switch click handlers
+        document.querySelectorAll(".baseline-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            document.querySelectorAll(".baseline-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            activeBaseline = btn.dataset.baseline;
+            if (currentStats) renderAll();
+          });
+        });
+
+        // Reset all filters button listener
+        if (resetBtn) {
+          resetBtn.addEventListener("click", resetGenreFilters);
+        }
+
+        // Setup Ingestion Form
+        setupIngestionForm();
+
+        // Setup Chart Hover & Tooltip Events
+        setupChartHoverListeners();
+
+        // Render genres and fetch novels
+        renderGenreCheckboxes();
+        fetchNovels();
+        checkUrlParams();
+      }
+
+      // 9. ClientRouter Lifecycle Initializer (astro:page-load)
+      document.addEventListener("astro:page-load", () => {
+        // Theme toggle
+        const themeToggleBtn = document.getElementById("themeToggleBtn");
+        if (themeToggleBtn) {
+          themeToggleBtn.addEventListener("click", () => {
+            const current = document.documentElement.getAttribute("data-theme") || "dark";
+            const next = current === "light" ? "dark" : "light";
+            document.documentElement.setAttribute("data-theme", next);
+            try {
+              localStorage.setItem("kisholens-theme", next);
+            } catch (e) {}
+            window.dispatchEvent(new CustomEvent("themechange", { detail: { theme: next } }));
+          });
+        }
+
+        // Initialize Library Explorer if on library page
+        if (document.getElementById("novels-container") || document.getElementById("territory-selector")) {
+          initExplorer();
+        }
+      });
+
+      // Window exposed functions for inline event handlers and global access
+      window.selectTerritory = selectTerritory;
+      window.handleGenreItemClick = handleGenreItemClick;
+      window.toggleIncludeGenre = toggleIncludeGenre;
+      window.toggleExcludeGenre = toggleExcludeGenre;
+      window.resetGenreFilters = resetGenreFilters;
+      window.selectNovel = selectNovel;
 
       // Reactive Theme Change Listener
       window.addEventListener("themechange", () => {
