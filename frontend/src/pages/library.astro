@@ -679,10 +679,10 @@ import { ClientRouter } from 'astro:transitions';
       }
 
       /* Scrollbar styling */
-      .novel-list::-webkit-scrollbar, .stats-content-scroll::-webkit-scrollbar {
+      .novel-list::-webkit-scrollbar {
         width: 6px;
       }
-      .novel-list::-webkit-scrollbar-thumb, .stats-content-scroll::-webkit-scrollbar-thumb {
+      .novel-list::-webkit-scrollbar-thumb {
         background: rgba(255, 255, 255, 0.12);
         border-radius: 4px;
       }
@@ -695,9 +695,8 @@ import { ClientRouter } from 'astro:transitions';
       }
 
       .stats-content-scroll {
-        max-height: 520px;
-        overflow-y: auto;
-        padding-right: 0.35rem;
+        /* No inner scroll — content flows into page scroll */
+        overflow: visible;
       }
 
       .stat-grid {
