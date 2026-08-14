@@ -3718,10 +3718,8 @@ import { ClientRouter } from 'astro:transitions';
 
         const cssW = canvas.clientWidth  || 480;
         const cssH = canvas.clientHeight || 480;
-        if (canvas.width !== Math.round(cssW * dpr) || canvas.height !== Math.round(cssH * dpr)) {
-          canvas.width  = Math.round(cssW * dpr);
-          canvas.height = Math.round(cssH * dpr);
-        }
+        canvas.width  = Math.round(cssW * dpr);
+        canvas.height = Math.round(cssH * dpr);
 
         const ctx = canvas.getContext("2d");
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -3745,14 +3743,14 @@ import { ClientRouter } from 'astro:transitions';
           }
           ctx.closePath();
           if (ring % 2 === 1) {
-            ctx.fillStyle = isLight ? "rgba(241, 245, 249, 0.6)" : "rgba(255, 255, 255, 0.015)";
+            ctx.fillStyle = isLight ? "rgba(241, 245, 249, 0.5)" : "transparent";
             ctx.fill();
           }
-          ctx.strokeStyle = isLight ? "rgba(15, 23, 42, 0.10)" : "rgba(255, 255, 255, 0.10)";
+          ctx.strokeStyle = isLight ? "rgba(15, 23, 42, 0.12)" : "rgba(255, 255, 255, 0.08)";
           ctx.lineWidth = 1;
           ctx.stroke();
 
-          ctx.fillStyle = isLight ? "rgba(15, 23, 42, 0.45)" : "rgba(255, 255, 255, 0.18)";
+          ctx.fillStyle = isLight ? "rgba(15, 23, 42, 0.45)" : "rgba(255, 255, 255, 0.3)";
           ctx.font = "10px Inter, sans-serif";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
@@ -4792,6 +4790,15 @@ import { ClientRouter } from 'astro:transitions';
       }
 
       // 9. ClientRouter Lifecycle Initializer (astro:page-load)
+      function reRenderLibrary() {
+        if (currentStats && (document.getElementById("radarChart") || document.getElementById("novels-container"))) {
+          renderAll();
+          if (currentStats.top_matches) {
+            renderSimilarNovels(currentStats.top_matches);
+          }
+        }
+      }
+
       function toggleTheme() {
         const current = document.documentElement.getAttribute("data-theme") || "dark";
         const next = current === "light" ? "dark" : "light";
@@ -4805,6 +4812,8 @@ import { ClientRouter } from 'astro:transitions';
 
         window.dispatchEvent(new CustomEvent("themechange", { detail: { theme: next } }));
 
+        reRenderLibrary();
+
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             document.documentElement.classList.remove("theme-transitioning");
@@ -4813,11 +4822,9 @@ import { ClientRouter } from 'astro:transitions';
       }
 
       document.addEventListener("astro:page-load", () => {
-        // Theme toggle with single-listener binding guard for persisted header
         const themeToggleBtn = document.getElementById("themeToggleBtn");
-        if (themeToggleBtn && !themeToggleBtn.dataset.themeBound) {
-          themeToggleBtn.dataset.themeBound = "true";
-          themeToggleBtn.addEventListener("click", toggleTheme);
+        if (themeToggleBtn) {
+          themeToggleBtn.onclick = toggleTheme;
         }
 
         // Initialize Library Explorer if on library page
@@ -4834,18 +4841,11 @@ import { ClientRouter } from 'astro:transitions';
       window.resetGenreFilters = resetGenreFilters;
       window.selectNovel = selectNovel;
 
-      // Reactive Theme Change Listener (Guarded & frame-batched)
-      if (!window._libraryThemeChangeBound) {
-        window._libraryThemeChangeBound = true;
-        window.addEventListener("themechange", () => {
-          requestAnimationFrame(() => {
-            if (currentStats) renderAll();
-            if (currentStats && currentStats.top_matches) {
-              renderSimilarNovels(currentStats.top_matches);
-            }
-          });
+      window.addEventListener("themechange", () => {
+        requestAnimationFrame(() => {
+          reRenderLibrary();
         });
-      }
+      });
     </script>
   </body>
 </html>

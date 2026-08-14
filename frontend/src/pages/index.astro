@@ -268,11 +268,9 @@ const INITIAL_MYSTERY_TEXT = `The autumn rain lashed against the fog-stained win
       }
 
       document.addEventListener("astro:page-load", () => {
-        // Theme toggle with single-binding guard
         const themeToggleBtn = document.getElementById("themeToggleBtn");
-        if (themeToggleBtn && !themeToggleBtn.dataset.themeBound) {
-          themeToggleBtn.dataset.themeBound = "true";
-          themeToggleBtn.addEventListener("click", toggleTheme);
+        if (themeToggleBtn) {
+          themeToggleBtn.onclick = toggleTheme;
         }
 
         const tabs = document.querySelectorAll(".reader-tab");
