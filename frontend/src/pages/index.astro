@@ -8,6 +8,19 @@ Sherlock Holmes did not rise immediately. He slowly lowered his pipe, allowing a
 
 <html lang="en">
   <head>
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem('kisholens-theme');
+          var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+          if (theme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+          } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
@@ -28,10 +41,28 @@ Sherlock Holmes did not rise immediately. He slowly lowered his pipe, allowing a
     <div class="app-container">
       <header class="site-header">
         <a href="/" class="brand-title">Kish<span>o</span>Lens</a>
-        <nav class="site-nav">
-          <a href="/analyze"><span class="nav-text-full">Analyze Prose</span><span class="nav-text-short">Analyze</span></a>
-          <a href="/library">Library</a>
-        </nav>
+        <div class="site-header-actions">
+          <nav class="site-nav">
+            <a href="/analyze"><span class="nav-text-full">Analyze Prose</span><span class="nav-text-short">Analyze</span></a>
+            <a href="/library">Library</a>
+          </nav>
+          <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle theme" title="Toggle theme">
+            <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2"></path>
+              <path d="M12 20v2"></path>
+              <path d="m4.93 4.93 1.41 1.41"></path>
+              <path d="m17.66 17.66 1.41 1.41"></path>
+              <path d="M2 12h2"></path>
+              <path d="M20 12h2"></path>
+              <path d="m6.34 17.66-1.41 1.41"></path>
+              <path d="m19.07 4.93-1.41 1.41"></path>
+            </svg>
+            <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+            </svg>
+          </button>
+        </div>
       </header>
       <!-- Hero Section -->
       <section class="hero-section">
@@ -212,6 +243,20 @@ Sherlock Holmes did not rise immediately. He slowly lowered his pipe, allowing a
       };
 
       document.addEventListener("DOMContentLoaded", () => {
+        // Theme toggle
+        const themeToggleBtn = document.getElementById("themeToggleBtn");
+        if (themeToggleBtn) {
+          themeToggleBtn.addEventListener("click", () => {
+            const current = document.documentElement.getAttribute("data-theme") || "dark";
+            const next = current === "light" ? "dark" : "light";
+            document.documentElement.setAttribute("data-theme", next);
+            try {
+              localStorage.setItem("kisholens-theme", next);
+            } catch (e) {}
+            window.dispatchEvent(new CustomEvent("themechange", { detail: { theme: next } }));
+          });
+        }
+
         const tabs = document.querySelectorAll(".reader-tab");
         const textEl = document.getElementById("excerpt-text");
         const dialogueEl = document.getElementById("metric-dialogue");

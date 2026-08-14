@@ -4,6 +4,19 @@ import "../styles/global.css";
 
 <html lang="en">
   <head>
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem('kisholens-theme');
+          var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+          if (theme === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+          } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
@@ -1145,8 +1158,211 @@ import "../styles/global.css";
       .archetype-label {
         text-align: center;
         font-size: 0.85rem;
-        color: rgba(255,255,255,0.5);
-        font-style: italic;
+        color: rgba(255,255,255,0.7);
+        font-weight: 500;
+        margin: 0;
+      }
+
+      /* Archetype Taxonomy & Multi-Genre Styles */
+      :global(.archetype-taxonomy-container) {
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+        margin-top: 0.85rem;
+        padding-top: 0.85rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      :global(.taxonomy-pillars-grid) {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 0.5rem;
+      }
+
+      :global(.pillar-card) {
+        background: rgba(255, 255, 255, 0.025);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 0.55rem;
+        padding: 0.5rem 0.65rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        transition: border-color 0.2s, background 0.2s;
+      }
+      :global(.pillar-card:hover) {
+        border-color: rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      :global(.pillar-card.inciting) { border-left: 3px solid #f472b6; }
+      :global(.pillar-card.world)    { border-left: 3px solid #38bdf8; }
+      :global(.pillar-card.plot)     { border-left: 3px solid #34d399; }
+
+      :global(.pillar-tag) {
+        font-size: 0.63rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #94a3b8;
+      }
+
+      :global(.pillar-name) {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.3rem;
+      }
+
+      :global(.pillar-score) {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #a78bfa;
+        background: rgba(167, 139, 250, 0.12);
+        padding: 0.05rem 0.35rem;
+        border-radius: 999px;
+      }
+
+      /* Dynamic Genre Affinities Track */
+      :global(.genre-affinities-track) {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+
+      :global(.affinities-header) {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      :global(.affinities-title) {
+        font-size: 0.68rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+      }
+
+      :global(.affinity-pills-row) {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+      }
+
+      :global(.genre-affinity-pill) {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.76rem;
+        font-weight: 500;
+        transition: transform 0.15s, border-color 0.2s;
+        cursor: default;
+      }
+      :global(.genre-affinity-pill:hover) {
+        transform: translateY(-1px);
+      }
+
+      :global(.genre-affinity-pill.tier-vibrant) {
+        background: rgba(167, 139, 250, 0.14);
+        border: 1px solid rgba(167, 139, 250, 0.4);
+        color: #c4b5fd;
+      }
+      :global(.genre-affinity-pill.tier-cyan) {
+        background: rgba(56, 189, 248, 0.12);
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        color: #7dd3fc;
+      }
+      :global(.genre-affinity-pill.tier-emerald) {
+        background: rgba(52, 211, 153, 0.12);
+        border: 1px solid rgba(52, 211, 153, 0.35);
+        color: #6ee7b7;
+      }
+
+      :global(.pill-pct) {
+        font-weight: 700;
+      }
+
+      /* Expandable All Genres Drawer */
+      :global(.toggle-all-genres-btn) {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #94a3b8;
+        padding: 0.35rem 0.75rem;
+        border-radius: 0.45rem;
+        font-size: 0.72rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        transition: all 0.2s ease;
+        margin-top: 0.1rem;
+        align-self: flex-start;
+      }
+      :global(.toggle-all-genres-btn:hover) {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(255, 255, 255, 0.18);
+        color: #ffffff;
+      }
+
+      :global(.chevron-icon) {
+        transition: transform 0.25s ease;
+      }
+
+      :global(.all-genres-drawer) {
+        margin-top: 0.35rem;
+        padding: 0.75rem;
+        background: rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 0.6rem;
+      }
+
+      :global(.all-genres-grid) {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 0.45rem 0.9rem;
+      }
+
+      :global(.genre-rank-row) {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+      }
+
+      :global(.genre-rank-info) {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.72rem;
+      }
+
+      :global(.genre-rank-name) {
+        color: #cbd5e1;
+        font-weight: 500;
+      }
+
+      :global(.genre-rank-score) {
+        font-weight: 700;
+        font-size: 0.7rem;
+      }
+
+      :global(.genre-rank-track) {
+        height: 3px;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      :global(.genre-rank-fill) {
+        height: 100%;
+        border-radius: 999px;
+        transition: width 0.3s ease;
       }
 
       @keyframes spin {
@@ -1528,10 +1744,28 @@ import "../styles/global.css";
     <div class="app-container">
       <header class="site-header">
         <a href="/" class="brand-title">Kish<span>o</span>Lens</a>
-        <nav class="site-nav">
-          <a href="/analyze"><span class="nav-text-full">Analyze Prose</span><span class="nav-text-short">Analyze</span></a>
-          <a href="/library" class="active">Library</a>
-        </nav>
+        <div class="site-header-actions">
+          <nav class="site-nav">
+            <a href="/analyze"><span class="nav-text-full">Analyze Prose</span><span class="nav-text-short">Analyze</span></a>
+            <a href="/library" class="active">Library</a>
+          </nav>
+          <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle theme" title="Toggle theme">
+            <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2"></path>
+              <path d="M12 20v2"></path>
+              <path d="m4.93 4.93 1.41 1.41"></path>
+              <path d="m17.66 17.66 1.41 1.41"></path>
+              <path d="M2 12h2"></path>
+              <path d="M20 12h2"></path>
+              <path d="m6.34 17.66-1.41 1.41"></path>
+              <path d="m19.07 4.93-1.41 1.41"></path>
+            </svg>
+            <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+            </svg>
+          </button>
+        </div>
       </header>
 
       <!-- 1. Top Section: Library Explorer (Left) + Stylistic Stats & Ingest Form (Right) -->
@@ -1768,7 +2002,16 @@ import "../styles/global.css";
             </div>
           </div>
           <canvas id="radarChart"></canvas>
-          <p id="archetypeLabel" class="archetype-label"></p>
+          <div id="archetypeTaxonomyContainer" class="archetype-taxonomy-container">
+            <p id="archetypeLabel" class="archetype-label"></p>
+            <div id="taxonomyPillars" class="taxonomy-pillars" style="display: none;"></div>
+            <div id="genreAffinitiesTrack" class="genre-affinities-track" style="display: none;"></div>
+            <button id="toggleAllGenresBtn" class="toggle-all-genres-btn" type="button" style="display: none;">
+              <span id="toggleAllGenresText">View All 17 Ranked Genres</span>
+              <svg id="toggleAllGenresChevron" class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div id="allGenresDrawer" class="all-genres-drawer" style="display: none;"></div>
+          </div>
         </div>
 
         <!-- Kishōtenketsu Sentiment Arc Chart -->
@@ -1831,6 +2074,20 @@ import "../styles/global.css";
 
     <!-- Client-side Logic -->
     <script is:inline>
+      // Theme Toggle Initialization
+      const themeToggleBtn = document.getElementById("themeToggleBtn");
+      if (themeToggleBtn) {
+        themeToggleBtn.addEventListener("click", () => {
+          const current = document.documentElement.getAttribute("data-theme") || "dark";
+          const next = current === "light" ? "dark" : "light";
+          document.documentElement.setAttribute("data-theme", next);
+          try {
+            localStorage.setItem("kisholens-theme", next);
+          } catch (e) {}
+          window.dispatchEvent(new CustomEvent("themechange", { detail: { theme: next } }));
+        });
+      }
+
       const API_URL = "http://localhost:8000";
 
       let allNovels = [];
@@ -2965,20 +3222,143 @@ import "../styles/global.css";
           ctx.shadowBlur = 0;
         }
 
-        const am = stats["archetype_match"];
-        if (am) {
+        renderArchetypeTaxonomy(stats);
+      }
+
+      function renderArchetypeTaxonomy(stats) {
+        const am = stats["archetype_match"] || {};
+        const tax = stats["taxonomy"] || am.taxonomy || {};
+
+        // 1. Primary Archetype & Territory Header Label
+        const labelEl = document.getElementById("archetypeLabel");
+        if (labelEl) {
           if (am.top_genres && am.top_territories && am.top_territories.length > 0) {
             const genresStr = am.top_genres.slice(0, 3).map(g => `${g.genre} (${Math.min(99, Math.max(1, Math.round(g.confidence * 100)))}%)`).join(", ");
             const tConf = am.top_territories[0].confidence !== undefined
               ? ` (${Math.min(99, Math.max(1, Math.round(am.top_territories[0].confidence * 100)))}%)`
               : "";
             const territoryStr = `${am.top_territories[0].territory}${tConf}`;
-            document.getElementById("archetypeLabel").textContent = `${genresStr} · ${territoryStr}`;
+            labelEl.textContent = `${genresStr} · ${territoryStr}`;
           } else {
             const tropeConf = Math.min(99, Math.max(1, Math.round((am.confidence || 0.75) * 100)));
-            document.getElementById("archetypeLabel").textContent =
-              `${am.closest_trope || 'Unknown'} (${tropeConf}%) · ${am.territory || 'Classic Literature Territory'}`;
+            labelEl.textContent = `${am.closest_trope || 'Unknown'} (${tropeConf}%) · ${am.territory || 'Classic Literature Territory'}`;
           }
+        }
+
+        // 2. 3-Pillar Taxonomy Badges
+        const pillarsEl = document.getElementById("taxonomyPillars");
+        if (pillarsEl) {
+          if (tax.world_setting || tax.narrative_plot || tax.inciting_event) {
+            const incitingVal = tax.inciting_event?.primary;
+            const incitingScore = tax.inciting_event?.score ? Math.round(tax.inciting_event.score * 100) : null;
+            const worldVal = tax.world_setting?.primary;
+            const worldScore = tax.world_setting?.score ? Math.round(tax.world_setting.score * 100) : null;
+            const plotVal = tax.narrative_plot?.primary;
+            const plotScore = tax.narrative_plot?.score ? Math.round(tax.narrative_plot.score * 100) : null;
+
+            let html = '<div class="taxonomy-pillars-grid">';
+            if (incitingVal) {
+              html += `
+                <div class="pillar-card inciting">
+                  <span class="pillar-tag">⚡ Inciting Catalyst</span>
+                  <span class="pillar-name">${incitingVal} ${incitingScore ? `<span class="pillar-score">${incitingScore}%</span>` : ''}</span>
+                </div>
+              `;
+            }
+            if (worldVal) {
+              html += `
+                <div class="pillar-card world">
+                  <span class="pillar-tag">🌍 World Setting</span>
+                  <span class="pillar-name">${worldVal} ${worldScore ? `<span class="pillar-score">${worldScore}%</span>` : ''}</span>
+                </div>
+              `;
+            }
+            if (plotVal) {
+              html += `
+                <div class="pillar-card plot">
+                  <span class="pillar-tag">📖 Narrative Plot</span>
+                  <span class="pillar-name">${plotVal} ${plotScore ? `<span class="pillar-score">${plotScore}%</span>` : ''}</span>
+                </div>
+              `;
+            }
+            html += '</div>';
+            pillarsEl.innerHTML = html;
+            pillarsEl.style.display = "block";
+          } else {
+            pillarsEl.innerHTML = "";
+            pillarsEl.style.display = "none";
+          }
+        }
+
+        // 3. Dynamic Genre Affinities (>= 65%)
+        const rawGenreScores = tax.genre_scores || am.genre_scores || am.top_genres || [];
+        const normalizedScores = rawGenreScores.map(g => ({
+          genre: g.genre,
+          score: g.score !== undefined ? g.score : (g.confidence !== undefined ? g.confidence : 0)
+        })).sort((a, b) => b.score - a.score);
+
+        const affinitiesTrack = document.getElementById("genreAffinitiesTrack");
+        const highAffinities = normalizedScores.filter(g => g.score >= 0.65);
+        const displayedAffinities = highAffinities.length >= 2 ? highAffinities : normalizedScores.slice(0, 4);
+
+        if (affinitiesTrack && displayedAffinities.length > 0) {
+          let pillsHtml = `
+            <div class="affinities-header">
+              <span class="affinities-title">Key Genre Affinities (≥65%)</span>
+            </div>
+            <div class="affinity-pills-row">
+          `;
+          displayedAffinities.forEach(g => {
+            const pct = Math.min(99, Math.max(1, Math.round(g.score * 100)));
+            let tierClass = pct >= 85 ? "tier-vibrant" : pct >= 75 ? "tier-cyan" : "tier-emerald";
+            pillsHtml += `<span class="genre-affinity-pill ${tierClass}">${g.genre} <strong class="pill-pct">${pct}%</strong></span>`;
+          });
+          pillsHtml += '</div>';
+          affinitiesTrack.innerHTML = pillsHtml;
+          affinitiesTrack.style.display = "block";
+        } else if (affinitiesTrack) {
+          affinitiesTrack.innerHTML = "";
+          affinitiesTrack.style.display = "none";
+        }
+
+        // 4. Expandable Drawer for All 17 Genres
+        const drawerBtn = document.getElementById("toggleAllGenresBtn");
+        const drawerEl = document.getElementById("allGenresDrawer");
+        if (drawerBtn && drawerEl && normalizedScores.length > 0) {
+          let drawerHtml = `
+            <div class="all-genres-grid">
+          `;
+          normalizedScores.forEach(g => {
+            const pct = Math.min(99, Math.max(1, Math.round(g.score * 100)));
+            let barColor = pct >= 80 ? "#a78bfa" :
+                           pct >= 65 ? "#38bdf8" :
+                           pct >= 45 ? "#34d399" : "rgba(255,255,255,0.25)";
+            drawerHtml += `
+              <div class="genre-rank-row">
+                <div class="genre-rank-info">
+                  <span class="genre-rank-name">${g.genre}</span>
+                  <span class="genre-rank-score" style="color: ${barColor};">${pct}%</span>
+                </div>
+                <div class="genre-rank-track">
+                  <div class="genre-rank-fill" style="width: ${pct}%; background: ${barColor};"></div>
+                </div>
+              </div>
+            `;
+          });
+          drawerHtml += '</div>';
+          drawerEl.innerHTML = drawerHtml;
+          drawerBtn.style.display = "inline-flex";
+
+          drawerBtn.onclick = () => {
+            const isHidden = drawerEl.style.display === "none";
+            drawerEl.style.display = isHidden ? "block" : "none";
+            const txt = document.getElementById("toggleAllGenresText");
+            const chev = document.getElementById("toggleAllGenresChevron");
+            if (txt) txt.textContent = isHidden ? "Hide All 17 Genres" : "View All 17 Ranked Genres";
+            if (chev) chev.style.transform = isHidden ? "rotate(180deg)" : "rotate(0deg)";
+          };
+        } else if (drawerBtn) {
+          drawerBtn.style.display = "none";
         }
       }
 
