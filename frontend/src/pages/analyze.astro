@@ -1921,6 +1921,14 @@ import { ClientRouter } from 'astro:transitions';
         // Setup Chart Hover Listeners
         setupChartHoverListeners();
 
+        // Close metric tooltip popovers on document click
+        document.addEventListener("click", () => {
+          if (resultsContainer) {
+            resultsContainer.querySelectorAll(".metric-tooltip-box").forEach(box => box.classList.remove("visible"));
+            resultsContainer.querySelectorAll(".metric-info-icon").forEach(i => i.classList.remove("active"));
+          }
+        });
+
         // Restore previous analysis state if available
         if (lastAnalysisData) {
           renderResults(lastAnalysisData);
@@ -2189,11 +2197,6 @@ import { ClientRouter } from 'astro:transitions';
               icon.classList.add("active");
             }
           });
-        });
-
-        document.addEventListener("click", () => {
-          resultsContainer.querySelectorAll(".metric-tooltip-box").forEach(box => box.classList.remove("visible"));
-          resultsContainer.querySelectorAll(".metric-info-icon").forEach(i => i.classList.remove("active"));
         });
       }
 
