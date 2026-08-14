@@ -1600,9 +1600,9 @@ import { ClientRouter } from 'astro:transitions';
     <ClientRouter />
   </head>
   <body>
-    <div class="hero__glow" aria-hidden="true"></div>
+    <div class="hero__glow" transition:persist aria-hidden="true"></div>
     <div class="app-container">
-      <header class="site-header">
+      <header class="site-header" transition:persist>
         <a href="/" class="brand-title">Kish<span>o</span>Lens</a>
         <div class="site-header-actions">
           <nav class="site-nav">

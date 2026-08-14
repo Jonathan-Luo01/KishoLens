@@ -228,6 +228,9 @@ header.site-header,
   top: 0;
   z-index: 100;
   transition: background-color var(--transition), border-color var(--transition), box-shadow var(--transition);
+  view-transition-name: site-header;
+  isolation: isolate;
+  transform: translateZ(0);
 }
 
 [data-theme="light"] header.site-header,
@@ -326,15 +329,21 @@ header.site-header,
 }
 
 /* ─── Astro View Transitions & Shared Nav Indicator ─────────────────── */
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 1000;
+}
+
 ::view-transition-group(active-nav-pill) {
-  animation-duration: 0.3s;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-duration: 0.22s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1001;
 }
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 0.22s;
-  animation-timing-function: ease-in-out;
+  animation-duration: 0.12s;
+  animation-timing-function: ease-out;
 }
 
 .nav-text-short {
