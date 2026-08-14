@@ -156,9 +156,6 @@ async def lifespan(app: FastAPI):
         try:
             print("[WARMUP] Pre-loading spaCy, NLTK VADER, SentenceTransformers, and multi-lingual NLP pipelines...")
             _init_nlp_resources()
-            _load_disk_cache()
-            _load_arc_disk_cache()
-            _load_vector_disk_cache()
             sample_en = "This is a generic prose warmup sample for initializing spaCy, VADER, and sentence transformer models."
             extract_english_features(sample_en)
             extract_japanese_features("これはモデルを事前ロードするためのウォームアップテキストです。")
@@ -380,6 +377,7 @@ def get_novel_stats(novel_id: int):
         if not stats.get("top_matches") or not any(m.get("reasons") for m in stats.get("top_matches", [])):
             from kisholens.ml.similarity import find_top_matches
             stats["top_matches"] = find_top_matches(stats, exclude_novel_id=novel_id, top_k=5)
+            _save_disk_cache()
         return stats
     try:
         with Session(engine) as session:
@@ -608,7 +606,14 @@ def get_novel_arc(novel_id: int):
                 detail="No raw text found for this novel"
             )
 
-        arc_res = compute_kishotenketsu_quantile_arc(all_sentences, lang)
+        # Fast representative sampling: sample up to 160 evenly-spaced sentences across the novel for instant arc calculation
+        if len(all_sentences) > 160:
+            step = (len(all_sentences) - 1) / 159.0
+            sampled_sents = [all_sentences[int(round(i * step))] for i in range(160)]
+        else:
+            sampled_sents = all_sentences
+
+        arc_res = compute_kishotenketsu_quantile_arc(sampled_sents, lang)
 
         arc_data = {
             "novel_id": novel_id,
@@ -1073,9 +1078,14 @@ def post_analyze(request: AnalysisRequest):
             "closest_trope": semantic["genre"],
             "territory": semantic["territory"],
             "confidence": semantic["genre_confidence"],
-            "top_genres": [{"genre": x["genre"], "confidence": x["score"]} for x in semantic["genre_scores"][:3]],
-            "top_territories": [{"territory": x["territory"], "confidence": x["score"]} for x in semantic["territory_scores"][:3]]
+            "top_genres": [{"genre": x["genre"], "confidence": x["score"]} for x in semantic["genre_scores"]],
+            "genre_scores": semantic["genre_scores"],
+            "top_territories": [{"territory": x["territory"], "confidence": x["score"]} for x in semantic["territory_scores"]],
+            "territory_confidence": semantic.get("territory_confidence"),
+            "taxonomy": semantic.get("taxonomy"),
         }
+        if "taxonomy" in semantic:
+            agg["taxonomy"] = semantic["taxonomy"]
     else:
         agg["archetype_match"] = archetype
 

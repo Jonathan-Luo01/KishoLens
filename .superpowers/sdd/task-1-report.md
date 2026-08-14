@@ -1,33 +1,38 @@
-# Task 1 Completion Report: Vector Cache Disk Hydration in similarity.py
+# Task 1 Report: Semantic Theme Tokens, Zero-FOUT Head Script & Header Toggle Component
 
-## Status: COMPLETE
+**Status**: DONE
 
-### Overview
-Implemented `_init_cache_from_disk()` in `kisholens/ml/similarity.py` to auto-hydrate `_novel_vector_cache` on module load from `data/stats_cache.json`. This provides instant, in-memory access to pre-computed 8-dimensional normalized radar stylistic feature vectors, primary genres, top genres, territories, and metadata for all 10,320 indexed novels.
+## Implementation Summary
 
-### TDD Execution Steps
-1. **Red (Failing Test)**:
-   - Added `test_cache_hydration_from_disk()` in `tests/ml/test_similarity.py`.
-   - Verified test failed on collection with `ImportError: cannot import name '_init_cache_from_disk'`.
+1. **Semantic Dual-Theme Tokens (`frontend/src/styles/global.css`)**:
+   - Configured root default tokens and `[data-theme="light"]` token overrides:
+     - `--color-bg: #f8fafc;`
+     - `--color-surface: #ffffff;`
+     - `--color-surface-card: #ffffff;`
+     - `--color-surface-hover: #f1f5f9;`
+     - `--color-border: rgba(0, 0, 0, 0.09);`
+     - `--color-border-subtle: rgba(0, 0, 0, 0.05);`
+     - `--color-accent: #6366f1;`
+     - `--color-accent-2: #a855f7;`
+     - `--color-accent-cyan: #0284c7;`
+     - `--color-accent-emerald: #059669;`
+     - `--color-text: #0f172a;`
+     - `--color-text-subtle: #475569;`
+     - `--color-muted: #64748b;`
+     - `--header-bg: rgba(255, 255, 255, 0.88);`
+     - `--card-shadow: 0 4px 24px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);`
+   - Added styles for `.site-header-actions`, responsive header adjustments, `.theme-toggle-btn`, and light mode adaptations for `.site-nav`, `.radar-tooltip`, and `.category-tab`.
 
-2. **Green (Implementation)**:
-   - Implemented `_init_cache_from_disk(cache_path=None)` in `kisholens/ml/similarity.py`:
-     - Reads `data/stats_cache.json`.
-     - Iterates over all non-metadata entries (`k` not starting with `_`).
-     - Extracts 8D stylistic feature vector via `extract_feature_vector(item)`.
-     - Extracts `primary_genre`, `top_genres`, `territory`, `title`, `author`, and semantic metadata.
-     - Populates `_novel_vector_cache[nid]` keyed by integer novel ID.
-     - Added auto-hydration invocation `_init_cache_from_disk()` on module import.
-   - Ran `uv run pytest tests/ml/test_similarity.py -v`:
-     - `test_cache_hydration_from_disk` PASSED (cache size: 10,320 items; #235 "The Adventures of Sherlock Holmes", vector shape (8,), primary_genre "Mystery").
-     - `test_find_top_matches_basic` PASSED.
-     - `test_find_top_matches_exclusion` PASSED.
+2. **Zero-FOUT Initializer Script**:
+   - Added inline `<script is:inline>` immediately in the `<head>` of `index.astro`, `analyze.astro`, and `library.astro`.
+   - Checks `localStorage.getItem('kisholens-theme')` with a fallback to `window.matchMedia('(prefers-color-scheme: light)').matches` and applies `document.documentElement.setAttribute('data-theme', theme)` before any rendering occurs.
 
-3. **Refactor & Verification**:
-   - Ran GitNexus blast radius / impact analysis and detect changes verification.
-   - Committed changes with: `git commit -m "feat(similarity): hydrate novel vector cache from disk with 8D radar stylistics"`.
+3. **Header Theme Toggle Component & Event Broadcasting**:
+   - Integrated `#themeToggleBtn` in `.site-header` across `index.astro`, `analyze.astro`, and `library.astro` featuring SVG Sun/Moon icons.
+   - Attached click handlers that toggle `data-theme`, persist preference to `localStorage`, and broadcast `window.dispatchEvent(new CustomEvent('themechange', { detail: { theme: next } }))`.
 
-### Commit
-- Hash: `e3d3af1`
-- Message: `feat(similarity): hydrate novel vector cache from disk with 8D radar stylistics`
-- Files changed: `kisholens/ml/similarity.py`, `tests/ml/test_similarity.py`
+4. **Verification & Build**:
+   - Ran `cd frontend && npm run build` -> built cleanly in ~202ms with 0 errors across all 3 static pages (`/`, `/analyze`, `/library`).
+
+5. **Commit**:
+   - Committed with message: `feat(theme): add light mode tokens, zero-FOUT head initializer, and header toggle button`.
