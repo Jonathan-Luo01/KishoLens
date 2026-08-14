@@ -1688,6 +1688,20 @@ import { ClientRouter } from 'astro:transitions';
         animation: pulse-dot 1.2s infinite ease-in-out;
       }
 
+      .skeleton-elapsed,
+      :global(.skeleton-elapsed) {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        font-family: monospace;
+      }
+
+      .skeleton-subtext,
+      :global(.skeleton-subtext) {
+        font-size: 0.8125rem;
+        color: #cbd5e1;
+        margin: 0.5rem 0 0 0;
+      }
+
       .skeleton-card,
       :global(.skeleton-card) {
         background: rgba(15, 23, 42, 0.45);
@@ -2367,32 +2381,56 @@ import { ClientRouter } from 'astro:transitions';
         border-radius: 2px;
       }
 
-      /* Skeleton Loading Components */
+      /* Skeleton Loading Components (Light Mode Frosted Glass) */
       :global([data-theme="light"]) .skeleton-card,
       :global([data-theme="light"]) .skeleton-chart-frame {
-        background: #f8fafc;
-        border-color: #e2e8f0;
+        background: rgba(255, 255, 255, 0.75) !important;
+        backdrop-filter: blur(14px) !important;
+        -webkit-backdrop-filter: blur(14px) !important;
+        border: 1px solid rgba(226, 232, 240, 0.85) !important;
+        box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
       }
       :global([data-theme="light"]) .skeleton-shimmer {
-        background: linear-gradient(90deg, rgba(226, 232, 240, 0.5) 0%, rgba(241, 245, 249, 0.9) 50%, rgba(226, 232, 240, 0.5) 100%);
+        background: linear-gradient(
+          90deg,
+          rgba(226, 232, 240, 0.6) 0%,
+          rgba(255, 255, 255, 0.95) 50%,
+          rgba(226, 232, 240, 0.6) 100%
+        ) !important;
+        background-size: 200% 100% !important;
       }
       :global([data-theme="light"]) .skeleton-progress-container {
-        background: #ffffff;
-        border-color: #e2e8f0;
+        background: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        border: 1px solid rgba(226, 232, 240, 0.9) !important;
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
       }
       :global([data-theme="light"]) .skeleton-stage-pill {
-        background: #f1f5f9;
-        border-color: #cbd5e1;
-        color: #334155;
+        background: rgba(99, 102, 241, 0.1) !important;
+        border: 1px solid rgba(99, 102, 241, 0.28) !important;
+        color: #4338ca !important;
       }
+      :global([data-theme="light"]) .skeleton-stage-dot {
+        background: #6366f1 !important;
+      }
+      :global([data-theme="light"]) .skeleton-progress-bar-bg {
+        background: rgba(226, 232, 240, 0.8) !important;
+      }
+      :global([data-theme="light"]) .skeleton-progress-bar-fill {
+        background: linear-gradient(90deg, #6366f1, #38bdf8) !important;
+        box-shadow: 0 0 10px rgba(99, 102, 241, 0.3) !important;
+      }
+      :global([data-theme="light"]) #skeletonElapsedTime,
       :global([data-theme="light"]) .skeleton-elapsed {
-        color: #64748b;
+        color: #64748b !important;
       }
+      :global([data-theme="light"]) #skeletonSubtext,
       :global([data-theme="light"]) .skeleton-subtext {
-        color: #64748b;
+        color: #475569 !important;
       }
-      :global([data-theme="light"]) .skeleton-progress-track {
-        background: #e2e8f0;
+      :global([data-theme="light"]) .skeleton-chart-frame svg line {
+        stroke: rgba(0, 0, 0, 0.08) !important;
       }
     </style>
     <ClientRouter />
@@ -3329,9 +3367,9 @@ import { ClientRouter } from 'astro:transitions';
                 <span class="skeleton-stage-dot" id="skeletonStageDot"></span>
                 <span id="skeletonStageText">Step 1/3: Extracting Stylistic Metrics...</span>
               </div>
-              <span style="font-size: 0.75rem; color: #94a3b8; font-family: monospace;" id="skeletonElapsedTime">0.0s elapsed</span>
+              <span class="skeleton-elapsed" id="skeletonElapsedTime">0.0s elapsed</span>
             </div>
-            <p id="skeletonSubtext" style="font-size: 0.8125rem; color: #cbd5e1; margin: 0.5rem 0 0 0;">
+            <p id="skeletonSubtext" class="skeleton-subtext">
               Parsing sentence structure, syntactic depth, and lexical richness...
             </p>
             <div class="skeleton-progress-bar-bg">
