@@ -1824,33 +1824,39 @@ import { ClientRouter } from 'astro:transitions';
         color: #0f172a;
       }
 
-      /* Cards & Containers */
+      /* Cards & Containers (Frosted Glassmorphism) */
       :global([data-theme="light"]) .card,
       :global([data-theme="light"]) .explorer-card,
       :global([data-theme="light"]) .chart-card,
       :global([data-theme="light"]) .doppelganger-card,
       :global([data-theme="light"]) .db-stats-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        box-shadow: var(--card-shadow);
+        background: rgba(255, 255, 255, 0.82) !important;
+        backdrop-filter: blur(20px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+        border: 1px solid rgba(226, 232, 240, 0.9) !important;
+        box-shadow: 0 4px 24px -2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
       }
 
       :global([data-theme="light"]) .card:hover,
       :global([data-theme="light"]) .explorer-card:hover,
       :global([data-theme="light"]) .chart-card:hover,
       :global([data-theme="light"]) .doppelganger-card:hover {
-        border-color: #cbd5e1;
-        box-shadow: var(--card-shadow-hover);
+        background: rgba(255, 255, 255, 0.94) !important;
+        border-color: rgba(99, 102, 241, 0.28) !important;
+        box-shadow: 0 14px 38px -4px rgba(99, 102, 241, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
       }
 
       /* Search & Filters */
       :global([data-theme="light"]) .search-input-wrapper {
-        background: #f8fafc;
-        border-color: #cbd5e1;
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(203, 213, 225, 0.85);
+        box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.03);
       }
       :global([data-theme="light"]) .search-input-wrapper:focus-within {
-        border-color: #0284c7;
-        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+        background: #ffffff;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15), inset 0 1px 0 #ffffff;
       }
       :global([data-theme="light"]) .search-input-wrapper svg {
         color: #64748b;
@@ -1864,86 +1870,104 @@ import { ClientRouter } from 'astro:transitions';
 
       /* Territory Tabs */
       :global([data-theme="light"]) .territory-tabs {
-        background: #f1f5f9;
-        border-color: #e2e8f0;
+        background: rgba(241, 245, 249, 0.75);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(226, 232, 240, 0.85);
+        box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
       }
       :global([data-theme="light"]) .t-tab {
         color: #64748b;
       }
       :global([data-theme="light"]) .t-tab:hover {
         color: #0f172a;
+        background: rgba(255, 255, 255, 0.6);
       }
       :global([data-theme="light"]) .t-tab.active {
         background: #ffffff;
-        color: #0284c7;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        color: #4338ca;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04), inset 0 1px 0 #ffffff;
       }
       :global([data-theme="light"]) .territory-desc-card {
-        background: #f8fafc;
-        border-color: #e2e8f0;
-        color: #64748b;
+        background: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(226, 232, 240, 0.85);
+        color: #475569;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
       }
 
       /* Genre Checkboxes & Tips */
       :global([data-theme="light"]) .explorer-section-title {
-        color: #475569;
-        border-bottom-color: #e2e8f0;
+        color: #334155;
+        font-weight: 700;
+        border-bottom-color: rgba(226, 232, 240, 0.8);
       }
       :global([data-theme="light"]) .tip-badge.tip-include {
-        background: rgba(2, 132, 199, 0.08);
-        border-color: rgba(2, 132, 199, 0.25);
-        color: #0284c7;
+        background: rgba(34, 197, 94, 0.1);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+        color: #15803d;
       }
       :global([data-theme="light"]) .tip-badge.tip-exclude {
-        background: rgba(220, 38, 38, 0.08);
-        border-color: rgba(220, 38, 38, 0.25);
-        color: #dc2626;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #b91c1c;
       }
       :global([data-theme="light"]) .btn-reset-filters {
-        background: #f1f5f9;
-        border-color: #cbd5e1;
-        color: #64748b;
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(203, 213, 225, 0.85);
+        color: #475569;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9);
       }
       :global([data-theme="light"]) .btn-reset-filters:hover {
-        background: #e2e8f0;
+        background: #ffffff;
         color: #0f172a;
+        border-color: #94a3b8;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06), inset 0 1px 0 #ffffff;
       }
       :global([data-theme="light"]) .genre-checkbox-item {
-        background: #f8fafc;
-        border-color: #e2e8f0;
+        background: rgba(255, 255, 255, 0.68);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(226, 232, 240, 0.85);
         color: #334155;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.8);
       }
       :global([data-theme="light"]) .genre-checkbox-item:hover {
-        background: #f1f5f9;
-        border-color: #cbd5e1;
+        background: rgba(255, 255, 255, 0.95);
+        border-color: rgba(99, 102, 241, 0.35);
         color: #0f172a;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08), inset 0 1px 0 rgba(255, 255, 255, 1);
       }
       :global([data-theme="light"]) .genre-checkbox-item.included {
-        background: rgba(2, 132, 199, 0.08);
-        border-color: #0284c7;
-        color: #0284c7;
+        background: linear-gradient(135deg, rgba(238, 242, 255, 0.92) 0%, rgba(224, 231, 255, 0.85) 100%);
+        border: 1px solid #6366f1;
+        box-shadow: 0 0 0 1px #6366f1, 0 3px 10px rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 1);
+        color: #4338ca;
       }
       :global([data-theme="light"]) .genre-checkbox-item.excluded {
-        background: rgba(220, 38, 38, 0.08);
-        border-color: #dc2626;
-        color: #dc2626;
+        background: linear-gradient(135deg, rgba(254, 242, 242, 0.92) 0%, rgba(254, 226, 226, 0.85) 100%);
+        border: 1px solid #dc2626;
+        box-shadow: 0 0 0 1px #dc2626, 0 3px 10px rgba(220, 38, 38, 0.15), inset 0 1px 0 rgba(255, 255, 255, 1);
+        color: #b91c1c;
       }
 
       /* Ingested Novel List */
       :global([data-theme="light"]) .card-novel {
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+        background: rgba(255, 255, 255, 0.72);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(226, 232, 240, 0.85);
+        box-shadow: 0 2px 6px -1px rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.85);
       }
       :global([data-theme="light"]) .card-novel:hover {
-        background: #f8fafc;
-        border-color: #94a3b8;
-        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+        background: rgba(255, 255, 255, 0.95);
+        border-color: rgba(99, 102, 241, 0.35);
+        box-shadow: 0 6px 20px -2px rgba(99, 102, 241, 0.10), inset 0 1px 0 rgba(255, 255, 255, 1);
       }
       :global([data-theme="light"]) .card-novel.active {
-        background: #ffffff;
-        border: 1.5px solid #4f46e5;
-        box-shadow: 0 0 0 1px #4f46e5, 0 4px 12px rgba(79, 70, 229, 0.15);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 243, 255, 0.95) 100%);
+        border: 1.5px solid #6366f1;
+        box-shadow: 0 0 0 1px #6366f1, 0 8px 24px rgba(99, 102, 241, 0.18), inset 0 1px 0 rgba(255, 255, 255, 1);
       }
       :global([data-theme="light"]) .card-novel .card__title {
         color: #0f172a;
@@ -1954,12 +1978,12 @@ import { ClientRouter } from 'astro:transitions';
         font-weight: 500;
       }
       :global([data-theme="light"]) .card__source-tag {
-        color: #4f46e5 !important;
+        color: #6366f1 !important;
       }
       :global([data-theme="light"]) .count-badge {
-        background: #f1f5f9;
-        border-color: #cbd5e1;
-        color: #475569;
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.28);
+        color: #4338ca;
       }
 
       /* Forms & Controls */
@@ -1969,32 +1993,50 @@ import { ClientRouter } from 'astro:transitions';
       :global([data-theme="light"]) .form-group input,
       :global([data-theme="light"]) .form-group select,
       :global([data-theme="light"]) select#novelSelect {
-        background: #ffffff;
-        border-color: #cbd5e1;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(203, 213, 225, 0.85);
         color: #0f172a;
+        box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.03);
       }
       :global([data-theme="light"]) .controls-bar {
-        background: #ffffff;
-        border-color: #e2e8f0;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1);
       }
       :global([data-theme="light"]) .selector-group label,
       :global([data-theme="light"]) .baseline-group span {
         color: #475569;
+        font-weight: 600;
       }
       :global([data-theme="light"]) .baseline-btn {
-        background: #f1f5f9;
-        border-color: #cbd5e1;
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(203, 213, 225, 0.85);
         color: #475569;
+        font-weight: 600;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9);
       }
       :global([data-theme="light"]) .baseline-btn:hover {
-        background: #e2e8f0;
+        background: #ffffff;
         color: #0f172a;
+        border-color: #94a3b8;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06), inset 0 1px 0 #ffffff;
       }
-      :global([data-theme="light"]) .baseline-btn.active {
-        background: #0284c7;
-        border-color: #0284c7;
-        color: #ffffff;
+      :global([data-theme="light"]) .baseline-btn.active[data-baseline="web_novel"] {
+        background: rgba(99, 102, 241, 0.12);
+        border: 1px solid #6366f1;
+        color: #4338ca;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 1);
+      }
+      :global([data-theme="light"]) .baseline-btn.active[data-baseline="classic_lit"] {
+        background: rgba(217, 119, 6, 0.12);
+        border: 1px solid #d97706;
+        color: #b45309;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(217, 119, 6, 0.15), inset 0 1px 0 rgba(255, 255, 255, 1);
       }
 
       /* DB Stats Overview */
@@ -2003,8 +2045,10 @@ import { ClientRouter } from 'astro:transitions';
         color: #0f172a !important;
       }
       :global([data-theme="light"]) .db-kpi-tile {
-        background: #f8fafc;
-        border-color: #e2e8f0;
+        background: rgba(255, 255, 255, 0.72);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(226, 232, 240, 0.85);
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.95);
       }
       :global([data-theme="light"]) .db-kpi-val {
         color: #0f172a;
@@ -2037,8 +2081,10 @@ import { ClientRouter } from 'astro:transitions';
         box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
       }
       :global([data-theme="light"]) .db-ratio-box {
-        background: #f8fafc !important;
-        border: 1px solid #cbd5e1 !important;
+        background: rgba(255, 255, 255, 0.72) !important;
+        backdrop-filter: blur(12px) !important;
+        border: 1px solid rgba(226, 232, 240, 0.85) !important;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
       }
       :global([data-theme="light"]) .db-ratio-bar-track {
         background: #cbd5e1 !important;
@@ -2048,72 +2094,67 @@ import { ClientRouter } from 'astro:transitions';
         color: #0f172a !important;
         font-weight: 700;
       }
-      :global([data-theme="light"]) .db-source-chip {
-        background: #f1f5f9;
-        border-color: #e2e8f0;
-        color: #334155;
-      }
-      :global([data-theme="light"]) .db-genre-chip {
-        background: #f1f5f9;
-        border-color: #e2e8f0;
-        color: #334155;
-      }
-      :global([data-theme="light"]) .db-genre-count {
-        background: #e2e8f0;
-        color: #475569;
-      }
       :global([data-theme="light"]) .count-badge,
       :global([data-theme="light"]) .db-total-badge {
         background: rgba(99, 102, 241, 0.12) !important;
-        border-color: rgba(99, 102, 241, 0.3) !important;
+        border: 1px solid rgba(99, 102, 241, 0.3) !important;
         color: #4338ca !important;
       }
 
       /* Dynamic Enhanced Metrics Dashboard */
       :global([data-theme="light"]) .metrics-hero {
-        background: linear-gradient(135deg, rgba(2, 132, 199, 0.04) 0%, rgba(99, 102, 241, 0.04) 100%);
-        border-color: #e2e8f0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(240, 249, 255, 0.80) 50%, rgba(245, 243, 255, 0.80) 100%) !important;
+        backdrop-filter: blur(16px) !important;
+        border: 1px solid rgba(99, 102, 241, 0.22) !important;
+        box-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.08), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
       }
       :global([data-theme="light"]) .hero-chip {
-        background: #ffffff;
-        border-color: #e2e8f0;
+        background: rgba(255, 255, 255, 0.78) !important;
+        backdrop-filter: blur(12px) !important;
+        border: 1px solid rgba(226, 232, 240, 0.85) !important;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
       }
       :global([data-theme="light"]) .hero-chip-val {
         color: #0f172a;
+        font-weight: 700;
       }
       :global([data-theme="light"]) .hero-chip-label,
       :global([data-theme="light"]) .hero-chip-lbl {
         color: #64748b;
         font-weight: 600;
       }
-      :global([data-theme="light"]) .hero-chip-val {
-        color: #0f172a;
-        font-weight: 700;
-      }
       :global([data-theme="light"]) .category-tabs-track {
-        background: #f1f5f9;
-        border-color: #e2e8f0;
+        background: rgba(241, 245, 249, 0.75);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(226, 232, 240, 0.85);
+        box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
       }
       :global([data-theme="light"]) .category-tab {
         color: #64748b;
       }
       :global([data-theme="light"]) .category-tab:hover {
         color: #0f172a;
+        background: rgba(255, 255, 255, 0.6);
       }
       :global([data-theme="light"]) .category-tab.active {
         background: #ffffff;
-        color: #0284c7;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        color: #4338ca;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04), inset 0 1px 0 #ffffff;
       }
       :global([data-theme="light"]) .metric-card {
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+        background: rgba(255, 255, 255, 0.72) !important;
+        backdrop-filter: blur(14px) !important;
+        -webkit-backdrop-filter: blur(14px) !important;
+        border: 1px solid rgba(226, 232, 240, 0.85) !important;
+        box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
       }
       :global([data-theme="light"]) .metric-card:hover {
-        background: #ffffff;
-        border-color: #94a3b8;
-        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+        background: rgba(255, 255, 255, 0.96) !important;
+        border-color: rgba(99, 102, 241, 0.35) !important;
+        box-shadow: 0 8px 24px -2px rgba(99, 102, 241, 0.12), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+        transform: translateY(-2px);
       }
       :global([data-theme="light"]) .metric-card-label {
         color: #475569;
@@ -2155,78 +2196,15 @@ import { ClientRouter } from 'astro:transitions';
         font-weight: 700;
       }
       :global([data-theme="light"]) .metric-tooltip-box {
-        background: #ffffff;
-        border: 1px solid rgba(0, 0, 0, 0.12);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.06);
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.06);
         color: #1e293b;
       }
       :global([data-theme="light"]) .chart-legend {
         color: #475569;
         font-weight: 500;
-      }
-      :global([data-theme="light"]) select#novelSelect {
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-        color: #0f172a;
-      }
-      :global([data-theme="light"]) select#novelSelect:focus {
-        border-color: #4f46e5;
-        outline: none;
-        box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
-      }
-      :global([data-theme="light"]) .selector-group label {
-        color: #475569;
-        font-weight: 600;
-      }
-      :global([data-theme="light"]) .baseline-group span {
-        color: #475569;
-        font-weight: 600;
-      }
-      :global([data-theme="light"]) .baseline-btn {
-        background: #f1f5f9;
-        border: 1px solid #cbd5e1;
-        color: #475569;
-        font-weight: 600;
-      }
-      :global([data-theme="light"]) .baseline-btn:hover {
-        background: #e2e8f0;
-        color: #0f172a;
-        border-color: #94a3b8;
-      }
-      :global([data-theme="light"]) .baseline-btn.active[data-baseline="web_novel"] {
-        background: rgba(99, 102, 241, 0.12);
-        border-color: #6366f1;
-        color: #4338ca;
-        font-weight: 700;
-      }
-      :global([data-theme="light"]) .baseline-btn.active[data-baseline="classic_lit"] {
-        background: rgba(217, 119, 6, 0.12);
-        border-color: #d97706;
-        color: #b45309;
-        font-weight: 700;
-      }
-      :global([data-theme="light"]) .btn-reset-filters {
-        background: #f1f5f9;
-        border: 1px solid #cbd5e1;
-        color: #475569;
-        font-weight: 600;
-      }
-      :global([data-theme="light"]) .btn-reset-filters:hover {
-        background: #e2e8f0;
-        color: #0f172a;
-        border-color: #94a3b8;
-      }
-      :global([data-theme="light"]) .tip-badge.tip-include {
-        background: rgba(34, 197, 94, 0.1);
-        color: #15803d;
-        border: 1px solid rgba(34, 197, 94, 0.3);
-        font-weight: 600;
-      }
-      :global([data-theme="light"]) .tip-badge.tip-exclude {
-        background: rgba(239, 68, 68, 0.1);
-        color: #b91c1c;
-        border: 1px solid rgba(239, 68, 68, 0.3);
-        font-weight: 600;
       }
 
       /* 3-Pillar Taxonomy & 17 Genres Drawer */
@@ -2234,13 +2212,16 @@ import { ClientRouter } from 'astro:transitions';
         color: #0284c7;
       }
       :global([data-theme="light"]) .pillar-card {
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+        background: rgba(255, 255, 255, 0.78) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid rgba(226, 232, 240, 0.85) !important;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
       }
       :global([data-theme="light"]) .pillar-card:hover {
-        border-color: #94a3b8;
-        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+        background: #ffffff !important;
+        border-color: rgba(99, 102, 241, 0.4) !important;
+        box-shadow: 0 6px 18px rgba(99, 102, 241, 0.12), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
       }
       :global([data-theme="light"]) .pillar-tag {
         color: #64748b;
