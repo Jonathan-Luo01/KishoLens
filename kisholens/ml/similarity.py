@@ -199,6 +199,7 @@ def _init_cache_from_disk(cache_path: Optional[Union[str, Path]] = None) -> None
             "territory": territory,
             "tags": tags,
             "vector": vec,
+            "raw_features": item,
             "semantic": item.get("taxonomy") or item.get("archetype_match"),
         }
 
@@ -303,10 +304,343 @@ def get_novel_vector_and_meta(novel: Novel, session: Session) -> dict:
         "territory": novel.territory or (sem.get("territory") if sem else "Unknown"),
         "tags": novel.tags or "",
         "vector": avg_vec,
+        "raw_features": {},
         "semantic": sem
     }
     _novel_vector_cache[novel.id] = meta
     return meta
+
+
+
+def _extract_metric_values(features: dict, vector: Optional[np.ndarray] = None) -> Dict[str, float]:
+    """
+    Extracts the 5 core stylistic and structural metrics from feature dicts or radar vectors:
+      1. dialogue_ratio (float, 0.0 - 1.0)
+      2. avg_sentence_len (float, words/sentence e.g. 5.0 - 35.0)
+      3. ttr (float, 0.0 - 1.0)
+      4. sensory_body_density (float, 0.0 - 1.0)
+      5. theme_explication_ratio (float, 0.0 - 10.0)
+    """
+    raw = features.get("raw_features") if isinstance(features.get("raw_features"), dict) else features
+
+    # 1. Dialogue Ratio
+    dlg = None
+    for k in ["dialogue_ratio", "en_dialogue_ratio", "ja_dialogue_ratio", "zh_dialogue_ratio"]:
+        if k in raw and raw[k] is not None:
+            try:
+                dlg = float(raw[k])
+                break
+            except (ValueError, TypeError):
+                pass
+    if dlg is None and vector is not None and len(vector) > 5:
+        dlg = float(vector[5])
+    if dlg is None:
+        dlg = 0.50
+
+    # 2. Average Sentence Length (Cadence)
+    asl = None
+    for k in [
+        "avg_sentence_len", "avg_sentence_length",
+        "en_avg_sentence_len", "en_avg_sentence_length",
+        "ja_avg_sentence_len", "ja_avg_sentence_length",
+        "zh_avg_sentence_len", "zh_avg_sentence_length"
+    ]:
+        if k in raw and raw[k] is not None:
+            try:
+                asl = float(raw[k])
+                break
+            except (ValueError, TypeError):
+                pass
+    if asl is None and vector is not None and len(vector) > 1:
+        asl = 6.0 + float(vector[1]) * 18.0
+    if asl is None:
+        asl = 12.0
+
+    # 3. Lexical Diversity (TTR)
+    ttr = None
+    for k in ["ttr", "en_ttr", "ja_ttr", "zh_ttr"]:
+        if k in raw and raw[k] is not None:
+            try:
+                ttr = float(raw[k])
+                break
+            except (ValueError, TypeError):
+                pass
+    if ttr is None and vector is not None and len(vector) > 6:
+        ttr = float(vector[6])
+    if ttr is None:
+        ttr = 0.50
+
+    # 4. Visceral Imagery (Sensory Body Density)
+    sbd = None
+    for k in ["sensory_body_density", "en_sensory_body_density", "ja_sensory_body_density", "zh_sensory_body_density"]:
+        if k in raw and raw[k] is not None:
+            try:
+                sbd = float(raw[k])
+                break
+            except (ValueError, TypeError):
+                pass
+    if sbd is None and vector is not None and len(vector) > 2:
+        sbd = float(vector[2])
+    if sbd is None:
+        sbd = 0.40
+
+    # 5. Thematic Explicitness (Theme Explication Ratio)
+    theme = None
+    for k in ["theme_explication_ratio", "en_theme_explication_ratio", "ja_theme_explication_ratio", "zh_theme_explication_ratio"]:
+        if k in raw and raw[k] is not None:
+            try:
+                theme = float(raw[k])
+                break
+            except (ValueError, TypeError):
+                pass
+    if theme is None and vector is not None and len(vector) > 0:
+        theme = float(vector[0]) * 5.0
+    if theme is None:
+        theme = 2.0
+
+    return {
+        "dialogue_ratio": dlg,
+        "avg_sentence_len": asl,
+        "ttr": ttr,
+        "sensory_body_density": sbd,
+        "theme_explication_ratio": theme,
+    }
+
+
+def _extract_catalyst(
+    query_text: Optional[str],
+    query_semantic: Optional[dict],
+    query_features: dict,
+    cand_meta: dict
+) -> Optional[str]:
+    combined_query = (query_text or "") + " " + str(query_features.get("genre", "")) + " " + str(query_features.get("tags", ""))
+    cand_text = (
+        str(cand_meta.get("title", "")) + " " +
+        str(cand_meta.get("genre", "")) + " " +
+        str(cand_meta.get("tags", ""))
+    )
+
+    inc_query = None
+    if query_semantic and isinstance(query_semantic.get("taxonomy"), dict):
+        inc = query_semantic["taxonomy"].get("inciting_event")
+        if isinstance(inc, dict) and inc.get("primary"):
+            inc_query = str(inc.get("primary"))
+
+    cand_sem = cand_meta.get("semantic")
+    inc_cand = None
+    if cand_sem and isinstance(cand_sem.get("taxonomy"), dict):
+        inc = cand_sem["taxonomy"].get("inciting_event")
+        if isinstance(inc, dict) and inc.get("primary"):
+            inc_cand = str(inc.get("primary"))
+
+    q_lower = combined_query.lower()
+    c_lower = cand_text.lower()
+
+    if "reincarnat" in q_lower or "reincarnat" in c_lower or (inc_query and "reincarnat" in inc_query.lower()) or (inc_cand and "reincarnat" in inc_cand.lower()):
+        return "Reincarnation"
+    if "summon" in q_lower or "summon" in c_lower or (inc_query and "summon" in inc_query.lower()) or (inc_cand and "summon" in inc_cand.lower()):
+        return "Summons"
+    if "regress" in q_lower or "regress" in c_lower or (inc_query and "regress" in inc_query.lower()) or (inc_cand and "regress" in inc_cand.lower()):
+        return "Regression"
+    if "transmigrat" in q_lower or "transmigrat" in c_lower:
+        return "Transmigration"
+    if "system" in q_lower or "system" in c_lower or "status screen" in q_lower:
+        return "System Awakening"
+    if "murder" in q_lower or "investigat" in q_lower or "detective" in q_lower or "murder" in c_lower or "detective" in c_lower:
+        return "Murder Investigation"
+    if "revenge" in q_lower or "betray" in q_lower or "revenge" in c_lower or "betray" in c_lower:
+        return "Betrayal"
+    if "tournament" in q_lower or "tournament" in c_lower or "competition" in q_lower:
+        return "Tournament"
+
+    if inc_cand:
+        parts = [p.strip() for p in inc_cand.split("&")]
+        return parts[0] if parts else inc_cand
+
+    if inc_query:
+        parts = [p.strip() for p in inc_query.split("&")]
+        return parts[0] if parts else inc_query
+
+    return None
+
+
+def _extract_setting(query_semantic: Optional[dict], cand_meta: dict) -> Optional[str]:
+    cand_sem = cand_meta.get("semantic")
+    if cand_sem and isinstance(cand_sem.get("taxonomy"), dict):
+        ws = cand_sem["taxonomy"].get("world_setting")
+        if isinstance(ws, dict) and ws.get("primary"):
+            return str(ws["primary"])
+    if query_semantic and isinstance(query_semantic.get("taxonomy"), dict):
+        ws = query_semantic["taxonomy"].get("world_setting")
+        if isinstance(ws, dict) and ws.get("primary"):
+            return str(ws["primary"])
+    cand_genre = cand_meta.get("primary_genre") or cand_meta.get("genre")
+    if cand_genre and cand_genre not in ["Unknown", ""]:
+        return str(cand_genre)
+    return None
+
+
+def _compute_metric_comparisons(
+    q_metrics: Dict[str, float],
+    c_metrics: Dict[str, float]
+) -> List[Dict[str, str]]:
+    """
+    Computes 5 side-by-side metric comparison rows:
+      - Dialogue Density
+      - Sentence Cadence
+      - Lexical Richness (TTR)
+      - Visceral Somatic Imagery
+      - Thematic Explicitness
+    """
+    q_dlg = q_metrics["dialogue_ratio"]
+    c_dlg = c_metrics["dialogue_ratio"]
+    dlg_match = max(0, min(100, int(round(100.0 - abs(q_dlg - c_dlg) * 200.0))))
+
+    q_asl = q_metrics["avg_sentence_len"]
+    c_asl = c_metrics["avg_sentence_len"]
+    asl_match = max(0, min(100, int(round(100.0 - abs(q_asl - c_asl) * 10.0))))
+
+    q_ttr = q_metrics["ttr"]
+    c_ttr = c_metrics["ttr"]
+    ttr_match = max(0, min(100, int(round(100.0 - abs(q_ttr - c_ttr) * 300.0))))
+
+    q_sbd = q_metrics["sensory_body_density"]
+    c_sbd = c_metrics["sensory_body_density"]
+    sbd_match = max(0, min(100, int(round(100.0 - abs(q_sbd - c_sbd) * 200.0))))
+
+    q_thm = q_metrics["theme_explication_ratio"]
+    c_thm = c_metrics["theme_explication_ratio"]
+    thm_match = max(0, min(100, int(round(100.0 - abs(q_thm - c_thm) * 20.0))))
+
+    return [
+        {
+            "metric": "Dialogue Density",
+            "query": f"{q_dlg * 100:.1f}%",
+            "candidate": f"{c_dlg * 100:.1f}%",
+            "match": f"{dlg_match}%",
+        },
+        {
+            "metric": "Sentence Cadence",
+            "query": f"{q_asl:.1f} w/s",
+            "candidate": f"{c_asl:.1f} w/s",
+            "match": f"{asl_match}%",
+        },
+        {
+            "metric": "Lexical Richness (TTR)",
+            "query": f"{q_ttr:.2f}",
+            "candidate": f"{c_ttr:.2f}",
+            "match": f"{ttr_match}%",
+        },
+        {
+            "metric": "Visceral Somatic Imagery",
+            "query": f"{q_sbd * 100:.1f}%",
+            "candidate": f"{c_sbd * 100:.1f}%",
+            "match": f"{sbd_match}%",
+        },
+        {
+            "metric": "Thematic Explicitness",
+            "query": f"{q_thm:.2f}",
+            "candidate": f"{c_thm:.2f}",
+            "match": f"{thm_match}%",
+        },
+    ]
+
+
+def _compute_match_badges(
+    q_metrics: Dict[str, float],
+    c_metrics: Dict[str, float],
+    query_text: Optional[str],
+    query_semantic: Optional[dict],
+    query_features: dict,
+    cand_meta: dict,
+    cand_primary_genre: str,
+    style_sim: float,
+    score: float
+) -> List[Dict[str, str]]:
+    badges: List[Dict[str, str]] = []
+
+    # 1. Emerald: Primary archetype / genre badge
+    if cand_primary_genre and cand_primary_genre != "Unknown":
+        badges.append({
+            "type": "trope",
+            "label": "Archetype",
+            "detail": cand_primary_genre,
+            "tier": "emerald"
+        })
+
+    # 2. Amber: Catalyst / Setting badge
+    catalyst = _extract_catalyst(query_text, query_semantic, query_features, cand_meta)
+    if catalyst:
+        badges.append({
+            "type": "taxonomy",
+            "label": "Catalyst",
+            "detail": catalyst,
+            "tier": "amber"
+        })
+    else:
+        setting = _extract_setting(query_semantic, cand_meta)
+        if setting and setting != cand_primary_genre:
+            badges.append({
+                "type": "taxonomy",
+                "label": "Setting",
+                "detail": setting,
+                "tier": "amber"
+            })
+
+    # 3. Cyan: Dialogue overlap badge
+    q_dlg = q_metrics["dialogue_ratio"]
+    c_dlg = c_metrics["dialogue_ratio"]
+    if abs(q_dlg - c_dlg) <= 0.15:
+        badges.append({
+            "type": "metric",
+            "label": "Dialogue",
+            "detail": f"{round(q_dlg * 100)}% ≈ {round(c_dlg * 100)}%",
+            "tier": "cyan"
+        })
+
+    # 4. Purple: Sentence Cadence overlap badge
+    q_asl = q_metrics["avg_sentence_len"]
+    c_asl = c_metrics["avg_sentence_len"]
+    if abs(q_asl - c_asl) <= 4.0:
+        badges.append({
+            "type": "metric",
+            "label": "Cadence",
+            "detail": f"{q_asl:.1f} ≈ {c_asl:.1f} w/s",
+            "tier": "purple"
+        })
+
+    # 5. Cyan: Lexical Richness (TTR) badge if needed
+    q_ttr = q_metrics["ttr"]
+    c_ttr = c_metrics["ttr"]
+    if len(badges) < 4 and abs(q_ttr - c_ttr) <= 0.08:
+        badges.append({
+            "type": "metric",
+            "label": "Vocab",
+            "detail": f"TTR {q_ttr:.2f} ≈ {c_ttr:.2f}",
+            "tier": "cyan"
+        })
+
+    # 6. Cyan: Visceral Somatic Imagery if needed
+    q_sbd = q_metrics["sensory_body_density"]
+    c_sbd = c_metrics["sensory_body_density"]
+    if len(badges) < 4 and (c_sbd >= 0.40 or abs(q_sbd - c_sbd) <= 0.15):
+        badges.append({
+            "type": "metric",
+            "label": "Imagery",
+            "detail": f"Visceral {round(c_sbd * 100)}%",
+            "tier": "cyan"
+        })
+
+    # Guarantee at least 1 badge
+    if not badges:
+        badges.append({
+            "type": "metric",
+            "label": "Affinity",
+            "detail": f"{int(round(score * 100))}% prose affinity",
+            "tier": "cyan"
+        })
+
+    return badges
 
 
 def find_top_matches(
@@ -332,6 +666,7 @@ def find_top_matches(
         _init_cache_from_disk()
 
     q_vec = extract_feature_vector(query_features)
+    q_metrics = _extract_metric_values(query_features, q_vec)
 
     query_semantic = None
     if query_text:
@@ -559,6 +894,22 @@ def find_top_matches(
         if not reasons:
             reasons.append("Overall stylistic and structural affinity")
 
+        # Compute granular match badges and side-by-side metric comparisons
+        c_metrics = _extract_metric_values(n_meta, n_vec)
+        cand_primary_clean = n_meta.get("primary_genre") or n_meta.get("genre") or "Fiction"
+        metric_comparisons = _compute_metric_comparisons(q_metrics, c_metrics)
+        match_badges = _compute_match_badges(
+            q_metrics=q_metrics,
+            c_metrics=c_metrics,
+            query_text=query_text,
+            query_semantic=query_semantic,
+            query_features=query_features,
+            cand_meta=n_meta,
+            cand_primary_genre=cand_primary_clean,
+            style_sim=style_sim,
+            score=score
+        )
+
         candidates.append({
             "id": nid,
             "title": title_str,
@@ -566,6 +917,8 @@ def find_top_matches(
             "genre": n_meta.get("genre", ""),
             "territory": n_territory or "Unknown",
             "similarity_score": score,
+            "match_badges": match_badges,
+            "metric_comparisons": metric_comparisons,
             "reasons": reasons,
             "breakdown": {
                 "style": round(style_sim, 3),

@@ -120,4 +120,35 @@ def test_match_reasons_generation():
             assert all(ord(c) < 128 or '\u4e00' <= c <= '\u9fff' or '\u3040' <= c <= '\u30ff' for c in reason), f"Found emoji or non-text char in reason: {reason}"
 
 
+def test_granular_match_badges_and_comparisons():
+    from kisholens.ml.similarity import find_top_matches
+    q_feats = {
+        "en_dialogue_ratio": 0.65,
+        "en_avg_sentence_length": 11.2,
+        "en_ttr": 0.46,
+        "en_sensory_body_density": 0.70,
+        "en_theme_explication_ratio": 2.8,
+        "genre": "Fantasy, Isekai",
+        "territory": "Web Novel"
+    }
+    matches = find_top_matches(q_feats, query_text="Hero summoned to another world", top_k=3)
+    assert len(matches) > 0
+    top = matches[0]
+    assert "match_badges" in top
+    assert isinstance(top["match_badges"], list)
+    assert len(top["match_badges"]) >= 1
+    assert "type" in top["match_badges"][0]
+    assert "label" in top["match_badges"][0]
+    assert "detail" in top["match_badges"][0]
+    assert "tier" in top["match_badges"][0]
+    assert "metric_comparisons" in top
+    assert isinstance(top["metric_comparisons"], list)
+    assert len(top["metric_comparisons"]) >= 1
+    assert "metric" in top["metric_comparisons"][0]
+    assert "query" in top["metric_comparisons"][0]
+    assert "candidate" in top["metric_comparisons"][0]
+    assert "match" in top["metric_comparisons"][0]
+
+
+
 
