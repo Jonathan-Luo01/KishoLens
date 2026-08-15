@@ -864,7 +864,13 @@ import { ClientRouter } from 'astro:transitions';
       :global(.hero-chip) {
         display: flex;
         flex-direction: column;
-        gap: 0.2rem;
+        justify-content: center;
+        padding: 0.85rem 1.1rem;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        gap: 0.3rem;
+        transition: all 0.2s ease;
       }
 
       :global(.hero-chip-label) {
@@ -1294,10 +1300,17 @@ import { ClientRouter } from 'astro:transitions';
       }
 
       :global([data-theme="light"]) .hero-chip {
-        background: rgba(255, 255, 255, 0.78) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        padding: 0.85rem 1.1rem !important;
+        gap: 0.3rem !important;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 249, 255, 0.85) 100%) !important;
         backdrop-filter: blur(12px) !important;
-        border: 1px solid rgba(226, 232, 240, 0.85) !important;
-        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+        border: 1px solid rgba(186, 230, 253, 0.85) !important;
+        border-radius: 10px !important;
+        box-shadow: 0 2px 8px rgba(2, 132, 199, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+        transition: all 0.2s ease;
       }
 
       :global([data-theme="light"]) .hero-chip-label {

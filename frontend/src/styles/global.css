@@ -823,6 +823,7 @@ header.site-header,
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 249, 255, 0.85) 100%) !important;
   border: 1px solid rgba(186, 230, 253, 0.85) !important;
   border-radius: 10px;
+  padding: 0.85rem 1.1rem !important;
   box-shadow: 0 2px 6px rgba(2, 132, 199, 0.04), inset 0 1px 0 #ffffff !important;
   transition: all 0.2s ease;
 }
@@ -845,10 +846,16 @@ header.site-header,
 }
 
 [data-theme="light"] .hero-chip {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  padding: 0.85rem 1.1rem !important;
+  gap: 0.3rem !important;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 249, 255, 0.85) 100%) !important;
   border: 1px solid rgba(186, 230, 253, 0.80) !important;
-  border-radius: 10px;
+  border-radius: 10px !important;
   box-shadow: 0 2px 8px rgba(2, 132, 199, 0.04), inset 0 1px 0 #ffffff !important;
+  transition: all 0.2s ease;
 }
 
 [data-theme="light"] .hero-chip:hover {
