@@ -374,7 +374,7 @@ def get_novel_stats(novel_id: int):
     global _cached_novel_stats
     if novel_id in _cached_novel_stats:
         stats = _cached_novel_stats[novel_id]
-        if not stats.get("top_matches") or not any(m.get("reasons") for m in stats.get("top_matches", [])):
+        if not stats.get("top_matches") or not any(m.get("match_badges") for m in stats.get("top_matches", [])):
             from kisholens.ml.similarity import find_top_matches
             stats["top_matches"] = find_top_matches(stats, exclude_novel_id=novel_id, top_k=5)
             _save_disk_cache()
