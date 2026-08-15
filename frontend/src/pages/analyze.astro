@@ -2142,16 +2142,34 @@ import { ClientRouter } from 'astro:transitions';
         narrative_feature_diversity: { label: "Subplot Diversity", category: "pacing", tooltip: "Co-occurrence diversity of secondary entities and subplots" }
       };
 
-      // Maps metric key -> index in RADAR_DIMS baselines array
-      const RADAR_KEY_INDEX = {
-        theme_explication_ratio: 0,
-        linearity_subversion_score: 1,
-        sensory_body_density: 2,
-        outside_world_engagement: 3,
-        narrative_feature_diversity: 4,
-        dialogue_ratio: 5,
-        ttr: 6,
-        compound_sentiment: 7,
+      // Maps metric key -> baseline reference values and radar dimension indices
+      const ALL_METRIC_BASELINES = {
+        // Structure & Volume
+        word_count:                  { wn: 0.45, cl: 0.68 },
+        char_count:                  { wn: 0.44, cl: 0.70 },
+        sentence_count:              { wn: 0.42, cl: 0.65 },
+        avg_sentence_len:            { wn: 0.38, cl: 0.68 },
+        avg_sentences_per_paragraph: { wn: 0.32, cl: 0.72 },
+        dep_tree_depth:              { wn: 0.35, cl: 0.76 },
+
+        // Prose & Style
+        dialogue_ratio:              { wn: 0.65, cl: 0.30, radarIdx: 5 },
+        ttr:                         { wn: 0.45, cl: 0.80, radarIdx: 6 },
+        adj_ratio:                   { wn: 0.40, cl: 0.72 },
+        verb_ratio:                  { wn: 0.68, cl: 0.42 },
+        particle_ratio:              { wn: 0.48, cl: 0.70 },
+        kanji_ratio:                 { wn: 0.36, cl: 0.78 },
+
+        // Theme & Emotion
+        compound_sentiment:          { wn: 0.50, cl: 0.40, radarIdx: 7 },
+        theme_explication_ratio:     { wn: 0.35, cl: 0.30, radarIdx: 0 },
+        sensory_body_density:        { wn: 0.60, cl: 0.40, radarIdx: 2 },
+        outside_world_engagement:    { wn: 0.40, cl: 0.80, radarIdx: 3 },
+
+        // Pacing & Subplots
+        linearity_subversion_score:  { wn: 0.55, cl: 0.20, radarIdx: 1 },
+        temporal_shift_score:        { wn: 0.62, cl: 0.40 },
+        narrative_feature_diversity: { wn: 0.40, cl: 0.70, radarIdx: 4 }
       };
 
       function renderEnhancedMetricsDashboard(stats) {
@@ -2238,12 +2256,16 @@ import { ClientRouter } from 'astro:transitions';
               benchChipHtml = `<span class="benchmark-chip neutral">Balanced</span>`;
             }
 
-            // Web Novel / Classic Lit baseline row
+            // Web Novel / Classic Lit baseline comparison row for ALL metrics
             let baselineRowHtml = "";
-            const radarIdx = RADAR_KEY_INDEX[key];
-            if (radarIdx !== undefined) {
-              const wnVal = wnRadar[radarIdx];
-              const clVal = clRadar[radarIdx];
+            const baseInfo = ALL_METRIC_BASELINES[key];
+            if (baseInfo) {
+              let wnVal = baseInfo.wn;
+              let clVal = baseInfo.cl;
+              if (baseInfo.radarIdx !== undefined) {
+                if (wnRadar[baseInfo.radarIdx] !== undefined) wnVal = wnRadar[baseInfo.radarIdx];
+                if (clRadar[baseInfo.radarIdx] !== undefined) clVal = clRadar[baseInfo.radarIdx];
+              }
               if (wnVal !== undefined || clVal !== undefined) {
                 baselineRowHtml = `<div class="metric-baseline-row">`;
                 if (wnVal !== undefined) {
