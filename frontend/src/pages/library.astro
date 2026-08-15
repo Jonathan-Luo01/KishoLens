@@ -41,7 +41,7 @@ import { ClientRouter } from 'astro:transitions';
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Kaisei+Tokumin:wght@500;700;800&family=Shippori+Mincho:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Kaisei+Tokumin:wght@500;700;800&family=Shippori+Mincho:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <style>
@@ -146,7 +146,7 @@ import { ClientRouter } from 'astro:transitions';
         display: flex;
         justify-content: space-between;
         align-items: center;
-        font-family: var(--font-display);
+        font-family: var(--font-sans);
         font-size: 0.95rem;
         font-weight: 600;
         color: var(--color-text);
@@ -484,7 +484,7 @@ import { ClientRouter } from 'astro:transitions';
       }
 
       .section-title {
-        font-family: var(--font-display);
+        font-family: var(--font-sans);
         font-size: 1.05rem;
         margin: 1rem 0 0.6rem 0;
         color: var(--color-text);
@@ -547,6 +547,9 @@ import { ClientRouter } from 'astro:transitions';
       }
 
       .genre-checkbox-item {
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
         display: flex;
         align-items: center;
         gap: 0.6rem;
@@ -585,6 +588,10 @@ import { ClientRouter } from 'astro:transitions';
         text-decoration: line-through !important;
         color: #f87171 !important;
         font-weight: 600 !important;
+      }
+
+      .genre-name-text {
+        font-family: var(--font-sans);
       }
 
       .real-genre-checkbox {
@@ -2507,28 +2514,24 @@ import { ClientRouter } from 'astro:transitions';
             <h3 style="font-family: var(--font-display); font-size: 1.15rem; margin-bottom: 0.75rem;" id="novel-details-title">Stylistic Analysis</h3>
             <div id="stats-content" class="stats-content-scroll">
               <div class="empty-state-card" id="library-empty-state">
-                <div class="empty-state-icon-box">📊</div>
                 <div>
                   <div class="empty-state-title">Select a Novel to Explore</div>
                   <div class="empty-state-desc">Choose any indexed novel from the left catalog or pick a sample below to inspect stylistic footprints, emotional arcs, and doppelgänger matches.</div>
                 </div>
                 <div class="empty-state-features">
                   <div class="empty-feature-item">
-                    <span class="empty-feature-icon">🎯</span>
                     <span><strong>6-Axis Archetype Radar:</strong> Complexity, vocabulary, dialogue & tone.</span>
                   </div>
                   <div class="empty-feature-item">
-                    <span class="empty-feature-icon">📈</span>
                     <span><strong>4-Act Kishōtenketsu Arc:</strong> Emotional narrative trajectory & turns.</span>
                   </div>
                   <div class="empty-feature-item">
-                    <span class="empty-feature-icon">⚡</span>
                     <span><strong>Paragraph Cadence:</strong> Rhythmic pacing distribution barcode.</span>
                   </div>
                 </div>
                 <div class="empty-state-actions">
-                  <button type="button" class="empty-quick-btn" id="quickSampleWebNovel">⚡ Load Sample Web Novel</button>
-                  <button type="button" class="empty-quick-btn" id="quickSampleClassicLit">📖 Load Sample Classic Lit</button>
+                  <button type="button" class="empty-quick-btn" id="quickSampleWebNovel">Load Sample Web Novel</button>
+                  <button type="button" class="empty-quick-btn" id="quickSampleClassicLit">Load Sample Classic Lit</button>
                 </div>
               </div>
             </div>
