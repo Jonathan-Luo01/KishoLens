@@ -1760,8 +1760,33 @@ import { ClientRouter } from 'astro:transitions';
           <div class="error-alert" id="error-box"></div>
 
           <!-- State 1: Ready -->
-          <div class="placeholder-text" id="ready-state">
-            Pasted text analysis will appear here. Paste writing in the input pane and click "Analyze Prose".
+          <div id="ready-state">
+            <div class="empty-state-card">
+              <div class="empty-state-icon-box">🔬</div>
+              <div>
+                <div class="empty-state-title">Live Prose Inspector</div>
+                <div class="empty-state-desc">Paste your chapter draft or select a sample snippet to compute multi-lingual stylistic fingerprints, narrative arcs, and doppelgänger matches.</div>
+              </div>
+              <div class="empty-state-features">
+                <div class="empty-feature-item">
+                  <span class="empty-feature-icon">🧬</span>
+                  <span><strong>3-Pillar Taxonomy:</strong> Catalyst, setting & narrative plot.</span>
+                </div>
+                <div class="empty-feature-item">
+                  <span class="empty-feature-icon">📊</span>
+                  <span><strong>Benchmark Baselines:</strong> Compared to 10,000+ indexed novels.</span>
+                </div>
+                <div class="empty-feature-item">
+                  <span class="empty-feature-icon">📚</span>
+                  <span><strong>Doppelgänger Engine:</strong> Find similar indexed literature.</span>
+                </div>
+              </div>
+              <div class="empty-state-actions">
+                <button type="button" class="empty-quick-btn" id="emptyTryMystery">⚡ Try Mystery Sample</button>
+                <button type="button" class="empty-quick-btn" id="emptyTryFantasy">🔮 Try Fantasy Sample</button>
+                <button type="button" class="empty-quick-btn" id="emptyTryIsekai">⚔️ Try Web Novel Sample</button>
+              </div>
+            </div>
           </div>
 
           <!-- State 2: Loading -->
@@ -1958,6 +1983,22 @@ import { ClientRouter } from 'astro:transitions';
             }
           });
         });
+
+        // Quick sample triggers from empty state card
+        const triggerSampleAndAnalyze = (sampleKey) => {
+          const sampleBtn = document.querySelector(`.sample-btn[data-sample="${sampleKey}"]`);
+          if (sampleBtn) {
+            sampleBtn.click();
+            setTimeout(() => {
+              const submitBtn = document.getElementById("analyze-submit");
+              if (submitBtn) submitBtn.click();
+            }, 120);
+          }
+        };
+
+        document.getElementById("emptyTryMystery")?.addEventListener("click", () => triggerSampleAndAnalyze("mystery"));
+        document.getElementById("emptyTryFantasy")?.addEventListener("click", () => triggerSampleAndAnalyze("fantasy"));
+        document.getElementById("emptyTryIsekai")?.addEventListener("click", () => triggerSampleAndAnalyze("isekai"));
 
         // Text Area character and word counter
         textarea.addEventListener("input", () => {
