@@ -3771,8 +3771,9 @@ import { ClientRouter } from 'astro:transitions';
         const isLight = document.documentElement.getAttribute("data-theme") === "light";
         const dpr = window.devicePixelRatio || 1;
 
-        const cssW = canvas.clientWidth  || 480;
-        const cssH = canvas.clientHeight || 480;
+        const rect = canvas.getBoundingClientRect();
+        const cssW = (rect.width > 50 ? rect.width : (canvas.clientWidth || 480));
+        const cssH = (rect.height > 50 ? rect.height : (canvas.clientHeight || 480));
         canvas.width  = Math.round(cssW * dpr);
         canvas.height = Math.round(cssH * dpr);
 
@@ -4909,6 +4910,12 @@ import { ClientRouter } from 'astro:transitions';
       window.selectNovel = selectNovel;
 
       window.addEventListener("themechange", () => {
+        requestAnimationFrame(() => {
+          reRenderLibrary();
+        });
+      });
+
+      window.addEventListener("resize", () => {
         requestAnimationFrame(() => {
           reRenderLibrary();
         });

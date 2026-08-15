@@ -1923,10 +1923,14 @@ import { ClientRouter } from 'astro:transitions';
       };
 
       function reRenderAnalyze() {
-        if (lastAnalysisData && (document.getElementById("radarChart") || document.getElementById("passage-text"))) {
-          renderResults(lastAnalysisData);
+        if (!lastAnalysisData && !currentStats) return;
+        if (lastAnalysisData && !currentStats) {
+          currentStats = lastAnalysisData.stats || lastAnalysisData.features;
         }
-        if (currentStats && currentArc && (document.getElementById("radarChart") || document.getElementById("passage-text"))) {
+        if (lastAnalysisData && !currentArc && lastAnalysisData.arc) {
+          currentArc = lastAnalysisData.arc;
+        }
+        if (currentStats) {
           renderAll();
           if (lastAnalysisData && lastAnalysisData.top_matches) {
             renderSimilarNovels(lastAnalysisData.top_matches);
@@ -2096,6 +2100,8 @@ import { ClientRouter } from 'astro:transitions';
 
         // Restore previous analysis state if available
         if (lastAnalysisData) {
+          currentStats = lastAnalysisData.stats || lastAnalysisData.features;
+          currentArc   = lastAnalysisData.arc;
           renderResults(lastAnalysisData);
           renderAll();
           if (lastAnalysisData.top_matches) {
@@ -2108,6 +2114,12 @@ import { ClientRouter } from 'astro:transitions';
       });
 
       window.addEventListener("themechange", () => {
+        requestAnimationFrame(() => {
+          reRenderAnalyze();
+        });
+      });
+
+      window.addEventListener("resize", () => {
         requestAnimationFrame(() => {
           reRenderAnalyze();
         });
@@ -2444,8 +2456,9 @@ import { ClientRouter } from 'astro:transitions';
         const isLight = document.documentElement.getAttribute("data-theme") === "light";
         const dpr = window.devicePixelRatio || 1;
 
-        const cssW = canvas.clientWidth  || 480;
-        const cssH = canvas.clientHeight || 480;
+        const rect = canvas.getBoundingClientRect();
+        const cssW = (rect.width > 50 ? rect.width : (canvas.clientWidth || 480));
+        const cssH = (rect.height > 50 ? rect.height : (canvas.clientHeight || 480));
         canvas.width  = Math.round(cssW * dpr);
         canvas.height = Math.round(cssH * dpr);
 
