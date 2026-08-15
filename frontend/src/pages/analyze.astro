@@ -1790,11 +1790,6 @@ import { ClientRouter } from 'astro:transitions';
                   <span><strong>Doppelgänger Engine:</strong> Find similar indexed literature.</span>
                 </div>
               </div>
-              <div class="empty-state-actions">
-                <button type="button" class="empty-quick-btn" id="emptyTryMystery">Try Mystery Sample</button>
-                <button type="button" class="empty-quick-btn" id="emptyTryFantasy">Try Fantasy Sample</button>
-                <button type="button" class="empty-quick-btn" id="emptyTryIsekai">Try Web Novel Sample</button>
-              </div>
             </div>
           </div>
 
@@ -1996,22 +1991,6 @@ import { ClientRouter } from 'astro:transitions';
             }
           });
         });
-
-        // Quick sample triggers from empty state card
-        const triggerSampleAndAnalyze = (sampleKey) => {
-          const sampleBtn = document.querySelector(`.sample-btn[data-sample="${sampleKey}"]`);
-          if (sampleBtn) {
-            sampleBtn.click();
-            setTimeout(() => {
-              const submitBtn = document.getElementById("analyze-submit");
-              if (submitBtn) submitBtn.click();
-            }, 120);
-          }
-        };
-
-        document.getElementById("emptyTryMystery")?.addEventListener("click", () => triggerSampleAndAnalyze("mystery"));
-        document.getElementById("emptyTryFantasy")?.addEventListener("click", () => triggerSampleAndAnalyze("fantasy"));
-        document.getElementById("emptyTryIsekai")?.addEventListener("click", () => triggerSampleAndAnalyze("isekai"));
 
         // Text Area character and word counter
         textarea.addEventListener("input", () => {
