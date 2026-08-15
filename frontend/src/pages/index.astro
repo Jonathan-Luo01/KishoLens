@@ -1076,15 +1076,15 @@ const INITIAL_MYSTERY_TEXT = `The autumn rain lashed against the fog-stained win
 
   /* Footer */
   .site-footer {
-    border-top: 1px solid var(--border-line);
-    padding: 1.8rem 1.5rem;
-    background: #07080b;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 2.25rem 1.5rem 2.5rem;
+    background: transparent;
     margin-top: 2rem;
     transition: background-color 0.2s ease, border-color 0.2s ease;
   }
 
   .footer-wrap {
-    max-width: 1100px;
+    max-width: 1200px;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -1096,9 +1096,11 @@ const INITIAL_MYSTERY_TEXT = `The autumn rain lashed against the fog-stained win
   .footer-logo {
     font-family: var(--font-heading);
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     color: #ffffff;
     transition: color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
   }
 
   .footer-accent {
@@ -1107,25 +1109,25 @@ const INITIAL_MYSTERY_TEXT = `The autumn rain lashed against the fog-stained win
   }
 
   .footer-meta {
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     color: #64748b;
     transition: color 0.2s ease;
   }
 
   :global([data-theme="light"]) .site-footer {
-    background: #ffffff;
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    background: transparent !important;
+    border-top: 1px solid rgba(186, 230, 253, 0.60) !important;
   }
 
   :global([data-theme="light"]) .footer-logo {
-    color: #0f172a;
+    color: #0f172a !important;
   }
 
   :global([data-theme="light"]) .footer-accent {
-    color: #6366f1;
+    color: #0284c7 !important;
   }
 
   :global([data-theme="light"]) .footer-meta {
-    color: #64748b;
+    color: #64748b !important;
   }
 </style>
