@@ -242,15 +242,23 @@ import { ClientRouter } from 'astro:transitions';
 
       :global(.doppelganger-item) {
         display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        justify-content: space-between !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
         background: #020617;
         padding: 16px;
         border-radius: 12px;
         border: 1px solid #1e293b;
         transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
         cursor: pointer;
+        min-width: 0;
+      }
+
+      :global(.doppelganger-main) {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
         min-width: 0;
       }
 
@@ -405,7 +413,7 @@ import { ClientRouter } from 'astro:transitions';
       }
 
       @media (max-width: 640px) {
-        :global(.doppelganger-item) {
+        :global(.doppelganger-main) {
           flex-direction: column !important;
           align-items: flex-start !important;
           gap: 12px;
@@ -425,6 +433,10 @@ import { ClientRouter } from 'astro:transitions';
         }
         :global(.doppelganger-breakdown) {
           margin-top: 0;
+        }
+        :global(.metric-compare-header),
+        :global(.metric-compare-row) {
+          grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
         }
         .controls-bar {
           flex-direction: column;
@@ -4413,52 +4425,137 @@ import { ClientRouter } from 'astro:transitions';
               ? (isLight ? '#6366f1' : '#818cf8')
               : (isLight ? '#64748b' : '#94a3b8');
 
+          const hasComparisons = Array.isArray(m.metric_comparisons) && m.metric_comparisons.length > 0;
+          
+          let badgesHtml = '';
+          if (Array.isArray(m.match_badges) && m.match_badges.length > 0) {
+            badgesHtml = `
+              <div class="doppelganger-reasons">
+                ${m.match_badges.map(b => `
+                  <span class="reason-pill tier-${b.tier || 'cyan'}"><strong>${b.label}:</strong> ${b.detail}</span>
+                `).join('')}
+              </div>
+            `;
+          } else if (Array.isArray(m.reasons) && m.reasons.length > 0) {
+            badgesHtml = `
+              <div class="doppelganger-reasons">
+                ${m.reasons.slice(0, 4).map(r => `<span class="reason-pill tier-cyan">${r}</span>`).join('')}
+              </div>
+            `;
+          }
+
           item.innerHTML = `
-            <div class="doppelganger-left">
-              <span class="doppelganger-rank">#${index + 1}</span>
-              <div class="doppelganger-info">
-                <h4 class="doppelganger-item-title">${m.title}</h4>
-                ${m.author ? `<span class="doppelganger-author">${m.author}</span>` : ''}
-                <span class="doppelganger-badge">${topGenres}</span>
-                ${m.reasons && m.reasons.length > 0 ? `
-                  <div class="doppelganger-reasons">
-                    ${m.reasons.slice(0, 3).map(r => `<span class="reason-pill">${r}</span>`).join('')}
+            <div class="doppelganger-main">
+              <div class="doppelganger-left">
+                <span class="doppelganger-rank">#${index + 1}</span>
+                <div class="doppelganger-info">
+                  <h4 class="doppelganger-item-title">${m.title}</h4>
+                  ${m.author ? `<span class="doppelganger-author">${m.author}</span>` : ''}
+                  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
+                    <span class="doppelganger-badge">${topGenres}</span>
+                    ${hasComparisons ? `
+                      <button type="button" class="doppelganger-why-btn" data-drawer-id="doppelganger-drawer-${m.id}" aria-expanded="false">
+                        Why this matched <span class="why-chevron">▾</span>
+                      </button>
+                    ` : ''}
+                  </div>
+                  ${badgesHtml}
+                </div>
+              </div>
+
+              <div class="doppelganger-right">
+                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
+                  <span class="doppelganger-score" style="color: ${scoreColor}">${pct}%</span>
+                  <div class="doppelganger-progress-bg">
+                    <div class="doppelganger-progress-fill" style="width: ${pct}%; background-color: ${scoreColor}"></div>
+                  </div>
+                </div>
+                ${m.breakdown ? `
+                  <div class="doppelganger-breakdown">
+                    ${[
+                      { label: 'STY', name: 'Prose Style', val: m.breakdown.style },
+                      { label: 'GEN', name: 'Genre', val: m.breakdown.genre },
+                      { label: 'TAG', name: 'Tags', val: m.breakdown.tags },
+                      { label: 'TER', name: 'Territory', val: m.breakdown.territory },
+                      { label: 'SEM', name: 'Semantic', val: m.breakdown.semantic }
+                    ].map(f => {
+                      const fPct = Math.round((f.val || 0) * 100);
+                      const fColor = f.val > 0.8 ? (isLight ? '#0284c7' : '#38bdf8') : (isLight ? '#64748b' : '#94a3b8');
+                      return `
+                        <div class="doppelganger-factor" title="${f.name}: ${fPct}%">
+                          <span class="doppelganger-factor-label">${f.label}</span>
+                          <div class="doppelganger-factor-bar-bg">
+                            <div class="doppelganger-factor-bar-fill" style="width: ${fPct}%; background-color: ${fColor}"></div>
+                          </div>
+                        </div>
+                      `;
+                    }).join('')}
                   </div>
                 ` : ''}
               </div>
             </div>
 
-            <div class="doppelganger-right">
-              <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
-                <span class="doppelganger-score" style="color: ${scoreColor}">${pct}%</span>
-                <div class="doppelganger-progress-bg">
-                  <div class="doppelganger-progress-fill" style="width: ${pct}%; background-color: ${scoreColor}"></div>
+            ${hasComparisons ? `
+              <div id="doppelganger-drawer-${m.id}" class="doppelganger-drawer" style="display: none;">
+                <div class="metric-compare-header">
+                  <span class="metric-col metric-col-name">Metric</span>
+                  <span class="metric-col metric-col-query">Selected Work</span>
+                  <span class="metric-col metric-col-target">Matched Work</span>
+                  <span class="metric-col metric-col-match">Alignment</span>
                 </div>
-              </div>
-              ${m.breakdown ? `
-                <div class="doppelganger-breakdown">
-                  ${[
-                    { label: 'STY', name: 'Prose Style', val: m.breakdown.style },
-                    { label: 'GEN', name: 'Genre', val: m.breakdown.genre },
-                    { label: 'TAG', name: 'Tags', val: m.breakdown.tags },
-                    { label: 'TER', name: 'Territory', val: m.breakdown.territory },
-                    { label: 'SEM', name: 'Semantic', val: m.breakdown.semantic }
-                  ].map(f => {
-                    const fPct = Math.round((f.val || 0) * 100);
-                    const fColor = f.val > 0.8 ? (isLight ? '#0284c7' : '#38bdf8') : (isLight ? '#64748b' : '#94a3b8');
+                <div class="metric-compare-table">
+                  ${m.metric_comparisons.map(comp => {
+                    const matchNum = parseInt(comp.match, 10) || 0;
+                    const barColor = matchNum >= 90
+                      ? (isLight ? '#0284c7' : '#38bdf8')
+                      : matchNum >= 75
+                        ? (isLight ? '#7c3aed' : '#a78bfa')
+                        : (isLight ? '#d97706' : '#fbbf24');
                     return `
-                      <div class="doppelganger-factor" title="${f.name}: ${fPct}%">
-                        <span class="doppelganger-factor-label">${f.label}</span>
-                        <div class="doppelganger-factor-bar-bg">
-                          <div class="doppelganger-factor-bar-fill" style="width: ${fPct}%; background-color: ${fColor}"></div>
+                      <div class="metric-compare-row">
+                        <div class="metric-col metric-col-name">${comp.metric}</div>
+                        <div class="metric-col metric-col-query">${comp.query}</div>
+                        <div class="metric-col metric-col-target">${comp.candidate}</div>
+                        <div class="metric-col metric-col-match">
+                          <span class="metric-match-pct">${comp.match}</span>
+                          <div class="metric-compare-bar-bg">
+                            <div class="metric-compare-bar" style="width: ${matchNum}%; background-color: ${barColor};"></div>
+                          </div>
                         </div>
                       </div>
                     `;
                   }).join('')}
                 </div>
-              ` : ''}
-            </div>
+              </div>
+            ` : ''}
           `;
+
+          // Attach event listeners for the drawer toggle and drawer container
+          const whyBtn = item.querySelector(`.doppelganger-why-btn`);
+          if (whyBtn) {
+            whyBtn.addEventListener("click", (e) => {
+              e.stopPropagation();
+              const drawer = item.querySelector(`.doppelganger-drawer`);
+              if (drawer) {
+                const isOpen = drawer.style.display !== "none";
+                drawer.style.display = isOpen ? "none" : "block";
+                whyBtn.setAttribute("aria-expanded", String(!isOpen));
+                if (!isOpen) {
+                  whyBtn.classList.add("active");
+                } else {
+                  whyBtn.classList.remove("active");
+                }
+              }
+            });
+          }
+
+          const drawerEl = item.querySelector(`.doppelganger-drawer`);
+          if (drawerEl) {
+            drawerEl.addEventListener("click", (e) => {
+              e.stopPropagation();
+            });
+          }
+
           container.appendChild(item);
         });
       }
