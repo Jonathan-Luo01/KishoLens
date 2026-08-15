@@ -2399,14 +2399,14 @@ import { ClientRouter } from 'astro:transitions';
           }
           ctx.closePath();
           if (ring % 2 === 1) {
-            ctx.fillStyle = isLight ? "rgba(241, 245, 249, 0.5)" : "transparent";
+            ctx.fillStyle = isLight ? "rgba(224, 242, 254, 0.50)" : "transparent";
             ctx.fill();
           }
-          ctx.strokeStyle = isLight ? "rgba(15, 23, 42, 0.12)" : "rgba(255, 255, 255, 0.08)";
+          ctx.strokeStyle = isLight ? "rgba(2, 132, 199, 0.16)" : "rgba(255, 255, 255, 0.08)";
           ctx.lineWidth = 1;
           ctx.stroke();
 
-          ctx.fillStyle = isLight ? "rgba(15, 23, 42, 0.45)" : "rgba(255, 255, 255, 0.3)";
+          ctx.fillStyle = isLight ? "rgba(2, 132, 199, 0.70)" : "rgba(255, 255, 255, 0.3)";
           ctx.font = "10px Inter, sans-serif";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
@@ -2422,7 +2422,7 @@ import { ClientRouter } from 'astro:transitions';
           ctx.lineTo(cx + R * Math.cos(angle), cy + R * Math.sin(angle));
           
           ctx.strokeStyle = isLight
-            ? (isHovered ? "rgba(15, 23, 42, 0.40)" : "rgba(15, 23, 42, 0.15)")
+            ? (isHovered ? "rgba(2, 132, 199, 0.60)" : "rgba(2, 132, 199, 0.20)")
             : (isHovered ? "rgba(255, 255, 255, 0.38)" : "rgba(255, 255, 255, 0.15)");
           ctx.lineWidth = isHovered ? 2.5 : 1;
           ctx.stroke();
@@ -2434,7 +2434,7 @@ import { ClientRouter } from 'astro:transitions';
           const words = dim.label.split(" ");
           ctx.fillStyle = isHovered
             ? (isLight ? "#0284c7" : "#7dd3fc")
-            : (isLight ? "#334155" : "#cbd5e1");
+            : (isLight ? "#0369a1" : "#cbd5e1");
           ctx.font = isHovered ? "bold 11px Inter, sans-serif" : "bold 10px Inter, sans-serif";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
@@ -2830,15 +2830,15 @@ import { ClientRouter } from 'astro:transitions';
           line.setAttribute("x2", String(endX));
           line.setAttribute("y2", y);
           line.setAttribute("stroke", isZero
-            ? (isLight ? "#94a3b8" : "rgba(255, 255, 255, 0.3)")
-            : (isLight ? "rgba(15, 23, 42, 0.08)" : "rgba(255, 255, 255, 0.055)"));
+            ? (isLight ? "rgba(2, 132, 199, 0.35)" : "rgba(255, 255, 255, 0.3)")
+            : (isLight ? "rgba(2, 132, 199, 0.10)" : "rgba(255, 255, 255, 0.055)"));
           if (!isZero) line.setAttribute("stroke-dasharray", "4 5");
           svg.appendChild(line);
 
           const lbl = document.createElementNS(ns, "text");
           lbl.setAttribute("x", String(axisX - 8));
           lbl.setAttribute("y", y + 3.5);
-          lbl.setAttribute("fill", isLight ? "#64748b" : "rgba(255, 255, 255, 0.3)");
+          lbl.setAttribute("fill", isLight ? "#0369a1" : "rgba(255, 255, 255, 0.3)");
           lbl.setAttribute("font-size", "9");
           lbl.setAttribute("font-family", "Inter, sans-serif");
           lbl.setAttribute("text-anchor", "end");
@@ -2849,13 +2849,13 @@ import { ClientRouter } from 'astro:transitions';
         const yAxis = document.createElementNS(ns, "line");
         yAxis.setAttribute("x1", String(axisX)); yAxis.setAttribute("y1", String(PAD.top));
         yAxis.setAttribute("x2", String(axisX)); yAxis.setAttribute("y2", String(bottomY));
-        yAxis.setAttribute("stroke", isLight ? "#cbd5e1" : "rgba(255, 255, 255, 0.15)");
+        yAxis.setAttribute("stroke", isLight ? "rgba(2, 132, 199, 0.20)" : "rgba(255, 255, 255, 0.15)");
         svg.appendChild(yAxis);
 
         const xAxis = document.createElementNS(ns, "line");
         xAxis.setAttribute("x1", String(axisX)); xAxis.setAttribute("y1", String(bottomY));
         xAxis.setAttribute("x2", String(endX));  xAxis.setAttribute("y2", String(bottomY));
-        xAxis.setAttribute("stroke", isLight ? "#cbd5e1" : "rgba(255, 255, 255, 0.15)");
+        xAxis.setAttribute("stroke", isLight ? "rgba(2, 132, 199, 0.20)" : "rgba(255, 255, 255, 0.15)");
         svg.appendChild(xAxis);
 
         ["Ki (Intro)", "Shō (Dev)", "Ten (Twist)", "Ketsu (Res)"].forEach((label, i) => {
@@ -2863,12 +2863,12 @@ import { ClientRouter } from 'astro:transitions';
           const tick = document.createElementNS(ns, "line");
           tick.setAttribute("x1", lx); tick.setAttribute("y1", bottomY);
           tick.setAttribute("x2", lx); tick.setAttribute("y2", bottomY + 4);
-          tick.setAttribute("stroke", isLight ? "#e2e8f0" : "rgba(255, 255, 255, 0.07)");
+          tick.setAttribute("stroke", isLight ? "rgba(2, 132, 199, 0.15)" : "rgba(255, 255, 255, 0.07)");
           svg.appendChild(tick);
 
           const txt = document.createElementNS(ns, "text");
           txt.setAttribute("x", lx); txt.setAttribute("y", bottomY + 16);
-          txt.setAttribute("fill", isLight ? "#64748b" : "rgba(255, 255, 255, 0.45)");
+          txt.setAttribute("fill", isLight ? "#0369a1" : "rgba(255, 255, 255, 0.45)");
           txt.setAttribute("font-size", "10"); txt.setAttribute("font-weight", "600");
           txt.setAttribute("font-family", "Inter, sans-serif");
           txt.setAttribute("text-anchor", "middle");
@@ -2967,8 +2967,8 @@ import { ClientRouter } from 'astro:transitions';
         if (!container) return;
         const isLight = document.documentElement.getAttribute("data-theme") === "light";
         container.innerHTML = "";
-        container.style.background = isLight ? "rgba(241, 245, 249, 0.8)" : "rgba(0, 0, 0, 0.3)";
-        container.style.border = `1px solid ${isLight ? "rgba(15, 23, 42, 0.08)" : "rgba(255, 255, 255, 0.05)"}`;
+        container.style.background = isLight ? "rgba(240, 249, 255, 0.85)" : "rgba(0, 0, 0, 0.25)";
+        container.style.border = `1px solid ${isLight ? "rgba(186, 230, 253, 0.80)" : "rgba(255, 255, 255, 0.06)"}`;
         
         if (!data || data.length === 0) {
           container.innerHTML = `<div style='color: ${isLight ? "#64748b" : "rgba(255, 255, 255, 0.3)"}; font-size:0.8rem; padding: 1rem; width:100%; text-align:center;'>No paragraph pacing data available</div>`;
