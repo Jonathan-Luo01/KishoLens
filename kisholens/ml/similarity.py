@@ -656,11 +656,11 @@ def find_top_matches(
     Returns per-match breakdown for frontend display.
 
     Scoring weights:
+      - 35% Semantic concept embedding (384D sentence transformer cosine similarity)
       - 30% Stylistic similarity (8D radar cosine + L1)
-      - 35% Genre similarity & primary genre affinity (Jaccard + primary match bonus)
-      - 20% Semantic concept embedding (384D sentence transformer cosine similarity)
+      - 25% Genre similarity & primary genre affinity (Jaccard + primary match bonus)
+      -  5% Territory semantic similarity
       -  5% Fine-grained tag overlap (Jaccard set similarity)
-      - 10% Territory semantic similarity
     """
     if len(_novel_vector_cache) == 0:
         _init_cache_from_disk()
@@ -854,11 +854,11 @@ def find_top_matches(
 
         # ── Composite Score (strictly normalized weights sum to 1.00) ──
         composite_score = (
-            0.30 * style_sim
-            + 0.35 * genre_sim
-            + 0.20 * semantic_sim
+            0.35 * semantic_sim
+            + 0.30 * style_sim
+            + 0.25 * genre_sim
+            + 0.05 * territory_sim
             + 0.05 * tag_sim
-            + 0.10 * territory_sim
         )
         score = round(min(0.99, max(0.01, composite_score)), 4)
 
