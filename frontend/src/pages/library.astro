@@ -3775,6 +3775,32 @@ import { ClientRouter } from 'astro:transitions';
           clearInterval(currentLoadingTimer);
           currentLoadingTimer = null;
         }
+
+        // Auto-navigate pagination to the page containing this novel
+        if (lastFilteredNovels && lastFilteredNovels.length > 0) {
+          const novelIndex = lastFilteredNovels.findIndex(n => n.id === id);
+          if (novelIndex !== -1) {
+            const targetPage = Math.floor(novelIndex / NOVELS_PER_PAGE) + 1;
+            if (currentNovelPage !== targetPage) {
+              currentNovelPage = targetPage;
+              renderNovelsList(lastFilteredNovels);
+            }
+          } else {
+            // If currently filtered out, check allNovels and navigate
+            const allIndex = allNovels.findIndex(n => n.id === id);
+            if (allIndex !== -1) {
+              searchQuery = "";
+              const searchInput = document.getElementById("novel-search-input");
+              if (searchInput) searchInput.value = "";
+              excludedGenres.clear();
+              selectedGenres.clear();
+              lastFilteredNovels = allNovels;
+              renderGenreCheckboxes();
+              currentNovelPage = Math.floor(allIndex / NOVELS_PER_PAGE) + 1;
+              renderNovelsList(allNovels);
+            }
+          }
+        }
         
         // Highlight active card in grid
         document.querySelectorAll(".card-novel").forEach(c => {
