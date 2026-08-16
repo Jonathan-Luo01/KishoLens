@@ -204,20 +204,10 @@ def consolidate_genre(tags: list[str]) -> Optional[str]:
 # Embedding
 # ---------------------------------------------------------------------------
 
-import threading
-
-_model_cache: dict[str, object] = {}
-_model_lock = threading.Lock()
-
-
 def _get_model(model_name: str = "all-MiniLM-L6-v2"):
-    """Lazy-load and cache the SentenceTransformer model on CPU safely."""
-    if model_name not in _model_cache:
-        with _model_lock:
-            if model_name not in _model_cache:
-                from sentence_transformers import SentenceTransformer
-                _model_cache[model_name] = SentenceTransformer(model_name, device="cpu")
-    return _model_cache[model_name]
+    """Lazy-load and cache the SentenceTransformer model on CPU safely via central singleton."""
+    from kisholens.ml.embeddings import get_transformer_model
+    return get_transformer_model(model_name)
 
 
 def get_representative_sample(text: str, target_words: int = 1000) -> str:

@@ -4,17 +4,24 @@ embeddings.py — Dual-scope vector generation for KishoLens.
 
 from __future__ import annotations
 from typing import Optional, Tuple
+import threading
+from typing import Optional, Tuple, Dict, Any
 import numpy as np
 
-_model = None
+_model_cache: Dict[str, Any] = {}
+_model_lock = threading.Lock()
 
 
-def get_transformer_model():
-    global _model
-    if _model is None:
-        from sentence_transformers import SentenceTransformer
-        _model = SentenceTransformer("all-MiniLM-L6-v2", device="cpu")
-    return _model
+def get_transformer_model(model_name: str = "all-MiniLM-L6-v2"):
+    """Thread-safe singleton getter for SentenceTransformer models on CPU."""
+    if model_name not in _model_cache:
+        with _model_lock:
+            if model_name not in _model_cache:
+                from sentence_transformers import SentenceTransformer
+                model = SentenceTransformer(model_name, device="cpu")
+                model.eval()
+                _model_cache[model_name] = model
+    return _model_cache[model_name]
 
 
 def _normalize(vec: np.ndarray) -> np.ndarray:

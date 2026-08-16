@@ -150,22 +150,21 @@ _load_vector_disk_cache()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Asynchronously pre-load PyTorch, sentence-transformers, and spaCy models at server launch."""
-    import threading
-    def _warmup():
-        try:
-            print("[WARMUP] Pre-loading spaCy, NLTK VADER, SentenceTransformers, and multi-lingual NLP pipelines...")
-            _init_nlp_resources()
-            sample_en = "This is a generic prose warmup sample for initializing spaCy, VADER, and sentence transformer models."
-            extract_english_features(sample_en)
-            extract_japanese_features("これはモデルを事前ロードするためのウォームアップテキストです。")
-            extract_chinese_features("这是一个用于模型预热的文本示例。")
-            match_semantic(sample_en)
-            compute_kishotenketsu_quantile_arc([sample_en, "The story reaches a climax.", "All conflicts are resolved."], lang="en")
-            print("[WARMUP] All NLP models & pipeline engines successfully pre-loaded in background! Ready for any novel or custom input.")
-        except Exception as e:
-            print(f"[WARMUP WARN] {e}")
-    threading.Thread(target=_warmup, daemon=True).start()
+    """Pre-load PyTorch, sentence-transformers, and spaCy models safely before traffic starts."""
+    try:
+        print("[WARMUP] Pre-loading spaCy, NLTK VADER, SentenceTransformers, and multi-lingual NLP pipelines...")
+        _init_nlp_resources()
+        from kisholens.ml.embeddings import get_transformer_model
+        get_transformer_model("all-MiniLM-L6-v2")
+        sample_en = "This is a generic prose warmup sample for initializing spaCy, VADER, and sentence transformer models."
+        extract_english_features(sample_en)
+        extract_japanese_features("これはモデルを事前ロードするためのウォームアップテキストです。")
+        extract_chinese_features("这是一个用于模型预热的文本示例。")
+        match_semantic(sample_en)
+        compute_kishotenketsu_quantile_arc([sample_en, "The story reaches a climax.", "All conflicts are resolved."], lang="en")
+        print("[WARMUP] All NLP models & pipeline engines successfully pre-loaded! Ready for any novel or custom input.")
+    except Exception as e:
+        print(f"[WARMUP WARN] {e}")
     yield
 
 app = FastAPI(title="KishoLens API", lifespan=lifespan)
