@@ -1098,6 +1098,37 @@ header.site-header,
   background: rgba(99, 102, 241, 0.08) !important;
   border: 1px solid rgba(99, 102, 241, 0.25) !important;
   color: #4338ca !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="light"] .doppelganger-score-chip.story {
+  background: rgba(99, 102, 241, 0.12) !important;
+  border: 1px solid rgba(99, 102, 241, 0.35) !important;
+}
+
+[data-theme="light"] .doppelganger-score-chip.story .score-chip-label {
+  color: #4338ca !important;
+  font-weight: 800 !important;
+}
+
+[data-theme="light"] .doppelganger-score-chip.story .score-chip-val {
+  color: #1e1b4b !important;
+  font-weight: 900 !important;
+}
+
+[data-theme="light"] .doppelganger-score-chip.style {
+  background: rgba(2, 132, 199, 0.10) !important;
+  border: 1px solid rgba(2, 132, 199, 0.35) !important;
+}
+
+[data-theme="light"] .doppelganger-score-chip.style .score-chip-label {
+  color: #0369a1 !important;
+  font-weight: 800 !important;
+}
+
+[data-theme="light"] .doppelganger-score-chip.style .score-chip-val {
+  color: #082f49 !important;
+  font-weight: 900 !important;
 }
 
 [data-theme="light"] .doppelganger-factor-label {

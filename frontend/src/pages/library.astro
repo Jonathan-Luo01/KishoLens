@@ -370,6 +370,64 @@ import { ClientRouter } from 'astro:transitions';
         margin-left: 16px;
       }
 
+      :global(.doppelganger-scores-dual) {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+
+      :global(.doppelganger-score-chip) {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 10px;
+        border-radius: 8px;
+        min-width: 62px;
+        box-sizing: border-box;
+      }
+
+      :global(.doppelganger-score-chip.story) {
+        background: rgba(99, 102, 241, 0.12);
+        border: 1px solid rgba(99, 102, 241, 0.35);
+      }
+
+      :global(.doppelganger-score-chip.story .score-chip-label) {
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #a5b4fc;
+      }
+
+      :global(.doppelganger-score-chip.story .score-chip-val) {
+        font-size: 15px;
+        font-weight: 800;
+        color: #c7d2fe;
+        line-height: 1.1;
+      }
+
+      :global(.doppelganger-score-chip.style) {
+        background: rgba(56, 189, 248, 0.08);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+      }
+
+      :global(.doppelganger-score-chip.style .score-chip-label) {
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #7dd3fc;
+      }
+
+      :global(.doppelganger-score-chip.style .score-chip-val) {
+        font-size: 15px;
+        font-weight: 800;
+        color: #bae6fd;
+        line-height: 1.1;
+      }
+
       :global(.doppelganger-score) {
         font-size: 18px;
         font-weight: bold;
@@ -2520,6 +2578,26 @@ import { ClientRouter } from 'astro:transitions';
         color: #0284c7;
         font-weight: 700;
       }
+      :global([data-theme="light"]) .doppelganger-score-chip.story {
+        background: rgba(99, 102, 241, 0.08) !important;
+        border-color: rgba(99, 102, 241, 0.3) !important;
+      }
+      :global([data-theme="light"]) .doppelganger-score-chip.story .score-chip-label {
+        color: #4f46e5 !important;
+      }
+      :global([data-theme="light"]) .doppelganger-score-chip.story .score-chip-val {
+        color: #312e81 !important;
+      }
+      :global([data-theme="light"]) .doppelganger-score-chip.style {
+        background: rgba(2, 132, 199, 0.06) !important;
+        border-color: rgba(2, 132, 199, 0.25) !important;
+      }
+      :global([data-theme="light"]) .doppelganger-score-chip.style .score-chip-label {
+        color: #0284c7 !important;
+      }
+      :global([data-theme="light"]) .doppelganger-score-chip.style .score-chip-val {
+        color: #0c4a6e !important;
+      }
       :global([data-theme="light"]) .doppelganger-item-title {
         color: #0f172a;
       }
@@ -4652,13 +4730,9 @@ import { ClientRouter } from 'astro:transitions';
           item.className = "doppelganger-item";
           item.addEventListener("click", () => selectNovel(m.id, m.title));
 
-          const pct = Math.round((m.similarity_score || 0) * 100);
+          const storyPct = m.story_similarity || Math.round((m.breakdown?.story || m.breakdown?.semantic || m.similarity_score || 0) * 100);
+          const stylePct = m.style_similarity || Math.round((m.breakdown?.style || 0) * 100);
           const topGenres = (m.genre || 'Fiction').split(',').map(g => g.trim()).filter(Boolean).slice(0, 3).join(', ');
-          const scoreColor = m.similarity_score > 0.9
-            ? (isLight ? '#0284c7' : '#38bdf8')
-            : m.similarity_score > 0.8
-              ? (isLight ? '#6366f1' : '#818cf8')
-              : (isLight ? '#64748b' : '#94a3b8');
 
           const hasComparisons = Array.isArray(m.metric_comparisons) && m.metric_comparisons.length > 0;
           
@@ -4690,7 +4764,7 @@ import { ClientRouter } from 'astro:transitions';
                     <span class="doppelganger-badge">${topGenres}</span>
                     ${hasComparisons ? `
                       <button type="button" class="doppelganger-why-btn" data-drawer-id="doppelganger-drawer-${m.id}" aria-expanded="false">
-                        Why this matched <span class="why-chevron">▾</span>
+                        Story & Style Breakdown <span class="why-chevron">▾</span>
                       </button>
                     ` : ''}
                   </div>
@@ -4699,20 +4773,23 @@ import { ClientRouter } from 'astro:transitions';
               </div>
 
               <div class="doppelganger-right">
-                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
-                  <span class="doppelganger-score" style="color: ${scoreColor}">${pct}%</span>
-                  <div class="doppelganger-progress-bg">
-                    <div class="doppelganger-progress-fill" style="width: ${pct}%; background-color: ${scoreColor}"></div>
+                <div class="doppelganger-scores-dual">
+                  <div class="doppelganger-score-chip story" title="Story & Plot Content Match (Premise, Setting & Conflict)">
+                    <span class="score-chip-label">Story Match</span>
+                    <span class="score-chip-val">${storyPct}%</span>
+                  </div>
+                  <div class="doppelganger-score-chip style" title="Prose Style & Sentence Cadence Match">
+                    <span class="score-chip-label">Style Match</span>
+                    <span class="score-chip-val">${stylePct}%</span>
                   </div>
                 </div>
                 ${m.breakdown ? `
                   <div class="doppelganger-breakdown">
                     ${[
-                      { label: 'STY', name: 'Prose Style', val: m.breakdown.style },
-                      { label: 'GEN', name: 'Genre', val: m.breakdown.genre },
-                      { label: 'TAG', name: 'Tags', val: m.breakdown.tags },
-                      { label: 'TER', name: 'Territory', val: m.breakdown.territory },
-                      { label: 'SEM', name: 'Semantic', val: m.breakdown.semantic }
+                      { label: 'SEM', name: 'Story Premise', val: m.breakdown.semantic },
+                      { label: 'GEN', name: 'Genre & Setting', val: m.breakdown.genre },
+                      { label: 'TAG', name: 'Narrative Tropes', val: m.breakdown.tags },
+                      { label: 'STY', name: 'Prose Cadence', val: m.breakdown.style }
                     ].map(f => {
                       const fPct = Math.round((f.val || 0) * 100);
                       const fColor = f.val > 0.8 ? (isLight ? '#0284c7' : '#38bdf8') : (isLight ? '#64748b' : '#94a3b8');
@@ -4732,8 +4809,24 @@ import { ClientRouter } from 'astro:transitions';
 
             ${hasComparisons ? `
               <div id="doppelganger-drawer-${m.id}" class="doppelganger-drawer" style="display: none;">
+                <div style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+                  <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #a78bfa; margin-bottom: 4px;">
+                    Story & Thematic Anatomy (85% Ranking Weight)
+                  </div>
+                  <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 0.75rem; color: var(--color-muted);">
+                    <span><strong>Premise Alignment:</strong> ${Math.round((m.breakdown?.semantic || 0) * 100)}%</span>
+                    <span>•</span>
+                    <span><strong>Genre & Setting:</strong> ${Math.round((m.breakdown?.genre || 0) * 100)}%</span>
+                    <span>•</span>
+                    <span><strong>Trope Overlap:</strong> ${Math.round((m.breakdown?.tags || 0) * 100)}%</span>
+                  </div>
+                </div>
+
+                <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #38bdf8; margin-bottom: 6px;">
+                  Forensic Stylometry & Cadence (15% Tiebreaker Weight)
+                </div>
                 <div class="metric-compare-header">
-                  <span class="metric-col metric-col-name">Metric</span>
+                  <span class="metric-col metric-col-name">Style Metric</span>
                   <span class="metric-col metric-col-query">Selected Work</span>
                   <span class="metric-col metric-col-target">Matched Work</span>
                   <span class="metric-col metric-col-match">Alignment</span>

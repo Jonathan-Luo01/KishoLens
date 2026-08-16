@@ -368,7 +368,7 @@ class IngestRequest(BaseModel):
     num_records: int
 
 
-SIMILARITY_MODEL_VERSION = "v2_semantic_35"
+SIMILARITY_MODEL_VERSION = "v3_story_dominant_85"
 
 
 @app.get("/api/novels/{novel_id}/stats")

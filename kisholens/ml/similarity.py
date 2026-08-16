@@ -852,47 +852,56 @@ def find_top_matches(
         else:
             territory_sim = 0.50
 
-        # ── Composite Score (strictly normalized weights sum to 1.00) ──
-        composite_score = (
-            0.35 * semantic_sim
-            + 0.30 * style_sim
-            + 0.25 * genre_sim
+        # ── Story Similarity Formulation (Story Content & Narrative Anatomy) ──
+        story_sim = float(
+            0.45 * semantic_sim
+            + 0.35 * genre_sim
+            + 0.15 * tag_sim
             + 0.05 * territory_sim
-            + 0.05 * tag_sim
         )
+        story_sim = float(np.clip(story_sim, 0.0, 1.0))
+
+        # ── Composite Overall Score (85% Story Content + 15% Prose Style Tiebreaker) ──
+        composite_score = 0.85 * story_sim + 0.15 * style_sim
         score = round(min(0.99, max(0.01, composite_score)), 4)
 
-        # Generate clean human-readable match reasons (no emojis)
-        reasons = []
-        if style_sim >= 0.88:
-            reasons.append("Similar prose style & sentence structure")
-        elif style_sim >= 0.75:
-            reasons.append("Comparable sentence cadence")
+        # Generate story-first human-readable match reasons
+        story_reasons = []
+        style_reasons = []
 
         if q_primary_genre_lower and cand_primary and q_primary_genre_lower == cand_primary:
             cand_primary_clean = n_meta.get("primary_genre") or n_meta.get("genre")
-            reasons.append(f"Matching primary archetype: {cand_primary_clean}")
+            story_reasons.append(f"Matching primary archetype: {cand_primary_clean}")
         elif q_primary_genre_lower and q_primary_genre_lower in cand_genres:
-            reasons.append(f"Shared genre: {q_primary_genre}")
+            story_reasons.append(f"Shared genre: {q_primary_genre}")
         elif genre_sim >= 0.60:
-            reasons.append("Strong genre overlap")
+            story_reasons.append("Strong genre overlap")
 
         if semantic_sim >= 0.80:
-            reasons.append("Closely aligned plot premise & themes")
+            story_reasons.append("Closely aligned plot premise & themes")
         elif semantic_sim >= 0.65:
-            reasons.append("Thematic narrative overlap")
+            story_reasons.append("Thematic narrative overlap")
+
+        if tag_sim >= 0.60:
+            story_reasons.append("Overlapping narrative tropes")
 
         if territory_sim >= 0.85 and n_territory and n_territory != "Unknown":
             if "classic" in n_territory.lower():
-                reasons.append("Shared Classic Literature tradition")
+                story_reasons.append("Shared Classic Literature tradition")
             elif "web" in n_territory.lower():
-                reasons.append("Shared Web Novel territory")
+                story_reasons.append("Shared Web Novel territory")
 
-        if tag_sim >= 0.60:
-            reasons.append("Overlapping narrative tropes")
+        if style_sim >= 0.88:
+            style_reasons.append("Similar prose style & sentence structure")
+        elif style_sim >= 0.75:
+            style_reasons.append("Comparable sentence cadence")
 
+        # Combined reasons list puts Story features first
+        reasons = story_reasons.copy()
+        if style_reasons:
+            reasons.extend(style_reasons)
         if not reasons:
-            reasons.append("Overall stylistic and structural affinity")
+            reasons.append("Overall thematic and stylistic affinity")
 
         # Compute granular match badges and side-by-side metric comparisons
         c_metrics = _extract_metric_values(n_meta, n_vec)
@@ -917,10 +926,15 @@ def find_top_matches(
             "genre": n_meta.get("genre", ""),
             "territory": n_territory or "Unknown",
             "similarity_score": score,
+            "story_similarity": int(round(story_sim * 100)),
+            "style_similarity": int(round(style_sim * 100)),
             "match_badges": match_badges,
             "metric_comparisons": metric_comparisons,
             "reasons": reasons,
+            "story_reasons": story_reasons,
+            "style_reasons": style_reasons,
             "breakdown": {
+                "story": round(story_sim, 3),
                 "style": round(style_sim, 3),
                 "semantic": round(semantic_sim, 3),
                 "genre": round(genre_sim, 3),
@@ -929,8 +943,8 @@ def find_top_matches(
             }
         })
 
-    # Sort by composite score descending, then by genre overlap as tiebreaker
-    candidates.sort(key=lambda x: (x["similarity_score"], x["breakdown"]["genre"]), reverse=True)
+    # Sort primarily by story-dominant composite score descending, then by pure story score
+    candidates.sort(key=lambda x: (x["similarity_score"], x["breakdown"]["story"]), reverse=True)
     return candidates[:top_k]
 
 
