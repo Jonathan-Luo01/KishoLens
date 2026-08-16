@@ -47,26 +47,42 @@ def _get_concept_embedding(
     genre: str = "",
     territory: str = "",
     title: str = "",
-    author: str = ""
+    author: str = "",
+    inciting_event: str = "",
+    world_setting: str = "",
+    narrative_plot: str = "",
+    tags: str = ""
 ) -> np.ndarray:
     """
-    Computes a 384D concept embedding for a novel by encoding its genre
-    and territory through the sentence transformer. This captures WHAT a novel
-    is about semantically (themes, setting, narrative type).
+    Computes a 384D concept embedding for a novel by encoding its title,
+    3-pillar taxonomy (catalyst, setting, plot), genre, tags, and territory
+    through the sentence transformer. This captures WHAT a novel is about
+    semantically (premise, conflict, themes).
 
     Results are cached by the composite key for high performance.
     """
-    cache_key = f"{genre.strip()}|{territory.strip()}"
+    cache_key = f"{title.strip().lower()}|{genre.strip().lower()}|{inciting_event.strip().lower()}|{narrative_plot.strip().lower()}|{world_setting.strip().lower()}|{tags.strip().lower()}|{territory.strip().lower()}"
     if cache_key in _concept_embedding_cache:
         return _concept_embedding_cache[cache_key]
 
     try:
         from kisholens.ml.embeddings import embed_single_text
         parts = []
-        if genre and genre.strip():
-            parts.append(genre.strip())
+        if title and title.strip() and title.strip() != "Unknown Title":
+            parts.append(title.strip())
+        if world_setting and world_setting.strip():
+            parts.append(f"Setting: {world_setting.strip()}")
+        elif genre and genre.strip():
+            parts.append(f"Genre: {genre.strip()}")
+        if inciting_event and inciting_event.strip():
+            parts.append(f"Catalyst: {inciting_event.strip()}")
+        if narrative_plot and narrative_plot.strip():
+            parts.append(f"Plot: {narrative_plot.strip()}")
+        if tags and tags.strip():
+            parts.append(f"Tropes: {tags.strip()}")
         if territory and territory.strip():
-            parts.append(territory.strip())
+            parts.append(f"Tradition: {territory.strip()}")
+
         concept_text = ". ".join(parts) if parts else "fiction"
         vec = embed_single_text(concept_text)
         _concept_embedding_cache[cache_key] = vec
@@ -189,6 +205,11 @@ def _init_cache_from_disk(cache_path: Optional[Union[str, Path]] = None) -> None
         author = item.get("author") or "Unknown Author"
         tags = item.get("tags") or ""
 
+        tax = item.get("taxonomy") if isinstance(item.get("taxonomy"), dict) else {}
+        inciting = tax.get("inciting_event", {}).get("primary") if isinstance(tax.get("inciting_event"), dict) else ""
+        world = tax.get("world_setting", {}).get("primary") if isinstance(tax.get("world_setting"), dict) else ""
+        plot = tax.get("narrative_plot", {}).get("primary") if isinstance(tax.get("narrative_plot"), dict) else ""
+
         _novel_vector_cache[nid] = {
             "id": nid,
             "title": title,
@@ -198,6 +219,9 @@ def _init_cache_from_disk(cache_path: Optional[Union[str, Path]] = None) -> None
             "top_genres": top_genres,
             "territory": territory,
             "tags": tags,
+            "inciting_event": inciting,
+            "world_setting": world,
+            "narrative_plot": plot,
             "vector": vec,
             "raw_features": item,
             "semantic": item.get("taxonomy") or item.get("archetype_match"),
@@ -751,10 +775,28 @@ def find_top_matches(
         except Exception:
             target_territory = query_semantic.get("territory") if query_semantic else None
 
+    q_tax = (
+        query_semantic.get("taxonomy", {})
+        if query_semantic and isinstance(query_semantic.get("taxonomy"), dict)
+        else (query_features.get("taxonomy", {}) if isinstance(query_features.get("taxonomy"), dict) else {})
+    )
+    q_inciting = q_tax.get("inciting_event", {}).get("primary") if isinstance(q_tax.get("inciting_event"), dict) else ""
+    q_world = q_tax.get("world_setting", {}).get("primary") if isinstance(q_tax.get("world_setting"), dict) else ""
+    q_plot = q_tax.get("narrative_plot", {}).get("primary") if isinstance(q_tax.get("narrative_plot"), dict) else ""
+    q_title = query_features.get("title") or (target_novel_meta.get("title") if target_novel_meta else "")
+
     # Query concept embedding (384D)
     try:
         q_genre_str = q_primary_genre or (", ".join(sorted(target_genres)) if target_genres else "")
-        q_concept_emb = _get_concept_embedding(genre=q_genre_str, territory=target_territory or "")
+        q_concept_emb = _get_concept_embedding(
+            title=q_title,
+            genre=q_genre_str,
+            territory=target_territory or "",
+            inciting_event=q_inciting,
+            world_setting=q_world,
+            narrative_plot=q_plot,
+            tags=raw_target_tags
+        )
     except Exception:
         q_concept_emb = np.zeros(384, dtype=np.float32)
 
@@ -780,7 +822,7 @@ def find_top_matches(
         if n_vec is None:
             n_vec = np.full(8, 0.5)
 
-        # ── Factor 1: Stylistic Similarity (30%) ──
+        # ── Factor 1: Stylistic Similarity (15% tiebreaker) ──
         cos_sim = float(np.dot(q_vec, n_vec) / (np.linalg.norm(q_vec) * np.linalg.norm(n_vec) + 1e-9))
         l1_diff = float(np.mean(np.abs(q_vec - n_vec)))
         style_sim = float(np.clip((0.5 * cos_sim) + (0.5 * max(0.0, 1.0 - (4.0 * l1_diff))), 0.0, 1.0))
@@ -809,27 +851,39 @@ def find_top_matches(
 
         genre_sim = float(np.clip(genre_sim, 0.0, 1.0))
 
-        # ── Factor 3: Semantic Concept Embedding (20%) ──
+        # ── Factor 3: Semantic Concept Embedding (45% of story weight) ──
         n_territory = n_meta.get("territory") or "Unknown"
         title_str = n_meta.get("title", "")
         author_str = n_meta.get("author", "")
 
-        n_concept_emb = _get_concept_embedding(genre=cand_primary, territory=n_territory)
+        n_concept_emb = _get_concept_embedding(
+            title=title_str,
+            genre=cand_primary,
+            territory=n_territory,
+            inciting_event=n_meta.get("inciting_event", ""),
+            world_setting=n_meta.get("world_setting", ""),
+            narrative_plot=n_meta.get("narrative_plot", ""),
+            tags=n_meta.get("tags", "")
+        )
         n_norm = float(np.linalg.norm(n_concept_emb))
         if q_norm > 1e-9 and n_norm > 1e-9:
             sem_raw = float(np.clip(np.dot(q_concept_emb, n_concept_emb) / (q_norm * n_norm), 0.0, 1.0))
         else:
             sem_raw = 0.40
 
-        # Generic token overlap between candidate title/author words (>= 4 chars) and query text
-        if query_text:
+        # Title keyword bonus
+        if q_title:
+            q_lower = q_title.lower()
+            title_tokens = [w for w in re.findall(r"\b[a-zA-Z]{4,}\b", title_str.lower()) if w not in {"with", "from", "that", "this", "into", "over", "about", "world"}]
+            title_matches = sum(1 for w in set(title_tokens) if w in q_lower)
+            token_overlap = min(0.30, 0.15 * title_matches)
+            semantic_sim = float(np.clip(0.70 * sem_raw + token_overlap, 0.0, 1.0))
+        elif query_text:
             q_lower = query_text.lower()
             title_tokens = [w for w in re.findall(r"\b[a-zA-Z]{4,}\b", title_str.lower()) if w not in {"with", "from", "that", "this", "into", "over", "about"}]
-            author_tokens = [w for w in re.findall(r"\b[a-zA-Z]{4,}\b", author_str.lower()) if w not in {"unknown", "author"}]
             title_matches = sum(1 for w in set(title_tokens) if w in q_lower)
-            author_matches = sum(1 for w in set(author_tokens) if w in q_lower)
-            token_overlap = min(0.60, 0.30 * title_matches + 0.20 * author_matches)
-            semantic_sim = float(np.clip(0.40 * sem_raw + token_overlap, 0.0, 1.0))
+            token_overlap = min(0.30, 0.15 * title_matches)
+            semantic_sim = float(np.clip(0.70 * sem_raw + token_overlap, 0.0, 1.0))
         else:
             semantic_sim = float(np.clip(sem_raw, 0.0, 1.0))
 
