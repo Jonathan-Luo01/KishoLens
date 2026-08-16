@@ -69,7 +69,7 @@ import { ClientRouter } from 'astro:transitions';
         display: grid;
         grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
         gap: 1.75rem;
-        align-items: stretch;
+        align-items: start;
       }
 
       @media (max-width: 950px) {
@@ -127,8 +127,6 @@ import { ClientRouter } from 'astro:transitions';
         flex-direction: column;
         gap: 1.25rem;
         min-width: 0;
-        height: 100%;
-        box-sizing: border-box;
       }
 
       .explorer-section {
@@ -137,15 +135,6 @@ import { ClientRouter } from 'astro:transitions';
         gap: 0.75rem;
         padding-bottom: 1.25rem;
         border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      }
-
-      .explorer-novels-section {
-        flex: 1 1 0;
-        display: flex;
-        flex-direction: column;
-        min-height: 240px;
-        padding-bottom: 0;
-        border-bottom: none;
       }
 
       .explorer-section:last-child {
@@ -700,29 +689,10 @@ import { ClientRouter } from 'astro:transitions';
       }
 
       .novel-list {
-        flex: 1 1 0;
         display: flex;
         flex-direction: column;
         gap: 0.65rem;
         width: 100%;
-        overflow-y: auto;
-        min-height: 180px;
-        max-height: 520px;
-        padding-right: 0.35rem;
-        overscroll-behavior-y: contain;
-        scrollbar-width: thin;
-        scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
-      }
-
-      .novel-list::-webkit-scrollbar {
-        width: 6px;
-      }
-      .novel-list::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.12);
-        border-radius: 4px;
-      }
-      :global([data-theme="light"]) .novel-list::-webkit-scrollbar-thumb {
-        background: rgba(203, 213, 225, 0.85);
       }
 
       /* Stats panel styling */
@@ -2698,9 +2668,14 @@ import { ClientRouter } from 'astro:transitions';
           </div>
 
           <!-- Section 3: Ingested Novels List -->
-          <div class="explorer-section explorer-novels-section">
-            <div class="explorer-section-title">
+          <div class="explorer-section">
+            <div class="explorer-section-title" style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
               <span id="novels-list-title">Ingested Novels</span>
+              <div class="metrics-carousel-nav" id="novelPaginationControls" style="display: none;">
+                <button class="carousel-nav-btn" id="novelPagePrev" aria-label="Previous page" title="Previous page">‹</button>
+                <span class="carousel-indicator-pill" id="novelPageIndicator">Page 1 of 1</span>
+                <button class="carousel-nav-btn" id="novelPageNext" aria-label="Next page" title="Next page">›</button>
+              </div>
             </div>
             <div class="novel-list" id="novels-container">
               <div class="placeholder-text">Loading library novels...</div>
@@ -3334,20 +3309,40 @@ import { ClientRouter } from 'astro:transitions';
 
         badgeEl.innerText = `${filtered.length} novel${filtered.length === 1 ? "" : "s"}`;
         populateNovelDropdown(filtered);
+        currentNovelPage = 1;
+        lastFilteredNovels = filtered;
         renderNovelsList(filtered);
       }
 
+      let currentNovelPage = 1;
+      const NOVELS_PER_PAGE = 6;
+      let lastFilteredNovels = [];
+
       function renderNovelsList(novelsToRender) {
         const container = document.getElementById("novels-container");
-        if (novelsToRender.length === 0) {
+        const paginationControls = document.getElementById("novelPaginationControls");
+        const prevBtn = document.getElementById("novelPagePrev");
+        const nextBtn = document.getElementById("novelPageNext");
+        const indicator = document.getElementById("novelPageIndicator");
+
+        if (!container) return;
+
+        if (!novelsToRender || novelsToRender.length === 0) {
           container.innerHTML = `<p class="placeholder-text" style="padding: 1.5rem 1rem;">No matching novels found.</p>`;
+          if (paginationControls) paginationControls.style.display = "none";
           return;
         }
 
-        container.innerHTML = "";
-        // Render up to 200 items for high performance smooth scrolling
-        const visibleNovels = novelsToRender.slice(0, 200);
+        const totalNovels = novelsToRender.length;
+        const totalPages = Math.max(1, Math.ceil(totalNovels / NOVELS_PER_PAGE));
+        if (currentNovelPage > totalPages) currentNovelPage = totalPages;
+        if (currentNovelPage < 1) currentNovelPage = 1;
 
+        const startIndex = (currentNovelPage - 1) * NOVELS_PER_PAGE;
+        const endIndex = Math.min(totalNovels, startIndex + NOVELS_PER_PAGE);
+        const visibleNovels = novelsToRender.slice(startIndex, endIndex);
+
+        container.innerHTML = "";
         visibleNovels.forEach(novel => {
           const card = document.createElement("div");
           card.className = `card-novel ${selectedNovelId === novel.id ? "active" : ""}`;
@@ -3365,6 +3360,17 @@ import { ClientRouter } from 'astro:transitions';
           `;
           container.appendChild(card);
         });
+
+        if (paginationControls) {
+          if (totalPages > 1) {
+            paginationControls.style.display = "inline-flex";
+            if (indicator) indicator.innerText = `Page ${currentNovelPage} of ${totalPages}`;
+            if (prevBtn) prevBtn.disabled = (currentNovelPage <= 1);
+            if (nextBtn) nextBtn.disabled = (currentNovelPage >= totalPages);
+          } else {
+            paginationControls.style.display = "none";
+          }
+        }
       }
 
       const METRIC_METADATA = {
@@ -5120,6 +5126,29 @@ import { ClientRouter } from 'astro:transitions';
         // Reset all filters button listener
         if (resetBtn) {
           resetBtn.addEventListener("click", resetGenreFilters);
+        }
+
+        // Novel catalog pagination listeners
+        const pagePrevBtn = document.getElementById("novelPagePrev");
+        const pageNextBtn = document.getElementById("novelPageNext");
+
+        if (pagePrevBtn) {
+          pagePrevBtn.addEventListener("click", () => {
+            if (currentNovelPage > 1) {
+              currentNovelPage--;
+              renderNovelsList(lastFilteredNovels);
+            }
+          });
+        }
+
+        if (pageNextBtn) {
+          pageNextBtn.addEventListener("click", () => {
+            const totalPages = Math.ceil(lastFilteredNovels.length / NOVELS_PER_PAGE);
+            if (currentNovelPage < totalPages) {
+              currentNovelPage++;
+              renderNovelsList(lastFilteredNovels);
+            }
+          });
         }
 
         // Setup Ingestion Form
