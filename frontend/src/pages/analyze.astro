@@ -2459,6 +2459,8 @@ import { ClientRouter } from 'astro:transitions';
         canvas.height = Math.round(cssH * dpr);
 
         const ctx = canvas.getContext("2d");
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
         const W = cssW, H = cssH;
@@ -2466,7 +2468,6 @@ import { ClientRouter } from 'astro:transitions';
         const labelPad = 80;
         const R  = Math.min(W, H) / 2 - labelPad;
         const n  = RADAR_DIMS.length;
-        ctx.clearRect(0, 0, W, H);
 
         /* Grid rings */
         for (let ring = 5; ring >= 1; ring--) {
@@ -2480,7 +2481,7 @@ import { ClientRouter } from 'astro:transitions';
           }
           ctx.closePath();
           if (ring % 2 === 1) {
-            ctx.fillStyle = isLight ? "rgba(224, 242, 254, 0.50)" : "transparent";
+            ctx.fillStyle = isLight ? "rgba(2, 132, 199, 0.03)" : "rgba(255, 255, 255, 0.015)";
             ctx.fill();
           }
           ctx.strokeStyle = isLight ? "rgba(2, 132, 199, 0.16)" : "rgba(255, 255, 255, 0.08)";
@@ -2488,7 +2489,7 @@ import { ClientRouter } from 'astro:transitions';
           ctx.stroke();
 
           ctx.fillStyle = isLight ? "rgba(2, 132, 199, 0.70)" : "rgba(255, 255, 255, 0.3)";
-          ctx.font = "10px Inter, sans-serif";
+          ctx.font = "600 10px Inter, sans-serif";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillText(`${ring * 20}%`, cx + 4, cy - R * ring / 5 - 7);
