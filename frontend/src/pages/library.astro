@@ -127,7 +127,7 @@ import { ClientRouter } from 'astro:transitions';
         flex-direction: column;
         gap: 1.25rem;
         min-width: 0;
-        height: 100%;
+        min-height: 100%;
         box-sizing: border-box;
       }
 
@@ -3331,7 +3331,7 @@ import { ClientRouter } from 'astro:transitions';
       }
 
       let currentNovelPage = 1;
-      const NOVELS_PER_PAGE = 10;
+      const NOVELS_PER_PAGE = 8;
       let lastFilteredNovels = [];
 
       function renderNovelsList(novelsToRender) {
