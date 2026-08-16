@@ -1726,52 +1726,59 @@ import { ClientRouter } from 'astro:transitions';
       :global(.db-source-chip) {
         display: inline-flex;
         align-items: center;
-        gap: 0.35rem;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        gap: 0.4rem;
+        background: rgba(255, 255, 255, 0.035);
+        border: 1px solid rgba(255, 255, 255, 0.09);
         border-radius: 6px;
-        padding: 0.22rem 0.55rem;
+        padding: 0.24rem 0.58rem;
         font-size: 0.74rem;
-        color: rgba(255, 255, 255, 0.85);
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.9);
         transition: all 0.2s ease;
       }
       :global(.db-source-chip:hover) {
         background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.25);
         transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       }
       :global(.db-source-dot) {
-        width: 6px;
-        height: 6px;
+        width: 7px;
+        height: 7px;
         border-radius: 50%;
         display: inline-block;
+        box-shadow: 0 0 6px currentColor;
       }
 
       :global(.db-genre-chip) {
         display: inline-flex;
         align-items: center;
         justify-content: space-between;
-        gap: 0.4rem;
-        background: rgba(124, 106, 255, 0.05);
-        border: 1px solid rgba(124, 106, 255, 0.12);
+        gap: 0.45rem;
+        background: rgba(124, 106, 255, 0.08);
+        border: 1px solid rgba(124, 106, 255, 0.2);
         border-radius: 6px;
-        padding: 0.22rem 0.5rem;
-        font-size: 0.72rem;
-        color: rgba(255, 255, 255, 0.8);
+        padding: 0.24rem 0.55rem;
+        font-size: 0.73rem;
+        color: #e2e8f0;
+        font-weight: 500;
         transition: all 0.18s ease;
       }
       :global(.db-genre-chip:hover) {
-        border-color: rgba(124, 106, 255, 0.4);
-        background: rgba(124, 106, 255, 0.12);
+        border-color: rgba(124, 106, 255, 0.45);
+        background: rgba(124, 106, 255, 0.16);
         color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 10px rgba(124, 106, 255, 0.2);
       }
       :global(.db-genre-count) {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(124, 106, 255, 0.22);
+        border: 1px solid rgba(124, 106, 255, 0.35);
         border-radius: 4px;
-        padding: 0.05rem 0.3rem;
-        font-size: 0.65rem;
+        padding: 0.05rem 0.35rem;
+        font-size: 0.66rem;
         font-weight: 700;
-        color: #a78bfa;
+        color: #c4b5fd;
       }
 
       /* ── Skeleton Loading UI & Shimmer Keyframes ── */
