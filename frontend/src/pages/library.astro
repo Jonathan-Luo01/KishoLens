@@ -692,21 +692,27 @@ import { ClientRouter } from 'astro:transitions';
         display: flex;
         flex-direction: column;
         gap: 0.65rem;
-        max-height: 280px;
+        max-height: 340px;
         overflow-y: auto;
+        overscroll-behavior-y: contain;
         padding-right: 0.35rem;
       }
 
       /* Scrollbar styling */
-      .novel-list::-webkit-scrollbar, .stats-content-scroll::-webkit-scrollbar {
+      .novel-list::-webkit-scrollbar,
+      .stats-content-scroll::-webkit-scrollbar,
+      #db-genres-badges::-webkit-scrollbar {
         width: 6px;
       }
-      .novel-list::-webkit-scrollbar-thumb, .stats-content-scroll::-webkit-scrollbar-thumb {
+      .novel-list::-webkit-scrollbar-thumb,
+      .stats-content-scroll::-webkit-scrollbar-thumb,
+      #db-genres-badges::-webkit-scrollbar-thumb {
         background: rgba(255, 255, 255, 0.12);
         border-radius: 4px;
       }
       :global([data-theme="light"]) .novel-list::-webkit-scrollbar-thumb,
-      :global([data-theme="light"]) .stats-content-scroll::-webkit-scrollbar-thumb {
+      :global([data-theme="light"]) .stats-content-scroll::-webkit-scrollbar-thumb,
+      :global([data-theme="light"]) #db-genres-badges::-webkit-scrollbar-thumb {
         background: rgba(203, 213, 225, 0.85);
       }
 
@@ -718,9 +724,7 @@ import { ClientRouter } from 'astro:transitions';
       }
 
       .stats-content-scroll {
-        max-height: 520px;
-        overflow-y: auto;
-        padding-right: 0.35rem;
+        width: 100%;
       }
 
       .stat-grid {
@@ -2654,7 +2658,7 @@ import { ClientRouter } from 'astro:transitions';
               <!-- Top Parent Genres Breakdown Chips -->
               <div>
                 <h4 style="font-size: 0.72rem; color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.45rem;">Genre Distribution</h4>
-                <div id="db-genres-badges" style="display: flex; flex-wrap: wrap; gap: 0.35rem; max-height: 140px; overflow-y: auto; padding-right: 4px;">
+                <div id="db-genres-badges" style="display: flex; flex-wrap: wrap; gap: 0.35rem; max-height: 140px; overflow-y: auto; overscroll-behavior-y: contain; padding-right: 4px;">
                   <span class="db-genre-chip">Action / Adventure <span class="db-genre-count">485</span></span>
                   <span class="db-genre-chip">Fantasy <span class="db-genre-count">397</span></span>
                   <span class="db-genre-chip">Progression Fantasy <span class="db-genre-count">367</span></span>
