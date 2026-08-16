@@ -739,21 +739,73 @@ header.site-header,
   box-shadow: 0 8px 24px -2px rgba(2, 132, 199, 0.20), inset 0 1px 0 #ffffff !important;
 }
 
-[data-theme="light"] .metric-primary-val {
-  color: #0f172a !important;
+/* 2x2 Metric Hero Chips Grid */
+[data-theme="light"] .metrics-hero {
+  background: linear-gradient(135deg, rgba(241, 245, 249, 0.85) 0%, rgba(238, 242, 255, 0.65) 100%) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(203, 213, 225, 0.85) !important;
+  border-radius: 12px !important;
+  padding: 0.85rem !important;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04), 0 2px 8px rgba(15, 23, 42, 0.02) !important;
 }
 
-[data-theme="light"] .metric-card-label {
-  color: #475569 !important;
+[data-theme="light"] .hero-chip {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  padding: 0.85rem 1.1rem !important;
+  gap: 0.3rem !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(203, 213, 225, 0.95) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04), inset 0 1px 0 #ffffff !important;
+  transition: all 0.2s ease;
+}
+
+[data-theme="light"] .hero-chip:hover {
+  border-color: rgba(99, 102, 241, 0.45) !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1), inset 0 1px 0 #ffffff !important;
 }
 
 [data-theme="light"] .hero-chip-val {
   color: #0f172a !important;
+  font-weight: 700 !important;
 }
 
 [data-theme="light"] .hero-chip-label,
 [data-theme="light"] .hero-chip-lbl {
   color: #64748b !important;
+  font-weight: 600 !important;
+}
+
+/* Metric Breakdown Cards */
+[data-theme="light"] .metric-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(203, 213, 225, 0.95) !important;
+  box-shadow: 0 2px 6px -1px rgba(15, 23, 42, 0.06), 0 1px 3px -1px rgba(15, 23, 42, 0.04), inset 0 1px 0 #ffffff !important;
+  border-radius: 12px !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+[data-theme="light"] .metric-card:hover {
+  background: #ffffff !important;
+  border-color: rgba(99, 102, 241, 0.45) !important;
+  box-shadow: 0 8px 24px -2px rgba(99, 102, 241, 0.14), 0 2px 6px -1px rgba(15, 23, 42, 0.06), inset 0 1px 0 #ffffff !important;
+  transform: translateY(-2px);
+}
+
+[data-theme="light"] .metric-primary-val {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="light"] .metric-card-label {
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="light"] .percentile-bar-bg {
+  background: #cbd5e1 !important;
 }
 
 [data-theme="light"] .benchmark-chip.higher {
@@ -1171,9 +1223,9 @@ header.site-header,
 }
 
 [data-theme="light"] .empty-state-card {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 249, 255, 0.75) 100%);
-  border: 1px dashed rgba(186, 230, 253, 0.95);
-  box-shadow: inset 0 1px 0 #ffffff, 0 8px 24px -4px rgba(2, 132, 199, 0.06);
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.85) 0%, rgba(241, 245, 249, 0.65) 100%);
+  border: 1.5px dashed rgba(148, 163, 184, 0.75);
+  box-shadow: inset 0 1px 0 #ffffff, 0 4px 16px -2px rgba(15, 23, 42, 0.04);
 }
 
 .empty-state-icon-box {
@@ -1236,9 +1288,16 @@ header.site-header,
 }
 
 [data-theme="light"] .empty-feature-item {
-  background: rgba(255, 255, 255, 0.90);
-  border: 1px solid rgba(186, 230, 253, 0.70);
-  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.04);
+  background: #ffffff;
+  border: 1px solid rgba(203, 213, 225, 0.95);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05), inset 0 1px 0 #ffffff;
+  color: #1e293b;
+  transition: all 0.2s ease;
+}
+
+[data-theme="light"] .empty-feature-item:hover {
+  border-color: rgba(99, 102, 241, 0.45);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08), inset 0 1px 0 #ffffff;
 }
 
 .genre-checkbox-item {
