@@ -692,28 +692,7 @@ import { ClientRouter } from 'astro:transitions';
         display: flex;
         flex-direction: column;
         gap: 0.65rem;
-        max-height: 340px;
-        overflow-y: auto;
-        overscroll-behavior-y: contain;
-        padding-right: 0.35rem;
-      }
-
-      /* Scrollbar styling */
-      .novel-list::-webkit-scrollbar,
-      .stats-content-scroll::-webkit-scrollbar,
-      #db-genres-badges::-webkit-scrollbar {
-        width: 6px;
-      }
-      .novel-list::-webkit-scrollbar-thumb,
-      .stats-content-scroll::-webkit-scrollbar-thumb,
-      #db-genres-badges::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.12);
-        border-radius: 4px;
-      }
-      :global([data-theme="light"]) .novel-list::-webkit-scrollbar-thumb,
-      :global([data-theme="light"]) .stats-content-scroll::-webkit-scrollbar-thumb,
-      :global([data-theme="light"]) #db-genres-badges::-webkit-scrollbar-thumb {
-        background: rgba(203, 213, 225, 0.85);
+        width: 100%;
       }
 
       /* Stats panel styling */
@@ -725,9 +704,6 @@ import { ClientRouter } from 'astro:transitions';
 
       .stats-content-scroll {
         width: 100%;
-        max-height: 520px;
-        overflow-y: auto;
-        overscroll-behavior-y: contain;
       }
 
       .stat-grid {
@@ -2661,7 +2637,7 @@ import { ClientRouter } from 'astro:transitions';
               <!-- Top Parent Genres Breakdown Chips -->
               <div>
                 <h4 style="font-size: 0.72rem; color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.45rem;">Genre Distribution</h4>
-                <div id="db-genres-badges" style="display: flex; flex-wrap: wrap; gap: 0.35rem; max-height: 140px; overflow-y: auto; overscroll-behavior-y: contain; padding-right: 4px;">
+                <div id="db-genres-badges" style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
                   <span class="db-genre-chip">Action / Adventure <span class="db-genre-count">485</span></span>
                   <span class="db-genre-chip">Fantasy <span class="db-genre-count">397</span></span>
                   <span class="db-genre-chip">Progression Fantasy <span class="db-genre-count">367</span></span>
@@ -3169,8 +3145,11 @@ import { ClientRouter } from 'astro:transitions';
 
         badgeEl.innerText = `${filtered.length} novel${filtered.length === 1 ? "" : "s"}`;
         populateNovelDropdown(filtered);
+        novelListLimit = 6;
         renderNovelsList(filtered);
       }
+
+      let novelListLimit = 6;
 
       function renderNovelsList(novelsToRender) {
         const container = document.getElementById("novels-container");
@@ -3180,7 +3159,9 @@ import { ClientRouter } from 'astro:transitions';
         }
 
         container.innerHTML = "";
-        novelsToRender.forEach(novel => {
+        const visibleNovels = novelsToRender.slice(0, novelListLimit);
+
+        visibleNovels.forEach(novel => {
           const card = document.createElement("div");
           card.className = `card-novel ${selectedNovelId === novel.id ? "active" : ""}`;
           card.setAttribute("data-novel-id", novel.id);
@@ -3197,6 +3178,18 @@ import { ClientRouter } from 'astro:transitions';
           `;
           container.appendChild(card);
         });
+
+        if (novelsToRender.length > novelListLimit) {
+          const moreBtn = document.createElement("button");
+          moreBtn.className = "baseline-btn";
+          moreBtn.style.cssText = "width: 100%; margin-top: 0.35rem; padding: 0.45rem 0.75rem; text-align: center; font-size: 0.78rem; font-weight: 600; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.15); border-radius: 8px;";
+          moreBtn.innerText = `Show More Novels (${novelListLimit} of ${novelsToRender.length.toLocaleString()})`;
+          moreBtn.addEventListener("click", () => {
+            novelListLimit += 12;
+            renderNovelsList(novelsToRender);
+          });
+          container.appendChild(moreBtn);
+        }
       }
 
       const METRIC_METADATA = {
@@ -3586,13 +3579,6 @@ import { ClientRouter } from 'astro:transitions';
       async function selectNovel(id, title) {
         selectedNovelId = id;
         const loadId = ++currentLoadId;
-
-        if (window.innerWidth <= 768) {
-          setTimeout(() => {
-            const dash = document.getElementById('chartsGrid') || document.getElementById('loadingState');
-            if (dash) dash.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 150);
-        }
 
         if (currentLoadingTimer) {
           clearInterval(currentLoadingTimer);
