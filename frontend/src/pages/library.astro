@@ -69,7 +69,7 @@ import { ClientRouter } from 'astro:transitions';
         display: grid;
         grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
         gap: 1.75rem;
-        align-items: start;
+        align-items: stretch;
       }
 
       @media (max-width: 950px) {
@@ -127,6 +127,8 @@ import { ClientRouter } from 'astro:transitions';
         flex-direction: column;
         gap: 1.25rem;
         min-width: 0;
+        height: 100%;
+        box-sizing: border-box;
       }
 
       .explorer-section {
@@ -135,6 +137,15 @@ import { ClientRouter } from 'astro:transitions';
         gap: 0.75rem;
         padding-bottom: 1.25rem;
         border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .explorer-novels-section {
+        flex: 1 1 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 240px;
+        padding-bottom: 0;
+        border-bottom: none;
       }
 
       .explorer-section:last-child {
@@ -689,10 +700,29 @@ import { ClientRouter } from 'astro:transitions';
       }
 
       .novel-list {
+        flex: 1 1 0;
         display: flex;
         flex-direction: column;
         gap: 0.65rem;
         width: 100%;
+        overflow-y: auto;
+        min-height: 180px;
+        max-height: 520px;
+        padding-right: 0.35rem;
+        overscroll-behavior-y: contain;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+      }
+
+      .novel-list::-webkit-scrollbar {
+        width: 6px;
+      }
+      .novel-list::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 4px;
+      }
+      :global([data-theme="light"]) .novel-list::-webkit-scrollbar-thumb {
+        background: rgba(203, 213, 225, 0.85);
       }
 
       /* Stats panel styling */
@@ -2668,7 +2698,7 @@ import { ClientRouter } from 'astro:transitions';
           </div>
 
           <!-- Section 3: Ingested Novels List -->
-          <div class="explorer-section">
+          <div class="explorer-section explorer-novels-section">
             <div class="explorer-section-title">
               <span id="novels-list-title">Ingested Novels</span>
             </div>
@@ -3304,11 +3334,8 @@ import { ClientRouter } from 'astro:transitions';
 
         badgeEl.innerText = `${filtered.length} novel${filtered.length === 1 ? "" : "s"}`;
         populateNovelDropdown(filtered);
-        novelListLimit = 6;
         renderNovelsList(filtered);
       }
-
-      let novelListLimit = 6;
 
       function renderNovelsList(novelsToRender) {
         const container = document.getElementById("novels-container");
@@ -3318,7 +3345,8 @@ import { ClientRouter } from 'astro:transitions';
         }
 
         container.innerHTML = "";
-        const visibleNovels = novelsToRender.slice(0, novelListLimit);
+        // Render up to 200 items for high performance smooth scrolling
+        const visibleNovels = novelsToRender.slice(0, 200);
 
         visibleNovels.forEach(novel => {
           const card = document.createElement("div");
@@ -3337,18 +3365,6 @@ import { ClientRouter } from 'astro:transitions';
           `;
           container.appendChild(card);
         });
-
-        if (novelsToRender.length > novelListLimit) {
-          const moreBtn = document.createElement("button");
-          moreBtn.className = "baseline-btn";
-          moreBtn.style.cssText = "width: 100%; margin-top: 0.35rem; padding: 0.45rem 0.75rem; text-align: center; font-size: 0.78rem; font-weight: 600; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.15); border-radius: 8px;";
-          moreBtn.innerText = `Show More Novels (${novelListLimit} of ${novelsToRender.length.toLocaleString()})`;
-          moreBtn.addEventListener("click", () => {
-            novelListLimit += 12;
-            renderNovelsList(novelsToRender);
-          });
-          container.appendChild(moreBtn);
-        }
       }
 
       const METRIC_METADATA = {
