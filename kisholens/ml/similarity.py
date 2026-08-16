@@ -38,6 +38,9 @@ RADAR_FEATURE_KEYS = [
 ]
 
 _novel_vector_cache: Dict[int, dict] = {}
+_concept_embedding_cache: Dict[str, np.ndarray] = {}
+
+SIMILARITY_MODEL_VERSION = "v4_rich_story_embeddings"
 
 # Cache for 384D concept embeddings keyed by "{genre}|{territory}|{title}" strings
 _concept_embedding_cache: Dict[str, np.ndarray] = {}
