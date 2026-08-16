@@ -779,11 +779,23 @@ import { ClientRouter } from 'astro:transitions';
         color: var(--color-text);
       }
 
+      :global(.metrics-carousel-header) {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+      }
+
       :global(.metrics-category-tabs) {
         display: flex;
-        gap: 0.4rem;
+        gap: 0.35rem;
         overflow-x: auto;
-        padding-bottom: 0.25rem;
+        padding-bottom: 0.15rem;
+        scrollbar-width: none;
+      }
+      :global(.metrics-category-tabs::-webkit-scrollbar) {
+        display: none;
       }
 
       :global(.category-tab) {
@@ -791,52 +803,188 @@ import { ClientRouter } from 'astro:transitions';
         border: 1px solid rgba(255, 255, 255, 0.1);
         color: var(--color-muted);
         border-radius: 20px;
-        padding: 0.3rem 0.75rem;
-        font-size: 0.75rem;
-        font-weight: 500;
+        padding: 0.3rem 0.65rem;
+        font-size: 0.73rem;
+        font-weight: 600;
         cursor: pointer;
         white-space: nowrap;
         transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
       }
 
       :global(.category-tab:hover), :global(.category-tab.active) {
-        background: rgba(124, 106, 255, 0.18);
-        border-color: rgba(124, 106, 255, 0.5);
+        background: rgba(124, 106, 255, 0.2);
+        border-color: rgba(124, 106, 255, 0.6);
         color: #ffffff;
       }
 
-      :global(.metric-category-section) {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
+      :global(.category-tab-badge) {
+        font-size: 0.62rem;
+        background: rgba(255, 255, 255, 0.12);
+        padding: 0.08rem 0.38rem;
+        border-radius: 10px;
       }
 
-      :global(.category-section-title) {
-        font-family: var(--font-display);
-        font-size: 0.8rem;
+      :global(.metrics-carousel-nav) {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      :global(.carousel-nav-btn) {
+        width: 26px;
+        height: 26px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: var(--color-text);
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-weight: 700;
+        line-height: 1;
+        transition: all 0.15s ease;
+      }
+      :global(.carousel-nav-btn:hover:not(:disabled)) {
+        background: rgba(124, 106, 255, 0.3);
+        border-color: #a78bfa;
+        color: #ffffff;
+      }
+      :global(.carousel-nav-btn:disabled) {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      :global(.carousel-indicator-pill) {
+        font-size: 0.7rem;
+        color: var(--color-muted);
+        padding: 0.2rem 0.5rem;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
         font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
+        white-space: nowrap;
+      }
+
+      :global(.metrics-carousel-track-wrapper) {
+        position: relative;
+        width: 100%;
+      }
+
+      :global(.metrics-carousel-track) {
+        display: flex;
+        gap: 0.65rem;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        padding: 0.2rem 0.15rem 0.65rem 0.15rem;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      :global(.metrics-carousel-track::-webkit-scrollbar) {
+        height: 5px;
+      }
+      :global(.metrics-carousel-track::-webkit-scrollbar-thumb) {
+        background: rgba(255, 255, 255, 0.18);
+        border-radius: 4px;
+      }
+
+      :global(.metric-category-group) {
+        display: flex;
+        gap: 0.65rem;
+        align-items: stretch;
+        flex-shrink: 0;
+        position: relative;
+        scroll-snap-align: start;
+      }
+
+      :global(.category-group-header) {
         display: flex;
         align-items: center;
-        gap: 0.4rem;
-        margin-top: 0.4rem;
+        gap: 0.35rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        height: fit-content;
+        align-self: flex-start;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        min-height: 120px;
+        justify-content: center;
       }
 
-      :global(.category-section-title.cat-structure) { color: #38bdf8; }
-      :global(.category-section-title.cat-prose)     { color: #a78bfa; }
-      :global(.category-section-title.cat-theme)     { color: #f472b6; }
-      :global(.category-section-title.cat-pacing)    { color: #34d399; }
-
-      :global(.metric-card-grid) {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 0.6rem;
-      }
+      :global(.category-group-header.cat-structure) { color: #38bdf8; border-color: rgba(56, 189, 248, 0.25); }
+      :global(.category-group-header.cat-prose)     { color: #a78bfa; border-color: rgba(167, 139, 250, 0.25); }
+      :global(.category-group-header.cat-theme)     { color: #f472b6; border-color: rgba(244, 114, 182, 0.25); }
+      :global(.category-group-header.cat-pacing)    { color: #34d399; border-color: rgba(52, 211, 153, 0.25); }
 
       :global(.metric-card) {
-        background: rgba(255, 255, 255, 0.02);
+        flex: 0 0 215px;
+        min-width: 215px;
+        max-width: 215px;
+        scroll-snap-align: start;
+        background: rgba(255, 255, 255, 0.025);
         border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        padding: 0.65rem 0.8rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        position: relative;
+        transition: border-color 0.2s ease, transform 0.2s ease;
+      }
+
+      :global(.metric-card-cat-badge) {
+        font-size: 0.62rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.1rem 0.4rem;
+        border-radius: 4px;
+        width: fit-content;
+        margin-bottom: 0.15rem;
+      }
+      :global(.metric-card-cat-badge.cat-structure) { background: rgba(56, 189, 248, 0.12); color: #38bdf8; }
+      :global(.metric-card-cat-badge.cat-prose)     { background: rgba(167, 139, 250, 0.12); color: #a78bfa; }
+      :global(.metric-card-cat-badge.cat-theme)     { background: rgba(244, 114, 182, 0.12); color: #f472b6; }
+      :global(.metric-card-cat-badge.cat-pacing)    { background: rgba(52, 211, 153, 0.12); color: #34d399; }
+
+      /* Light Theme Overrides */
+      :global([data-theme="light"]) .carousel-nav-btn {
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(203, 213, 225, 0.9);
+        color: #0f172a;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+      }
+      :global([data-theme="light"]) .carousel-nav-btn:hover:not(:disabled) {
+        background: #0284c7;
+        border-color: #0284c7;
+        color: #ffffff;
+      }
+      :global([data-theme="light"]) .carousel-indicator-pill {
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(203, 213, 225, 0.8);
+        color: #475569;
+      }
+      :global([data-theme="light"]) .metrics-carousel-track::-webkit-scrollbar-thumb {
+        background: rgba(203, 213, 225, 0.9);
+      }
+      :global([data-theme="light"]) .category-tab-badge {
+        background: rgba(15, 23, 42, 0.08);
+        color: #475569;
+      }
         border-radius: 8px;
         padding: 0.65rem 0.8rem;
         display: flex;
@@ -3282,29 +3430,19 @@ import { ClientRouter } from 'astro:transitions';
           </div>
         `;
 
-        // 2. Filter Tabs (Default to Structure for compact, non-expanding fixed viewport)
-        const tabsHtml = `
-          <div class="metrics-category-tabs">
-            <button class="category-tab active" data-cat="structure">Structure</button>
-            <button class="category-tab" data-cat="prose">Prose & Style</button>
-            <button class="category-tab" data-cat="theme">Theme & Emotion</button>
-            <button class="category-tab" data-cat="pacing">Pacing & Narrative</button>
-            <button class="category-tab" data-cat="all">All Metrics</button>
-          </div>
-        `;
-
-        // 3. Metric Sections Grouping
+        // 2. Metric Categories
         const categories = [
-          { id: "structure", title: "Structure & Volume", class: "cat-structure", barClass: "bar-fill-structure" },
-          { id: "prose", title: "Prose & Style", class: "cat-prose", barClass: "bar-fill-prose" },
-          { id: "theme", title: "Theme & Emotion", class: "cat-theme", barClass: "bar-fill-theme" },
-          { id: "pacing", title: "Pacing & Narrative", class: "cat-pacing", barClass: "bar-fill-pacing" }
+          { id: "structure", label: "Structure", title: "Structure & Volume", class: "cat-structure", barClass: "bar-fill-structure" },
+          { id: "prose", label: "Prose", title: "Prose & Style", class: "cat-prose", barClass: "bar-fill-prose" },
+          { id: "theme", label: "Theme", title: "Theme & Emotion", class: "cat-theme", barClass: "bar-fill-theme" },
+          { id: "pacing", label: "Pacing", title: "Pacing & Narrative", class: "cat-pacing", barClass: "bar-fill-pacing" }
         ];
 
-        let sectionsHtml = "";
+        let allCardsHtml = "";
+        let totalCardsCount = 0;
+        const catCounts = { structure: 0, prose: 0, theme: 0, pacing: 0 };
 
         categories.forEach(cat => {
-          let cardsInCatHtml = "";
           Object.keys(METRIC_METADATA).forEach(key => {
             const meta = METRIC_METADATA[key];
             if (meta.category !== cat.id) return;
@@ -3315,6 +3453,10 @@ import { ClientRouter } from 'astro:transitions';
               rawVal = stats[`en_${key}`] ?? stats[`zh_${key}`] ?? stats[`ja_${key}`] ?? stats[key];
             }
             if (rawVal === null || rawVal === undefined) return;
+
+            catCounts[cat.id]++;
+            totalCardsCount++;
+            const cardIdx = totalCardsCount;
 
             let displayVal = meta.isPercent ? `${(rawVal * 100).toFixed(1)}%` :
                              meta.isInteger ? Math.round(rawVal).toLocaleString() :
@@ -3328,9 +3470,9 @@ import { ClientRouter } from 'astro:transitions';
             // Benchmark comparison chip
             let benchChipHtml = "";
             if (normScore >= 0.65) {
-              benchChipHtml = `<span class="benchmark-chip higher">High (+${Math.round((normScore - 0.5) * 100)}% vs Avg)</span>`;
+              benchChipHtml = `<span class="benchmark-chip higher">High (+${Math.round((normScore - 0.5) * 100)}%)</span>`;
             } else if (normScore <= 0.35) {
-              benchChipHtml = `<span class="benchmark-chip lower">Low (-${Math.round((0.5 - normScore) * 100)}% vs Avg)</span>`;
+              benchChipHtml = `<span class="benchmark-chip lower">Low (-${Math.round((0.5 - normScore) * 100)}%)</span>`;
             } else {
               benchChipHtml = `<span class="benchmark-chip neutral">Balanced</span>`;
             }
@@ -3367,13 +3509,14 @@ import { ClientRouter } from 'astro:transitions';
               }
             }
 
-            cardsInCatHtml += `
-              <div class="metric-card" data-category="${cat.id}">
+            allCardsHtml += `
+              <div class="metric-card" data-category="${cat.id}" data-card-index="${cardIdx}">
                 <div class="metric-card-header">
-                  <span class="metric-card-label">${meta.label}</span>
+                  <span class="metric-card-cat-badge ${cat.class}">${cat.label}</span>
                   <span class="metric-info-icon" role="button" aria-label="${meta.tooltip}">ⓘ</span>
                   <div class="metric-tooltip-box">${meta.tooltip}</div>
                 </div>
+                <span class="metric-card-label" style="font-size: 0.78rem; font-weight: 600; color: var(--color-text); margin-top: 0.1rem;">${meta.label}</span>
                 <div class="metric-val-row">
                   <span class="metric-primary-val">${displayVal}</span>
                   ${benchChipHtml}
@@ -3385,25 +3528,35 @@ import { ClientRouter } from 'astro:transitions';
               </div>
             `;
           });
-
-          if (cardsInCatHtml) {
-            const isDefaultVisible = (cat.id === "structure");
-            sectionsHtml += `
-              <div class="metric-category-section" data-cat-section="${cat.id}" style="${isDefaultVisible ? 'display: flex;' : 'display: none;'}">
-                <div class="category-section-title ${cat.class}">${cat.title}</div>
-                <div class="metric-card-grid">
-                  ${cardsInCatHtml}
-                </div>
-              </div>
-            `;
-          }
         });
+
+        // Category tabs with live counts and horizontal carousel controls
+        const tabsHtml = `
+          <div class="metrics-carousel-header">
+            <div class="metrics-category-tabs">
+              <button class="category-tab active" data-cat="all">All <span class="category-tab-badge">${totalCardsCount}</span></button>
+              <button class="category-tab" data-cat="structure">Structure <span class="category-tab-badge">${catCounts.structure}</span></button>
+              <button class="category-tab" data-cat="prose">Prose <span class="category-tab-badge">${catCounts.prose}</span></button>
+              <button class="category-tab" data-cat="theme">Theme <span class="category-tab-badge">${catCounts.theme}</span></button>
+              <button class="category-tab" data-cat="pacing">Pacing <span class="category-tab-badge">${catCounts.pacing}</span></button>
+            </div>
+            <div class="metrics-carousel-nav">
+              <button class="carousel-nav-btn" id="metricsCarouselPrev" aria-label="Scroll left" title="Scroll left">‹</button>
+              <span class="carousel-indicator-pill" id="metricsCarouselIndicator">1–3 of ${totalCardsCount}</span>
+              <button class="carousel-nav-btn" id="metricsCarouselNext" aria-label="Scroll right" title="Scroll right">›</button>
+            </div>
+          </div>
+        `;
 
         return `
           <div class="metrics-dashboard">
             ${heroHtml}
             ${tabsHtml}
-            ${sectionsHtml}
+            <div class="metrics-carousel-track-wrapper">
+              <div class="metrics-carousel-track" id="metricsCarouselTrack">
+                ${allCardsHtml}
+              </div>
+            </div>
           </div>
         `;
       }
@@ -3435,10 +3588,10 @@ import { ClientRouter } from 'astro:transitions';
             <div class="skeleton-shimmer" style="height: 32px; width: 100px; border-radius: 8px;"></div>
           </div>
 
-          <!-- Metrics Cards Skeleton Grid -->
-          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-            ${[1,2,3,4,5,6].map(() => `
-              <div class="skeleton-card">
+          <!-- Metrics Cards Skeleton Track -->
+          <div style="display: flex; gap: 0.75rem; overflow: hidden; margin-bottom: 1.5rem;">
+            ${[1,2,3,4].map(() => `
+              <div class="skeleton-card" style="flex: 0 0 215px; min-width: 215px;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                   <div class="skeleton-shimmer" style="height: 14px; width: 55%; border-radius: 4px;"></div>
                   <div class="skeleton-shimmer" style="height: 18px; width: 18px; border-radius: 50%;"></div>
@@ -3447,63 +3600,6 @@ import { ClientRouter } from 'astro:transitions';
                 <div class="skeleton-shimmer" style="height: 8px; width: 100%; border-radius: 4px;"></div>
               </div>
             `).join('')}
-          </div>
-
-          <!-- Visualizations Skeletons Grid -->
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
-            <!-- Radar Skeleton -->
-            <div class="skeleton-chart-frame">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div class="skeleton-shimmer" style="height: 16px; width: 45%; border-radius: 4px;"></div>
-                <div class="skeleton-shimmer" style="height: 14px; width: 25%; border-radius: 4px;"></div>
-              </div>
-              <div style="height: 260px; display: flex; align-items: center; justify-content: center; position: relative;">
-                <svg width="200" height="200" viewBox="0 0 200 200" style="opacity: 0.35;">
-                  <polygon points="100,20 180,60 180,140 100,180 20,140 20,60" fill="none" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="4 4" />
-                  <polygon points="100,50 150,75 150,125 100,150 50,125 50,75" fill="none" stroke="#a855f7" stroke-width="1.5" />
-                  <circle cx="100" cy="100" r="4" fill="#06b6d4" />
-                  <line x1="100" y1="20" x2="100" y2="180" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
-                  <line x1="20" y1="60" x2="180" y2="140" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
-                  <line x1="20" y1="140" x2="180" y2="60" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
-                </svg>
-              </div>
-            </div>
-
-            <!-- Sentiment Arc Skeleton -->
-            <div class="skeleton-chart-frame">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div class="skeleton-shimmer" style="height: 16px; width: 50%; border-radius: 4px;"></div>
-                <div class="skeleton-shimmer" style="height: 14px; width: 30%; border-radius: 4px;"></div>
-              </div>
-              <div style="height: 260px; display: flex; flex-direction: column; justify-content: space-between; padding: 1rem 0;">
-                <svg width="100%" height="160" viewBox="0 0 300 120" preserveAspectRatio="none" style="opacity: 0.4;">
-                  <line x1="0" y1="60" x2="300" y2="60" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="2 2" />
-                  <line x1="75" y1="0" x2="75" y2="120" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
-                  <line x1="150" y1="0" x2="150" y2="120" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
-                  <line x1="225" y1="0" x2="225" y2="120" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
-                  <path d="M 0 70 Q 75 20, 150 70 T 300 40" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round" />
-                </svg>
-                <div style="display: flex; justify-content: space-between;">
-                  <div class="skeleton-shimmer" style="height: 10px; width: 18%; border-radius: 3px;"></div>
-                  <div class="skeleton-shimmer" style="height: 10px; width: 18%; border-radius: 3px;"></div>
-                  <div class="skeleton-shimmer" style="height: 10px; width: 18%; border-radius: 3px;"></div>
-                  <div class="skeleton-shimmer" style="height: 10px; width: 18%; border-radius: 3px;"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Pacing Barcode Skeleton -->
-          <div class="skeleton-chart-frame" style="margin-top: 1.5rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <div class="skeleton-shimmer" style="height: 16px; width: 35%; border-radius: 4px;"></div>
-              <div class="skeleton-shimmer" style="height: 14px; width: 20%; border-radius: 4px;"></div>
-            </div>
-            <div style="display: flex; align-items: flex-end; gap: 3px; height: 70px; padding: 0.5rem 0; overflow: hidden;">
-              ${Array.from({length: 48}).map((_, i) => `
-                <div class="skeleton-shimmer" style="flex: 1; height: ${20 + ((i * 17) % 55)}px; border-radius: 2px;"></div>
-              `).join('')}
-            </div>
           </div>
         `;
       }
@@ -3530,26 +3626,71 @@ import { ClientRouter } from 'astro:transitions';
 
       function attachDashboardEventListeners(container) {
         if (!container) return;
-        // Attach tab filter click handler
+        const track = container.querySelector("#metricsCarouselTrack");
+        const prevBtn = container.querySelector("#metricsCarouselPrev");
+        const nextBtn = container.querySelector("#metricsCarouselNext");
+        const indicator = container.querySelector("#metricsCarouselIndicator");
         const tabBtns = container.querySelectorAll(".category-tab");
-        tabBtns.forEach(btn => {
-          btn.addEventListener("click", () => {
-            tabBtns.forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            const targetCat = btn.getAttribute("data-cat");
-            const sections = container.querySelectorAll("[data-cat-section]");
-            sections.forEach(sec => {
-              if (targetCat === "all" || sec.getAttribute("data-cat-section") === targetCat) {
-                sec.style.display = "flex";
-                sec.classList.remove("fade-in-content");
-                void sec.offsetWidth;
-                sec.classList.add("fade-in-content");
+        const cards = container.querySelectorAll(".metric-card");
+        const totalCards = cards.length;
+
+        function updateCarouselState() {
+          if (!track || !indicator) return;
+          const scrollLeft = track.scrollLeft;
+          const cardWidth = 222; // 215px + 7px gap
+          const visibleCount = Math.max(1, Math.floor((track.clientWidth + 10) / cardWidth));
+          const firstIdx = Math.min(totalCards - 1, Math.max(0, Math.round(scrollLeft / cardWidth)));
+          const lastIdx = Math.min(totalCards, firstIdx + visibleCount);
+
+          indicator.innerText = `${firstIdx + 1}–${lastIdx} of ${totalCards}`;
+          if (prevBtn) prevBtn.disabled = (scrollLeft <= 5);
+          if (nextBtn) nextBtn.disabled = (scrollLeft + track.clientWidth >= track.scrollWidth - 5);
+
+          // Update active category tab based on current first visible card
+          const currentCard = cards[firstIdx];
+          if (currentCard) {
+            const currentCat = currentCard.getAttribute("data-category");
+            tabBtns.forEach(btn => {
+              const cat = btn.getAttribute("data-cat");
+              if (cat === currentCat || (firstIdx === 0 && cat === "all")) {
+                btn.classList.add("active");
               } else {
-                sec.style.display = "none";
+                btn.classList.remove("active");
               }
             });
-            if (container.scrollTop > 0) {
-              container.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }
+
+        if (track) {
+          track.addEventListener("scroll", updateCarouselState, { passive: true });
+          updateCarouselState();
+        }
+
+        if (prevBtn && track) {
+          prevBtn.addEventListener("click", () => {
+            track.scrollBy({ left: -track.clientWidth * 0.75, behavior: "smooth" });
+          });
+        }
+
+        if (nextBtn && track) {
+          nextBtn.addEventListener("click", () => {
+            track.scrollBy({ left: track.clientWidth * 0.75, behavior: "smooth" });
+          });
+        }
+
+        tabBtns.forEach(btn => {
+          btn.addEventListener("click", () => {
+            const targetCat = btn.getAttribute("data-cat");
+            tabBtns.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+
+            if (targetCat === "all") {
+              track.scrollTo({ left: 0, behavior: "smooth" });
+            } else {
+              const targetCard = container.querySelector(`.metric-card[data-category="${targetCat}"]`);
+              if (targetCard && track) {
+                track.scrollTo({ left: targetCard.offsetLeft - track.offsetLeft - 4, behavior: "smooth" });
+              }
             }
           });
         });
