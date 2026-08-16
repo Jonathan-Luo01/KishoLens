@@ -725,6 +725,9 @@ import { ClientRouter } from 'astro:transitions';
 
       .stats-content-scroll {
         width: 100%;
+        max-height: 520px;
+        overflow-y: auto;
+        overscroll-behavior-y: contain;
       }
 
       .stat-grid {
@@ -3286,14 +3289,14 @@ import { ClientRouter } from 'astro:transitions';
           </div>
         `;
 
-        // 2. Filter Tabs
+        // 2. Filter Tabs (Default to Structure for compact, non-expanding fixed viewport)
         const tabsHtml = `
           <div class="metrics-category-tabs">
-            <button class="category-tab active" data-cat="all">All Metrics</button>
-            <button class="category-tab" data-cat="structure">Structure</button>
+            <button class="category-tab active" data-cat="structure">Structure</button>
             <button class="category-tab" data-cat="prose">Prose & Style</button>
             <button class="category-tab" data-cat="theme">Theme & Emotion</button>
             <button class="category-tab" data-cat="pacing">Pacing & Narrative</button>
+            <button class="category-tab" data-cat="all">All Metrics</button>
           </div>
         `;
 
@@ -3391,8 +3394,9 @@ import { ClientRouter } from 'astro:transitions';
           });
 
           if (cardsInCatHtml) {
+            const isDefaultVisible = (cat.id === "structure");
             sectionsHtml += `
-              <div class="metric-category-section" data-cat-section="${cat.id}">
+              <div class="metric-category-section" data-cat-section="${cat.id}" style="${isDefaultVisible ? 'display: flex;' : 'display: none;'}">
                 <div class="category-section-title ${cat.class}">${cat.title}</div>
                 <div class="metric-card-grid">
                   ${cardsInCatHtml}
@@ -3544,10 +3548,16 @@ import { ClientRouter } from 'astro:transitions';
             sections.forEach(sec => {
               if (targetCat === "all" || sec.getAttribute("data-cat-section") === targetCat) {
                 sec.style.display = "flex";
+                sec.classList.remove("fade-in-content");
+                void sec.offsetWidth;
+                sec.classList.add("fade-in-content");
               } else {
                 sec.style.display = "none";
               }
             });
+            if (container.scrollTop > 0) {
+              container.scrollTo({ top: 0, behavior: 'smooth' });
+            }
           });
         });
 
