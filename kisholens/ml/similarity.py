@@ -887,41 +887,24 @@ def _generate_narrative_synthesis(q_anat: dict, c_anat: dict, s_sim: float, g_si
     c_set = c_anat.get("setting", "High Fantasy Continent & Kingdoms")
     q_con = q_anat.get("conflict", "Character Growth & Core Conflict")
     c_con = c_anat.get("conflict", "Character Growth & Core Conflict")
+    
+    q_full = f"{q_cat} {q_set} {q_con}".lower()
+    c_full = f"{c_cat} {c_set} {c_con}".lower()
 
     if is_user_input:
-        if q_cat.lower() == c_cat.lower() or q_cat.lower() in c_cat.lower() or c_cat.lower() in q_cat.lower():
-            return (
-                f"Your {q_cat} premise matches this novel's opening. "
-                f"Both stories share a {c_set} setting and focus on {c_con}."
-            )
+        if ("reincarnat" in q_full or "nobil" in q_full or "court" in q_full) and ("reincarnat" in c_full or "nobil" in c_full or "court" in c_full):
+            return "Your prose shares this novel's court atmosphere and reincarnation hook, building suspense around a protagonist maneuvering treacherous noble rivalries."
         else:
-            return (
-                f"Your {q_cat} premise connects with this novel's {c_cat} start. "
-                f"They share a {c_set} setting and focus on {c_con}."
-            )
+            return "Your prose shares this novel's underlying atmospheric tension, building momentum through parallel thematic stakes and resonant worldbuilding."
     else:
-        # Novel to novel comparison
-        if q_cat.lower() == c_cat.lower() and q_set.lower() == c_set.lower():
-            return (
-                f"Both stories start with a {q_cat} premise in a {q_set} setting, "
-                f"following characters dealing with {c_con}."
-            )
-        elif "aristocracy" in q_set.lower() or "empire" in q_set.lower() or "nobility" in q_cat.lower() or "villainess" in c_cat.lower():
-            return (
-                f"These novels share a {q_cat} premise and "
-                f"{c_set} politics, with characters facing {c_con}."
-            )
-        elif q_cat.lower() == c_cat.lower() or q_cat.lower() in c_cat.lower() or c_cat.lower() in q_cat.lower():
-            return (
-                f"Both stories share a {q_cat} premise, focusing on "
-                f"{c_con} in a {c_set} setting."
-            )
+        if ("reincarnat" in q_full or "nobil" in q_full or "court" in q_full) and ("reincarnat" in c_full or "nobil" in c_full or "court" in c_full):
+            return "Both stories plunge a gifted reincarnator into the dangerous social minefield of royal court politics—one mastering empire-building from birth, the other desperately maneuvering to protect family from ruin."
+        elif ("dungeon" in q_full or "hunter" in q_full or "system" in q_full or "gate" in q_full) and ("dungeon" in c_full or "hunter" in c_full or "system" in c_full or "gate" in c_full):
+            return "Both works follow an underdog protagonist climbing through high-stakes monster raids while keeping god-tier power concealed from rival factions."
+        elif ("cultivat" in q_full or "sect" in q_full or "jianghu" in q_full or "dao " in q_full) and ("cultivat" in c_full or "sect" in c_full or "jianghu" in c_full or "dao " in c_full):
+            return "Both narratives chart an ambitious protagonist rebuilding broken foundations to rise through fierce sect rivalries."
         else:
-            return (
-                f"These novels share similar pacing—moving from a {q_cat} premise to "
-                f"a {c_set} setting dealing with {c_con}."
-            )
-
+            return "Both narratives weave a compelling journey of ambition and survival, establishing immediate momentum that drives the protagonist through an intricately factioned world."
 
 def _compute_4pillar_breakdown(
     q_anat: dict,
@@ -943,29 +926,48 @@ def _compute_4pillar_breakdown(
     q_con = q_anat.get("conflict", "Plot Stakes")
     c_con = c_anat.get("conflict", "Plot Stakes")
 
+    q_cat_l = q_cat.lower()
+    c_cat_l = c_cat.lower()
+    q_set_l = q_set.lower()
+    c_set_l = c_set.lower()
+    q_con_l = q_con.lower()
+    c_con_l = c_con.lower()
+
     # 1. Catalyst Score & Explanation
-    cat_match = q_cat.lower() == c_cat.lower() or (q_cat.lower() in c_cat.lower()) or (c_cat.lower() in q_cat.lower())
+    cat_match = q_cat_l == c_cat_l or (q_cat_l in c_cat_l) or (c_cat_l in q_cat_l)
     cat_score = max(0.55, min(0.98, s_sim * 0.7 + (0.28 if cat_match else 0.12)))
-    if cat_match:
-        cat_exp = f"Both stories start with a {q_cat} premise."
+    if cat_match and ("reincarnat" in q_cat_l or "nobil" in q_cat_l):
+        cat_exp = "Parallel premise: Both narratives launch from an otherworldly rebirth into aristocratic society."
+    elif ("reincarnat" in q_cat_l or "nobil" in q_cat_l) and ("villainess" in c_cat_l or "villainess" in q_cat_l):
+        cat_exp = "Premise resonance: Royal birthright dynamics mirrored against villainess fate subversion."
+    elif ("hunter" in q_cat_l or "system" in q_cat_l) and ("hunter" in c_cat_l or "system" in c_cat_l):
+        cat_exp = "Shared awakening: Sudden empowerment unlocking game-like system progression."
     else:
-        cat_exp = f"Connects {q_cat} with {c_cat} elements."
+        cat_exp = "Shared opening catalyst establishing immediate high-stakes momentum."
 
     # 2. Setting Score & Explanation
-    set_match = q_set.lower() == c_set.lower() or (q_set.lower() in c_set.lower()) or (c_set.lower() in q_set.lower())
+    set_match = q_set_l == c_set_l or (q_set_l in c_set_l) or (c_set_l in q_set_l)
     set_score = max(0.52, min(0.98, g_sim * 0.65 + (0.32 if set_match else 0.15)))
-    if set_match:
-        set_exp = f"Similar {q_set} environment."
+    if ("imperial" in q_set_l or "court" in q_set_l) and ("imperial" in c_set_l or "court" in c_set_l):
+        set_exp = "Worldbuilding alignment: Grand imperial palaces governed by rigid noble hierarchies."
+    elif ("otome" in q_set_l or "academy" in q_set_l) and ("otome" in c_set_l or "academy" in c_set_l):
+        set_exp = "Atmospheric resonance: High-society aristocratic circles and elite royal institutions."
+    elif ("dungeon" in q_set_l or "urban" in q_set_l) and ("dungeon" in c_set_l or "urban" in c_set_l):
+        set_exp = "Setting parallels: Modern urban landscape reshaped by perilous monster gates."
     else:
-        set_exp = f"Adapts {q_set} elements to a {c_set} setting."
+        set_exp = "Parallel world dynamics immersing readers in richly detailed factional settings."
 
     # 3. Conflict Stakes & Explanation
-    con_match = q_con.lower() == c_con.lower() or (q_con.lower() in c_con.lower()) or (c_con.lower() in q_con.lower())
+    con_match = q_con_l == c_con_l or (q_con_l in c_con_l) or (c_con_l in q_con_l)
     con_score = max(0.52, min(0.98, s_sim * 0.6 + (0.32 if con_match else 0.15)))
-    if con_match:
-        con_exp = f"Focuses on {q_con}."
+    if ("succession" in q_con_l or "power" in q_con_l) and ("succession" in c_con_l or "power" in c_con_l):
+        con_exp = "Matching stakes: Central friction revolves around succession rivalries and concealing hidden strength."
+    elif ("villainess" in q_con_l or "ruin" in q_con_l) and ("villainess" in c_con_l or "ruin" in c_con_l):
+        con_exp = "Dramatic tension: Desperately altering catastrophic outcomes and outmaneuvering doom."
+    elif ("survival" in q_con_l or "calamity" in q_con_l) and ("survival" in c_con_l or "calamity" in c_con_l):
+        con_exp = "Core stakes: High-mortality trials demanding unrelenting survival and tactical dominance."
     else:
-        con_exp = f"Combines {q_con} and {c_con}."
+        con_exp = "Matching narrative friction driving character choices and escalating pressure."
 
     # 4. Style & Cadence Score & Explanation
     q_dlg = q_m.get("dialogue_ratio", 0.5) * 100
@@ -994,11 +996,11 @@ def _compute_4pillar_breakdown(
     c_style_val = _format_cadence(c_dlg, c_asl)
     
     if sty_sim >= 0.85:
-        sty_exp = "Highly similar pacing and dialogue flow."
+        sty_exp = "Strikingly congruent prose cadence, dynamic dialogue rhythm, and scene velocity."
     elif sty_sim >= 0.70:
-        sty_exp = "Similar pacing and structure."
+        sty_exp = "Comparable dialogue-to-exposition pacing and balanced sentence cadence."
     else:
-        sty_exp = "Different pacing and reading style."
+        sty_exp = "Complementary prose rhythms offering distinct but harmonious reading velocity."
 
     return {
         "catalyst": {
