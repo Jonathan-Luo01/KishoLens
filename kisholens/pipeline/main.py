@@ -1,5 +1,4 @@
-import re
-import sys
+from typing import Optional
 from datasets import load_dataset
 from sqlmodel import SQLModel, Session, select, func
 
@@ -11,7 +10,7 @@ from kisholens.ml.features import (
     extract_japanese_features,
     extract_chinese_features
 )
-from kisholens.ml.build_centroids import consolidate_genre, GENRE_TERRITORIES
+from kisholens.ml.build_centroids import consolidate_genre
 
 def extract_features(text: str, lang: str = "en"):
     """Computes baseline preview features by delegating to the unified extractors in ml.features."""

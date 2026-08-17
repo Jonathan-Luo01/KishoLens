@@ -317,24 +317,6 @@ const INITIAL_MYSTERY_TEXT = `The autumn rain lashed against the fog-stained win
           });
         });
 
-        // Capabilities section scroll highlight observer
-        const capSection = document.getElementById("capabilities");
-        const capNav = document.getElementById("nav-capabilities");
-        if (capSection && capNav) {
-          const observer = new IntersectionObserver(
-            (entries) => {
-              entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                  capNav.classList.add("active");
-                } else {
-                  capNav.classList.remove("active");
-                }
-              });
-            },
-            { threshold: 0.3 }
-          );
-          observer.observe(capSection);
-        }
       });
     </script>
   </body>
@@ -467,13 +449,6 @@ const INITIAL_MYSTERY_TEXT = `The autumn rain lashed against the fog-stained win
     background: rgba(99, 102, 241, 0.16);
     color: #4f46e5;
     border-color: rgba(99, 102, 241, 0.4);
-  }
-
-  /* Page Layout */
-  .page-container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 7rem 1.5rem 4rem;
   }
 
   /* Hero Section */
@@ -652,10 +627,6 @@ const INITIAL_MYSTERY_TEXT = `The autumn rain lashed against the fog-stained win
   }
 
   @media (max-width: 600px) {
-    .page-container {
-      padding: 5rem 1rem 3rem;
-    }
-
     .hero-title {
       font-size: clamp(2.2rem, 8vw, 3.2rem);
       line-height: 1.15;

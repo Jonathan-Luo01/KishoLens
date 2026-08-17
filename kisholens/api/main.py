@@ -22,11 +22,8 @@ from kisholens.ml.features import (
     extract_chinese_features,
     match_archetype,
     normalize_feature_percentile,
-    compute_sentence_sentiment_normalized,
     split_paragraphs,
-    JA_POS_WORDS, JA_NEG_WORDS,
-    ZH_POS_WORDS, ZH_NEG_WORDS,
-    EN_POS_WORDS, EN_NEG_WORDS,
+    detect_language,
     _init_nlp_resources,
 )
 from kisholens.ml.semantic_match import match_semantic
@@ -545,14 +542,6 @@ def get_novel_stats(novel_id: int):
         )
 
 
-def compute_4act_peak_arc(all_sentences: list[str], lang: str) -> list[dict]:
-    """
-    Computes the Kishōtenketsu 4-act sentiment arc derived from quantile sentiment density weighing.
-    """
-    arc_res = compute_kishotenketsu_quantile_arc(all_sentences, lang)
-    return arc_res["acts"]
-
-
 @app.get("/api/novels/{novel_id}/arc")
 def get_novel_arc(novel_id: int):
     """
@@ -689,14 +678,6 @@ class AnalysisRequest(BaseModel):
     text: str
     lang: str = "auto"
     title: str = "Untitled"
-
-
-def detect_language(text: str) -> str:
-    if re.search(r"[\u3040-\u309f\u30a0-\u30ff]", text):
-        return "ja"
-    if re.search(r"[\u4e00-\u9fff]", text):
-        return "zh"
-    return "en"
 
 
 _cached_dynamic_visual_baselines = {}

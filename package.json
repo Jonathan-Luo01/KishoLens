@@ -6,10 +6,10 @@
   "scripts": {
     "predev": "node free-ports.js",
     "dev:frontend": "npm --prefix frontend run dev",
-    "dev:backend": "node run-venv.js uvicorn kisholens.api.main:app --reload",
-    "dev:pipeline": "node run-venv.js python -m kisholens.pipeline.main",
-    "dev:ml": "node run-venv.js python -m kisholens.ml.main",
-    "dev:build-centroids": "node run-venv.js python -m kisholens.ml.build_centroids",
+    "dev:backend": "uv run uvicorn kisholens.api.main:app --reload",
+    "dev:pipeline": "uv run python -m kisholens.pipeline.main",
+    "dev:ml": "uv run python -m kisholens.ml.main",
+    "dev:build-centroids": "uv run python -m kisholens.ml.build_centroids",
     "dev": "concurrently --handle-input \"npm:dev:frontend\" \"npm:dev:backend\""
   },
   "devDependencies": {

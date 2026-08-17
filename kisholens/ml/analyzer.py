@@ -8,8 +8,8 @@ import numpy as np
 
 from kisholens.ml.embeddings import generate_dual_vectors
 from kisholens.ml.centroids import get_inciting_concept_vectors
-from kisholens.ml.semantic_match import _load_with_cache, DEFAULT_DATA_DIR, scan_anchor_boosts
-from kisholens.pipeline.taxonomy import evaluate_epic_cultivation_guardrail
+from kisholens.ml.semantic_match import _load_with_cache, DEFAULT_DATA_DIR
+from kisholens.pipeline.taxonomy import evaluate_epic_cultivation_guardrail, scan_anchor_boosts
 
 
 def analyze_prose(

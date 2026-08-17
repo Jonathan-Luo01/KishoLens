@@ -53,15 +53,6 @@ def _load_with_cache(data_dir: str) -> tuple[Optional[np.ndarray], Optional[dict
     return entry["genre"][0], entry["genre"][1], entry["territory"][0], entry["territory"][1]
 
 
-from kisholens.pipeline.taxonomy import (
-    GENRE_TAXONOMY,
-    ANCHOR_TERMS,
-    detect_text_language,
-    scan_anchor_boosts,
-)
-
-
-
 from kisholens.ml.analyzer import analyze_prose
 
 

@@ -3,17 +3,13 @@ import math
 import threading
 import numpy as np
 from typing import List, Dict, Any
-from collections import Counter
-from scipy.stats import percentileofscore
 
 # Dynamic library availability flags
 HAS_SPACY = False
 HAS_SUDACHI = False
 HAS_NLTK = False
-HAS_PKUSEG = False
 HAS_CNTEXT = False
 HAS_OSETI = False
-HAS_JIEBA = False
 
 # Shared sentiment constants
 EN_POS_WORDS = ["good", "great", "joy", "happy", "love", "hope", "bright", "beautiful", "triumph", "warm", "kind", "wonderful", "excellent"]
@@ -29,9 +25,7 @@ ZH_NEG_WORDS = ["悲伤", "痛苦", "生气", "讨厌", "失败", "疼", "差", 
 _nlp_en = None
 _nlp_ja = None
 _nlp_zh = None
-_sudachi_tokenizer = None
 _oseti_analyzer = None
-_pkuseg_tokenizer = None
 _sia_en = None
 _initialized = False
 _nlp_lock = threading.Lock()
@@ -39,11 +33,11 @@ _nlp_lock = threading.Lock()
 def _init_nlp_resources():
     """
     Task 1: Tri-language NLP resource initialization for English (spaCy/VADER),
-    Chinese (pkuseg/cntext/jieba), and Japanese (sudachipy/oseti).
+    Chinese (cntext/spaCy), and Japanese (sudachipy/oseti/spaCy).
     Guarded by _nlp_lock for multi-threaded safety.
     """
-    global HAS_SPACY, HAS_SUDACHI, HAS_NLTK, HAS_PKUSEG, HAS_CNTEXT, HAS_OSETI, HAS_JIEBA
-    global _nlp_en, _nlp_ja, _nlp_zh, _sudachi_tokenizer, _oseti_analyzer, _pkuseg_tokenizer, _sia_en, _initialized
+    global HAS_SPACY, HAS_SUDACHI, HAS_NLTK, HAS_CNTEXT, HAS_OSETI
+    global _nlp_en, _nlp_ja, _nlp_zh, _oseti_analyzer, _sia_en, _initialized
     
     if _initialized:
         return
@@ -78,10 +72,10 @@ def _init_nlp_resources():
         except Exception:
             HAS_NLTK = False
 
-        # 3. SudachiPy (Japanese Tokenization)
+        # 3. SudachiPy (Japanese Tokenization Check)
         try:
             from sudachipy import Dictionary
-            _sudachi_tokenizer = Dictionary().create()
+            Dictionary().create()
             HAS_SUDACHI = True
         except Exception:
             HAS_SUDACHI = False
@@ -98,20 +92,7 @@ def _init_nlp_resources():
         except Exception:
             HAS_OSETI = False
 
-        # 5. Chinese Tokenization & Sentiment (pkuseg / jieba / cntext)
-        try:
-            import pkuseg
-            _pkuseg_tokenizer = pkuseg.pkuseg()
-            HAS_PKUSEG = True
-        except Exception:
-            HAS_PKUSEG = False
-
-        try:
-            import jieba
-            HAS_JIEBA = True
-        except Exception:
-            HAS_JIEBA = False
-
+        # 5. Chinese Sentiment Library
         try:
             import cntext
             HAS_CNTEXT = True
