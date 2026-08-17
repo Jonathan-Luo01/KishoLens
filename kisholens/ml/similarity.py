@@ -878,7 +878,7 @@ def _infer_query_anatomy(query_text: Optional[str], query_semantic: Optional[dic
 
 def _generate_narrative_synthesis(q_anat: dict, c_anat: dict, s_sim: float, g_sim: float, is_user_input: bool) -> str:
     """
-    Synthesizes a cohesive 1-2 sentence narrative explanation comparing the query's
+    Synthesizes a cohesive, expressive 1-2 sentence narrative explanation comparing the query's
     catalyst, setting, and conflict with the candidate novel.
     """
     q_cat = q_anat.get("catalyst", "Premise Inciting Spark")
@@ -891,8 +891,8 @@ def _generate_narrative_synthesis(q_anat: dict, c_anat: dict, s_sim: float, g_si
     if is_user_input:
         if q_cat.lower() == c_cat.lower() or q_cat.lower() in c_cat.lower() or c_cat.lower() in q_cat.lower():
             return (
-                f"Your prose's {q_cat} premise aligns directly with this novel's opening arc. "
-                f"Both narratives immerse the reader in a {c_set} setting where the protagonist must navigate {c_con}."
+                f"Your prose's {q_cat} hook aligns directly with this novel's opening arc. "
+                f"Both narratives immerse the reader in {c_set} where the protagonist must navigate {c_con}."
             )
         else:
             return (
@@ -900,10 +900,16 @@ def _generate_narrative_synthesis(q_anat: dict, c_anat: dict, s_sim: float, g_si
                 f"sharing a vivid {c_set} atmosphere underpinned by {c_con}."
             )
     else:
-        if (q_cat.lower() == c_cat.lower()) and (q_set.lower() == c_set.lower()):
+        # Novel to novel comparison
+        if q_cat.lower() == c_cat.lower() and q_set.lower() == c_set.lower():
             return (
-                f"Both stories share a high-stakes {q_cat} foundation situated in a {q_set} world, "
-                f"centering on protagonists contending with {c_con}."
+                f"Both narratives launch from a shared {q_cat} foundation into {q_set}, "
+                f"charting protagonists who must navigate {c_con} while commanding exceptional talents."
+            )
+        elif "aristocracy" in q_set.lower() or "empire" in q_set.lower() or "nobility" in q_cat.lower() or "villainess" in c_cat.lower():
+            return (
+                f"These works mirror each other across key narrative pillars—pairing a {q_cat} premise with "
+                f"{c_set} court dynamics where characters face {c_con}."
             )
         elif q_cat.lower() == c_cat.lower() or q_cat.lower() in c_cat.lower() or c_cat.lower() in q_cat.lower():
             return (
@@ -912,8 +918,8 @@ def _generate_narrative_synthesis(q_anat: dict, c_anat: dict, s_sim: float, g_si
             )
         else:
             return (
-                f"These works mirror each other across key narrative pillars—pairing a {q_cat} premise with "
-                f"a {c_set} world where characters face {c_con}."
+                f"These works resonate through parallel narrative beats—translating a {q_cat} premise into "
+                f"a {c_set} world shaped by {c_con}."
             )
 
 
