@@ -4833,10 +4833,10 @@ import { ClientRouter } from 'astro:transitions';
                       return `
                         <div class="pillar-card">
                           <div class="pillar-card-header">
-                            <strong>${titles[pKey] || pKey}</strong>
+                            <strong>${p.name || titles[pKey] || pKey}</strong>
                             <span class="pillar-score-badge">${Math.round(p.score * 100)}%</span>
                           </div>
-                          <div class="pillar-mapping">${p.query_val} → ${p.cand_val}</div>
+                          <div class="pillar-mapping">${p.query_val || p.value || ''} → ${p.cand_val || p.value || ''}</div>
                           <p class="pillar-desc">${p.explanation}</p>
                         </div>
                       `;

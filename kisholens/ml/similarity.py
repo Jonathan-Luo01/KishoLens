@@ -671,8 +671,13 @@ def _compute_match_badges(
 
 
 def _infer_query_anatomy(query_text: Optional[str], query_semantic: Optional[dict], query_features: dict) -> dict:
+    """
+    Extracts or dynamically infers the 3 core story pillars (catalyst, setting, conflict)
+    and salient trope motifs from either structured taxonomy metadata or raw input prose.
+    """
     anatomy = {"catalyst": "Unknown", "setting": "Unknown", "conflict": "Unknown", "tropes": []}
     
+    # 1. Database taxonomy extraction
     if query_semantic and isinstance(query_semantic.get("taxonomy"), dict):
         tax = query_semantic["taxonomy"]
         if "inciting_event" in tax and isinstance(tax["inciting_event"], dict):
@@ -682,7 +687,7 @@ def _infer_query_anatomy(query_text: Optional[str], query_semantic: Optional[dic
         if "narrative_plot" in tax and isinstance(tax["narrative_plot"], dict):
             anatomy["conflict"] = tax["narrative_plot"].get("primary", "Unknown")
     
-    # Fallback to query_features if taxonomy is there
+    # Fallback to query_features taxonomy
     if anatomy["catalyst"] == "Unknown" and query_features:
         tax = query_features.get("taxonomy", {})
         if isinstance(tax, dict):
@@ -693,68 +698,249 @@ def _infer_query_anatomy(query_text: Optional[str], query_semantic: Optional[dic
             if "narrative_plot" in tax and isinstance(tax["narrative_plot"], dict):
                 anatomy["conflict"] = tax["narrative_plot"].get("primary", "Unknown")
     
-    # Extract tropes
+    # Extract tropes from tags or genres
     tropes = []
     if query_features.get("tags"):
         tropes.extend([t.strip() for t in query_features["tags"].split(",") if t.strip()])
     
-    # Very basic fallback for user text
+    # 2. Dynamic NLP Anchor Detection for Raw User Text
     if query_text:
         qt_lower = query_text.lower()
-        if anatomy["catalyst"] == "Unknown":
-            if "reincarnat" in qt_lower: anatomy["catalyst"] = "Reincarnation"
-            elif "summon" in qt_lower: anatomy["catalyst"] = "Summons"
-            elif "regress" in qt_lower: anatomy["catalyst"] = "Regression"
-            else: anatomy["catalyst"] = "Personal Crisis"
+        
+        # Catalyst Detection from prose anchors
+        if re.search(r"reincarnat|truck-kun|previous life|past life|reborn|woke up in another|transmigrat|possessed the body|isekai", qt_lower):
+            anatomy["catalyst"] = "Reincarnation & Rebirth"
+        elif re.search(r"regress|turn back time|second chance|return to the past|time loop|died and returned", qt_lower):
+            anatomy["catalyst"] = "Regression & Time Reversal"
+        elif re.search(r"summoned|summoning circle|hero summoning|transported to|another world|portal", qt_lower):
+            anatomy["catalyst"] = "Otherworldly Summoning"
+        elif re.search(r"system|status window|level up|awakened|awakening|hunter rank|quest notification", qt_lower):
+            anatomy["catalyst"] = "System & Status Awakening"
+        elif re.search(r"betray|exiled|banished|framed|backstab|poisoned|abandoned by", qt_lower):
+            anatomy["catalyst"] = "Betrayal & Fall from Grace"
+        elif re.search(r"magic academy|academy entrance|dormitory|enrolled|grimoire|ancient relic|hidden talent", qt_lower):
+            anatomy["catalyst"] = "Hidden Heritage & Awakening"
+        elif anatomy["catalyst"] == "Unknown":
+            p_genre = query_features.get("primary_genre") or query_features.get("genre") or ""
+            anatomy["catalyst"] = f"{p_genre} Premise Spark" if p_genre else "Premise Inciting Spark"
             
-        if anatomy["setting"] == "Unknown":
-            if "palace" in qt_lower or "duke" in qt_lower or "empire" in qt_lower: anatomy["setting"] = "Fantasy Empire"
-            elif "school" in qt_lower or "academy" in qt_lower: anatomy["setting"] = "Academy"
-            else: anatomy["setting"] = "Modern World"
+        # Setting Detection from prose anchors
+        if re.search(r"palace|empire|emperor|empress|grand duke|noble|crown prince|aristocrat|royal court|duchy", qt_lower):
+            anatomy["setting"] = "Imperial Court & Aristocracy"
+        elif re.search(r"dungeon|gate|hunter|monster break|seoul|tokyo|skyscrapers|guild master|raid party", qt_lower):
+            anatomy["setting"] = "Urban Fantasy & Monster Gates"
+        elif re.search(r"qi|cultivat|sect|dantian|meridian|martial arts|wuxia|xianxia|elder|soaring sword", qt_lower):
+            anatomy["setting"] = "Cultivation & Martial World"
+        elif re.search(r"academy|mana|spell|sorcery|archmage|elemental|guild|dragon|enchanted forest", qt_lower):
+            anatomy["setting"] = "High Magic Academy Realm"
+        elif re.search(r"cyber|neon|implant|megacorp|starship|galaxy|android|colony|post-apocalyptic", qt_lower):
+            anatomy["setting"] = "Dystopian Sci-Fi Frontier"
+        elif re.search(r"village|feudal|manor|peasant|knight|kingdom|medieval|castle", qt_lower):
+            anatomy["setting"] = "Feudal Kingdom & Manorial Estate"
+        elif anatomy["setting"] == "Unknown":
+            p_terr = query_features.get("territory") or query_features.get("genre") or ""
+            anatomy["setting"] = f"{p_terr} Realm" if p_terr else "Immersive Narrative Realm"
             
-        if anatomy["conflict"] == "Unknown":
-            if "war" in qt_lower: anatomy["conflict"] = "War/Rebellion"
-            elif "revenge" in qt_lower: anatomy["conflict"] = "Revenge"
-            else: anatomy["conflict"] = "Survival"
-    
-    anatomy["tropes"] = list(set(tropes))
+        # Conflict Stakes Detection from prose anchors
+        if re.search(r"civil war|war|rebellion|battlefield|succession|throne|intrigue|faction|conspiracy|court politics|power struggle|noble rivalry", qt_lower):
+            anatomy["conflict"] = "Court Intrigue & Succession War"
+        elif re.search(r"survival|death game|boss monster|calamity|apocalypse|catastrophe|extinction", qt_lower):
+            anatomy["conflict"] = "High-Stakes Calamity & Survival"
+        elif re.search(r"revenge|avenge|payback|retribution|destroy them|sworn enemy|blood debt", qt_lower):
+            anatomy["conflict"] = "Vengeance & Retributive Justice"
+        elif re.search(r"conceal|hide.*power|secret identity|underdog|f-rank|disguised|unassuming", qt_lower):
+            anatomy["conflict"] = "Covert Power & Hidden Master"
+        elif re.search(r"mastery|strongest|reach the peak|breakthrough|ascend|conquer|unrivaled", qt_lower):
+            anatomy["conflict"] = "Ascension & Pinnacle Mastery"
+        elif anatomy["conflict"] == "Unknown":
+            anatomy["conflict"] = "High-Stakes Narrative Tension"
+        
+        # Extract tropes dynamically from text
+        trope_patterns = [
+            ("Overpowered Protagonist", r"overpower|cheat|supreme|unrivaled|god-level"),
+            ("Hidden Identity", r"hide.*power|secret identity|disguise|unassuming"),
+            ("Cold Aristocrat", r"cold duke|tyrant|calculat|emotionless"),
+            ("System Interface", r"status window|system notification|quest|level up"),
+            ("Time Reversal", r"regress|return to past|second chance|do-over"),
+            ("Reincarnation", r"reincarnat|past life|salaryman|reborn"),
+            ("Found Family", r"companion|comrade|trusted ally|found family"),
+            ("Academy Life", r"classroom|exam|dormitory|fellow student|professor"),
+            ("Dungeon Raid", r"dungeon|boss monster|raid|loot|mana core"),
+            ("Political Intrigue", r"conspiracy|faction|noble court|scheming|treason"),
+        ]
+        for trope_name, pat in trope_patterns:
+            if re.search(pat, qt_lower):
+                tropes.append(trope_name)
+
+    # Fallbacks for clean display if still unknown
+    if anatomy["catalyst"] == "Unknown":
+        p_genre = query_features.get("primary_genre") or query_features.get("genre") or "Fiction"
+        anatomy["catalyst"] = f"{p_genre} Narrative Arc"
+    if anatomy["setting"] == "Unknown":
+        p_terr = query_features.get("territory") or "General"
+        anatomy["setting"] = f"{p_terr} Setting"
+    if anatomy["conflict"] == "Unknown":
+        anatomy["conflict"] = "Character Growth & Core Conflict"
+
+    # Deduplicate tropes while preserving order
+    seen_tropes = set()
+    cleaned_tropes = []
+    for t in tropes:
+        t_clean = t.strip().title()
+        if t_clean and t_clean.lower() not in seen_tropes:
+            seen_tropes.add(t_clean.lower())
+            cleaned_tropes.append(t_clean)
+            
+    anatomy["tropes"] = cleaned_tropes
     return anatomy
 
-def _generate_narrative_synthesis(q_anat: dict, c_anat: dict, s_sim: float, g_sim: float, is_user_input: bool) -> str:
-    parts = []
-    if is_user_input:
-        parts.append("This novel matches your input by echoing similar themes.")
-    else:
-        parts.append("This novel shares a strong narrative thread with your library.")
-        
-    if s_sim > 0.8:
-        parts.append(f"It pairs a {c_anat['catalyst']} catalyst with a vivid {c_anat['setting']} setting.")
-    else:
-        parts.append(f"Expect a focus on {c_anat['conflict']} within a {c_anat['setting']} backdrop.")
-    
-    return " ".join(parts)
 
-def _compute_4pillar_breakdown(q_anat: dict, c_anat: dict, q_m: dict, c_m: dict, s_sim: float, g_sim: float, sty_sim: float) -> dict:
-    cat_score = 0.8 if q_anat['catalyst'] != 'Unknown' and q_anat['catalyst'] == c_anat['catalyst'] else 0.5
-    set_score = 0.8 if q_anat['setting'] != 'Unknown' and q_anat['setting'] == c_anat['setting'] else 0.5
-    con_score = 0.8 if q_anat['conflict'] != 'Unknown' and q_anat['conflict'] == c_anat['conflict'] else 0.5
-    sty_score = sty_sim
+def _generate_narrative_synthesis(q_anat: dict, c_anat: dict, s_sim: float, g_sim: float, is_user_input: bool) -> str:
+    """
+    Synthesizes a cohesive 1-2 sentence narrative explanation comparing the query's
+    catalyst, setting, and conflict with the candidate novel.
+    """
+    q_cat = q_anat.get("catalyst", "Premise Inciting Spark")
+    c_cat = c_anat.get("catalyst", "Premise Inciting Spark")
+    q_set = q_anat.get("setting", "Immersive Narrative Realm")
+    c_set = c_anat.get("setting", "Immersive Narrative Realm")
+    q_con = q_anat.get("conflict", "High-Stakes Narrative Tension")
+    c_con = c_anat.get("conflict", "High-Stakes Narrative Tension")
+
+    if is_user_input:
+        if q_cat.lower() == c_cat.lower() or q_cat.lower() in c_cat.lower() or c_cat.lower() in q_cat.lower():
+            return (
+                f"Your prose's {q_cat} premise aligns directly with this novel's opening arc. "
+                f"Both narratives immerse the reader in a {c_set} setting where the protagonist must navigate {c_con}."
+            )
+        else:
+            return (
+                f"Your narrative's focus on {q_cat} resonates with this novel's {c_cat} trajectory, "
+                f"sharing a vivid {c_set} atmosphere underpinned by {c_con}."
+            )
+    else:
+        if (q_cat.lower() == c_cat.lower()) and (q_set.lower() == c_set.lower()):
+            return (
+                f"Both stories share a high-stakes {q_cat} foundation situated in a {q_set} world, "
+                f"centering on protagonists contending with {c_con}."
+            )
+        elif q_cat.lower() == c_cat.lower() or q_cat.lower() in c_cat.lower() or c_cat.lower() in q_cat.lower():
+            return (
+                f"Both narratives are anchored by a {q_cat} catalyst, exploring thematic tensions of "
+                f"{c_con} against a richly drawn {c_set} backdrop."
+            )
+        else:
+            return (
+                f"These works mirror each other across key narrative pillars—pairing a {q_cat} premise with "
+                f"a {c_set} world where characters face {c_con}."
+            )
+
+
+def _compute_4pillar_breakdown(
+    q_anat: dict,
+    c_anat: dict,
+    q_m: dict,
+    c_m: dict,
+    s_sim: float,
+    g_sim: float,
+    sty_sim: float
+) -> dict:
+    """
+    Computes structured scores, value mappings (Query -> Candidate), and comparative
+    explanations across the 4 core story & style pillars.
+    """
+    q_cat = q_anat.get("catalyst", "Narrative Inciting Spark")
+    c_cat = c_anat.get("catalyst", "Narrative Inciting Spark")
+    q_set = q_anat.get("setting", "World Setting")
+    c_set = c_anat.get("setting", "World Setting")
+    q_con = q_anat.get("conflict", "Plot Stakes")
+    c_con = c_anat.get("conflict", "Plot Stakes")
+
+    # 1. Catalyst Score & Explanation
+    cat_match = q_cat.lower() == c_cat.lower() or (q_cat.lower() in c_cat.lower()) or (c_cat.lower() in q_cat.lower())
+    cat_score = max(0.50, min(0.98, s_sim * 0.7 + (0.28 if cat_match else 0.12)))
+    if cat_match:
+        cat_exp = f"Shared premise anchor: Both narratives launch from a {q_cat} foundation."
+    else:
+        cat_exp = f"Harmonious narrative catalyst: Shifts from {q_cat} into {c_cat} thematic beats."
+
+    # 2. Setting Score & Explanation
+    set_match = q_set.lower() == c_set.lower() or (q_set.lower() in c_set.lower()) or (c_set.lower() in q_set.lower())
+    set_score = max(0.48, min(0.98, g_sim * 0.65 + (0.32 if set_match else 0.15)))
+    if set_match:
+        set_exp = f"Parallel worldbuilding: Richly realized {q_set} atmosphere and socio-political hierarchy."
+    else:
+        set_exp = f"Thematic atmospheric resonance: Translates {q_set} environmental motifs to a {c_set} landscape."
+
+    # 3. Conflict Score & Explanation
+    con_match = q_con.lower() == c_con.lower() or (q_con.lower() in c_con.lower()) or (c_con.lower() in q_con.lower())
+    con_score = max(0.48, min(0.98, s_sim * 0.6 + (0.32 if con_match else 0.15)))
+    if con_match:
+        con_exp = f"Matching dramatic stakes: Central friction revolves around {q_con}."
+    else:
+        con_exp = f"Shared narrative tension: Balancing {q_con} alongside escalating {c_con} stakes."
+
+    # 4. Style & Cadence Score & Explanation
+    q_dlg = q_m.get("dialogue_ratio", 0.5) * 100
+    c_dlg = c_m.get("dialogue_ratio", 0.5) * 100
+    q_asl = q_m.get("avg_sentence_len", 12.0)
+    c_asl = c_m.get("avg_sentence_len", 12.0)
     
-    # Just to ensure scores are high enough to pass tests
-    if cat_score < 0.6: cat_score = 0.7
-    if set_score < 0.6: set_score = 0.7
+    q_style_val = f"{'Dialogue-Dense' if q_dlg > 60 else 'Narrative-Dense'} ({q_dlg:.0f}%), {q_asl:.1f} w/s"
+    c_style_val = f"{'Dialogue-Dense' if c_dlg > 60 else 'Narrative-Dense'} ({c_dlg:.0f}%), {c_asl:.1f} w/s"
     
+    if sty_sim >= 0.85:
+        sty_exp = "Strikingly congruent prose cadence, dynamic rhythm, and scene velocity."
+    elif sty_sim >= 0.70:
+        sty_exp = "Comparable dialogue-to-exposition pacing and structural sentence cadence."
+    else:
+        sty_exp = "Complementary stylistic rhythm offering a fresh reading tempo."
+
     return {
-        "catalyst": {"score": cat_score, "value": c_anat['catalyst'], "explanation": "Catalyst match"},
-        "setting": {"score": set_score, "value": c_anat['setting'], "explanation": "Setting match"},
-        "conflict": {"score": con_score, "value": c_anat['conflict'], "explanation": "Conflict match"},
-        "style_cadence": {"score": sty_score, "value": "Style", "explanation": "Prose style match"}
+        "catalyst": {
+            "name": "Premise & Inciting Catalyst",
+            "score": round(cat_score, 2),
+            "query_val": q_cat,
+            "cand_val": c_cat,
+            "explanation": cat_exp
+        },
+        "setting": {
+            "name": "World Setting & Atmosphere",
+            "score": round(set_score, 2),
+            "query_val": q_set,
+            "cand_val": c_set,
+            "explanation": set_exp
+        },
+        "conflict": {
+            "name": "Conflict Stakes & Tension",
+            "score": round(con_score, 2),
+            "query_val": q_con,
+            "cand_val": c_con,
+            "explanation": con_exp
+        },
+        "style_cadence": {
+            "name": "Prose Voice & Cadence",
+            "score": round(sty_sim, 2),
+            "query_val": q_style_val,
+            "cand_val": c_style_val,
+            "explanation": sty_exp
+        }
     }
 
+
 def _extract_shared_tropes(q_anat: dict, c_anat: dict) -> list:
-    shared = list(set(q_anat['tropes']).intersection(set(c_anat['tropes'])))
-    if not shared and c_anat['tropes']:
-        shared = c_anat['tropes'][:2]
+    """
+    Finds overlapping trope chips between query and candidate.
+    Falls back to prominent candidate tropes if no strict intersection exists.
+    """
+    q_set = {t.lower(): t for t in q_anat.get("tropes", [])}
+    c_set = {t.lower(): t for t in c_anat.get("tropes", [])}
+    
+    shared_keys = set(q_set.keys()).intersection(set(c_set.keys()))
+    shared = [c_set[k] for k in shared_keys]
+    
+    if not shared and c_anat.get("tropes"):
+        shared = c_anat["tropes"][:3]
     return shared
 
 def find_top_matches(
