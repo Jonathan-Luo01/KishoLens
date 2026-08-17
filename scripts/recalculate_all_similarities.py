@@ -23,6 +23,10 @@ from kisholens.ml.similarity import (
     _compute_metric_comparisons,
     _compute_match_badges,
     _extract_genre_list,
+    _infer_query_anatomy,
+    _generate_narrative_synthesis,
+    _compute_4pillar_breakdown,
+    _extract_shared_tropes,
     SIMILARITY_MODEL_VERSION
 )
 from kisholens.ml.embeddings import get_transformer_model
@@ -117,6 +121,7 @@ def main():
     all_titles = []
     all_authors = []
     all_metrics = []
+    all_anatomies = []
 
     for i, item in enumerate(novel_items):
         g_names = (
@@ -134,6 +139,7 @@ def main():
         all_titles.append(item.get("title") or "Unknown Title")
         all_authors.append(item.get("author") or "Unknown Author")
         all_metrics.append(_extract_metric_values(item, style_vectors[i]))
+        all_anatomies.append(_infer_query_anatomy(None, item.get("semantic"), item))
 
     # 5. Build Fast Vectorized Primary Genre & Territory Match Matrices
     print("Building vectorized genre and territory affinity matrices...")
@@ -285,6 +291,17 @@ def main():
                     score=c_score
                 )
 
+                q_anat = all_anatomies[global_i]
+                c_anat = all_anatomies[cand_j]
+                narrative_synthesis = _generate_narrative_synthesis(q_anat, c_anat, st_sim, g_sim, is_user_input=False)
+                pillars = _compute_4pillar_breakdown(q_anat, c_anat, q_m, c_metrics, st_sim, g_sim, sty_sim)
+                shared_tropes = _extract_shared_tropes(q_anat, c_anat)
+                narrative_reasoning = {
+                    "narrative_synthesis": narrative_synthesis,
+                    "pillars": pillars,
+                    "shared_tropes": shared_tropes
+                }
+
                 formatted_matches.append({
                     "id": cid,
                     "title": all_titles[cand_j],
@@ -299,6 +316,7 @@ def main():
                     "reasons": reasons,
                     "story_reasons": story_reasons,
                     "style_reasons": style_reasons,
+                    "narrative_reasoning": narrative_reasoning,
                     "breakdown": {
                         "story": round(st_sim, 3),
                         "style": round(sty_sim, 3),
