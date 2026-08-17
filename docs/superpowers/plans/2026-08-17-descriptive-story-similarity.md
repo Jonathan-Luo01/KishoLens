@@ -114,16 +114,16 @@ git commit -m "feat(similarity): implement hybrid narrative synthesis and 4-pill
 - Consumes: `_infer_query_anatomy`, `_generate_narrative_synthesis`, `_compute_4pillar_breakdown`, `_extract_shared_tropes`
 - Produces: Hydrated `data/stats_cache.json` with `narrative_reasoning` for all 10,320 novels.
 
-- [ ] **Step 1: Update `scripts/recalculate_all_similarities.py` to embed `narrative_reasoning`**
+- [x] **Step 1: Update `scripts/recalculate_all_similarities.py` to embed `narrative_reasoning`**
 
 Include full `narrative_reasoning` dictionary in each top match when batch generating `data/stats_cache.json`.
 
-- [ ] **Step 2: Execute batch recalculation across all 10,320 novels**
+- [x] **Step 2: Execute batch recalculation across all 10,320 novels**
 
 Run: `./.venv/bin/python scripts/recalculate_all_similarities.py`
 Expected: Successfully updated all 10,320 novels in `data/stats_cache.json`.
 
-- [ ] **Step 3: Commit Task 2**
+- [x] **Step 3: Commit Task 2**
 
 ```bash
 git add scripts/recalculate_all_similarities.py
