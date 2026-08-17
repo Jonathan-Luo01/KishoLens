@@ -71,3 +71,25 @@ def test_descriptive_similarity_for_raw_user_text():
     # Check shared tropes extracted
     tropes = reasoning["shared_tropes"]
     assert isinstance(tropes, list)
+
+def test_editorial_natural_phrasing():
+    from kisholens.ml.similarity import _generate_narrative_synthesis, _compute_4pillar_breakdown
+    
+    q_anat = {"catalyst": "Reincarnation", "setting": "Empire", "conflict": "War"}
+    c_anat = {"catalyst": "Reincarnation", "setting": "Empire", "conflict": "War"}
+    
+    synth = _generate_narrative_synthesis(q_anat, c_anat, 0.9, 0.9, False)
+    assert "thematic beats" not in synth.lower()
+    assert "anchored by a" not in synth.lower()
+    assert "socio-political hierarchy" not in synth.lower()
+    assert "richly drawn backdrop" not in synth.lower()
+    
+    q_m = {"dialogue_ratio": 0.5, "avg_sentence_len": 12.0}
+    c_m = {"dialogue_ratio": 0.5, "avg_sentence_len": 12.0}
+    
+    pillars = _compute_4pillar_breakdown(q_anat, c_anat, q_m, c_m, 0.9, 0.9, 0.9)
+    for p_key in ["catalyst", "setting", "conflict", "style_cadence"]:
+        exp = pillars[p_key]["explanation"]
+        assert "thematic beats" not in exp.lower()
+        assert "socio-political hierarchy" not in exp.lower()
+        assert "richly drawn backdrop" not in exp.lower()

@@ -891,35 +891,35 @@ def _generate_narrative_synthesis(q_anat: dict, c_anat: dict, s_sim: float, g_si
     if is_user_input:
         if q_cat.lower() == c_cat.lower() or q_cat.lower() in c_cat.lower() or c_cat.lower() in q_cat.lower():
             return (
-                f"Your prose's {q_cat} hook aligns directly with this novel's opening arc. "
-                f"Both narratives immerse the reader in {c_set} where the protagonist must navigate {c_con}."
+                f"Your {q_cat} premise matches this novel's opening. "
+                f"Both stories share a {c_set} setting and focus on {c_con}."
             )
         else:
             return (
-                f"Your narrative's focus on {q_cat} resonates with this novel's {c_cat} trajectory, "
-                f"sharing a vivid {c_set} atmosphere underpinned by {c_con}."
+                f"Your {q_cat} premise connects with this novel's {c_cat} start. "
+                f"They share a {c_set} setting and focus on {c_con}."
             )
     else:
         # Novel to novel comparison
         if q_cat.lower() == c_cat.lower() and q_set.lower() == c_set.lower():
             return (
-                f"Both narratives launch from a shared {q_cat} foundation into {q_set}, "
-                f"charting protagonists who must navigate {c_con} while commanding exceptional talents."
+                f"Both stories start with a {q_cat} premise in a {q_set} setting, "
+                f"following characters dealing with {c_con}."
             )
         elif "aristocracy" in q_set.lower() or "empire" in q_set.lower() or "nobility" in q_cat.lower() or "villainess" in c_cat.lower():
             return (
-                f"These works mirror each other across key narrative pillars—pairing a {q_cat} premise with "
-                f"{c_set} court dynamics where characters face {c_con}."
+                f"These novels share a {q_cat} premise and "
+                f"{c_set} politics, with characters facing {c_con}."
             )
         elif q_cat.lower() == c_cat.lower() or q_cat.lower() in c_cat.lower() or c_cat.lower() in q_cat.lower():
             return (
-                f"Both narratives are anchored by a {q_cat} catalyst, exploring thematic tensions of "
-                f"{c_con} against a richly drawn {c_set} backdrop."
+                f"Both stories share a {q_cat} premise, focusing on "
+                f"{c_con} in a {c_set} setting."
             )
         else:
             return (
-                f"These works resonate through parallel narrative beats—translating a {q_cat} premise into "
-                f"a {c_set} world shaped by {c_con}."
+                f"These novels share similar pacing—moving from a {q_cat} premise to "
+                f"a {c_set} setting dealing with {c_con}."
             )
 
 
@@ -947,25 +947,25 @@ def _compute_4pillar_breakdown(
     cat_match = q_cat.lower() == c_cat.lower() or (q_cat.lower() in c_cat.lower()) or (c_cat.lower() in q_cat.lower())
     cat_score = max(0.55, min(0.98, s_sim * 0.7 + (0.28 if cat_match else 0.12)))
     if cat_match:
-        cat_exp = f"Shared premise anchor: Both narratives launch from a {q_cat} foundation."
+        cat_exp = f"Both stories start with a {q_cat} premise."
     else:
-        cat_exp = f"Harmonious narrative catalyst: Shifts from {q_cat} into {c_cat} thematic beats."
+        cat_exp = f"Connects {q_cat} with {c_cat} elements."
 
     # 2. Setting Score & Explanation
     set_match = q_set.lower() == c_set.lower() or (q_set.lower() in c_set.lower()) or (c_set.lower() in q_set.lower())
     set_score = max(0.52, min(0.98, g_sim * 0.65 + (0.32 if set_match else 0.15)))
     if set_match:
-        set_exp = f"Parallel worldbuilding: Richly realized {q_set} atmosphere and socio-political hierarchy."
+        set_exp = f"Similar {q_set} environment."
     else:
-        set_exp = f"Thematic atmospheric resonance: Translates {q_set} environmental motifs to a {c_set} landscape."
+        set_exp = f"Adapts {q_set} elements to a {c_set} setting."
 
     # 3. Conflict Stakes & Explanation
     con_match = q_con.lower() == c_con.lower() or (q_con.lower() in c_con.lower()) or (c_con.lower() in q_con.lower())
     con_score = max(0.52, min(0.98, s_sim * 0.6 + (0.32 if con_match else 0.15)))
     if con_match:
-        con_exp = f"Matching dramatic stakes: Central friction revolves around {q_con}."
+        con_exp = f"Focuses on {q_con}."
     else:
-        con_exp = f"Shared narrative tension: Balancing {q_con} alongside escalating {c_con} stakes."
+        con_exp = f"Combines {q_con} and {c_con}."
 
     # 4. Style & Cadence Score & Explanation
     q_dlg = q_m.get("dialogue_ratio", 0.5) * 100
@@ -994,11 +994,11 @@ def _compute_4pillar_breakdown(
     c_style_val = _format_cadence(c_dlg, c_asl)
     
     if sty_sim >= 0.85:
-        sty_exp = "Strikingly congruent prose cadence, dynamic dialogue rhythm, and scene velocity."
+        sty_exp = "Highly similar pacing and dialogue flow."
     elif sty_sim >= 0.70:
-        sty_exp = "Comparable dialogue-to-exposition pacing and structural sentence cadence."
+        sty_exp = "Similar pacing and structure."
     else:
-        sty_exp = "Complementary stylistic rhythm offering a fresh reading tempo."
+        sty_exp = "Different pacing and reading style."
 
     return {
         "catalyst": {
