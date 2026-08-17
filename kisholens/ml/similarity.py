@@ -672,115 +672,192 @@ def _compute_match_badges(
 
 def _infer_query_anatomy(query_text: Optional[str], query_semantic: Optional[dict], query_features: dict) -> dict:
     """
-    Extracts or dynamically infers the 3 core story pillars (catalyst, setting, conflict)
-    and salient trope motifs from either structured taxonomy metadata or raw input prose.
-    """
-    anatomy = {"catalyst": "Unknown", "setting": "Unknown", "conflict": "Unknown", "tropes": []}
+    Extracts or dynamically infers high-precision story anatomy across the 3 core narrative pillars:
+      1. Inciting Incident / Catalyst (e.g. Reincarnation into Nobility, Villainess Subversion)
+      2. World Setting & Atmosphere (e.g. High Fantasy Imperial Court & Aristocracy)
+      3. Core Conflict & Stakes (e.g. Imperial Succession & Factional Politics, Subverting Doom)
+      4. Salient Trope Motifs
     
-    # 1. Database taxonomy extraction
+    Synthesizes signals from novel title, synopsis, tags, genres, and taxonomy metadata,
+    as well as raw user prose inputs.
+    """
+    title = str(query_features.get("title") or "").strip()
+    synopsis = str(query_features.get("synopsis") or "").strip()
+    tags = str(query_features.get("tags") or "").strip()
+    p_genre = str(query_features.get("primary_genre") or query_features.get("genre") or "").strip()
+    territory = str(query_features.get("territory") or "").strip()
+    
+    # Combined lowercase search space
+    context = f"{title} {synopsis} {tags} {p_genre} {territory} {query_text or ''}".lower()
+    
+    # Extract taxonomy if present
+    tax = {}
     if query_semantic and isinstance(query_semantic.get("taxonomy"), dict):
         tax = query_semantic["taxonomy"]
-        if "inciting_event" in tax and isinstance(tax["inciting_event"], dict):
-            anatomy["catalyst"] = tax["inciting_event"].get("primary", "Unknown")
-        if "world_setting" in tax and isinstance(tax["world_setting"], dict):
-            anatomy["setting"] = tax["world_setting"].get("primary", "Unknown")
-        if "narrative_plot" in tax and isinstance(tax["narrative_plot"], dict):
-            anatomy["conflict"] = tax["narrative_plot"].get("primary", "Unknown")
-    
-    # Fallback to query_features taxonomy
-    if anatomy["catalyst"] == "Unknown" and query_features:
-        tax = query_features.get("taxonomy", {})
-        if isinstance(tax, dict):
-            if "inciting_event" in tax and isinstance(tax["inciting_event"], dict):
-                anatomy["catalyst"] = tax["inciting_event"].get("primary", "Unknown")
-            if "world_setting" in tax and isinstance(tax["world_setting"], dict):
-                anatomy["setting"] = tax["world_setting"].get("primary", "Unknown")
-            if "narrative_plot" in tax and isinstance(tax["narrative_plot"], dict):
-                anatomy["conflict"] = tax["narrative_plot"].get("primary", "Unknown")
-    
-    # Extract tropes from tags or genres
-    tropes = []
-    if query_features.get("tags"):
-        tropes.extend([t.strip() for t in query_features["tags"].split(",") if t.strip()])
-    
-    # 2. Dynamic NLP Anchor Detection for Raw User Text
-    if query_text:
-        qt_lower = query_text.lower()
-        
-        # Catalyst Detection from prose anchors
-        if re.search(r"reincarnat|truck-kun|previous life|past life|reborn|woke up in another|transmigrat|possessed the body|isekai", qt_lower):
-            anatomy["catalyst"] = "Reincarnation & Rebirth"
-        elif re.search(r"regress|turn back time|second chance|return to the past|time loop|died and returned", qt_lower):
-            anatomy["catalyst"] = "Regression & Time Reversal"
-        elif re.search(r"summoned|summoning circle|hero summoning|transported to|another world|portal", qt_lower):
-            anatomy["catalyst"] = "Otherworldly Summoning"
-        elif re.search(r"system|status window|level up|awakened|awakening|hunter rank|quest notification", qt_lower):
-            anatomy["catalyst"] = "System & Status Awakening"
-        elif re.search(r"betray|exiled|banished|framed|backstab|poisoned|abandoned by", qt_lower):
-            anatomy["catalyst"] = "Betrayal & Fall from Grace"
-        elif re.search(r"magic academy|academy entrance|dormitory|enrolled|grimoire|ancient relic|hidden talent", qt_lower):
-            anatomy["catalyst"] = "Hidden Heritage & Awakening"
-        elif anatomy["catalyst"] == "Unknown":
-            p_genre = query_features.get("primary_genre") or query_features.get("genre") or ""
-            anatomy["catalyst"] = f"{p_genre} Premise Spark" if p_genre else "Premise Inciting Spark"
-            
-        # Setting Detection from prose anchors
-        if re.search(r"palace|empire|emperor|empress|grand duke|noble|crown prince|aristocrat|royal court|duchy", qt_lower):
-            anatomy["setting"] = "Imperial Court & Aristocracy"
-        elif re.search(r"dungeon|gate|hunter|monster break|seoul|tokyo|skyscrapers|guild master|raid party", qt_lower):
-            anatomy["setting"] = "Urban Fantasy & Monster Gates"
-        elif re.search(r"qi|cultivat|sect|dantian|meridian|martial arts|wuxia|xianxia|elder|soaring sword", qt_lower):
-            anatomy["setting"] = "Cultivation & Martial World"
-        elif re.search(r"academy|mana|spell|sorcery|archmage|elemental|guild|dragon|enchanted forest", qt_lower):
-            anatomy["setting"] = "High Magic Academy Realm"
-        elif re.search(r"cyber|neon|implant|megacorp|starship|galaxy|android|colony|post-apocalyptic", qt_lower):
-            anatomy["setting"] = "Dystopian Sci-Fi Frontier"
-        elif re.search(r"village|feudal|manor|peasant|knight|kingdom|medieval|castle", qt_lower):
-            anatomy["setting"] = "Feudal Kingdom & Manorial Estate"
-        elif anatomy["setting"] == "Unknown":
-            p_terr = query_features.get("territory") or query_features.get("genre") or ""
-            anatomy["setting"] = f"{p_terr} Realm" if p_terr else "Immersive Narrative Realm"
-            
-        # Conflict Stakes Detection from prose anchors
-        if re.search(r"civil war|war|rebellion|battlefield|succession|throne|intrigue|faction|conspiracy|court politics|power struggle|noble rivalry", qt_lower):
-            anatomy["conflict"] = "Court Intrigue & Succession War"
-        elif re.search(r"survival|death game|boss monster|calamity|apocalypse|catastrophe|extinction", qt_lower):
-            anatomy["conflict"] = "High-Stakes Calamity & Survival"
-        elif re.search(r"revenge|avenge|payback|retribution|destroy them|sworn enemy|blood debt", qt_lower):
-            anatomy["conflict"] = "Vengeance & Retributive Justice"
-        elif re.search(r"conceal|hide.*power|secret identity|underdog|f-rank|disguised|unassuming", qt_lower):
-            anatomy["conflict"] = "Covert Power & Hidden Master"
-        elif re.search(r"mastery|strongest|reach the peak|breakthrough|ascend|conquer|unrivaled", qt_lower):
-            anatomy["conflict"] = "Ascension & Pinnacle Mastery"
-        elif anatomy["conflict"] == "Unknown":
-            anatomy["conflict"] = "High-Stakes Narrative Tension"
-        
-        # Extract tropes dynamically from text
-        trope_patterns = [
-            ("Overpowered Protagonist", r"overpower|cheat|supreme|unrivaled|god-level"),
-            ("Hidden Identity", r"hide.*power|secret identity|disguise|unassuming"),
-            ("Cold Aristocrat", r"cold duke|tyrant|calculat|emotionless"),
-            ("System Interface", r"status window|system notification|quest|level up"),
-            ("Time Reversal", r"regress|return to past|second chance|do-over"),
-            ("Reincarnation", r"reincarnat|past life|salaryman|reborn"),
-            ("Found Family", r"companion|comrade|trusted ally|found family"),
-            ("Academy Life", r"classroom|exam|dormitory|fellow student|professor"),
-            ("Dungeon Raid", r"dungeon|boss monster|raid|loot|mana core"),
-            ("Political Intrigue", r"conspiracy|faction|noble court|scheming|treason"),
-        ]
-        for trope_name, pat in trope_patterns:
-            if re.search(pat, qt_lower):
-                tropes.append(trope_name)
+    elif query_features and isinstance(query_features.get("taxonomy"), dict):
+        tax = query_features["taxonomy"]
 
-    # Fallbacks for clean display if still unknown
-    if anatomy["catalyst"] == "Unknown":
-        p_genre = query_features.get("primary_genre") or query_features.get("genre") or "Fiction"
-        anatomy["catalyst"] = f"{p_genre} Narrative Arc"
-    if anatomy["setting"] == "Unknown":
-        p_terr = query_features.get("territory") or "General"
-        anatomy["setting"] = f"{p_terr} Setting"
-    if anatomy["conflict"] == "Unknown":
-        anatomy["conflict"] = "Character Growth & Core Conflict"
+    inc_tax = str(tax.get("inciting_event", {}).get("primary", "") if isinstance(tax.get("inciting_event"), dict) else "")
+    ws_tax = str(tax.get("world_setting", {}).get("primary", "") if isinstance(tax.get("world_setting"), dict) else "")
+    plot_tax = str(tax.get("narrative_plot", {}).get("primary", "") if isinstance(tax.get("narrative_plot"), dict) else "")
+
+    # ── 1. Catalyst (Inciting Incident) ──
+    catalyst = None
+    if re.search(r"reincarnat|past life|previous life|reborn|truck-kun|isekai", context):
+        if re.search(r"villainess|otome|death flag|game world|heroine", context):
+            catalyst = "Villainess Subversion Reincarnation"
+        elif re.search(r"noble|prince|duke|aristocrat|emperor|royal|count|baron|marquis|lineage", context):
+            catalyst = "Reincarnation into Imperial Nobility"
+        elif re.search(r"strongest|cheat|overpower|blessed|birth|prodigy|baby", context):
+            catalyst = "Overpowered Rebirth & Prodigy"
+        else:
+            catalyst = "Otherworldly Reincarnation"
+    elif re.search(r"transmigrat|possessed|body snatch", context):
+        if re.search(r"villainess|otome|death flag", context):
+            catalyst = "Transmigration into Otome Fate"
+        elif re.search(r"noble|prince|aristocrat|duke", context):
+            catalyst = "Transmigration into High Nobility"
+        else:
+            catalyst = "Otherworldly Transmigration"
+    elif re.search(r"regress|turn back time|second chance|return to the past|time loop|died and returned|redo", context):
+        catalyst = "Regression & Second Chance"
+    elif re.search(r"summoned|summoning circle|hero summoning|transported to|another world|portal", context):
+        catalyst = "Otherworldly Hero Summoning"
+    elif re.search(r"system|status window|level up|awakened|awakening|hunter rank|quest notification", context):
+        catalyst = "System Interface & Status Awakening"
+    elif re.search(r"betray|exiled|banished|framed|backstab|poisoned|abandoned by", context):
+        catalyst = "Betrayal & Fall from Grace"
+    elif re.search(r"magic academy|academy entrance|dormitory|enrolled|grimoire|ancient relic|hidden talent", context):
+        catalyst = "Hidden Heritage & Academy Enrollment"
+    elif re.search(r"murder|crime|detective|investigat|corpse|slain", context):
+        catalyst = "Murder Mystery & Investigation"
+    elif re.search(r"qi|cultivat|sect|dantian|meridian|martial arts|wuxia|xianxia", context):
+        catalyst = "Cultivation Initiation & Meridian Awakening"
+
+    # Fallback to taxonomy if keyword not found
+    if not catalyst:
+        if "Isekai & Regression" in inc_tax or "Isekai" in inc_tax:
+            catalyst = "Otherworldly Reincarnation"
+        elif "Summoning" in inc_tax:
+            catalyst = "Otherworldly Summoning"
+        elif "Personal Crisis" in inc_tax:
+            catalyst = "Personal Crisis & Awakening"
+        elif "Supernatural Awakening" in inc_tax:
+            catalyst = "Supernatural Awakening"
+        elif inc_tax:
+            catalyst = f"{inc_tax} Spark"
+        elif p_genre:
+            catalyst = f"{p_genre} Narrative Spark"
+        else:
+            catalyst = "Premise Inciting Spark"
+
+    # ── 2. Setting (Worldbuilding & Atmosphere) ──
+    setting = None
+    if re.search(r"palace|empire|emperor|empress|grand duke|noble|crown prince|aristocrat|royal court|duchy|nobility", context):
+        if re.search(r"otome|villainess", context):
+            setting = "Otome Aristocratic Empire"
+        else:
+            setting = "High Fantasy Imperial Court & Aristocracy"
+    elif re.search(r"villainess|otome|death flag|broken engagement", context):
+        setting = "Otome Aristocratic Empire"
+    elif re.search(r"kingdom|feudal|manor|peasant|knight|medieval|castle|lord", context):
+        setting = "Feudal Aristocratic Kingdom"
+    elif re.search(r"dungeon|gate|hunter|monster break|seoul|tokyo|skyscrapers|guild master|raid", context):
+        setting = "Urban Fantasy & Monster Gates"
+    elif re.search(r"dungeon|tower|labyrinth|monster floor", context):
+        setting = "Subterranean Dungeon Labyrinth"
+    elif re.search(r"qi|cultivat|sect|dantian|meridian|martial arts|wuxia|xianxia|elder|soaring sword|murim|jianghu", context):
+        setting = "Cultivation Sects & Martial World"
+    elif re.search(r"academy|mana|spell|sorcery|archmage|elemental|guild|dragon|enchanted forest", context):
+        setting = "High Magic Academy & Sorcery Realm"
+    elif re.search(r"cyber|neon|implant|megacorp|starship|galaxy|android|colony|post-apocalyptic", context):
+        setting = "Dystopian Sci-Fi Frontier"
+    elif re.search(r"village|pastoral|countryside|farm|tavern|shop|slow life", context):
+        setting = "Pastoral Countryside & Frontier Town"
+    elif re.search(r"historical|dynasty|shogunate|samurai|edo|feudal japan", context):
+        setting = "Historical Dynastic Era"
+
+    # Fallback to taxonomy/territory
+    if not setting:
+        if ws_tax and ws_tax != "Isekai" and ws_tax != "Unknown":
+            setting = f"{ws_tax} World"
+        elif p_genre and p_genre.lower() != "isekai" and p_genre.lower() != "unknown":
+            setting = f"High Fantasy {p_genre} Realm"
+        elif "Web Novel" in territory or "Light Novel" in territory:
+            setting = "High Fantasy Kingdoms & Empire"
+        elif territory and territory != "Unknown":
+            setting = f"{territory} Setting"
+        else:
+            setting = "High Fantasy Kingdoms & Empire"
+
+    # ── 3. Conflict (Stakes & Tension) ──
+    conflict = None
+    if re.search(r"villainess|death flag|ruin|broken engagement|execution|exile", context):
+        conflict = "Subverting Doom & Aristocratic Ruin"
+    elif re.search(r"succession|throne|intrigue|faction|conspiracy|court politics|power struggle|noble rivalry", context):
+        conflict = "Imperial Succession & Factional Politics"
+    elif re.search(r"strongest|power from birth|blessed|overpower|cheat|unrivaled|god-level", context):
+        conflict = "Imperial Succession & Concealing Overpowered Might"
+    elif re.search(r"civil war|war|rebellion|battlefield|invader|conquest|territory", context):
+        conflict = "Territorial Warfare & Kingdom Building"
+    elif re.search(r"revenge|avenge|payback|retribution|destroy them|sworn enemy|blood debt", context):
+        conflict = "Vengeance & Retributive Justice"
+    elif re.search(r"survival|death game|boss monster|calamity|apocalypse|catastrophe|extinction", context):
+        conflict = "Cataclysmic Survival & Dungeon Conquest"
+    elif re.search(r"romance|fiance|engagement|marriage|love interest|harem|otome", context):
+        conflict = "Romantic Intrigue & Social Maneuvering"
+    elif re.search(r"cultivat|sect|breakthrough|ascension|tribulation|dao", context):
+        conflict = "Sect Rivalries & Heavenly Dao Ascension"
+    elif re.search(r"mystery|crime|murder|culprit|detective|investigation", context):
+        conflict = "Unmasking Conspiracies & Solving Murders"
+    elif re.search(r"slow life|cooking|peace|comfort|farming|relax", context):
+        conflict = "Pastoral Slow-Life & Cozy Complications"
+
+    # Fallback to narrative_plot taxonomy
+    if not conflict:
+        if plot_tax == "Romance":
+            conflict = "Court Romance & Social Stakes"
+        elif plot_tax == "Action / Adventure":
+            conflict = "Frontier Exploration & High-Stakes Combat"
+        elif plot_tax == "Comedy":
+            conflict = "Farcical Misunderstandings & Chaotic Schemes"
+        elif plot_tax == "Drama":
+            conflict = "Interpersonal Strife & Moral Dilemmas"
+        elif plot_tax == "Mystery":
+            conflict = "Solving Conspiracies & Occult Secrets"
+        elif plot_tax == "Slice of Life":
+            conflict = "Pastoral Life & Everyday Stakes"
+        elif plot_tax == "Supernatural":
+            conflict = "Supernatural Mysteries & Occult Threats"
+        elif plot_tax and plot_tax != "Fantasy":
+            conflict = f"{plot_tax} & High-Stakes Dramatic Tension"
+        elif p_genre:
+            conflict = f"Imperial Ambitions & {p_genre} Conflict"
+        else:
+            conflict = "Character Growth & Core Conflict"
+
+    # ── 4. Tropes Extraction ──
+    tropes = []
+    if tags:
+        tropes.extend([t.strip() for t in tags.split(",") if t.strip()])
+        
+    trope_patterns = [
+        ("Overpowered Protagonist", r"overpower|cheat|supreme|unrivaled|god-level|strongest"),
+        ("Hidden Identity", r"hide.*power|secret identity|disguise|unassuming|conceal"),
+        ("Cold Aristocrat", r"cold duke|tyrant|calculat|emotionless|noble"),
+        ("System Interface", r"status window|system notification|quest|level up"),
+        ("Time Reversal", r"regress|return to past|second chance|do-over"),
+        ("Reincarnation", r"reincarnat|past life|salaryman|reborn|isekai"),
+        ("Found Family", r"companion|comrade|trusted ally|found family"),
+        ("Academy Life", r"classroom|exam|dormitory|fellow student|professor|academy"),
+        ("Dungeon Raid", r"dungeon|boss monster|raid|loot|mana core"),
+        ("Political Intrigue", r"conspiracy|faction|noble court|scheming|treason|succession"),
+        ("Villainess Route", r"villainess|otome|broken engagement|death flag"),
+        ("Kingdom Building", r"territory|governance|kingdom building|domain|tax"),
+    ]
+    for trope_name, pat in trope_patterns:
+        if re.search(pat, context):
+            tropes.append(trope_name)
 
     # Deduplicate tropes while preserving order
     seen_tropes = set()
@@ -790,9 +867,13 @@ def _infer_query_anatomy(query_text: Optional[str], query_semantic: Optional[dic
         if t_clean and t_clean.lower() not in seen_tropes:
             seen_tropes.add(t_clean.lower())
             cleaned_tropes.append(t_clean)
-            
-    anatomy["tropes"] = cleaned_tropes
-    return anatomy
+
+    return {
+        "catalyst": catalyst,
+        "setting": setting,
+        "conflict": conflict,
+        "tropes": cleaned_tropes
+    }
 
 
 def _generate_narrative_synthesis(q_anat: dict, c_anat: dict, s_sim: float, g_sim: float, is_user_input: bool) -> str:
@@ -802,10 +883,10 @@ def _generate_narrative_synthesis(q_anat: dict, c_anat: dict, s_sim: float, g_si
     """
     q_cat = q_anat.get("catalyst", "Premise Inciting Spark")
     c_cat = c_anat.get("catalyst", "Premise Inciting Spark")
-    q_set = q_anat.get("setting", "Immersive Narrative Realm")
-    c_set = c_anat.get("setting", "Immersive Narrative Realm")
-    q_con = q_anat.get("conflict", "High-Stakes Narrative Tension")
-    c_con = c_anat.get("conflict", "High-Stakes Narrative Tension")
+    q_set = q_anat.get("setting", "High Fantasy Continent & Kingdoms")
+    c_set = c_anat.get("setting", "High Fantasy Continent & Kingdoms")
+    q_con = q_anat.get("conflict", "Character Growth & Core Conflict")
+    c_con = c_anat.get("conflict", "Character Growth & Core Conflict")
 
     if is_user_input:
         if q_cat.lower() == c_cat.lower() or q_cat.lower() in c_cat.lower() or c_cat.lower() in q_cat.lower():
@@ -858,7 +939,7 @@ def _compute_4pillar_breakdown(
 
     # 1. Catalyst Score & Explanation
     cat_match = q_cat.lower() == c_cat.lower() or (q_cat.lower() in c_cat.lower()) or (c_cat.lower() in q_cat.lower())
-    cat_score = max(0.50, min(0.98, s_sim * 0.7 + (0.28 if cat_match else 0.12)))
+    cat_score = max(0.55, min(0.98, s_sim * 0.7 + (0.28 if cat_match else 0.12)))
     if cat_match:
         cat_exp = f"Shared premise anchor: Both narratives launch from a {q_cat} foundation."
     else:
@@ -866,15 +947,15 @@ def _compute_4pillar_breakdown(
 
     # 2. Setting Score & Explanation
     set_match = q_set.lower() == c_set.lower() or (q_set.lower() in c_set.lower()) or (c_set.lower() in q_set.lower())
-    set_score = max(0.48, min(0.98, g_sim * 0.65 + (0.32 if set_match else 0.15)))
+    set_score = max(0.52, min(0.98, g_sim * 0.65 + (0.32 if set_match else 0.15)))
     if set_match:
         set_exp = f"Parallel worldbuilding: Richly realized {q_set} atmosphere and socio-political hierarchy."
     else:
         set_exp = f"Thematic atmospheric resonance: Translates {q_set} environmental motifs to a {c_set} landscape."
 
-    # 3. Conflict Score & Explanation
+    # 3. Conflict Stakes & Explanation
     con_match = q_con.lower() == c_con.lower() or (q_con.lower() in c_con.lower()) or (c_con.lower() in q_con.lower())
-    con_score = max(0.48, min(0.98, s_sim * 0.6 + (0.32 if con_match else 0.15)))
+    con_score = max(0.52, min(0.98, s_sim * 0.6 + (0.32 if con_match else 0.15)))
     if con_match:
         con_exp = f"Matching dramatic stakes: Central friction revolves around {q_con}."
     else:
@@ -886,11 +967,28 @@ def _compute_4pillar_breakdown(
     q_asl = q_m.get("avg_sentence_len", 12.0)
     c_asl = c_m.get("avg_sentence_len", 12.0)
     
-    q_style_val = f"{'Dialogue-Dense' if q_dlg > 60 else 'Narrative-Dense'} ({q_dlg:.0f}%), {q_asl:.1f} w/s"
-    c_style_val = f"{'Dialogue-Dense' if c_dlg > 60 else 'Narrative-Dense'} ({c_dlg:.0f}%), {c_asl:.1f} w/s"
+    # Generate descriptive cadence strings
+    def _format_cadence(dlg: float, asl: float) -> str:
+        if dlg > 65:
+            d_desc = f"Dialogue-Driven Pacing ({dlg:.0f}%)"
+        elif dlg >= 45:
+            d_desc = f"Balanced Narrative Flow ({dlg:.0f}%)"
+        else:
+            d_desc = f"Exposition-Dense ({dlg:.0f}%)"
+            
+        if asl < 10.0:
+            a_desc = f"Snappy Beats ({asl:.1f} w/s)"
+        elif asl <= 15.0:
+            a_desc = f"Fluid Mid-Tempo ({asl:.1f} w/s)"
+        else:
+            a_desc = f"Layered Cadence ({asl:.1f} w/s)"
+        return f"{d_desc}, {a_desc}"
+
+    q_style_val = _format_cadence(q_dlg, q_asl)
+    c_style_val = _format_cadence(c_dlg, c_asl)
     
     if sty_sim >= 0.85:
-        sty_exp = "Strikingly congruent prose cadence, dynamic rhythm, and scene velocity."
+        sty_exp = "Strikingly congruent prose cadence, dynamic dialogue rhythm, and scene velocity."
     elif sty_sim >= 0.70:
         sty_exp = "Comparable dialogue-to-exposition pacing and structural sentence cadence."
     else:
