@@ -3268,19 +3268,43 @@ import { ClientRouter } from 'astro:transitions';
                     ${['catalyst', 'setting', 'conflict', 'style_cadence'].map(pKey => {
                       const p = m.narrative_reasoning.pillars[pKey];
                       if (!p) return '';
-                      const titles = {
-                        catalyst: "Inciting Incident / Catalyst",
-                        setting: "Worldbuilding / Setting",
-                        conflict: "Core Conflict / Stakes",
-                        style_cadence: "Prose Style / Cadence"
-                      };
+                      const meta = {
+                        catalyst: { icon: "⚡", title: "Premise & Inciting Catalyst", color: "linear-gradient(90deg, #818cf8, #a78bfa)" },
+                        setting: { icon: "🏰", title: "World Setting & Atmosphere", color: "linear-gradient(90deg, #38bdf8, #67e8f9)" },
+                        conflict: { icon: "⚔️", title: "Conflict Stakes & Tension", color: "linear-gradient(90deg, #f43f5e, #fb7185)" },
+                        style_cadence: { icon: "✍️", title: "Prose Voice & Cadence", color: "linear-gradient(90deg, #34d399, #6ee7b7)" }
+                      }[pKey] || { icon: "🔹", title: pKey, color: "#a78bfa" };
+
+                      const scorePct = Math.round((p.score || 0) * 100);
+                      const qVal = p.query_val || p.value || 'N/A';
+                      const cVal = p.cand_val || p.value || 'N/A';
+
                       return `
                         <div class="pillar-card">
                           <div class="pillar-card-header">
-                            <strong>${p.name || titles[pKey] || pKey}</strong>
-                            <span class="pillar-score-badge">${Math.round(p.score * 100)}%</span>
+                            <div class="pillar-title-group">
+                              <span class="pillar-icon">${meta.icon}</span>
+                              <strong>${p.name || meta.title}</strong>
+                            </div>
+                            <span class="pillar-score-badge">${scorePct}%</span>
                           </div>
-                          <div class="pillar-mapping">${p.query_val || p.value || ''} → ${p.cand_val || p.value || ''}</div>
+                          
+                          <div class="pillar-score-bar-bg">
+                            <div class="pillar-score-bar-fill" style="width: ${scorePct}%; background: ${meta.color};"></div>
+                          </div>
+
+                          <div class="pillar-mapping-container">
+                            <div class="pillar-capsule" title="Your Prose: ${qVal}">
+                              <span class="capsule-label">Your Prose</span>
+                              <span class="capsule-value">${qVal}</span>
+                            </div>
+                            <span class="pillar-arrow">➔</span>
+                            <div class="pillar-capsule" title="Matched Novel: ${cVal}">
+                              <span class="capsule-label">Matched Novel</span>
+                              <span class="capsule-value">${cVal}</span>
+                            </div>
+                          </div>
+
                           <p class="pillar-desc">${p.explanation}</p>
                         </div>
                       `;
