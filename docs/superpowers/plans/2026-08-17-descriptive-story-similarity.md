@@ -176,17 +176,17 @@ git commit -m "feat(frontend): render narrative synthesis and 4-pillar alignment
 - Verify: `tests/`
 - Verify: `frontend/`
 
-- [ ] **Step 1: Run full backend test suite**
+- [x] **Step 1: Run full backend test suite**
 
 Run: `./.venv/bin/pytest`
 Expected: 100% tests passing.
 
-- [ ] **Step 2: Test live API endpoints**
+- [x] **Step 2: Test live API endpoints**
 
 Run: `curl -s http://localhost:8000/api/novels/1/stats | jq '.top_matches[0].narrative_reasoning'`
 Verify: Contains narrative synthesis, pillars, and shared tropes.
 
-- [ ] **Step 3: Final Commit**
+- [x] **Step 3: Final Commit**
 
 ```bash
 git commit --allow-empty -m "chore: completed and verified descriptive story similarity engine"
