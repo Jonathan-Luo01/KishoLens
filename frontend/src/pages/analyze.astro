@@ -3206,7 +3206,7 @@ import { ClientRouter } from 'astro:transitions';
                   ${m.author ? `<span class="doppelganger-author">${m.author}</span>` : ''}
                   <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
                     <span class="doppelganger-badge">${topGenres}</span>
-                    ${hasComparisons ? `
+                    ${hasComparisons || m.narrative_reasoning ? `
                       <button type="button" class="doppelganger-why-btn" data-drawer-id="doppelganger-drawer-${m.id}" aria-expanded="false">
                         Story & Style Breakdown <span class="why-chevron">▾</span>
                       </button>
@@ -3251,53 +3251,99 @@ import { ClientRouter } from 'astro:transitions';
               </div>
             </div>
 
-            ${hasComparisons ? `
+            ${hasComparisons || m.narrative_reasoning ? `
               <div id="doppelganger-drawer-${m.id}" class="doppelganger-drawer" style="display: none;">
-                <div style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-                  <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #a78bfa; margin-bottom: 4px;">
-                    Story & Thematic Anatomy (85% Ranking Weight)
+                ${m.narrative_reasoning?.narrative_synthesis ? `
+                  <div class="narrative-synthesis-box">
+                    <div class="synthesis-tag">📖 Narrative Synthesis</div>
+                    <p class="synthesis-text">"${m.narrative_reasoning.narrative_synthesis}"</p>
                   </div>
-                  <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 0.75rem; color: var(--color-muted);">
-                    <span><strong>Premise Alignment:</strong> ${Math.round((m.breakdown?.semantic || 0) * 100)}%</span>
-                    <span>•</span>
-                    <span><strong>Genre & Setting:</strong> ${Math.round((m.breakdown?.genre || 0) * 100)}%</span>
-                    <span>•</span>
-                    <span><strong>Trope Overlap:</strong> ${Math.round((m.breakdown?.tags || 0) * 100)}%</span>
-                  </div>
-                </div>
+                ` : ''}
 
-                <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #38bdf8; margin-bottom: 6px;">
-                  Forensic Stylometry & Cadence (15% Tiebreaker Weight)
-                </div>
-                <div class="metric-compare-header">
-                  <span class="metric-col metric-col-name">Style Metric</span>
-                  <span class="metric-col metric-col-query">Your Prose</span>
-                  <span class="metric-col metric-col-target">Matched Work</span>
-                  <span class="metric-col metric-col-match">Alignment</span>
-                </div>
-                <div class="metric-compare-table">
-                  ${m.metric_comparisons.map(comp => {
-                    const matchNum = parseInt(comp.match, 10) || 0;
-                    const barColor = matchNum >= 90
-                      ? (isLight ? '#0284c7' : '#38bdf8')
-                      : matchNum >= 75
-                        ? (isLight ? '#7c3aed' : '#a78bfa')
-                        : (isLight ? '#d97706' : '#fbbf24');
-                    return `
-                      <div class="metric-compare-row">
-                        <div class="metric-col metric-col-name">${comp.metric}</div>
-                        <div class="metric-col metric-col-query">${comp.query}</div>
-                        <div class="metric-col metric-col-target">${comp.candidate}</div>
-                        <div class="metric-col metric-col-match">
-                          <span class="metric-match-pct">${comp.match}</span>
-                          <div class="metric-compare-bar-bg">
-                            <div class="metric-compare-bar" style="width: ${matchNum}%; background-color: ${barColor};"></div>
+                ${m.narrative_reasoning?.pillars ? `
+                  <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #a78bfa; margin-bottom: 4px; margin-top: 12px;">
+                    4-Pillar Narrative Alignment (85% Ranking Weight)
+                  </div>
+                  <div class="pillars-grid">
+                    ${['catalyst', 'setting', 'conflict', 'style_cadence'].map(pKey => {
+                      const p = m.narrative_reasoning.pillars[pKey];
+                      if (!p) return '';
+                      const titles = {
+                        catalyst: "Inciting Incident / Catalyst",
+                        setting: "Worldbuilding / Setting",
+                        conflict: "Core Conflict / Stakes",
+                        style_cadence: "Prose Style / Cadence"
+                      };
+                      return `
+                        <div class="pillar-card">
+                          <div class="pillar-card-header">
+                            <strong>${titles[pKey] || pKey}</strong>
+                            <span class="pillar-score-badge">${Math.round(p.score * 100)}%</span>
+                          </div>
+                          <div class="pillar-mapping">${p.query_val} → ${p.cand_val}</div>
+                          <p class="pillar-desc">${p.explanation}</p>
+                        </div>
+                      `;
+                    }).join('')}
+                  </div>
+                ` : `
+                  <div style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+                    <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #a78bfa; margin-bottom: 4px;">
+                      Story & Thematic Anatomy (85% Ranking Weight)
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 0.75rem; color: var(--color-muted);">
+                      <span><strong>Premise Alignment:</strong> ${Math.round((m.breakdown?.semantic || 0) * 100)}%</span>
+                      <span>•</span>
+                      <span><strong>Genre & Setting:</strong> ${Math.round((m.breakdown?.genre || 0) * 100)}%</span>
+                      <span>•</span>
+                      <span><strong>Trope Overlap:</strong> ${Math.round((m.breakdown?.tags || 0) * 100)}%</span>
+                    </div>
+                  </div>
+                `}
+
+                ${m.narrative_reasoning?.shared_tropes?.length ? `
+                  <div class="shared-tropes-section" style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+                    <span class="tropes-label" style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--color-muted); display: block; margin-bottom: 6px;">🏷️ Shared Tropes & Motifs:</span>
+                    <div class="tropes-list" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                      ${m.narrative_reasoning.shared_tropes.map(t => `<span class="shared-trope-chip">${t}</span>`).join('')}
+                    </div>
+                  </div>
+                ` : ''}
+
+                ${hasComparisons ? `
+                  <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #38bdf8; margin-bottom: 6px;">
+                    Forensic Stylometry & Cadence (15% Tiebreaker Weight)
+                  </div>
+                  <div class="metric-compare-header">
+                    <span class="metric-col metric-col-name">Style Metric</span>
+                    <span class="metric-col metric-col-query">Your Prose</span>
+                    <span class="metric-col metric-col-target">Matched Work</span>
+                    <span class="metric-col metric-col-match">Alignment</span>
+                  </div>
+                  <div class="metric-compare-table">
+                    ${m.metric_comparisons.map(comp => {
+                      const matchNum = parseInt(comp.match, 10) || 0;
+                      const barColor = matchNum >= 90
+                        ? (isLight ? '#0284c7' : '#38bdf8')
+                        : matchNum >= 75
+                          ? (isLight ? '#7c3aed' : '#a78bfa')
+                          : (isLight ? '#d97706' : '#fbbf24');
+                      return `
+                        <div class="metric-compare-row">
+                          <div class="metric-col metric-col-name">${comp.metric}</div>
+                          <div class="metric-col metric-col-query">${comp.query}</div>
+                          <div class="metric-col metric-col-target">${comp.candidate}</div>
+                          <div class="metric-col metric-col-match">
+                            <span class="metric-match-pct">${comp.match}</span>
+                            <div class="metric-compare-bar-bg">
+                              <div class="metric-compare-bar" style="width: ${matchNum}%; background-color: ${barColor};"></div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    `;
-                  }).join('')}
-                </div>
+                      `;
+                    }).join('')}
+                  </div>
+                ` : ''}
               </div>
             ` : ''}
           `;
