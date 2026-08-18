@@ -17,3 +17,5 @@ frontend/node_modules
 docs/
 notebooks/
 scratch/
+data/*.db
+data/kisholens.db

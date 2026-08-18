@@ -194,14 +194,19 @@ def health_check():
 @app.get("/api/novels")
 def get_novels():
     try:
-        with Session(engine) as session:
-            stmt = (
-                select(Novel, func.count(Chapter.id).label("chapter_count"))
-                .outerjoin(Chapter, Novel.id == Chapter.novel_id)
-                .group_by(Novel.id)
-            )
-            results = session.exec(stmt).all()
+        results = []
+        try:
+            with Session(engine) as session:
+                stmt = (
+                    select(Novel, func.count(Chapter.id).label("chapter_count"))
+                    .outerjoin(Chapter, Novel.id == Chapter.novel_id)
+                    .group_by(Novel.id)
+                )
+                results = session.exec(stmt).all()
+        except Exception:
+            results = []
 
+        if results:
             return [
                 {
                     "id": novel.id,
@@ -214,6 +219,22 @@ def get_novels():
                 }
                 for novel, chapter_count in results
             ]
+        
+        # Fallback to pre-computed stats cache if SQLite database is not present in container
+        if _cached_novel_stats:
+            return [
+                {
+                    "id": nid,
+                    "title": stats.get("title", f"Novel #{nid}"),
+                    "author": stats.get("author", "Unknown Author"),
+                    "source": "cache",
+                    "chapter_count": stats.get("en_sentence_count", 1) or 1,
+                    "genre": stats.get("genre", ""),
+                    "territory": stats.get("territory", "Unknown"),
+                }
+                for nid, stats in _cached_novel_stats.items()
+            ]
+        return []
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -225,22 +246,25 @@ def get_novels():
 def get_db_stats():
     """Returns database overview statistics including total novels, source counts, territory counts, and genre breakdown."""
     try:
-        with Session(engine) as session:
-            novels = session.exec(select(Novel)).all()
-            total_novels = len(novels)
+        novels = []
+        try:
+            with Session(engine) as session:
+                novels = session.exec(select(Novel)).all()
+        except Exception:
+            novels = []
 
+        genres_list = [
+            "Action / Adventure", "Comedy", "Drama", "Fantasy", "Horror",
+            "Historical", "Sci-Fi", "Philosophy", "Mystery", "Tragedy",
+            "Supernatural", "Poetry", "Romance", "Slice of Life",
+            "Cultivation", "Isekai", "Progression Fantasy"
+        ]
+
+        if novels:
+            total_novels = len(novels)
             by_source = {}
             by_territory = {}
-            by_genre = {}
-
-            genres_list = [
-                "Action / Adventure", "Comedy", "Drama", "Fantasy", "Horror",
-                "Historical", "Sci-Fi", "Philosophy", "Mystery", "Tragedy",
-                "Supernatural", "Poetry", "Romance", "Slice of Life",
-                "Cultivation", "Isekai", "Progression Fantasy"
-            ]
-            for g in genres_list:
-                by_genre[g] = 0
+            by_genre = {g: 0 for g in genres_list}
 
             for novel in novels:
                 raw_src = novel.source or "unknown"
@@ -259,8 +283,37 @@ def get_db_stats():
                 "total_novels": total_novels,
                 "by_source": by_source,
                 "by_territory": by_territory,
-                "by_genre": by_genre
+                "by_genre": by_genre,
             }
+
+        # Fallback to pre-computed stats cache
+        if _cached_novel_stats:
+            total_novels = len(_cached_novel_stats)
+            by_source = {"web novel": 0, "gutenberg": 0}
+            by_territory = {}
+            by_genre = {g: 0 for g in genres_list}
+
+            for stats in _cached_novel_stats.values():
+                terr = stats.get("territory") or "Web Novel Territory"
+                by_territory[terr] = by_territory.get(terr, 0) + 1
+                if "Classic" in terr:
+                    by_source["gutenberg"] += 1
+                else:
+                    by_source["web novel"] += 1
+
+                n_g = (stats.get("genre") or "").lower()
+                for g in genres_list:
+                    if g.lower() in n_g:
+                        by_genre[g] += 1
+
+            return {
+                "total_novels": total_novels,
+                "by_source": by_source,
+                "by_territory": by_territory,
+                "by_genre": by_genre,
+            }
+
+        return {"total_novels": 0, "by_source": {}, "by_territory": {}, "by_genre": {}}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
