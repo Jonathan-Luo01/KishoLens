@@ -1,15 +1,17 @@
 """
-embeddings.py — Dual-scope vector generation for KishoLens.
+embeddings.py — Dual-scope vector generation for KishoLens with Hugging Face Inference API support.
 """
 
 from __future__ import annotations
-from typing import Optional, Tuple
+import os
 import threading
 from typing import Optional, Tuple, Dict, Any
 import numpy as np
 
 _model_cache: Dict[str, Any] = {}
 _model_lock = threading.Lock()
+
+HF_INFERENCE_URL = "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2"
 
 
 def get_transformer_model(model_name: str = "all-MiniLM-L6-v2"):
@@ -31,9 +33,43 @@ def _normalize(vec: np.ndarray) -> np.ndarray:
     return (vec / norm).astype(np.float32)
 
 
+def _embed_via_huggingface(text: str, token: str) -> Optional[np.ndarray]:
+    """Call Hugging Face Serverless Inference API for feature extraction."""
+    try:
+        import httpx
+        headers = {"Authorization": f"Bearer {token}"}
+        payload = {
+            "inputs": text.strip()[:2000],
+            "options": {"wait_for_model": True}
+        }
+        with httpx.Client(timeout=10.0) as client:
+            resp = client.post(HF_INFERENCE_URL, headers=headers, json=payload)
+            if resp.status_code == 200:
+                data = resp.json()
+                if isinstance(data, list) and len(data) > 0:
+                    if isinstance(data[0], list):
+                        vec = np.array(data[0], dtype=np.float32)
+                    else:
+                        vec = np.array(data, dtype=np.float32)
+                    if vec.shape == (384,):
+                        return _normalize(vec)
+    except Exception as e:
+        print(f"[WARN] Hugging Face Inference API failed: {e}. Falling back to local SentenceTransformer.")
+    return None
+
+
 def embed_single_text(text: str) -> np.ndarray:
     if not text or not text.strip():
         return np.zeros(384, dtype=np.float32)
+    
+    # 1. Check if Hugging Face API token is provided in environment
+    hf_token = os.getenv("HUGGINGFACE_API_TOKEN") or os.getenv("HF_TOKEN")
+    if hf_token:
+        hf_vec = _embed_via_huggingface(text, hf_token)
+        if hf_vec is not None:
+            return hf_vec
+
+    # 2. Fall back to local SentenceTransformer model
     model = get_transformer_model()
     vec = model.encode(text.strip(), convert_to_numpy=True)
     return _normalize(vec.astype(np.float32))
