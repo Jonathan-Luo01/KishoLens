@@ -15,11 +15,12 @@ R2_BUCKET_NAME = os.getenv("R2_BUCKET_NAME", "kisholens-data")
 
 DEFAULT_SYNC_FILES = [
     "stats_cache.json",
-    "novels_metadata.json",
-    "arc_cache.json",
     "vector_cache.json",
+    "arc_cache.json",
+    "genre_centroids.npy",
+    "genre_centroids_meta.json",
     "territory_centroids.npy",
-    "genre_centroids.npz",
+    "territory_centroids_meta.json",
 ]
 
 
