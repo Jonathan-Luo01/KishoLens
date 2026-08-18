@@ -29,6 +29,7 @@ from kisholens.ml.features import (
 from kisholens.ml.semantic_match import match_semantic
 from kisholens.ml.sentiment_arc import compute_kishotenketsu_quantile_arc
 from kisholens.ml.similarity import find_top_matches
+from kisholens.storage.r2 import sync_from_r2
 
 DATA_CACHE_PATH = "data/stats_cache.json"
 VECTOR_CACHE_PATH = "data/vector_cache.json"
@@ -36,6 +37,9 @@ ARC_CACHE_PATH = "data/arc_cache.json"
 
 _cached_novel_stats: Dict[int, Any] = {}
 _cached_novel_arcs: Dict[int, Any] = {}
+
+# Sync any missing caches from Cloudflare R2 if configured
+sync_from_r2()
 
 def _load_disk_cache():
     if os.path.exists(DATA_CACHE_PATH):
@@ -166,10 +170,14 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="KishoLens API", lifespan=lifespan)
 
-# Add CORS middleware so the Astro frontend can fetch data
+# Add CORS middleware so the Astro frontend (Cloudflare Pages, GitHub Pages, localhost) can fetch data
+cors_env = os.getenv("CORS_ORIGINS")
+origins = [o.strip() for o in cors_env.split(",") if o.strip()] if cors_env else ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4321", "http://127.0.0.1:4321"],
+    allow_origins=origins,
+    allow_origin_regex=r"https://.*\.pages\.dev|https://.*\.github\.io|http://localhost:.*|http://127\.0\.0\.1:.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

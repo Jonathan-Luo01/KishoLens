@@ -1985,7 +1985,7 @@ import { ClientRouter } from 'astro:transitions';
     </div>
 
     <script>
-      const API_URL = "http://127.0.0.1:8000";
+      const API_URL = (import.meta.env && import.meta.env.PUBLIC_API_URL) || "http://127.0.0.1:8000";
       let lastAnalysisData = null;
       let currentStats = null;
       let currentArc   = null;
