@@ -3134,6 +3134,13 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
           populateNovelDropdown();
           renderGenreCheckboxes();
           filterNovels();
+
+          // Restore previously selected novel across page switches
+          const savedId = sessionStorage.getItem("library_selected_novel_id");
+          const savedTitle = sessionStorage.getItem("library_selected_novel_title");
+          if (savedId && savedTitle) {
+            selectNovel(parseInt(savedId), savedTitle);
+          }
         } catch (err) {
           console.error("Error fetching novels from API:", err);
           document.getElementById("novels-container").innerHTML = `
@@ -4004,6 +4011,11 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
           if (stats.top_matches) {
             renderSimilarNovels(stats.top_matches);
           }
+
+          try {
+            sessionStorage.setItem("library_selected_novel_id", id.toString());
+            sessionStorage.setItem("library_selected_novel_title", title);
+          } catch (e) {}
 
         } catch (err) {
           if (loadId !== currentLoadId) return;
