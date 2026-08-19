@@ -3127,11 +3127,8 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         renderGenreCheckboxes(); // Render checkboxes immediately on page load
         fetchDbStats();
         try {
-          let res = await fetch(`${API_URL}/api/novels`).catch(() => null);
-          if (!res || !res.ok) {
-            res = await fetch("/api/novels");
-          }
-          if (!res.ok) throw new Error("Failed to fetch novels");
+          const res = await fetch(`${API_URL}/api/novels`);
+          if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to fetch novels`);
           allNovels = await res.json();
 
           populateNovelDropdown();
