@@ -4253,37 +4253,41 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
             if (rawVal !== undefined && rawVal !== null) {
               return norm(rawVal, d.min, d.max);
             }
-            return 0.5;
+            return 0.0;
           });
-          plotPolygon(
-            userVals,
-            `rgba(${userRgb}, ${userOpacityStroke})`,
-            `rgba(${userRgb}, ${userOpacityFill})`
-          );
 
-          /* Dot on each axis */
-          userVals.forEach((v, i) => {
-            const isHovered = hoveredIndex === i;
-            const angle = (2 * Math.PI * i / n) - Math.PI / 2;
-            const r = R * Math.max(0, Math.min(1, v));
-            ctx.beginPath();
-            
-            if (isHovered) {
-              ctx.shadowBlur = 8;
-              ctx.shadowColor = userColor;
-              ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 6, 0, 2 * Math.PI);
-              ctx.fillStyle = userColor;
-              ctx.fill();
-              ctx.strokeStyle = isLight ? "#ffffff" : "rgba(255,255,255,0.95)";
-              ctx.lineWidth = 2.5;
-              ctx.stroke();
-              ctx.shadowBlur = 0;
-            } else {
-              ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 3.5, 0, 2 * Math.PI);
-              ctx.fillStyle = hasHover ? `rgba(${userRgb}, 0.4)` : userColor;
-              ctx.fill();
-            }
-          });
+          const hasUserData = userVals.some(v => v > 0);
+          if (hasUserData) {
+            plotPolygon(
+              userVals,
+              `rgba(${userRgb}, ${userOpacityStroke})`,
+              `rgba(${userRgb}, ${userOpacityFill})`
+            );
+
+            /* Dot on each axis */
+            userVals.forEach((v, i) => {
+              const isHovered = hoveredIndex === i;
+              const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+              const r = R * Math.max(0, Math.min(1, v));
+              ctx.beginPath();
+              
+              if (isHovered) {
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = userColor;
+                ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 6, 0, 2 * Math.PI);
+                ctx.fillStyle = userColor;
+                ctx.fill();
+                ctx.strokeStyle = isLight ? "#ffffff" : "rgba(255,255,255,0.95)";
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+              } else {
+                ctx.arc(cx + r * Math.cos(angle), cy + r * Math.sin(angle), 3.5, 0, 2 * Math.PI);
+                ctx.fillStyle = hasHover ? `rgba(${userRgb}, 0.4)` : userColor;
+                ctx.fill();
+              }
+            });
+          }
 
           if (hasHover) {
             const blVal = blVals[hoveredIndex];
