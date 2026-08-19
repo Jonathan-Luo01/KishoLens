@@ -38,9 +38,23 @@ DATA_CACHE_PATH = "data/stats_cache.json"
 STATS_DB_PATH = "data/stats_cache.sqlite"
 VECTOR_CACHE_PATH = "data/vector_cache.json"
 ARC_CACHE_PATH = "data/arc_cache.json"
+NOVELS_METADATA_PATH = "data/novels_metadata.json"
 
 _cached_novel_stats: Dict[int, Any] = {}
 _cached_novel_arcs: Dict[int, Any] = {}
+_cached_novels_metadata: Dict[int, Any] = {}
+
+
+def _load_novels_metadata():
+    global _cached_novels_metadata
+    if os.path.exists(NOVELS_METADATA_PATH):
+        try:
+            with open(NOVELS_METADATA_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                _cached_novels_metadata = {int(k): v for k, v in data.items()}
+            print(f"[CACHE] Loaded {len(_cached_novels_metadata)} novel metadata records from {NOVELS_METADATA_PATH}.")
+        except Exception as e:
+            print(f"[CACHE WARN] Could not load novels metadata: {e}")
 
 
 def _get_stats_db_conn():
@@ -185,6 +199,7 @@ def _save_novel_to_vector_cache(novel_id: int, title: str, author: str, genre: s
         print(f"[CACHE WARN] Could not save vector cache entry: {e}")
 
 # Immediately load pre-computed disk caches upon module import
+_load_novels_metadata()
 _load_disk_cache()
 _load_arc_disk_cache()
 _load_vector_disk_cache()
@@ -217,6 +232,9 @@ def health_check():
 @app.get("/api/novels")
 def get_novels():
     try:
+        if _cached_novels_metadata:
+            return list(_cached_novels_metadata.values())
+
         results = []
         try:
             with Session(engine) as session:
@@ -304,19 +322,45 @@ def get_novels():
 def get_db_stats():
     """Returns database overview statistics including total novels, source counts, territory counts, and genre breakdown."""
     try:
-        novels = []
-        try:
-            with Session(engine) as session:
-                novels = session.exec(select(Novel)).all()
-        except Exception:
-            novels = []
-
         genres_list = [
             "Action / Adventure", "Comedy", "Drama", "Fantasy", "Horror",
             "Historical", "Sci-Fi", "Philosophy", "Mystery", "Tragedy",
             "Supernatural", "Poetry", "Romance", "Slice of Life",
             "Cultivation", "Isekai", "Progression Fantasy"
         ]
+
+        if _cached_novels_metadata:
+            total_novels = len(_cached_novels_metadata)
+            by_source = {}
+            by_territory = {}
+            by_genre = {g: 0 for g in genres_list}
+
+            for v in _cached_novels_metadata.values():
+                raw_src = v.get("source") or "unknown"
+                src = raw_src.split("/")[0].lower() if "/" in raw_src else raw_src.lower()
+                by_source[src] = by_source.get(src, 0) + 1
+
+                terr = v.get("territory") or ("Classic Literature Territory" if src == "gutenberg" else "Web Novel Territory")
+                by_territory[terr] = by_territory.get(terr, 0) + 1
+
+                n_g = (v.get("genre") or "").lower()
+                for g in genres_list:
+                    if g.lower() in n_g:
+                        by_genre[g] += 1
+
+            return {
+                "total_novels": total_novels,
+                "by_source": by_source,
+                "by_territory": by_territory,
+                "by_genre": by_genre,
+            }
+
+        novels = []
+        try:
+            with Session(engine) as session:
+                novels = session.exec(select(Novel)).all()
+        except Exception:
+            novels = []
 
         if novels:
             total_novels = len(novels)
