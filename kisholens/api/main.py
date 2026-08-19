@@ -59,12 +59,7 @@ def _load_novels_metadata():
 
 def _get_stats_db_conn():
     if not os.path.exists(STATS_DB_PATH):
-        if not os.path.exists(DATA_CACHE_PATH):
-            sync_from_r2()
-        if os.path.exists(DATA_CACHE_PATH):
-            _build_sqlite_stats_cache()
-        else:
-            return None
+        return None
     try:
         return sqlite3.connect(STATS_DB_PATH, check_same_thread=False)
     except Exception as e:
