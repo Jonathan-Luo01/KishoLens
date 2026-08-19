@@ -283,7 +283,22 @@ engine = get_engine()
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "service": "kisholens"}
+    db_count = 0
+    if _compact_stats_conn:
+        try:
+            cur = _compact_stats_conn.cursor()
+            cur.execute("SELECT count(*) FROM novel_stats")
+            db_count = cur.fetchone()[0]
+        except Exception:
+            db_count = -1
+    return {
+        "status": "ok",
+        "service": "kisholens",
+        "novels_metadata_count": len(_cached_novels_metadata),
+        "compact_db_ready": _compact_stats_conn is not None and db_count > 0,
+        "compact_db_count": db_count,
+        "compact_db_path": _resolve_path(STATS_COMPACT_DB_PATH),
+    }
 
 
 @app.get("/api/novels")

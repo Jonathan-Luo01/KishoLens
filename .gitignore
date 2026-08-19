@@ -18,11 +18,10 @@ env/
 .DS_Store
 Thumbs.db
 
-# Data — raw scraped text and 200MB+ large files (hosted in R2)
+# Large raw archive files (hosted in R2)
 data/raw_cache/
-data/*.db
-data/*.sqlite
-!data/novel_stats.sqlite
+data/kisholens.db
+data/stats_cache.sqlite
 data/stats_cache.json
 scratch/
 
