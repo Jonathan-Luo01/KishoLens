@@ -197,15 +197,11 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="KishoLens API", lifespan=lifespan)
 
-# Add CORS middleware so the Astro frontend (Cloudflare Pages, GitHub Pages, localhost) can fetch data
-cors_env = os.getenv("CORS_ORIGINS")
-origins = [o.strip() for o in cors_env.split(",") if o.strip()] if cors_env else ["*"]
-
+# Add fully open CORS middleware so Cloudflare Pages and any web client can fetch data without restriction
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_origin_regex=r"https://.*\.pages\.dev|https://.*\.github\.io|http://localhost:.*|http://127\.0\.0\.1:.*",
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
