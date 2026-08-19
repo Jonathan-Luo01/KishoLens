@@ -1,0 +1,40 @@
+{
+  "genres": [
+    "Action / Adventure",
+    "Comedy",
+    "Romance",
+    "Drama",
+    "Fantasy",
+    "Horror",
+    "Historical",
+    "Sci-Fi",
+    "Philosophy",
+    "Mystery",
+    "Tragedy",
+    "Supernatural",
+    "Poetry",
+    "Slice of Life",
+    "Cultivation",
+    "Isekai",
+    "Progression Fantasy"
+  ],
+  "samples_used": {
+    "Action / Adventure": 87,
+    "Comedy": 16,
+    "Romance": 57,
+    "Drama": 49,
+    "Fantasy": 50,
+    "Horror": 100,
+    "Historical": 41,
+    "Sci-Fi": 93,
+    "Philosophy": 44,
+    "Mystery": 90,
+    "Tragedy": 8,
+    "Supernatural": 8,
+    "Poetry": 59,
+    "Slice of Life": 100,
+    "Cultivation": 100,
+    "Isekai": 100,
+    "Progression Fantasy": 0
+  }
+}

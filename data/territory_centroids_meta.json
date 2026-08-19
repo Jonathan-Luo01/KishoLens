@@ -1,0 +1,10 @@
+{
+  "territories": [
+    "Classic Literature Territory",
+    "Web Novel Territory"
+  ],
+  "samples_used": {
+    "Classic Literature Territory": 347,
+    "Web Novel Territory": 300
+  }
+}

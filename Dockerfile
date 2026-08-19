@@ -31,9 +31,6 @@ COPY kisholens/ ./kisholens/
 COPY data/ ./data/
 COPY pyproject.toml .
 
-# Pre-build lightweight SQLite cache during docker build so container starts with <50MB RAM
-RUN python -c "from kisholens.api.main import _build_sqlite_stats_cache; _build_sqlite_stats_cache()"
-
 EXPOSE 8080
 
 # Run uvicorn on dynamically bound $PORT for Google Cloud Run
