@@ -14,6 +14,7 @@ R2_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY")
 R2_BUCKET_NAME = os.getenv("R2_BUCKET_NAME", "kisholens-data")
 
 DEFAULT_SYNC_FILES = [
+    "novels_metadata.json",
     "stats_cache.sqlite",
     "stats_cache.json",
     "vector_cache.json",
@@ -39,7 +40,7 @@ def get_r2_client():
             endpoint_url=endpoint_url,
             aws_access_key_id=R2_ACCESS_KEY_ID,
             aws_secret_access_key=R2_SECRET_ACCESS_KEY,
-            config=Config(signature_version="s3v4"),
+            config=Config(signature_version="s3v4", max_pool_connections=10),
             region_name="auto",
         )
     except Exception as e:
@@ -71,8 +72,26 @@ def sync_from_r2(target_dir: str = "data", files: Optional[List[str]] = None) ->
     return success_count > 0
 
 
+class UploadProgressCallback:
+    def __init__(self, filename: str, total_bytes: int):
+        self.filename = filename
+        self.total_bytes = total_bytes
+        self.uploaded_bytes = 0
+        self.last_percent = -1
+
+    def __call__(self, bytes_transferred: int):
+        self.uploaded_bytes += bytes_transferred
+        if self.total_bytes > 0:
+            percent = int((self.uploaded_bytes / self.total_bytes) * 100)
+            if percent != self.last_percent and percent % 10 == 0:
+                self.last_percent = percent
+                mb = self.uploaded_bytes / (1024 * 1024)
+                tot_mb = self.total_bytes / (1024 * 1024)
+                print(f"  [{self.filename}] Uploading... {percent}% ({mb:.1f} / {tot_mb:.1f} MB)")
+
+
 def upload_file_to_r2(local_path: str, remote_filename: Optional[str] = None) -> bool:
-    """Upload a local data file to Cloudflare R2."""
+    """Upload a local data file to Cloudflare R2 with multipart progress tracking."""
     client = get_r2_client()
     if not client:
         print("[R2 ERROR] Missing R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, or R2_SECRET_ACCESS_KEY.")
@@ -83,10 +102,12 @@ def upload_file_to_r2(local_path: str, remote_filename: Optional[str] = None) ->
         return False
 
     dest_key = remote_filename or os.path.basename(local_path)
+    file_size = os.path.getsize(local_path)
     try:
-        print(f"[R2] Uploading {local_path} to {R2_BUCKET_NAME}/{dest_key}...")
-        client.upload_file(local_path, R2_BUCKET_NAME, dest_key)
-        print(f"[R2] Successfully uploaded {dest_key}.")
+        print(f"[R2] Uploading {local_path} ({file_size / (1024*1024):.2f} MB) to {R2_BUCKET_NAME}/{dest_key}...")
+        callback = UploadProgressCallback(dest_key, file_size)
+        client.upload_file(local_path, R2_BUCKET_NAME, dest_key, Callback=callback)
+        print(f"[R2] ✅ Successfully uploaded {dest_key}.")
         return True
     except Exception as e:
         print(f"[R2 ERROR] Failed to upload {dest_key}: {e}")
