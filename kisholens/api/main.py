@@ -61,6 +61,7 @@ def _get_stats_db_conn():
 def _build_sqlite_stats_cache():
     if not os.path.exists(DATA_CACHE_PATH):
         return
+    import gc
     try:
         print(f"[CACHE] Indexing {DATA_CACHE_PATH} into lightweight SQLite database {STATS_DB_PATH}...")
         conn = sqlite3.connect(STATS_DB_PATH)
@@ -72,10 +73,14 @@ def _build_sqlite_stats_cache():
             (int(k), v.get("title", ""), v.get("author", ""), v.get("genre", ""), v.get("territory", ""), json.dumps(v))
             for k, v in stats_data.items()
         ]
+        del stats_data
+        gc.collect()
         cursor.executemany("INSERT OR REPLACE INTO stats VALUES (?, ?, ?, ?, ?, ?)", rows)
         conn.commit()
         conn.close()
-        print(f"[CACHE] Successfully indexed {len(rows)} novels into SQLite cache.")
+        del rows
+        gc.collect()
+        print(f"[CACHE] Successfully indexed novels into SQLite cache.")
     except Exception as e:
         print(f"[CACHE WARN] Could not build SQLite cache from JSON: {e}")
 
