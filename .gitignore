@@ -21,6 +21,7 @@ Thumbs.db
 # Data — raw scraped text must never be committed (copyright)
 data/raw_cache/
 data/*.db
+data/*.sqlite
 data/*.npy
 data/*_meta.json
 data/*_cache.json

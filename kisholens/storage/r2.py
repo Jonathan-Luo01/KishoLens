@@ -14,6 +14,7 @@ R2_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY")
 R2_BUCKET_NAME = os.getenv("R2_BUCKET_NAME", "kisholens-data")
 
 DEFAULT_SYNC_FILES = [
+    "stats_cache.sqlite",
     "stats_cache.json",
     "vector_cache.json",
     "arc_cache.json",

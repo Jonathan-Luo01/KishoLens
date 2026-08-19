@@ -18,4 +18,5 @@ docs/
 notebooks/
 scratch/
 data/*.db
+data/*.sqlite
 data/kisholens.db

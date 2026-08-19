@@ -31,7 +31,10 @@ from kisholens.ml.sentiment_arc import compute_kishotenketsu_quantile_arc
 from kisholens.ml.similarity import find_top_matches
 from kisholens.storage.r2 import sync_from_r2
 
+import sqlite3
+
 DATA_CACHE_PATH = "data/stats_cache.json"
+STATS_DB_PATH = "data/stats_cache.sqlite"
 VECTOR_CACHE_PATH = "data/vector_cache.json"
 ARC_CACHE_PATH = "data/arc_cache.json"
 
@@ -41,16 +44,48 @@ _cached_novel_arcs: Dict[int, Any] = {}
 # Sync any missing caches from Cloudflare R2 if configured
 sync_from_r2()
 
+
+def _get_stats_db_conn():
+    if not os.path.exists(STATS_DB_PATH):
+        if os.path.exists(DATA_CACHE_PATH):
+            _build_sqlite_stats_cache()
+        else:
+            return None
+    try:
+        return sqlite3.connect(STATS_DB_PATH, check_same_thread=False)
+    except Exception as e:
+        print(f"[CACHE ERROR] Could not connect to SQLite stats DB: {e}")
+        return None
+
+
+def _build_sqlite_stats_cache():
+    if not os.path.exists(DATA_CACHE_PATH):
+        return
+    try:
+        print(f"[CACHE] Indexing {DATA_CACHE_PATH} into lightweight SQLite database {STATS_DB_PATH}...")
+        conn = sqlite3.connect(STATS_DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("CREATE TABLE IF NOT EXISTS stats (id INTEGER PRIMARY KEY, title TEXT, author TEXT, genre TEXT, territory TEXT, data TEXT)")
+        with open(DATA_CACHE_PATH, "r", encoding="utf-8") as f:
+            stats_data = json.load(f)
+        rows = [
+            (int(k), v.get("title", ""), v.get("author", ""), v.get("genre", ""), v.get("territory", ""), json.dumps(v))
+            for k, v in stats_data.items()
+        ]
+        cursor.executemany("INSERT OR REPLACE INTO stats VALUES (?, ?, ?, ?, ?, ?)", rows)
+        conn.commit()
+        conn.close()
+        print(f"[CACHE] Successfully indexed {len(rows)} novels into SQLite cache.")
+    except Exception as e:
+        print(f"[CACHE WARN] Could not build SQLite cache from JSON: {e}")
+
+
 def _load_disk_cache():
+    if os.path.exists(STATS_DB_PATH):
+        print(f"[CACHE] Connected to lightweight SQLite index at {STATS_DB_PATH} (< 5MB RAM).")
+        return
     if os.path.exists(DATA_CACHE_PATH):
-        try:
-            with open(DATA_CACHE_PATH, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                for k, v in data.items():
-                    _cached_novel_stats[int(k)] = v
-            print(f"[CACHE] Loaded {len(_cached_novel_stats)} pre-computed novel stats from disk cache.")
-        except Exception as e:
-            print(f"[CACHE WARN] Could not load disk cache: {e}")
+        _build_sqlite_stats_cache()
 
 def _save_disk_cache():
     if not _cached_novel_stats:
@@ -225,7 +260,26 @@ def get_novels():
                 for novel, chapter_count in results
             ]
         
-        # Fallback to pre-computed stats cache if SQLite database is not present in container
+        # Fallback to SQLite stats cache if raw SQLite table is not populated
+        conn = _get_stats_db_conn()
+        if conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT id, title, author, genre, territory FROM stats")
+            rows = cursor.fetchall()
+            if rows:
+                return [
+                    {
+                        "id": r[0],
+                        "title": r[1] or f"Novel #{r[0]}",
+                        "author": r[2] or "Unknown Author",
+                        "source": "cache",
+                        "chapter_count": 1,
+                        "genre": r[3] or "",
+                        "territory": r[4] or "Unknown",
+                    }
+                    for r in rows
+                ]
+
         if _cached_novel_stats:
             return [
                 {
@@ -291,32 +345,37 @@ def get_db_stats():
                 "by_genre": by_genre,
             }
 
-        # Fallback to pre-computed stats cache
-        if _cached_novel_stats:
-            total_novels = len(_cached_novel_stats)
-            by_source = {"web novel": 0, "gutenberg": 0}
-            by_territory = {}
-            by_genre = {g: 0 for g in genres_list}
+        # Query from SQLite stats cache
+        conn = _get_stats_db_conn()
+        if conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT genre, territory FROM stats")
+            rows = cursor.fetchall()
+            if rows:
+                total_novels = len(rows)
+                by_source = {"web novel": 0, "gutenberg": 0}
+                by_territory = {}
+                by_genre = {g: 0 for g in genres_list}
 
-            for stats in _cached_novel_stats.values():
-                terr = stats.get("territory") or "Web Novel Territory"
-                by_territory[terr] = by_territory.get(terr, 0) + 1
-                if "Classic" in terr:
-                    by_source["gutenberg"] += 1
-                else:
-                    by_source["web novel"] += 1
+                for genre_val, terr_val in rows:
+                    terr = terr_val or "Web Novel Territory"
+                    by_territory[terr] = by_territory.get(terr, 0) + 1
+                    if "Classic" in terr:
+                        by_source["gutenberg"] += 1
+                    else:
+                        by_source["web novel"] += 1
 
-                n_g = (stats.get("genre") or "").lower()
-                for g in genres_list:
-                    if g.lower() in n_g:
-                        by_genre[g] += 1
+                    n_g = (genre_val or "").lower()
+                    for g in genres_list:
+                        if g.lower() in n_g:
+                            by_genre[g] += 1
 
-            return {
-                "total_novels": total_novels,
-                "by_source": by_source,
-                "by_territory": by_territory,
-                "by_genre": by_genre,
-            }
+                return {
+                    "total_novels": total_novels,
+                    "by_source": by_source,
+                    "by_territory": by_territory,
+                    "by_genre": by_genre,
+                }
 
         return {"total_novels": 0, "by_source": {}, "by_territory": {}, "by_genre": {}}
     except Exception as e:
@@ -449,6 +508,19 @@ def get_novel_stats(novel_id: int):
             stats["similarity_version"] = SIMILARITY_MODEL_VERSION
             _save_disk_cache()
         return stats
+
+    # Fast query from lightweight SQLite stats index
+    conn = _get_stats_db_conn()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT data FROM stats WHERE id = ?", (novel_id,))
+            row = cursor.fetchone()
+            if row and row[0]:
+                return json.loads(row[0])
+        except Exception as e:
+            print(f"[CACHE WARN] SQLite query error for novel {novel_id}: {e}")
+
     try:
         with Session(engine) as session:
             novel = session.get(Novel, novel_id)
