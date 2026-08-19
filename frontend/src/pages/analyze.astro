@@ -1,10 +1,16 @@
 ---
 import "../styles/global.css";
 import { ClientRouter } from 'astro:transitions';
+const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
 ---
 
 <html lang="en">
   <head>
+    <script is:inline define:vars={{ publicApiUrl }}>
+      if (publicApiUrl) {
+        window.__PUBLIC_API_URL__ = publicApiUrl;
+      }
+    </script>
     <script is:inline>
       (function() {
         function getTheme() {
@@ -1985,7 +1991,7 @@ import { ClientRouter } from 'astro:transitions';
     </div>
 
     <script>
-      const API_URL = (import.meta.env && import.meta.env.PUBLIC_API_URL) || "http://127.0.0.1:8000";
+      const API_URL = (typeof window !== "undefined" && window.__PUBLIC_API_URL__) || (import.meta.env && import.meta.env.PUBLIC_API_URL) || "http://127.0.0.1:8000";
       let lastAnalysisData = null;
       let currentStats = null;
       let currentArc   = null;
