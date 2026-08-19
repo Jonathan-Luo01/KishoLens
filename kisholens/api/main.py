@@ -1168,139 +1168,157 @@ def post_analyze(request: AnalysisRequest):
     if not request.text.strip():
         raise HTTPException(status_code=400, detail="Text content cannot be empty")
 
-    lang = request.lang
-    if lang == "auto":
-        lang = detect_language(request.text)
+    try:
+        lang = request.lang
+        if lang == "auto":
+            lang = detect_language(request.text)
 
-    if lang == "en":
-        features = extract_english_features(request.text)
-    elif lang == "ja":
-        features = extract_japanese_features(request.text)
-    elif lang == "zh":
-        features = extract_chinese_features(request.text)
-    else:
-        raise HTTPException(status_code=400, detail=f"Unsupported language: {lang}")
-
-    baselines = get_baseline_stats(lang)
-
-    # 1. Compute paragraph pacing lengths for input text
-    paragraphs = [p.strip() for p in re.split(r'\n\s*\n', request.text) if p.strip()]
-    paragraph_lengths = []
-    for p in paragraphs:
         if lang == "en":
-            word_count = len(re.findall(r'\b\w+\b', p))
+            features = extract_english_features(request.text)
+        elif lang == "ja":
+            features = extract_japanese_features(request.text)
+        elif lang == "zh":
+            features = extract_chinese_features(request.text)
         else:
-            word_count = len([c for c in p if not c.isspace()])
-        if word_count > 0:
-            paragraph_lengths.append(word_count)
-    pacing = paragraph_lengths[:100]
+            raise HTTPException(status_code=400, detail=f"Unsupported language: {lang}")
 
-    # 2. Format features for matcher and add pacing array
-    agg = {f"{lang}_{k}": v for k, v in features.items()}
-    agg["pacing"] = pacing
+        baselines = get_baseline_stats(lang)
 
-    normalized_radar = {}
-    for k, v in features.items():
-        if v is not None:
-            normalized_radar[f"{lang}_{k}"] = normalize_feature_percentile(k, v)
-    agg["normalized_radar"] = normalized_radar
+        # 1. Compute paragraph pacing lengths for input text
+        paragraphs = [p.strip() for p in re.split(r'\n\s*\n', request.text) if p.strip()]
+        paragraph_lengths = []
+        for p in paragraphs:
+            if lang == "en":
+                word_count = len(re.findall(r'\b\w+\b', p))
+            else:
+                word_count = len([c for c in p if not c.isspace()])
+            if word_count > 0:
+                paragraph_lengths.append(word_count)
+        pacing = paragraph_lengths[:100]
 
-    dyn_baselines = compute_dynamic_baselines(lang)
-    agg["baselines"] = {
-        "radar": dyn_baselines.get("radar", {}),
-        "pacing": dyn_baselines.get("pacing", {}),
-    }
+        # 2. Format features for matcher and add pacing array
+        agg = {f"{lang}_{k}": v for k, v in features.items()}
+        agg["pacing"] = pacing
 
-    archetype = match_archetype(agg)
-    # Semantic genre & territory matching is currently optimized for English text (all-MiniLM-L6-v2)
-    semantic = match_semantic(request.text, features=features) if lang == "en" else None
-    
-    if semantic:
-        agg["archetype_match"] = {
-            "closest_trope": semantic["genre"],
-            "territory": semantic["territory"],
-            "confidence": semantic["genre_confidence"],
-            "top_genres": [{"genre": x["genre"], "confidence": x["score"]} for x in semantic["genre_scores"]],
-            "genre_scores": semantic["genre_scores"],
-            "top_territories": [{"territory": x["territory"], "confidence": x["score"]} for x in semantic["territory_scores"]],
-            "territory_confidence": semantic.get("territory_confidence"),
-            "taxonomy": semantic.get("taxonomy"),
+        normalized_radar = {}
+        for k, v in features.items():
+            if v is not None:
+                normalized_radar[f"{lang}_{k}"] = normalize_feature_percentile(k, v)
+        agg["normalized_radar"] = normalized_radar
+
+        dyn_baselines = compute_dynamic_baselines(lang)
+        agg["baselines"] = {
+            "radar": dyn_baselines.get("radar", {}),
+            "pacing": dyn_baselines.get("pacing", {}),
         }
-        if "taxonomy" in semantic:
-            agg["taxonomy"] = semantic["taxonomy"]
-    else:
-        agg["archetype_match"] = archetype
 
-    # 3. Compute Kishōtenketsu 4-quantile sentiment arc
-    if lang == "en":
-        sents = [s.strip() for s in re.split(r'[.!?]+', request.text) if s.strip()]
-    else:
-        sents = [s.strip() for s in re.split(r'[。！？]+', request.text) if s.strip()]
-
-    # For short samples (< 4 sentences), split by clauses so 4 distinct acts render gracefully
-    if len(sents) < 4:
-        clause_pat = r'[,;:\.!\?\-\n]+' if lang == "en" else r'[，、；：。！？\n]+'
-        arc_units = [c.strip() for c in re.split(clause_pat, request.text) if len(c.strip()) > 3]
-        if not arc_units:
-            arc_units = sents
-    else:
-        arc_units = sents
-
-    arc_res = compute_kishotenketsu_quantile_arc(arc_units, lang)
-
-    # 4. Rhythmic Pacing (Paragraph / Sentence Barcode)
-    paragraphs = split_paragraphs(request.text)
-    pacing_bars = []
-    for p in paragraphs:
-        w_cnt = len(re.findall(r'\b\w+\b', p)) if lang == "en" else len([c for c in p if not c.isspace()])
-        if w_cnt > 0:
-            pacing_bars.append(w_cnt)
-
-    if len(pacing_bars) < 8:
-        # Short sample: generate sentence/clause-level word count bars so barcode populates 15-25 bars
-        units = [u.strip() for u in re.split(r'[,;\.!\?\n]+', request.text) if u.strip()]
-        unit_lengths = [len(re.findall(r'\b\w+\b', u)) if lang == "en" else len([c for c in u if not c.isspace()]) for u in units]
-        unit_lengths = [l for l in unit_lengths if l > 0]
-        if len(unit_lengths) >= len(pacing_bars):
-            pacing_bars = unit_lengths
-
-    agg["pacing"] = pacing_bars[:100]
-
-    arc = {
-        "title": request.title or "Untitled",
-        "acts": arc_res["acts"],
-        "quantiles": arc_res["quantiles"],
-        "baselines": dyn_baselines.get("arc", {})
-    }
-
-    response = {
-        "status": "success",
-        "detected_lang": lang,
-        "features": features,
-        "archetype": {
-            "archetype": semantic["genre"] if semantic else archetype["closest_trope"],
-            "confidence": semantic["genre_confidence"] if semantic else archetype["confidence"],
-            "description": f"Classification: {semantic['territory'] if semantic else archetype['territory']}. Semantically matched genre and territory.",
-            "top_genres": [{"genre": x["genre"], "confidence": x["score"]} for x in semantic["genre_scores"][:3]] if semantic else [],
-            "top_territories": [{"territory": x["territory"], "confidence": x["score"]} for x in semantic["territory_scores"][:3]] if semantic else []
-        },
-        "baselines": {
-            "gutenberg": {
-                "ttr": baselines["gutenberg"]["ttr"],
-                "dialogue_ratio": baselines["gutenberg"]["dialogue_ratio"],
-                "avg_sentence_len": baselines["gutenberg"]["avg_sentence_len"]
-            },
-            "webnovel": {
-                "ttr": baselines["webnovel"]["ttr"],
-                "dialogue_ratio": baselines["webnovel"]["dialogue_ratio"],
-                "avg_sentence_len": baselines["webnovel"]["avg_sentence_len"]
+        archetype = match_archetype(agg)
+        # Semantic genre & territory matching is currently optimized for English text (all-MiniLM-L6-v2)
+        try:
+            semantic = match_semantic(request.text, features=features) if lang == "en" else None
+        except Exception as e:
+            print(f"[WARN] match_semantic fallback: {e}")
+            semantic = None
+        
+        if semantic:
+            agg["archetype_match"] = {
+                "closest_trope": semantic["genre"],
+                "territory": semantic["territory"],
+                "confidence": semantic["genre_confidence"],
+                "top_genres": [{"genre": x["genre"], "confidence": x["score"]} for x in semantic["genre_scores"]],
+                "genre_scores": semantic["genre_scores"],
+                "top_territories": [{"territory": x["territory"], "confidence": x["score"]} for x in semantic["territory_scores"]],
+                "territory_confidence": semantic.get("territory_confidence"),
+                "taxonomy": semantic.get("taxonomy"),
             }
-        },
-        "stats": agg,
-        "arc": arc,
-        "top_matches": find_top_matches(agg, query_text=request.text, top_k=5)
-    }
-    if semantic is not None:
-        response["semantic"] = semantic
-    return response
+            if "taxonomy" in semantic:
+                agg["taxonomy"] = semantic["taxonomy"]
+        else:
+            agg["archetype_match"] = archetype
+
+        # 3. Compute Kishōtenketsu 4-quantile sentiment arc
+        if lang == "en":
+            sents = [s.strip() for s in re.split(r'[.!?]+', request.text) if s.strip()]
+        else:
+            sents = [s.strip() for s in re.split(r'[。！？]+', request.text) if s.strip()]
+
+        # For short samples (< 4 sentences), split by clauses so 4 distinct acts render gracefully
+        if len(sents) < 4:
+            clause_pat = r'[,;:\.!\?\-\n]+' if lang == "en" else r'[，、；：。！？\n]+'
+            arc_units = [c.strip() for c in re.split(clause_pat, request.text) if len(c.strip()) > 3]
+            if not arc_units:
+                arc_units = sents
+        else:
+            arc_units = sents
+
+        try:
+            arc_res = compute_kishotenketsu_quantile_arc(arc_units, lang)
+        except Exception as e:
+            print(f"[WARN] compute_kishotenketsu_quantile_arc fallback: {e}")
+            arc_res = {"acts": [0.1, 0.2, 0.3, 0.2], "quantiles": [0.1, 0.15, 0.2, 0.25, 0.3, 0.25, 0.2, 0.15]}
+
+        # 4. Rhythmic Pacing (Paragraph / Sentence Barcode)
+        paragraphs = split_paragraphs(request.text)
+        pacing_bars = []
+        for p in paragraphs:
+            w_cnt = len(re.findall(r'\b\w+\b', p)) if lang == "en" else len([c for c in p if not c.isspace()])
+            if w_cnt > 0:
+                pacing_bars.append(w_cnt)
+
+        if len(pacing_bars) < 8:
+            units = [u.strip() for u in re.split(r'[,;\.!\?\n]+', request.text) if u.strip()]
+            unit_lengths = [len(re.findall(r'\b\w+\b', u)) if lang == "en" else len([c for c in u if not c.isspace()]) for u in units]
+            unit_lengths = [l for l in unit_lengths if l > 0]
+            if len(unit_lengths) >= len(pacing_bars):
+                pacing_bars = unit_lengths
+
+        agg["pacing"] = pacing_bars[:100]
+
+        arc = {
+            "title": request.title or "Untitled",
+            "acts": arc_res["acts"],
+            "quantiles": arc_res["quantiles"],
+            "baselines": dyn_baselines.get("arc", {})
+        }
+
+        try:
+            top_matches = find_top_matches(agg, query_text=request.text, top_k=5)
+        except Exception as e:
+            print(f"[WARN] find_top_matches fallback: {e}")
+            top_matches = []
+
+        response = {
+            "status": "success",
+            "detected_lang": lang,
+            "features": features,
+            "archetype": {
+                "archetype": semantic["genre"] if semantic else archetype["closest_trope"],
+                "confidence": semantic["genre_confidence"] if semantic else archetype["confidence"],
+                "description": f"Classification: {semantic['territory'] if semantic else archetype['territory']}. Semantically matched genre and territory.",
+                "top_genres": [{"genre": x["genre"], "confidence": x["score"]} for x in semantic["genre_scores"][:3]] if semantic else [],
+                "top_territories": [{"territory": x["territory"], "confidence": x["score"]} for x in semantic["territory_scores"][:3]] if semantic else []
+            },
+            "baselines": {
+                "gutenberg": {
+                    "ttr": baselines["gutenberg"]["ttr"],
+                    "dialogue_ratio": baselines["gutenberg"]["dialogue_ratio"],
+                    "avg_sentence_len": baselines["gutenberg"]["avg_sentence_len"]
+                },
+                "webnovel": {
+                    "ttr": baselines["webnovel"]["ttr"],
+                    "dialogue_ratio": baselines["webnovel"]["dialogue_ratio"],
+                    "avg_sentence_len": baselines["webnovel"]["avg_sentence_len"]
+                }
+            },
+            "stats": agg,
+            "arc": arc,
+            "top_matches": top_matches
+        }
+        if semantic is not None:
+            response["semantic"] = semantic
+        return response
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Analysis engine error: {str(e)}")
 

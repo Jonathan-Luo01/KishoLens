@@ -11,7 +11,7 @@ import numpy as np
 _model_cache: Dict[str, Any] = {}
 _model_lock = threading.Lock()
 
-HF_INFERENCE_URL = "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2"
+HF_INFERENCE_URL = "https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2"
 
 
 def get_transformer_model(model_name: str = "all-MiniLM-L6-v2"):
@@ -19,6 +19,8 @@ def get_transformer_model(model_name: str = "all-MiniLM-L6-v2"):
     if model_name not in _model_cache:
         with _model_lock:
             if model_name not in _model_cache:
+                import torch
+                torch.set_num_threads(1)
                 from sentence_transformers import SentenceTransformer
                 model = SentenceTransformer(model_name, device="cpu")
                 model.eval()
@@ -53,6 +55,8 @@ def _embed_via_huggingface(text: str, token: str) -> Optional[np.ndarray]:
                         vec = np.array(data, dtype=np.float32)
                     if vec.shape == (384,):
                         return _normalize(vec)
+            else:
+                print(f"[WARN] HF Inference returned status {resp.status_code}: {resp.text[:100]}")
     except Exception as e:
         print(f"[WARN] Hugging Face Inference API failed: {e}. Falling back to local SentenceTransformer.")
     return None
