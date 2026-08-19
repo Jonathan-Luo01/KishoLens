@@ -284,20 +284,20 @@ def embed_texts(
     V_prose = 0.50 * V_A + 0.25 * V_B + 0.25 * V_C
     Returns a (N, 384) float32 numpy array.
     """
-    model = _get_model(model_name)
+    from kisholens.ml.embeddings import embed_single_text
     all_embeddings = []
 
     for t in texts:
         win_a, win_b, win_c = extract_3window_slices(t, words_per_slice=300)
-        slices = [s if s.strip() else "sample prose text" for s in [win_a, win_b, win_c]]
-        v_s = model.encode(slices, convert_to_numpy=True, show_progress_bar=False).astype(np.float32)
-        v_a, v_b, v_c = v_s[0], v_s[1], v_s[2]
+        v_a = embed_single_text(win_a if win_a.strip() else "sample prose text")
+        v_b = embed_single_text(win_b if win_b.strip() else "sample prose text")
+        v_c = embed_single_text(win_c if win_c.strip() else "sample prose text")
 
         v_prose = 0.50 * v_a + 0.25 * v_b + 0.25 * v_c
         norm = np.linalg.norm(v_prose)
         if norm == 0:
             norm = 1.0
-        v_prose = v_prose / norm
+        v_prose = (v_prose / norm).astype(np.float32)
         all_embeddings.append(v_prose)
 
     return np.vstack(all_embeddings).astype(np.float32)

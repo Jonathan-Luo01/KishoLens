@@ -513,10 +513,9 @@ def compute_subplot_diversity(text: str, doc=None, lang: str = "en") -> float:
 
     # 2. Generate embedding vectors for each macro-window using MiniLM
     try:
-        from kisholens.ml.embeddings import get_transformer_model
-        model = get_transformer_model("all-MiniLM-L6-v2")
+        from kisholens.ml.embeddings import embed_single_text
         slices = [w.strip() if w.strip() else "prose text" for w in windows]
-        v_s = model.encode(slices, convert_to_numpy=True, show_progress_bar=False).astype(np.float32)
+        v_s = np.vstack([embed_single_text(s) for s in slices]).astype(np.float32)
 
         norms = np.linalg.norm(v_s, axis=1, keepdims=True)
         norms[norms == 0] = 1.0
