@@ -2663,11 +2663,20 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
           const prefix = Object.keys(stats).find(k => k.startsWith("zh_")) ? "zh_" :
                          Object.keys(stats).find(k => k.startsWith("ja_")) ? "ja_" : "en_";
           const userVals = RADAR_DIMS.map(d => {
-            const statsKey = d.key.replace("en_", prefix);
-            if (stats.normalized_radar && stats.normalized_radar[statsKey] !== undefined) {
-              return stats.normalized_radar[statsKey];
+            const baseKey = d.key.replace(/^en_/, "");
+            const statsKey = `${prefix}${baseKey}`;
+            if (stats.normalized_radar) {
+              if (stats.normalized_radar[statsKey] !== undefined) return stats.normalized_radar[statsKey];
+              if (stats.normalized_radar[baseKey] !== undefined) return stats.normalized_radar[baseKey];
+              if (stats.normalized_radar[`en_${baseKey}`] !== undefined) return stats.normalized_radar[`en_${baseKey}`];
+              if (stats.normalized_radar[`ja_${baseKey}`] !== undefined) return stats.normalized_radar[`ja_${baseKey}`];
+              if (stats.normalized_radar[`zh_${baseKey}`] !== undefined) return stats.normalized_radar[`zh_${baseKey}`];
             }
-            return norm(stats[statsKey] ?? 0, d.min, d.max);
+            const rawVal = stats[statsKey] ?? stats[baseKey] ?? stats[`en_${baseKey}`] ?? stats[`ja_${baseKey}`];
+            if (rawVal !== undefined && rawVal !== null) {
+              return norm(rawVal, d.min, d.max);
+            }
+            return 0.5;
           });
           plotPolygon(
             userVals,
