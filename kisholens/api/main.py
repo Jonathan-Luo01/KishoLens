@@ -39,6 +39,7 @@ STATS_DB_PATH = "data/stats_cache.sqlite"
 VECTOR_CACHE_PATH = "data/vector_cache.json"
 ARC_CACHE_PATH = "data/arc_cache.json"
 NOVELS_METADATA_PATH = "data/novels_metadata.json"
+STATS_COMPACT_DB_PATH = "data/novel_stats.sqlite"
 
 _cached_novel_stats: Dict[int, Any] = {}
 _cached_novel_arcs: Dict[int, Any] = {}
@@ -55,6 +56,22 @@ def _load_novels_metadata():
             print(f"[CACHE] Loaded {len(_cached_novels_metadata)} novel metadata records from {NOVELS_METADATA_PATH}.")
         except Exception as e:
             print(f"[CACHE WARN] Could not load novels metadata: {e}")
+
+
+def _get_novel_stats_from_compact_db(novel_id: int):
+    if os.path.exists(STATS_COMPACT_DB_PATH):
+        try:
+            import gzip
+            conn = sqlite3.connect(STATS_COMPACT_DB_PATH, check_same_thread=False)
+            cur = conn.cursor()
+            cur.execute("SELECT data FROM novel_stats WHERE id = ?", (novel_id,))
+            row = cur.fetchone()
+            conn.close()
+            if row and row[0]:
+                return json.loads(gzip.decompress(row[0]).decode("utf-8"))
+        except Exception as e:
+            print(f"[CACHE WARN] Could not read from compact novel stats DB: {e}")
+    return None
 
 
 def _get_stats_db_conn():
@@ -533,7 +550,12 @@ def get_novel_stats(novel_id: int):
     if novel_id in _cached_novel_stats:
         return _cached_novel_stats[novel_id]
 
-    # Fast query from lightweight SQLite stats index if present
+    # 1. Instant query from compact novel stats database (0.2ms)
+    compact_data = _get_novel_stats_from_compact_db(novel_id)
+    if compact_data:
+        return compact_data
+
+    # 2. Fast query from lightweight SQLite stats index if present
     conn = _get_stats_db_conn()
     if conn:
         try:

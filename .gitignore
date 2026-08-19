@@ -22,6 +22,7 @@ Thumbs.db
 data/raw_cache/
 data/*.db
 data/*.sqlite
+!data/novel_stats.sqlite
 data/stats_cache.json
 scratch/
 
