@@ -90,25 +90,28 @@ def _get_novel_stats_from_compact_db(novel_id: int):
 
 
 def _get_stats_db_conn():
-    if not os.path.exists(STATS_DB_PATH):
+    path = _resolve_path(STATS_DB_PATH)
+    if not os.path.exists(path):
         return None
     try:
-        return sqlite3.connect(STATS_DB_PATH, check_same_thread=False)
+        return sqlite3.connect(path, check_same_thread=False)
     except Exception as e:
-        print(f"[CACHE ERROR] Could not connect to SQLite stats DB: {e}")
+        print(f"[CACHE ERROR] Could not connect to SQLite stats DB at {path}: {e}")
         return None
 
 
 def _build_sqlite_stats_cache():
-    if not os.path.exists(DATA_CACHE_PATH):
+    json_path = _resolve_path(DATA_CACHE_PATH)
+    db_path = _resolve_path(STATS_DB_PATH)
+    if not os.path.exists(json_path):
         return
     import gc
     try:
-        print(f"[CACHE] Indexing {DATA_CACHE_PATH} into lightweight SQLite database {STATS_DB_PATH}...")
-        conn = sqlite3.connect(STATS_DB_PATH)
+        print(f"[CACHE] Indexing {json_path} into lightweight SQLite database {db_path}...")
+        conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         cursor.execute("CREATE TABLE IF NOT EXISTS stats (id INTEGER PRIMARY KEY, title TEXT, author TEXT, genre TEXT, territory TEXT, data TEXT)")
-        with open(DATA_CACHE_PATH, "r", encoding="utf-8") as f:
+        with open(json_path, "r", encoding="utf-8") as f:
             stats_data = json.load(f)
         rows = [
             (int(k), v.get("title", ""), v.get("author", ""), v.get("genre", ""), v.get("territory", ""), json.dumps(v))
@@ -127,10 +130,12 @@ def _build_sqlite_stats_cache():
 
 
 def _load_disk_cache():
-    if os.path.exists(STATS_DB_PATH):
-        print(f"[CACHE] Connected to lightweight SQLite index at {STATS_DB_PATH} (< 5MB RAM).")
+    db_path = _resolve_path(STATS_DB_PATH)
+    if os.path.exists(db_path):
+        print(f"[CACHE] Connected to lightweight SQLite index at {db_path} (< 5MB RAM).")
         return
-    if os.path.exists(DATA_CACHE_PATH):
+    json_path = _resolve_path(DATA_CACHE_PATH)
+    if os.path.exists(json_path):
         _build_sqlite_stats_cache()
 
 def _save_disk_cache():
@@ -138,46 +143,49 @@ def _save_disk_cache():
         print("[CACHE WARN] Refusing to overwrite disk cache with empty dict.")
         return
     try:
+        json_path = _resolve_path(DATA_CACHE_PATH)
         existing = {}
-        if os.path.exists(DATA_CACHE_PATH):
-            with open(DATA_CACHE_PATH, "r", encoding="utf-8") as f:
+        if os.path.exists(json_path):
+            with open(json_path, "r", encoding="utf-8") as f:
                 try:
                     existing = json.load(f)
                 except Exception:
                     existing = {}
         for k, v in _cached_novel_stats.items():
             existing[str(k)] = v
-        with open(DATA_CACHE_PATH, "w", encoding="utf-8") as f:
+        with open(json_path, "w", encoding="utf-8") as f:
             json.dump(existing, f, ensure_ascii=False)
     except Exception as e:
         print(f"[CACHE WARN] Could not save disk cache: {e}")
 
 def _load_arc_disk_cache():
-    if os.path.exists(ARC_CACHE_PATH):
+    path = _resolve_path(ARC_CACHE_PATH)
+    if os.path.exists(path):
         try:
-            with open(ARC_CACHE_PATH, "r", encoding="utf-8") as f:
+            with open(path, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 for k, v in data.items():
                     _cached_novel_arcs[int(k)] = v
             print(f"[CACHE] Loaded {len(_cached_novel_arcs)} pre-computed novel arcs from disk cache.")
         except Exception as e:
-            print(f"[CACHE WARN] Could not load arc disk cache: {e}")
+            print(f"[CACHE WARN] Could not load arc disk cache from {path}: {e}")
 
 def _save_arc_disk_cache():
     if not _cached_novel_arcs:
         print("[CACHE WARN] Refusing to overwrite arc disk cache with empty dict.")
         return
     try:
+        path = _resolve_path(ARC_CACHE_PATH)
         existing = {}
-        if os.path.exists(ARC_CACHE_PATH):
-            with open(ARC_CACHE_PATH, "r", encoding="utf-8") as f:
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
                 try:
                     existing = json.load(f)
                 except Exception:
                     existing = {}
         for k, v in _cached_novel_arcs.items():
             existing[str(k)] = v
-        with open(ARC_CACHE_PATH, "w", encoding="utf-8") as f:
+        with open(path, "w", encoding="utf-8") as f:
             json.dump(existing, f, ensure_ascii=False)
     except Exception as e:
         print(f"[CACHE WARN] Could not save arc disk cache: {e}")
@@ -187,9 +195,10 @@ def _load_vector_disk_cache():
     """Load pre-computed novel feature vectors into similarity._novel_vector_cache."""
     from kisholens.ml.similarity import _novel_vector_cache
     import numpy as np
-    if os.path.exists(VECTOR_CACHE_PATH):
+    path = _resolve_path(VECTOR_CACHE_PATH)
+    if os.path.exists(path):
         try:
-            with open(VECTOR_CACHE_PATH, "r", encoding="utf-8") as f:
+            with open(path, "r", encoding="utf-8") as f:
                 data = json.load(f)
             for k, v in data.items():
                 entry = dict(v)
@@ -197,12 +206,13 @@ def _load_vector_disk_cache():
                 _novel_vector_cache[int(k)] = entry
             print(f"[CACHE] Loaded {len(_novel_vector_cache)} novel vectors from disk vector cache.")
         except Exception as e:
-            print(f"[CACHE WARN] Could not load vector cache: {e}")
+            print(f"[CACHE WARN] Could not load vector cache from {path}: {e}")
 
 def _save_novel_to_vector_cache(novel_id: int, title: str, author: str, genre: str, territory: str, feature_vec):
     """Persist a single novel's vector to the vector cache JSON (incremental save)."""
     from kisholens.ml.similarity import _novel_vector_cache
     import numpy as np
+    path = _resolve_path(VECTOR_CACHE_PATH)
     entry = {
         "id": novel_id,
         "title": title,
@@ -213,14 +223,13 @@ def _save_novel_to_vector_cache(novel_id: int, title: str, author: str, genre: s
         "semantic": None,
     }
     _novel_vector_cache[novel_id] = {**entry, "vector": np.array(entry["vector"], dtype=float)}
-    # Incremental save: update only this novel's entry in the JSON file
     try:
         existing = {}
-        if os.path.exists(VECTOR_CACHE_PATH):
-            with open(VECTOR_CACHE_PATH, "r", encoding="utf-8") as f:
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
                 existing = json.load(f)
         existing[str(novel_id)] = entry
-        with open(VECTOR_CACHE_PATH, "w", encoding="utf-8") as f:
+        with open(path, "w", encoding="utf-8") as f:
             json.dump(existing, f, ensure_ascii=False)
     except Exception as e:
         print(f"[CACHE WARN] Could not save vector cache entry: {e}")
