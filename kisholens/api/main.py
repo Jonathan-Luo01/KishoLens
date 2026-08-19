@@ -44,12 +44,15 @@ STATS_COMPACT_DB_PATH = "data/novel_stats.sqlite"
 _cached_novel_stats: Dict[int, Any] = {}
 _cached_novel_arcs: Dict[int, Any] = {}
 _cached_novels_metadata: Dict[int, Any] = {}
+_compact_stats_conn: Optional[sqlite3.Connection] = None
 
 
 def _resolve_path(filename: str) -> str:
+    from pathlib import Path
+    root_dir = Path(__file__).resolve().parent.parent.parent
     candidates = [
+        str(root_dir / filename),
         filename,
-        os.path.join(os.path.dirname(__file__), "..", "..", filename),
         os.path.join(os.getcwd(), filename),
         os.path.join("/app", filename),
     ]
@@ -72,20 +75,37 @@ def _load_novels_metadata():
             print(f"[CACHE WARN] Could not load novels metadata: {e}")
 
 
-def _get_novel_stats_from_compact_db(novel_id: int):
+def _init_compact_stats_db():
+    global _compact_stats_conn
     path = _resolve_path(STATS_COMPACT_DB_PATH)
     if os.path.exists(path):
         try:
+            _compact_stats_conn = sqlite3.connect(path, check_same_thread=False)
+            cursor = _compact_stats_conn.cursor()
+            cursor.execute("SELECT count(*) FROM novel_stats")
+            count = cursor.fetchone()[0]
+            print(f"[CACHE] Connected to compact SQLite stats DB at {path} ({count} novels ready).")
+        except Exception as e:
+            print(f"[CACHE ERROR] Could not connect to compact SQLite stats DB at {path}: {e}")
+            _compact_stats_conn = None
+    else:
+        print(f"[CACHE WARN] Compact SQLite stats DB not found at {path}")
+
+
+def _get_novel_stats_from_compact_db(novel_id: int):
+    global _compact_stats_conn
+    if _compact_stats_conn is None:
+        _init_compact_stats_db()
+    if _compact_stats_conn is not None:
+        try:
             import gzip
-            conn = sqlite3.connect(path, check_same_thread=False)
-            cur = conn.cursor()
-            cur.execute("SELECT data FROM novel_stats WHERE id = ?", (novel_id,))
-            row = cur.fetchone()
-            conn.close()
+            cursor = _compact_stats_conn.cursor()
+            cursor.execute("SELECT data FROM novel_stats WHERE id = ?", (novel_id,))
+            row = cursor.fetchone()
             if row and row[0]:
                 return json.loads(gzip.decompress(row[0]).decode("utf-8"))
         except Exception as e:
-            print(f"[CACHE WARN] Could not read from compact novel stats DB at {path}: {e}")
+            print(f"[CACHE WARN] Could not fetch novel stats for ID {novel_id}: {e}")
     return None
 
 
@@ -236,6 +256,7 @@ def _save_novel_to_vector_cache(novel_id: int, title: str, author: str, genre: s
 
 # Immediately load pre-computed disk caches upon module import
 _load_novels_metadata()
+_init_compact_stats_db()
 _load_disk_cache()
 _load_arc_disk_cache()
 _load_vector_disk_cache()
