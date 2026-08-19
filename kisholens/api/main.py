@@ -153,15 +153,20 @@ _load_vector_disk_cache()
 async def lifespan(app: FastAPI):
     """Pre-load PyTorch, sentence-transformers, and spaCy models safely before traffic starts."""
     try:
-        print("[WARMUP] Pre-loading spaCy, NLTK VADER, SentenceTransformers, and multi-lingual NLP pipelines...")
+        print("[WARMUP] Pre-loading spaCy, NLTK VADER, and multi-lingual NLP pipelines...")
         _init_nlp_resources()
-        from kisholens.ml.embeddings import get_transformer_model
-        get_transformer_model("all-MiniLM-L6-v2")
+        hf_token = os.getenv("HUGGINGFACE_API_TOKEN") or os.getenv("HF_TOKEN")
+        if not hf_token:
+            from kisholens.ml.embeddings import get_transformer_model
+            get_transformer_model("all-MiniLM-L6-v2")
+        else:
+            print("[WARMUP] Hugging Face Serverless Inference API configured. Skipping local PyTorch model load.")
         sample_en = "This is a generic prose warmup sample for initializing spaCy, VADER, and sentence transformer models."
         extract_english_features(sample_en)
         extract_japanese_features("これはモデルを事前ロードするためのウォームアップテキストです。")
         extract_chinese_features("这是一个用于模型预热的文本示例。")
-        match_semantic(sample_en)
+        if not hf_token:
+            match_semantic(sample_en)
         compute_kishotenketsu_quantile_arc([sample_en, "The story reaches a climax.", "All conflicts are resolved."], lang="en")
         print("[WARMUP] All NLP models & pipeline engines successfully pre-loaded! Ready for any novel or custom input.")
     except Exception as e:
