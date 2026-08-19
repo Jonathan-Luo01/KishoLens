@@ -3135,8 +3135,13 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
           renderGenreCheckboxes();
           filterNovels();
         } catch (err) {
-          console.error("Error fetching novels:", err);
-          document.getElementById("novels-container").innerHTML = `<p class="placeholder-text">Failed to load novels. Ensure backend API is running at ${API_URL}</p>`;
+          console.error("Error fetching novels from API:", err);
+          document.getElementById("novels-container").innerHTML = `
+            <div class="placeholder-box" style="text-align:center; padding: 40px 20px;">
+              <p class="placeholder-text" style="margin-bottom: 12px; color: var(--color-text-muted, #94a3b8);">Unable to connect to the novel library at this time.</p>
+              <button onclick="fetchNovels()" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.85rem; cursor: pointer;">Retry Connection</button>
+            </div>
+          `;
         }
       }
 

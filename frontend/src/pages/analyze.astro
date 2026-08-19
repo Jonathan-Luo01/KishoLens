@@ -2159,9 +2159,13 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
               sessionStorage.setItem("custom_analysis", JSON.stringify(data));
             } catch (e) {}
           } catch (err) {
+            console.error("Analysis submission error:", err);
             if (loadingState) loadingState.style.display = "none";
             if (errorBox) {
-              errorBox.textContent = `Analysis error: ${err.message}`;
+              const msg = err.message === "Failed to fetch"
+                ? "Unable to reach the analysis engine. Please check your network connection or try again in a moment."
+                : `Analysis notice: ${err.message}`;
+              errorBox.textContent = msg;
               errorBox.style.display = "block";
             }
           }
