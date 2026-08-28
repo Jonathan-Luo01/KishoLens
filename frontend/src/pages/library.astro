@@ -56,7 +56,6 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
       body {
         margin: 0;
         padding: 0;
-        background: var(--color-bg);
         color: var(--color-text);
         font-family: var(--font-sans);
         min-height: 100vh;
@@ -76,6 +75,12 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
         gap: 1.75rem;
         align-items: stretch;
+      }
+
+      .explorer-card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
       }
 
       @media (max-width: 950px) {
@@ -133,7 +138,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         flex-direction: column;
         gap: 1.25rem;
         min-width: 0;
-        min-height: 100%;
+        height: fit-content;
         box-sizing: border-box;
       }
 
@@ -146,12 +151,13 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
       }
 
       .explorer-novels-section {
-        flex: 1 1 0;
         display: flex;
         flex-direction: column;
-        min-height: 0;
+        gap: 0.75rem;
         padding-bottom: 0;
         border-bottom: none;
+        flex: 1;
+        justify-content: flex-start;
       }
 
       .explorer-section:last-child {
@@ -355,9 +361,9 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         align-items: center;
         font-size: 11.5px;
         font-weight: 500;
-        color: #c4b5fd;
-        background: rgba(167, 139, 250, 0.10);
-        border: 1px solid rgba(167, 139, 250, 0.28);
+        color: #93c5fd;
+        background: rgba(59, 130, 246, 0.10);
+        border: 1px solid rgba(59, 130, 246, 0.28);
         border-radius: 6px;
         padding: 3px 8px;
         letter-spacing: 0.01em;
@@ -731,22 +737,25 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         min-height: 76px;
         max-height: 76px;
         box-sizing: border-box;
-        background: rgba(255, 255, 255, 0.015);
+        background: rgba(255, 255, 255, 0.03);
         border: 1px solid var(--color-border);
         border-radius: var(--radius);
         padding: 0.65rem 0.95rem;
-        transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
       }
 
       :global(.card-novel:hover) {
-        background: rgba(255, 255, 255, 0.04);
-        border-color: rgba(124, 106, 255, 0.3);
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(59, 130, 246, 0.45);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
       }
 
       :global(.card-novel.active) {
-        background: rgba(124, 106, 255, 0.08);
-        border-color: var(--color-accent);
-        box-shadow: 0 0 15px rgba(124, 106, 255, 0.15);
+        background: rgba(37, 99, 235, 0.14);
+        border-color: #3b82f6;
+        box-shadow: 0 0 20px -4px rgba(37, 99, 235, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.14);
       }
 
       :global(.card__title) {
@@ -754,6 +763,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         font-size: 0.95rem;
         font-weight: 600;
         line-height: 1.3;
+        color: var(--color-text);
       }
 
       :global(.card__meta) {
@@ -780,6 +790,21 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         display: flex;
         flex-direction: column;
         gap: 1.25rem;
+        height: 100%;
+      }
+
+      .db-stats-card {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+      }
+
+      #db-stats-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.95rem;
+        flex: 1;
       }
 
       .stats-content-scroll {
@@ -938,8 +963,8 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         transition: all 0.15s ease;
       }
       :global(.carousel-nav-btn:hover:not(:disabled)) {
-        background: rgba(124, 106, 255, 0.3);
-        border-color: #a78bfa;
+        background: rgba(37, 99, 235, 0.25);
+        border-color: #60a5fa;
         color: #ffffff;
       }
       :global(.carousel-nav-btn:disabled) {
@@ -1017,8 +1042,8 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
       }
 
       :global(.category-group-header.cat-structure) { color: #38bdf8; border-color: rgba(56, 189, 248, 0.25); }
-      :global(.category-group-header.cat-prose)     { color: #a78bfa; border-color: rgba(167, 139, 250, 0.25); }
-      :global(.category-group-header.cat-theme)     { color: #f472b6; border-color: rgba(244, 114, 182, 0.25); }
+      :global(.category-group-header.cat-prose)     { color: #60a5fa; border-color: rgba(96, 165, 250, 0.25); }
+      :global(.category-group-header.cat-theme)     { color: #f59e0b; border-color: rgba(245, 158, 11, 0.25); }
       :global(.category-group-header.cat-pacing)    { color: #34d399; border-color: rgba(52, 211, 153, 0.25); }
 
       :global(.metric-card) {
@@ -1048,8 +1073,8 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         margin-bottom: 0.15rem;
       }
       :global(.metric-card-cat-badge.cat-structure) { background: rgba(56, 189, 248, 0.12); color: #38bdf8; }
-      :global(.metric-card-cat-badge.cat-prose)     { background: rgba(167, 139, 250, 0.12); color: #a78bfa; }
-      :global(.metric-card-cat-badge.cat-theme)     { background: rgba(244, 114, 182, 0.12); color: #f472b6; }
+      :global(.metric-card-cat-badge.cat-prose)     { background: rgba(96, 165, 250, 0.12); color: #60a5fa; }
+      :global(.metric-card-cat-badge.cat-theme)     { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
       :global(.metric-card-cat-badge.cat-pacing)    { background: rgba(52, 211, 153, 0.12); color: #34d399; }
 
       /* Light Theme Overrides */
@@ -1179,8 +1204,8 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
       }
 
       :global(.bar-fill-structure) { background: linear-gradient(90deg, #0284c7, #38bdf8); }
-      :global(.bar-fill-prose)     { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
-      :global(.bar-fill-theme)     { background: linear-gradient(90deg, #db2777, #f472b6); }
+      :global(.bar-fill-prose)     { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+      :global(.bar-fill-theme)     { background: linear-gradient(90deg, #d97706, #f59e0b); }
       :global(.bar-fill-pacing)    { background: linear-gradient(90deg, #059669, #34d399); }
 
       :global(.benchmark-chip) {
@@ -1316,7 +1341,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         width: 100%;
       }
 
-      select#novelSelect:focus { border-color: #a78bfa; }
+      select#novelSelect:focus { border-color: #3b82f6; }
 
       .baseline-group {
         display: flex;
@@ -1349,13 +1374,13 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
 
       .baseline-btn:hover { color: #e2e2f0; border-color: rgba(255,255,255,0.25); }
       .baseline-btn.active[data-baseline="web_novel"] {
-        background: rgba(167,139,250,0.18);
-        border-color: #a78bfa;
-        color: #c4b5fd;
+        background: rgba(37,99,235,0.18);
+        border-color: #3b82f6;
+        color: #93c5fd;
       }
       .baseline-btn.active[data-baseline="classic_lit"] {
-        background: rgba(251,191,36,0.18);
-        border-color: #fbbf24;
+        background: rgba(245,158,11,0.18);
+        border-color: #f59e0b;
         color: #fde68a;
       }
 
@@ -1379,6 +1404,9 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         gap: 1rem;
         position: relative;
         min-width: 0;
+        container-type: inline-size;
+        overflow: hidden;
+        box-sizing: border-box;
       }
 
       .chart-header {
@@ -1405,9 +1433,9 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
 
       .legend-item { display: flex; align-items: center; gap: 0.4rem; }
       .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-      .legend-dot.user { background: #7dd3fc; }
-      .legend-dot.wn { background: #a78bfa; }
-      .legend-dot.baseline { background: #a78bfa; }
+      .legend-dot.user { background: #38bdf8; }
+      .legend-dot.wn { background: #3b82f6; }
+      .legend-dot.baseline { background: #3b82f6; }
 
       #radarChart {
         width: 100%;
@@ -1491,8 +1519,8 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
       :global(.pillar-score) {
         font-size: 0.72rem;
         font-weight: 700;
-        color: #a78bfa;
-        background: rgba(167, 139, 250, 0.12);
+        color: #60a5fa;
+        background: rgba(59, 130, 246, 0.12);
         padding: 0.05rem 0.35rem;
         border-radius: 999px;
       }
@@ -1540,9 +1568,9 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
       }
 
       :global(.genre-affinity-pill.tier-vibrant) {
-        background: rgba(167, 139, 250, 0.14);
-        border: 1px solid rgba(167, 139, 250, 0.4);
-        color: #c4b5fd;
+        background: rgba(59, 130, 246, 0.14);
+        border: 1px solid rgba(59, 130, 246, 0.4);
+        color: #93c5fd;
       }
       :global(.genre-affinity-pill.tier-cyan) {
         background: rgba(56, 189, 248, 0.12);
@@ -1819,8 +1847,8 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         align-items: center;
         justify-content: space-between;
         gap: 0.45rem;
-        background: rgba(124, 106, 255, 0.08);
-        border: 1px solid rgba(124, 106, 255, 0.2);
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 6px;
         padding: 0.24rem 0.55rem;
         font-size: 0.73rem;
@@ -1829,20 +1857,20 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         transition: all 0.18s ease;
       }
       :global(.db-genre-chip:hover) {
-        border-color: rgba(124, 106, 255, 0.45);
-        background: rgba(124, 106, 255, 0.16);
+        border-color: rgba(59, 130, 246, 0.45);
+        background: rgba(59, 130, 246, 0.12);
         color: #ffffff;
         transform: translateY(-1px);
-        box-shadow: 0 3px 10px rgba(124, 106, 255, 0.2);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
       }
       :global(.db-genre-count) {
-        background: rgba(124, 106, 255, 0.22);
-        border: 1px solid rgba(124, 106, 255, 0.35);
+        background: rgba(59, 130, 246, 0.18);
+        border: 1px solid rgba(59, 130, 246, 0.30);
         border-radius: 4px;
         padding: 0.05rem 0.35rem;
         font-size: 0.66rem;
         font-weight: 700;
-        color: #c4b5fd;
+        color: #93c5fd;
       }
 
       /* ── Skeleton Loading UI & Shimmer Keyframes ── */
@@ -2845,7 +2873,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
                     required
                   />
                 </div>
-                <button type="submit" class="btn btn--primary" id="ingest-submit" style="flex: 1.5; height: 38px; font-size: 0.85rem;">Schedule Ingest</button>
+                <button type="submit" class="btn btn-primary btn--primary" id="ingest-submit" style="flex: 1.5; height: 38px; font-size: 0.85rem;">Schedule Ingest</button>
               </div>
             </form>
           </div>
@@ -2854,7 +2882,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
           <div class="card db-stats-card" id="db-stats-card">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
               <div style="display: flex; align-items: center; gap: 0.4rem;">
-                <span style="width: 8px; height: 8px; border-radius: 50%; background: #a78bfa; box-shadow: 0 0 10px #a78bfa; display: inline-block;"></span>
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.6); display: inline-block;"></span>
                 <h3 class="db-overview-title" style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; margin: 0;">Database Overview</h3>
               </div>
               <span id="db-total-badge" class="count-badge db-total-badge">529 Novels</span>
@@ -2888,8 +2916,8 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
                   <span id="db-territory-ratio" class="db-territory-text">398 Web (75.2%) • 131 Classic (24.8%)</span>
                 </div>
                 <div class="db-ratio-bar-track">
-                  <div id="db-bar-web" style="width: 75.2%; background: linear-gradient(90deg, #a855f7, #ec4899); transition: width 0.4s ease;"></div>
-                  <div id="db-bar-classic" style="width: 24.8%; background: linear-gradient(90deg, #f59e0b, #eab308); transition: width 0.4s ease;"></div>
+                  <div id="db-bar-web" style="width: 75.2%; background: linear-gradient(90deg, #3b82f6, #60a5fa); transition: width 0.4s ease;"></div>
+                  <div id="db-bar-classic" style="width: 24.8%; background: linear-gradient(90deg, #f59e0b, #fbbf24); transition: width 0.4s ease;"></div>
                 </div>
               </div>
 
@@ -2897,7 +2925,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
               <div style="margin-bottom: 0.95rem;">
                 <h4 style="font-size: 0.72rem; color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.45rem;">Ingested Data Sources</h4>
                 <div id="db-sources-badges" style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
-                  <span class="db-source-chip"><span class="db-source-dot" style="background: #a855f7;"></span>ScribbleHub: 167</span>
+                  <span class="db-source-chip"><span class="db-source-dot" style="background: #6366f1;"></span>ScribbleHub: 167</span>
                   <span class="db-source-chip"><span class="db-source-dot" style="background: #f59e0b;"></span>Gutenberg: 131</span>
                   <span class="db-source-chip"><span class="db-source-dot" style="background: #10b981;"></span>CN Novel: 125</span>
                   <span class="db-source-chip"><span class="db-source-dot" style="background: #38bdf8;"></span>Royal Road: 68</span>
@@ -3003,6 +3031,86 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
             Tracks emotional polarity of the language used across the 4 acts (Ki, Shō, Ten, Ketsu).
           </p>
           <svg id="arcChart" viewBox="0 0 600 420" preserveAspectRatio="xMidYMid meet"></svg>
+
+          <!-- Narrative Arc Trajectory, Act Transitions & Continuous Valence Spectrum -->
+          <div id="arcBreakdownContainer" class="arc-breakdown-container">
+            <!-- Section 1: Narrative Trajectory Summary Card -->
+            <div class="arc-trajectory-summary-card">
+              <div class="arc-trajectory-header">
+                <span class="arc-trajectory-title">Narrative Trajectory</span>
+                <span class="arc-trajectory-badge" id="arcTrajectoryBadge">Dynamic Reversal Arc</span>
+              </div>
+              <p class="arc-trajectory-desc" id="arcTrajectoryDesc">
+                Opening in tense low-valence territory, escalating across rising development, peaking at a pivotal dramatic twist, and resolving into an unresolved conclusion.
+              </p>
+            </div>
+
+            <!-- Section 2: 3-Stage Act Transition Deltas -->
+            <div class="arc-act-transitions-row">
+              <div class="transition-pill">
+                <div class="transition-pill-header">
+                  <span class="transition-pill-label">
+                    Ki
+                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    Shō
+                  </span>
+                  <span id="transDelta1" class="transition-delta neutral">+0.00</span>
+                </div>
+                <span id="transDesc1" class="transition-desc">Rising Action</span>
+              </div>
+
+              <div class="transition-pill">
+                <div class="transition-pill-header">
+                  <span class="transition-pill-label">
+                    Shō
+                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    Ten
+                  </span>
+                  <span id="transDelta2" class="transition-delta neutral">+0.00</span>
+                </div>
+                <span id="transDesc2" class="transition-desc">Climactic Turn</span>
+              </div>
+
+              <div class="transition-pill">
+                <div class="transition-pill-header">
+                  <span class="transition-pill-label">
+                    Ten
+                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    Ketsu
+                  </span>
+                  <span id="transDelta3" class="transition-delta neutral">+0.00</span>
+                </div>
+                <span id="transDesc3" class="transition-desc">Resolution</span>
+              </div>
+            </div>
+
+            <!-- Section 3: Continuous Valence Spectrum Scale -->
+            <div class="valence-spectrum-card">
+              <div class="valence-spectrum-header">
+                <span class="valence-spectrum-title">Emotional Polarity &amp; Valence Scale</span>
+                <span class="valence-spectrum-range">-1.0 to +1.0</span>
+              </div>
+              <div class="valence-spectrum-bar-wrap">
+                <div class="valence-spectrum-bar"></div>
+                <div class="valence-spectrum-ticks">
+                  <span>-1.0</span>
+                  <span>0.0</span>
+                  <span>+1.0</span>
+                </div>
+              </div>
+              <div class="valence-legend-labels">
+                <div class="valence-legend-col left">
+                  <span>High Stakes, Peril &amp; Tension</span>
+                </div>
+                <div class="valence-legend-col center">
+                  <span>Neutral Exposition &amp; Worldbuilding</span>
+                </div>
+                <div class="valence-legend-col right">
+                  <span>Triumph, Hope &amp; Catharsis</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Rhythmic Pacing Barcode (Full Width) -->
@@ -3198,16 +3306,16 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
           const sourcesContainer = document.getElementById("db-sources-badges");
           if (sourcesContainer && stats.by_source) {
             const srcMeta = {
-              scribblehub: { label: "ScribbleHub", color: "#a855f7" },
-              gutenberg:  { label: "Gutenberg",   color: "#f59e0b" },
-              cnnovel:    { label: "CN Novel",    color: "#10b981" },
               royalroad:  { label: "Royal Road",  color: "#38bdf8" },
+              gutenberg:  { label: "Gutenberg",   color: "#f59e0b" },
+              scribblehub: { label: "ScribbleHub", color: "#6366f1" },
+              cnnovel:    { label: "CN Novel",    color: "#10b981" },
               syosetu:    { label: "Syosetu",     color: "#f43f5e" }
             };
             sourcesContainer.innerHTML = Object.entries(stats.by_source)
               .sort((a, b) => b[1] - a[1])
               .map(([src, cnt]) => {
-                const meta = srcMeta[src] || { label: src, color: "#a78bfa" };
+                const meta = srcMeta[src] || { label: src, color: "#3b82f6" };
                 return `<span class="db-source-chip"><span class="db-source-dot" style="background: ${meta.color};"></span>${meta.label}: ${cnt}</span>`;
               })
               .join("");
@@ -3431,7 +3539,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
       }
 
       let currentNovelPage = 1;
-      const NOVELS_PER_PAGE = 8;
+      const NOVELS_PER_PAGE = 10;
       let lastFilteredNovels = [];
 
       function renderNovelsList(novelsToRender) {
@@ -3549,6 +3657,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
       };
 
       function renderEnhancedMetricsDashboard(stats) {
+        const isLight = document.documentElement.getAttribute("data-theme") === "light";
         const keys = Object.keys(stats);
         const langPrefix = keys.some(k => k.startsWith("ja_")) ? "ja_" :
                            keys.some(k => k.startsWith("zh_")) ? "zh_" : "en_";
@@ -3568,7 +3677,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
           <div class="metrics-hero">
             <div class="hero-chip">
               <span class="hero-chip-label">Archetype</span>
-              <span class="hero-chip-val" style="color: #a78bfa;">${archetypeLabel}</span>
+              <span class="hero-chip-val" style="color: ${isLight ? '#2563eb' : '#60a5fa'};">${archetypeLabel}</span>
             </div>
             <div class="hero-chip">
               <span class="hero-chip-label">Territory</span>
@@ -3650,7 +3759,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
                   const wnPct = Math.round(wnVal * 100);
                   baselineRowHtml += `
                     <span class="metric-baseline-item">
-                      <span class="metric-baseline-dot" style="background:#a78bfa;"></span>
+                      <span class="metric-baseline-dot" style="background:${isLight ? '#2563eb' : '#3b82f6'};"></span>
                       WN: ${wnPct}%
                     </span>`;
                 }
@@ -4087,8 +4196,8 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         const isWeb = activeBaseline === "web_novel";
         const labelText = isWeb ? "Web Novel" : "Classic Lit";
         const dotColor = isWeb
-          ? (isLight ? "#7c3aed" : "#a78bfa")
-          : (isLight ? "#d97706" : "#fbbf24");
+          ? (isLight ? "#2563eb" : "#3b82f6")
+          : (isLight ? "#d97706" : "#f59e0b");
         
         const rLbl = document.getElementById("radarBaselineLegendLabel");
         const aLbl = document.getElementById("baselineLegendLabel");
@@ -4217,14 +4326,14 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
 
         const isWeb = baseline === "web_novel";
         const blColor = isWeb
-          ? (isLight ? "#7c3aed" : "#a78bfa")
-          : (isLight ? "#d97706" : "#fbbf24");
+          ? (isLight ? "#2563eb" : "#3b82f6")
+          : (isLight ? "#d97706" : "#f59e0b");
         const blRgb = isWeb
-          ? (isLight ? "124, 58, 237" : "167, 139, 250")
-          : (isLight ? "217, 119, 6" : "251, 191, 36");
+          ? (isLight ? "37, 99, 235" : "59, 130, 246")
+          : (isLight ? "217, 119, 6" : "245, 158, 11");
 
-        const userColor = isLight ? "#0284c7" : "#7dd3fc";
-        const userRgb   = isLight ? "2, 132, 199" : "125, 211, 252";
+        const userColor = isLight ? "#0284c7" : "#38bdf8";
+        const userRgb   = isLight ? "2, 132, 199" : "56, 189, 248";
 
         const blVals = (stats && stats.baselines && stats.baselines.radar && stats.baselines.radar[baseline])
           ? stats.baselines.radar[baseline]
@@ -4416,8 +4525,8 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
           normalizedScores.forEach(g => {
             const pct = Math.min(99, Math.max(1, Math.round(g.score * 100)));
             let barColor = isLight
-              ? (pct >= 80 ? "#6366f1" : pct >= 65 ? "#0284c7" : pct >= 45 ? "#059669" : "#64748b")
-              : (pct >= 80 ? "#a78bfa" : pct >= 65 ? "#38bdf8" : pct >= 45 ? "#34d399" : "rgba(255,255,255,0.25)");
+              ? (pct >= 80 ? "#2563eb" : pct >= 65 ? "#0284c7" : pct >= 45 ? "#059669" : "#64748b")
+              : (pct >= 80 ? "#3b82f6" : pct >= 65 ? "#38bdf8" : pct >= 45 ? "#34d399" : "rgba(255,255,255,0.25)");
             drawerHtml += `
               <div class="genre-rank-row">
                 <div class="genre-rank-info">
@@ -4469,13 +4578,13 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
           : [0.0839, 0.0588, 0.1347, 0.1006];
         const isWeb   = baseline === "web_novel";
         const blColor = isWeb
-          ? (isLight ? "#7c3aed" : "#a78bfa")
-          : (isLight ? "#d97706" : "#fbbf24");
+          ? (isLight ? "#2563eb" : "#3b82f6")
+          : (isLight ? "#d97706" : "#f59e0b");
         const blRgb   = isWeb
-          ? (isLight ? "124, 58, 237" : "167, 139, 250")
-          : (isLight ? "217, 119, 6" : "251, 191, 36");
-        const userColor = isLight ? "#0284c7" : "#7dd3fc";
-        const userRgb   = isLight ? "2, 132, 199" : "125, 211, 252";
+          ? (isLight ? "37, 99, 235" : "59, 130, 246")
+          : (isLight ? "217, 119, 6" : "245, 158, 11");
+        const userColor = isLight ? "#0284c7" : "#38bdf8";
+        const userRgb   = isLight ? "2, 132, 199" : "56, 189, 248";
 
         const sentY = s => {
           const clamped = Math.max(-1.0, Math.min(1.0, s));
@@ -4599,9 +4708,10 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
           const lbl = document.createElementNS(ns, "text");
           lbl.setAttribute("x", String(axisX - 8));
           lbl.setAttribute("y", y + 3.5);
-          lbl.setAttribute("fill", isLight ? "#0369a1" : "rgba(255, 255, 255, 0.3)");
+          lbl.setAttribute("fill", isLight ? "#475569" : "rgba(255, 255, 255, 0.50)");
           lbl.setAttribute("font-size", "9");
           lbl.setAttribute("font-family", "Inter, sans-serif");
+          lbl.setAttribute("font-weight", "500");
           lbl.setAttribute("text-anchor", "end");
           lbl.textContent = val > 0 ? `+${val.toFixed(1)}` : val.toFixed(1);
           svg.appendChild(lbl);
@@ -4611,14 +4721,14 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         const yAxis = document.createElementNS(ns, "line");
         yAxis.setAttribute("x1", String(axisX)); yAxis.setAttribute("y1", String(PAD.top));
         yAxis.setAttribute("x2", String(axisX)); yAxis.setAttribute("y2", String(bottomY));
-        yAxis.setAttribute("stroke", isLight ? "rgba(2, 132, 199, 0.20)" : "rgba(255, 255, 255, 0.15)");
+        yAxis.setAttribute("stroke", isLight ? "#cbd5e1" : "rgba(255, 255, 255, 0.15)");
         svg.appendChild(yAxis);
 
         // X-axis line & labels
         const xAxis = document.createElementNS(ns, "line");
         xAxis.setAttribute("x1", String(axisX)); xAxis.setAttribute("y1", String(bottomY));
         xAxis.setAttribute("x2", String(endX));  xAxis.setAttribute("y2", String(bottomY));
-        xAxis.setAttribute("stroke", isLight ? "#cbd5e1" : "rgba(255, 255, 255, 0.15)");
+        xAxis.setAttribute("stroke", isLight ? "#94a3b8" : "rgba(255, 255, 255, 0.20)");
         svg.appendChild(xAxis);
 
         ["Ki (Intro)", "Shō (Dev)", "Ten (Twist)", "Ketsu (Res)"].forEach((label, i) => {
@@ -4626,12 +4736,12 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
           const tick = document.createElementNS(ns, "line");
           tick.setAttribute("x1", lx); tick.setAttribute("y1", bottomY);
           tick.setAttribute("x2", lx); tick.setAttribute("y2", bottomY + 4);
-          tick.setAttribute("stroke", isLight ? "#e2e8f0" : "rgba(255, 255, 255, 0.07)");
+          tick.setAttribute("stroke", isLight ? "#cbd5e1" : "rgba(255, 255, 255, 0.12)");
           svg.appendChild(tick);
 
           const txt = document.createElementNS(ns, "text");
           txt.setAttribute("x", lx); txt.setAttribute("y", bottomY + 16);
-          txt.setAttribute("fill", isLight ? "#64748b" : "rgba(255, 255, 255, 0.45)");
+          txt.setAttribute("fill", isLight ? "#1e293b" : "rgba(255, 255, 255, 0.70)");
           txt.setAttribute("font-size", "10"); txt.setAttribute("font-weight", "600");
           txt.setAttribute("font-family", "Inter, sans-serif");
           txt.setAttribute("text-anchor", "middle");
@@ -4688,6 +4798,73 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
           blDot.setAttribute("stroke-width", "1.5");
           svg.appendChild(blDot);
         });
+
+        // Update 4-Phase Narrative Arc Breakdown
+        updateArcBreakdown(acts, blVals, baseline);
+      }
+
+      function updateArcBreakdown(acts, blVals, baseline) {
+        const rawVals = acts.map(a => typeof a === "number" ? a : (a?.sentiment ?? 0));
+        if (rawVals.length < 4) return;
+
+        const vKi = rawVals[0];
+        const vSho = rawVals[1];
+        const vTen = rawVals[2];
+        const vKetsu = rawVals[3];
+
+        const formatSent = v => (v > 0 ? `+${v.toFixed(2)}` : v.toFixed(2));
+        const formatDelta = d => (d > 0 ? `+${d.toFixed(2)}` : d.toFixed(2));
+        const getDeltaClass = d => (d > 0.05 ? "positive" : (d < -0.05 ? "negative" : "neutral"));
+
+        // Act Transition Deltas
+        const d1 = vSho - vKi;
+        const d2 = vTen - vSho;
+        const d3 = vKetsu - vTen;
+
+        const desc1 = d1 > 0.2 ? "Rising Friction" : (d1 < -0.2 ? "Descent into Crisis" : "Steady Development");
+        const desc2 = d2 > 0.2 ? "Uplifting Turning Point" : (d2 < -0.2 ? "Dramatic Climax Drop" : "Tension Shift");
+        const desc3 = d3 > 0.15 ? "Triumphant Uplift" : (d3 < -0.15 ? "Lingering Cliffhanger" : "Measured Resolution");
+
+        const updatePill = (deltaId, descId, deltaVal, descText) => {
+          const deltaEl = document.getElementById(deltaId);
+          const descEl = document.getElementById(descId);
+          if (deltaEl) {
+            deltaEl.textContent = formatDelta(deltaVal);
+            deltaEl.className = `transition-delta ${getDeltaClass(deltaVal)}`;
+          }
+          if (descEl) {
+            descEl.textContent = descText;
+          }
+        };
+
+        updatePill("transDelta1", "transDesc1", d1, desc1);
+        updatePill("transDelta2", "transDesc2", d2, desc2);
+        updatePill("transDelta3", "transDesc3", d3, desc3);
+
+        let badge = "Dynamic Reversal Arc";
+        let desc = "Opening with calculated atmospheric tension, escalating across development, peaking at a pivotal dramatic turn, and resolving into an unresolved conclusion.";
+
+        if (vTen > vKi && vTen > vSho && vKetsu < vTen) {
+          badge = "Dynamic Reversal Arc";
+          desc = `Begins in grounded exposition (${formatSent(vKi)}), builds rising momentum through development (${formatSent(vSho)}), reaches peak emotional intensity at the Ten twist (${formatSent(vTen)}), and descends into an impact-heavy resolution (${formatSent(vKetsu)}).`;
+        } else if (vKi < 0 && vSho > vKi && vTen > vSho && vKetsu > 0) {
+          badge = "Heroic Ascent Arc";
+          desc = `Opens from an adversarial low point (${formatSent(vKi)}), steadily climbing through character growth and climactic breakthroughs into a sustained positive resolution (${formatSent(vKetsu)}).`;
+        } else if (vKi > 0 && vKetsu < 0) {
+          badge = "Tragic Descent Arc";
+          desc = `Launches from optimistic stability (${formatSent(vKi)}) before descending through escalating complications into high-stakes dramatic consequence (${formatSent(vKetsu)}).`;
+        } else if (Math.abs(vTen - vSho) >= 0.35) {
+          badge = "High-Volatility Twist Arc";
+          desc = `Characterized by sharp emotional volatility between development (${formatSent(vSho)}) and the Ten inflection point (${formatSent(vTen)}), driving intense dramatic momentum.`;
+        } else {
+          badge = "Balanced Narrative Arc";
+          desc = `Maintains harmonious narrative equilibrium across all four acts, balancing descriptive exposition with steady emotional engagement.`;
+        }
+
+        const badgeEl = document.getElementById("arcTrajectoryBadge");
+        const descEl = document.getElementById("arcTrajectoryDesc");
+        if (badgeEl) badgeEl.textContent = badge;
+        if (descEl) descEl.textContent = desc;
       }
 
       /* ── Rhythmic Pacing (Paragraph Barcode) ── */
@@ -4697,8 +4874,8 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         const userPacing = stats.pacing || [];
         const isWeb = baseline === "web_novel";
         const baselineColor = isWeb
-          ? (isLight ? "linear-gradient(180deg, #a78bfa 0%, #7c3aed 100%)" : "linear-gradient(180deg, #c084fc 0%, #7c3aed 100%)")
-          : (isLight ? "linear-gradient(180deg, #fbbf24 0%, #d97706 100%)" : "linear-gradient(180deg, #fde68a 0%, #d97706 100%)");
+          ? (isLight ? "linear-gradient(180deg, #60a5fa 0%, #2563eb 100%)" : "linear-gradient(180deg, #93c5fd 0%, #3b82f6 100%)")
+          : (isLight ? "linear-gradient(180deg, #fbbf24 0%, #d97706 100%)" : "linear-gradient(180deg, #fde68a 0%, #f59e0b 100%)");
         const userColor = isLight
           ? "linear-gradient(180deg, #38bdf8 0%, #0284c7 100%)"
           : "linear-gradient(180deg, #7dd3fc 0%, #0284c7 100%)";
@@ -4852,13 +5029,13 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
               <div id="doppelganger-drawer-${m.id}" class="doppelganger-drawer" style="display: none;">
                 ${m.narrative_reasoning?.narrative_synthesis ? `
                   <div class="narrative-synthesis-box">
-                    <div class="synthesis-tag">📖 Narrative Synthesis</div>
+                    <div class="synthesis-tag"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 5px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Narrative Synthesis</div>
                     <p class="synthesis-text">"${m.narrative_reasoning.narrative_synthesis}"</p>
                   </div>
                 ` : ''}
 
                 ${m.narrative_reasoning?.pillars ? `
-                  <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #a78bfa; margin-bottom: 4px; margin-top: 12px;">
+                  <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: ${isLight ? '#2563eb' : '#60a5fa'}; margin-bottom: 4px; margin-top: 12px;">
                     4-Pillar Narrative Alignment (85% Ranking Weight)
                   </div>
                   <div class="pillars-grid">
@@ -4866,11 +5043,11 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
                       const p = m.narrative_reasoning.pillars[pKey];
                       if (!p) return '';
                       const meta = {
-                        catalyst: { icon: "⚡", title: "Premise & Inciting Catalyst", color: "linear-gradient(90deg, #818cf8, #a78bfa)" },
-                        setting: { icon: "🏰", title: "World Setting & Atmosphere", color: "linear-gradient(90deg, #38bdf8, #67e8f9)" },
-                        conflict: { icon: "⚔️", title: "Conflict Stakes & Tension", color: "linear-gradient(90deg, #f43f5e, #fb7185)" },
-                        style_cadence: { icon: "✍️", title: "Prose Voice & Cadence", color: "linear-gradient(90deg, #34d399, #6ee7b7)" }
-                      }[pKey] || { icon: "🔹", title: pKey, color: "#a78bfa" };
+                        catalyst: { title: "Premise & Inciting Catalyst", color: "linear-gradient(90deg, #3b82f6, #60a5fa)" },
+                        setting: { title: "World Setting & Atmosphere", color: "linear-gradient(90deg, #38bdf8, #67e8f9)" },
+                        conflict: { title: "Conflict Stakes & Tension", color: "linear-gradient(90deg, #f43f5e, #fb7185)" },
+                        style_cadence: { title: "Prose Voice & Cadence", color: "linear-gradient(90deg, #34d399, #6ee7b7)" }
+                      }[pKey] || { title: pKey, color: "#3b82f6" };
 
                       const scorePct = Math.round((p.score || 0) * 100);
                       const qVal = p.query_val || p.value || 'N/A';
@@ -4880,7 +5057,6 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
                         <div class="pillar-card">
                           <div class="pillar-card-header">
                             <div class="pillar-title-group">
-                              <span class="pillar-icon">${meta.icon}</span>
                               <strong>${p.name || meta.title}</strong>
                             </div>
                             <span class="pillar-score-badge">${scorePct}%</span>
@@ -4895,7 +5071,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
                               <span class="capsule-label">Target Novel</span>
                               <span class="capsule-value">${qVal}</span>
                             </div>
-                            <span class="pillar-arrow">➔</span>
+                            <span class="pillar-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
                             <div class="pillar-capsule" title="Matched Work: ${cVal}">
                               <span class="capsule-label">Matched Work</span>
                               <span class="capsule-value">${cVal}</span>
@@ -4909,7 +5085,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
                   </div>
                 ` : `
                   <div style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-                    <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #a78bfa; margin-bottom: 4px;">
+                    <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: ${isLight ? '#2563eb' : '#60a5fa'}; margin-bottom: 4px;">
                       Story & Thematic Anatomy (85% Ranking Weight)
                     </div>
                     <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 0.75rem; color: var(--color-muted);">
@@ -4924,7 +5100,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
 
                 ${m.narrative_reasoning?.shared_tropes?.length ? `
                   <div class="shared-tropes-section" style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-                    <span class="tropes-label" style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--color-muted); display: block; margin-bottom: 6px;">🏷️ Shared Tropes & Motifs:</span>
+                    <span class="tropes-label" style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--color-muted); display: block; margin-bottom: 6px;">Shared Tropes & Motifs:</span>
                     <div class="tropes-list" style="display: flex; flex-wrap: wrap; gap: 6px;">
                       ${m.narrative_reasoning.shared_tropes.map(t => `<span class="shared-trope-chip">${t}</span>`).join('')}
                     </div>
@@ -4947,7 +5123,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
                       const barColor = matchNum >= 90
                         ? (isLight ? '#0284c7' : '#38bdf8')
                         : matchNum >= 75
-                          ? (isLight ? '#7c3aed' : '#a78bfa')
+                          ? (isLight ? '#2563eb' : '#60a5fa')
                           : (isLight ? '#d97706' : '#fbbf24');
                       return `
                         <div class="metric-compare-row">
@@ -5448,7 +5624,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         });
       }
 
-      document.addEventListener("astro:page-load", () => {
+      function setupPage() {
         const themeToggleBtn = document.getElementById("themeToggleBtn");
         if (themeToggleBtn) {
           themeToggleBtn.onclick = toggleTheme;
@@ -5458,7 +5634,14 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         if (document.getElementById("novels-container") || document.getElementById("territory-selector")) {
           initExplorer();
         }
-      });
+      }
+
+      document.addEventListener("astro:page-load", setupPage);
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", setupPage);
+      } else {
+        setupPage();
+      }
 
       // Window exposed functions for inline event handlers and global access
       window.selectTerritory = selectTerritory;

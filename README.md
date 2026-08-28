@@ -6,37 +6,32 @@ A computational stylometry and narrative similarity platform for web fiction and
 
 ---
 
-## Core Capabilities
+## Interface & Visualizations
 
-### 1. Multi-Lingual Prose Stylometry (37 Metrics)
-Custom NLP tokenization pipelines extract 37 forensic literary dimensions across English (`spaCy`, `NLTK VADER`), Japanese (`SudachiPy`, `Oseti`), and Chinese (`spaCy`):
-- **Structure & Volume**: Word/character counts, sentence count, average sentence length, sentences per paragraph, syntactic dependency tree depth.
-- **Prose & Style**: Dialogue ratio, Type-Token Ratio (TTR / lexical richness), adjective/verb/particle distribution ratios, Kanji density.
-- **Theme & Emotion**: Compound sentiment polarity, thematic explicitness ratio, visceral/somatic sensory density, outside-world engagement score.
-- **Pacing & Narrative**: Linearity subversion score, temporal shift frequency, entity/subplot diversity, paragraph length variance.
+<div align="center">
+  <img src="docs/screenshots/hero-prose-inspector.png" alt="KishoLens Live Prose Inspector" width="100%" />
+</div>
 
-### 2. Explainable Similarity Engine ("Doppelgängers")
-Identifies stylistic and thematic twin works across the 10,320-novel database in **< 2ms**:
-- **5-Factor Similarity Model**: Combines 384D semantic embeddings (`all-MiniLM-L6-v2`), 8D stylometric fingerprint vectors, parent genre overlap (Jaccard), fine-grained tag overlap, and territory semantic similarity.
-- **NumPy Matrix Vectorization**: Full-corpus candidate screening vectorized with cosine dot products in memory.
-- **4-Pillar Narrative Alignment**: Side-by-side comparative breakdown across *Premise Catalyst*, *Setting Atmosphere*, *Conflict Stakes*, and *Prose Cadence*.
-- **Editorial Synthesis**: Dynamically generates concise editorial commentary explaining why works align.
-- **Forensic Delta Table**: Interactive drawer comparing input prose metrics directly against matched works with visual alignment bars.
+<br/>
 
-### 3. Interactive Visualization Suite
-- **8-Axis Archetype Radar**: HTML5 Canvas radar chart with interactive spoke tooltips, spoken metric explanations, and baseline toggles (*Web Novel* vs *Classic Literature*).
-- **Rhythmic Pacing Barcodes**: Visual chapter/paragraph density barcode displaying pacing tempo, scene velocity, and dialogue frequency variations.
-- **4-Phase Kishōtenketsu Sentiment Arcs**: Dynamic emotional polarity curves tracking narrative progression across **Ki** (起 / Introduction), **Shō** (承 / Development), **Ten** (転 / Twist), and **Ketsu** (結 / Resolution).
-- **Metric Cards Carousel**: Grouped by category with percentile progress meters and benchmark chips (`+X% vs Avg`).
+| Archetype Radar & Pacing Barcode | 4-Pillar Narrative Alignment Drawer |
+|:---:|:---:|
+| <img src="docs/screenshots/radar-arc-pacing.png" width="100%" alt="Archetype Radar, Kishotenketsu Arc & Pacing Barcode" /> | <img src="docs/screenshots/doppelganger-narrative-matrix.png" width="100%" alt="4-Pillar Narrative Alignment Drawer" /> |
 
-### 4. Interactive Prose Analyzer (`/analyze`)
-- Paste or type custom text in any supported language for instant NLP extraction, archetype prediction, and similarity matching.
-- Preset literary excerpt loader for testing classic literature, translated light novels, wuxia, and modern web serials.
+<br/>
 
-### 5. Library Explorer (`/library`)
-- Search and browse 10,320 indexed works across Royal Road, Syosetu, Project Gutenberg, ScribbleHub, and CNNovel.
-- Filter by Territory (*Web Novel* vs *Classic Literature*) and multi-tag inclusion/exclusion checkboxes.
-- State preservation across client router navigation via `sessionStorage`.
+<div align="center">
+  <img src="docs/screenshots/library-metrics-dashboard.png" alt="Library Explorer & Metrics Dashboard" width="100%" />
+</div>
+
+---
+
+## Key Features
+
+- **37-Metric Multi-Lingual Stylometry**: Native syntax parsing and lexical analysis across English (`spaCy`, `VADER`), Japanese (`SudachiPy`, `Oseti`), and Chinese (`spaCy`) covering sentence structure, dialogue density, vocabulary richness (TTR), and somatic sentiment.
+- **Explainable Similarity Engine (< 2ms)**: Vectorized NumPy search combining 384D semantic embeddings with 8D prose fingerprints, generating 4-pillar narrative alignments (*Catalyst, Setting, Conflict, Cadence*) and side-by-side metric diffs across 10,320 works.
+- **Interactive Visualizations**: 8-axis archetype radar charts with territory baseline overlays, 100-bar chapter pacing barcodes, and 4-phase *Kishōtenketsu* quantile sentiment arcs.
+- **Live Prose Analyzer & Library Explorer**: Real-time analysis of custom input prose alongside a searchable 10,320-novel library with multi-genre inclusion/exclusion filtering and session state persistence.
 
 ---
 
@@ -155,6 +150,16 @@ KishoLens/
 
 ---
 
+## Privacy & Data Retention
+
+KishoLens is designed with privacy-first principles:
+- **Zero Server-Side Text Storage**: User-submitted prose sent to `/api/analyze` is processed purely in-memory in real time for stylometric feature extraction and is never logged, saved, or persisted on backend servers or databases.
+- **Local Persistence Only**: Any draft text or session settings stored in the web application reside exclusively within your browser's local storage (`localStorage`) and never leave your machine.
+
+---
+
 ## License & Dataset Notes
+
+This project is licensed under the [MIT License](LICENSE).
 
 Raw scraped text from web platforms is subject to copyright by respective authors and is excluded from the repository. All statistical metrics, Gutenberg public domain data, and embeddings are provided for non-commercial research and educational use.

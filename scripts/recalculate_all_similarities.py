@@ -19,6 +19,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from kisholens.ml.similarity import (
     extract_feature_vector,
+    extract_effective_genre,
     _extract_metric_values,
     _compute_metric_comparisons,
     _compute_match_badges,
@@ -38,7 +39,7 @@ def build_concept_text(item: dict) -> str:
     inciting = tax.get("inciting_event", {}).get("primary", "") if isinstance(tax.get("inciting_event"), dict) else ""
     world = tax.get("world_setting", {}).get("primary", "") if isinstance(tax.get("world_setting"), dict) else ""
     plot = tax.get("narrative_plot", {}).get("primary", "") if isinstance(tax.get("narrative_plot"), dict) else ""
-    genre = (item.get("primary_genre") or item.get("genre") or "").strip()
+    genre = extract_effective_genre(item)
     tags = (item.get("tags") or "").strip()
     territory = (item.get("territory") or "").strip()
 
@@ -124,13 +125,15 @@ def main():
     all_anatomies = []
 
     for i, item in enumerate(novel_items):
+        eff_g = extract_effective_genre(item)
+        item["genre"] = eff_g
         g_names = (
             _extract_genre_list(item.get("top_genres"))
             + _extract_genre_list(item.get("primary_genre"))
-            + _extract_genre_list(item.get("genre"))
+            + [eff_g]
         )
         all_genres.append(set(g.lower().strip() for g in g_names if g and g.strip()))
-        p_genre = (item.get("primary_genre") or item.get("genre") or "").lower().strip()
+        p_genre = eff_g.lower().strip()
         all_primary_genres.append(p_genre)
 
         raw_tags = item.get("tags") or ""
@@ -293,9 +296,15 @@ def main():
 
                 q_anat = all_anatomies[global_i]
                 c_anat = all_anatomies[cand_j]
-                narrative_synthesis = _generate_narrative_synthesis(q_anat, c_anat, st_sim, g_sim, is_user_input=False)
-                pillars = _compute_4pillar_breakdown(q_anat, c_anat, q_m, c_metrics, st_sim, g_sim, sty_sim)
-                shared_tropes = _extract_shared_tropes(q_anat, c_anat)
+                narrative_synthesis = _generate_narrative_synthesis(
+                    q_anat, c_anat, st_sim, g_sim, is_user_input=False,
+                    q_title=all_titles[global_i], c_title=all_titles[cand_j]
+                )
+                pillars = _compute_4pillar_breakdown(
+                    q_anat, c_anat, q_m, c_metrics, st_sim, g_sim, sty_sim,
+                    c_title=all_titles[cand_j]
+                )
+                shared_tropes = _extract_shared_tropes(q_anat, c_anat, c_meta=c_item)
                 narrative_reasoning = {
                     "narrative_synthesis": narrative_synthesis,
                     "pillars": pillars,
@@ -306,7 +315,7 @@ def main():
                     "id": cid,
                     "title": all_titles[cand_j],
                     "author": all_authors[cand_j],
-                    "genre": c_item.get("genre", ""),
+                    "genre": extract_effective_genre(c_item),
                     "territory": all_territories[cand_j],
                     "similarity_score": c_score,
                     "story_similarity": int(round(st_sim * 100)),
@@ -342,6 +351,32 @@ def main():
         json.dump(data, f, ensure_ascii=False)
     temp_path.replace(cache_path)
     print(f"Successfully updated all {num_novels} novels in {cache_path} with {SIMILARITY_MODEL_VERSION}!")
+
+    # 7. Rebuild compact SQLite stats DB
+    sqlite_path = PROJECT_ROOT / "data" / "novel_stats.sqlite"
+    print(f"Rebuilding compact SQLite database at {sqlite_path}...")
+    import sqlite3
+    import gzip
+
+    conn = sqlite3.connect(sqlite_path)
+    conn.execute("DROP TABLE IF EXISTS novel_stats")
+    conn.execute("CREATE TABLE novel_stats (id INTEGER PRIMARY KEY, data BLOB)")
+
+    rows = []
+    for k, item in data.items():
+        if k.startswith("_") or not isinstance(item, dict):
+            continue
+        try:
+            nid = int(k)
+            blob = gzip.compress(json.dumps(item, ensure_ascii=False).encode("utf-8"))
+            rows.append((nid, blob))
+        except (ValueError, TypeError):
+            continue
+
+    conn.executemany("INSERT INTO novel_stats (id, data) VALUES (?, ?)", rows)
+    conn.commit()
+    conn.close()
+    print(f"Successfully wrote {len(rows)} compressed records into {sqlite_path}.")
 
 
 if __name__ == "__main__":

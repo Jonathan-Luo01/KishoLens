@@ -56,7 +56,8 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
       .analyze-layout {
         display: grid;
         grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-        gap: 2rem;
+        gap: 1.75rem;
+        align-items: stretch;
       }
       @media (max-width: 900px) {
         .analyze-layout {
@@ -74,11 +75,11 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
       .form-group {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
-        margin-bottom: 1.25rem;
+        gap: 0.4rem;
+        margin-bottom: 0.85rem;
       }
       label {
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         font-weight: 500;
         color: var(--color-text);
       }
@@ -86,10 +87,10 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid var(--color-border);
         border-radius: 8px;
-        padding: 0.75rem;
+        padding: 0.65rem 0.75rem;
         color: var(--color-text);
         font-family: var(--font-sans);
-        font-size: 0.95rem;
+        font-size: 0.92rem;
         outline: none;
         transition: border-color var(--transition);
       }
@@ -98,15 +99,16 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
       }
       textarea {
         resize: vertical;
-        min-height: 250px;
+        min-height: 180px;
+        height: 195px;
       }
       .counter-row {
         display: flex;
         justify-content: space-between;
-        font-size: 0.8rem;
+        font-size: 0.78rem;
         color: var(--color-muted);
-        margin-top: -0.75rem;
-        margin-bottom: 1.25rem;
+        margin-top: -0.5rem;
+        margin-bottom: 0.85rem;
       }
       .placeholder-text {
         color: var(--color-muted);
@@ -283,11 +285,11 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         cursor: pointer;
         transition: all 0.2s;
       }
-      .baseline-btn:hover { border-color: #a78bfa; color: #a78bfa; }
+      .baseline-btn:hover { border-color: #3b82f6; color: #60a5fa; }
       .baseline-btn.active {
-        background: rgba(167,139,250,0.15);
-        border-color: #a78bfa;
-        color: #a78bfa;
+        background: rgba(37,99,235,0.18);
+        border-color: #3b82f6;
+        color: #93c5fd;
       }
 
       .charts-grid {
@@ -311,8 +313,11 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         -webkit-backdrop-filter: blur(12px);
         transition: border-color 0.3s;
         min-width: 0;
+        container-type: inline-size;
+        overflow: hidden;
+        box-sizing: border-box;
       }
-      .chart-card:hover { border-color: rgba(167,139,250,0.25); }
+      .chart-card:hover { border-color: rgba(59,130,246,0.35); }
 
       .chart-header {
         display: flex;
@@ -348,10 +353,10 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         border-radius: 50%;
         flex-shrink: 0;
       }
-      .legend-dot.user     { background: #7dd3fc; }
-      .legend-dot.wn       { background: #a78bfa; }
-      .legend-dot.cl       { background: #fbbf24; }
-      .legend-dot.baseline { background: #a78bfa; border: 1.5px dashed rgba(255,255,255,0.4); }
+      .legend-dot.user     { background: #38bdf8; }
+      .legend-dot.wn       { background: #3b82f6; }
+      .legend-dot.cl       { background: #f59e0b; }
+      .legend-dot.baseline { background: #3b82f6; border: 1.5px dashed rgba(255,255,255,0.4); }
 
       canvas#radarChart {
         width: 100%;
@@ -426,8 +431,8 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
       :global(.pillar-score) {
         font-size: 0.72rem;
         font-weight: 700;
-        color: #a78bfa;
-        background: rgba(167, 139, 250, 0.12);
+        color: #60a5fa;
+        background: rgba(59, 130, 246, 0.12);
         padding: 0.05rem 0.35rem;
         border-radius: 999px;
       }
@@ -475,9 +480,9 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
       }
 
       :global(.genre-affinity-pill.tier-vibrant) {
-        background: rgba(167, 139, 250, 0.14);
-        border: 1px solid rgba(167, 139, 250, 0.4);
-        color: #c4b5fd;
+        background: rgba(59, 130, 246, 0.14);
+        border: 1px solid rgba(59, 130, 246, 0.4);
+        color: #93c5fd;
       }
       :global(.genre-affinity-pill.tier-cyan) {
         background: rgba(56, 189, 248, 0.12);
@@ -703,9 +708,9 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         align-items: center;
         font-size: 11.5px;
         font-weight: 500;
-        color: #c4b5fd;
-        background: rgba(167, 139, 250, 0.10);
-        border: 1px solid rgba(167, 139, 250, 0.28);
+        color: #93c5fd;
+        background: rgba(59, 130, 246, 0.10);
+        border: 1px solid rgba(59, 130, 246, 0.28);
         border-radius: 6px;
         padding: 3px 8px;
         letter-spacing: 0.01em;
@@ -894,7 +899,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         width: 100%;
         max-width: 100%;
         height: auto;
-        min-height: 180px;
+        aspect-ratio: 600 / 420;
         display: block;
       }
 
@@ -912,7 +917,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         font-family: 'Outfit', sans-serif;
         font-size: 0.85rem;
         font-weight: 700;
-        color: #a78bfa;
+        color: #3b82f6;
       }
       .act-name {
         font-size: 0.7rem;
@@ -920,37 +925,36 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         letter-spacing: 0.03em;
       }
 
-      /* ── ENHANCED METRICS DASHBOARD (PARITY WITH LIBRARY) ── */
+      /* ── ENHANCED METRICS DASHBOARD (HORIZONTAL CAROUSEL) ── */
       :global(.metrics-dashboard) {
         display: flex;
         flex-direction: column;
-        gap: 0.85rem;
+        gap: 1rem;
       }
 
       :global(.metrics-hero) {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 12px;
-        background: rgba(124, 106, 255, 0.05);
-        border: 1px solid rgba(124, 106, 255, 0.2);
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.55rem;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--color-border);
         border-radius: 12px;
-        padding: 0.85rem;
+        padding: 0.75rem;
       }
 
       :global(.hero-chip) {
         display: flex;
         flex-direction: column;
         justify-content: center;
-        padding: 0.85rem 1.1rem;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 10px;
-        gap: 0.3rem;
-        transition: all 0.2s ease;
+        padding: 0.55rem 0.85rem;
+        background: rgba(255, 255, 255, 0.025);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 8px;
+        gap: 0.2rem;
       }
 
       :global(.hero-chip-label) {
-        font-size: 0.68rem;
+        font-size: 0.65rem;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         color: var(--color-muted);
@@ -958,21 +962,29 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
 
       :global(.hero-chip-val) {
         font-family: var(--font-display);
-        font-size: 1.1rem;
+        font-size: 1.05rem;
         font-weight: 700;
         color: var(--color-text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      :global(.metrics-carousel-header) {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.6rem;
+        flex-wrap: wrap;
       }
 
       :global(.metrics-category-tabs) {
         display: flex;
-        gap: 8px;
+        gap: 0.35rem;
         overflow-x: auto;
-        flex-wrap: nowrap;
-        -webkit-overflow-scrolling: touch;
+        padding-bottom: 0.15rem;
         scrollbar-width: none;
-        padding-bottom: 4px;
       }
-
       :global(.metrics-category-tabs::-webkit-scrollbar) {
         display: none;
       }
@@ -981,53 +993,109 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         background: rgba(255, 255, 255, 0.04);
         border: 1px solid rgba(255, 255, 255, 0.1);
         color: var(--color-muted);
-        border-radius: 999px;
-        padding: 6px 14px;
-        font-size: 12px;
-        font-weight: 500;
+        border-radius: 20px;
+        padding: 0.3rem 0.65rem;
+        font-size: 0.73rem;
+        font-weight: 600;
         cursor: pointer;
         white-space: nowrap;
-        flex-shrink: 0;
         transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
       }
 
       :global(.category-tab:hover), :global(.category-tab.active) {
-        background: rgba(124, 106, 255, 0.18);
-        border-color: rgba(124, 106, 255, 0.5);
+        background: rgba(59, 130, 246, 0.18);
+        border-color: rgba(59, 130, 246, 0.5);
         color: #ffffff;
       }
 
-      :global(.metric-category-section) {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
+      :global(.category-tab-badge) {
+        font-size: 0.62rem;
+        background: rgba(255, 255, 255, 0.12);
+        padding: 0.08rem 0.38rem;
+        border-radius: 10px;
       }
 
-      :global(.category-section-title) {
-        font-family: var(--font-display);
-        font-size: 0.8rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        display: flex;
+      :global(.metrics-carousel-nav) {
+        display: inline-flex;
         align-items: center;
-        gap: 0.4rem;
-        margin-top: 0.4rem;
+        gap: 0.35rem;
       }
 
-      :global(.category-section-title.cat-structure) { color: #38bdf8; }
-      :global(.category-section-title.cat-prose)     { color: #a78bfa; }
-      :global(.category-section-title.cat-theme)     { color: #f472b6; }
-      :global(.category-section-title.cat-pacing)    { color: #34d399; }
+      :global(.carousel-nav-btn) {
+        width: 26px;
+        height: 26px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: var(--color-text);
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-weight: 700;
+        line-height: 1;
+        transition: all 0.15s ease;
+      }
+      :global(.carousel-nav-btn:hover:not(:disabled)) {
+        background: rgba(59, 130, 246, 0.3);
+        border-color: #60a5fa;
+        color: #ffffff;
+      }
+      :global(.carousel-nav-btn:disabled) {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
 
-      :global(.metric-card-grid) {
+      :global(.carousel-indicator-pill) {
+        font-size: 0.7rem;
+        color: var(--color-muted);
+        padding: 0.2rem 0.5rem;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      :global(.metrics-carousel-track-wrapper) {
+        position: relative;
+        width: 100%;
+      }
+
+      :global(.metrics-carousel-track) {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+        grid-template-rows: repeat(2, minmax(135px, 1fr));
+        grid-auto-flow: column;
+        grid-auto-columns: 215px;
         gap: 0.6rem;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        padding: 0.2rem 0.15rem 0.65rem 0.15rem;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      :global(.metrics-carousel-track::-webkit-scrollbar) {
+        height: 5px;
+      }
+      :global(.metrics-carousel-track::-webkit-scrollbar-thumb) {
+        background: rgba(255, 255, 255, 0.18);
+        border-radius: 4px;
       }
 
       :global(.metric-card) {
-        background: rgba(255, 255, 255, 0.02);
+        flex: 0 0 215px;
+        min-width: 215px;
+        max-width: 215px;
+        scroll-snap-align: start;
+        background: rgba(255, 255, 255, 0.025);
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 8px;
         padding: 0.65rem 0.8rem;
@@ -1039,9 +1107,24 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
       }
 
       :global(.metric-card:hover) {
-        border-color: rgba(124, 106, 255, 0.3);
+        border-color: rgba(59, 130, 246, 0.35);
         transform: translateY(-1px);
       }
+
+      :global(.metric-card-cat-badge) {
+        font-size: 0.62rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.1rem 0.4rem;
+        border-radius: 4px;
+        width: fit-content;
+        margin-bottom: 0.15rem;
+      }
+      :global(.metric-card-cat-badge.cat-structure) { background: rgba(56, 189, 248, 0.12); color: #38bdf8; }
+      :global(.metric-card-cat-badge.cat-prose)     { background: rgba(96, 165, 250, 0.12); color: #60a5fa; }
+      :global(.metric-card-cat-badge.cat-theme)     { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+      :global(.metric-card-cat-badge.cat-pacing)    { background: rgba(52, 211, 153, 0.12); color: #34d399; }
 
       :global(.metric-card-header) {
         display: flex;
@@ -1068,15 +1151,15 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         width: 18px;
         height: 18px;
         border-radius: 50%;
-        background: rgba(124, 106, 255, 0.12);
-        border: 1px solid rgba(124, 106, 255, 0.25);
+        background: rgba(59, 130, 246, 0.12);
+        border: 1px solid rgba(59, 130, 246, 0.25);
         user-select: none;
       }
 
       :global(.metric-info-icon:hover), :global(.metric-info-icon.active) {
         opacity: 1.0;
         transform: scale(1.12);
-        background: rgba(124, 106, 255, 0.3);
+        background: rgba(59, 130, 246, 0.25);
         border-color: var(--color-accent);
         color: #ffffff;
       }
@@ -1086,8 +1169,8 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         bottom: 125%;
         right: 0;
         background: #0f172a;
-        border: 1px solid rgba(124, 106, 255, 0.4);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), 0 0 12px rgba(124, 106, 255, 0.25);
+        border: 1px solid rgba(59, 130, 246, 0.35);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), 0 0 12px rgba(59, 130, 246, 0.2);
         border-radius: 8px;
         padding: 0.6rem 0.8rem;
         font-size: 0.73rem;
@@ -1138,8 +1221,8 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
       }
 
       :global(.bar-fill-structure) { background: linear-gradient(90deg, #0284c7, #38bdf8); }
-      :global(.bar-fill-prose)     { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
-      :global(.bar-fill-theme)     { background: linear-gradient(90deg, #db2777, #f472b6); }
+      :global(.bar-fill-prose)     { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+      :global(.bar-fill-theme)     { background: linear-gradient(90deg, #d97706, #f59e0b); }
       :global(.bar-fill-pacing)    { background: linear-gradient(90deg, #059669, #34d399); }
 
       :global(.benchmark-chip) {
@@ -1405,28 +1488,52 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         font-weight: 700 !important;
       }
 
-      /* Category Tabs Track */
-      :global([data-theme="light"] .category-tabs-track) {
-        background: rgba(241, 245, 249, 0.75);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(226, 232, 240, 0.85);
-        box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
-      }
-
+      /* Category Tabs & Carousel Nav */
       :global([data-theme="light"] .category-tab) {
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(203, 213, 225, 0.8);
         color: #64748b;
       }
 
       :global([data-theme="light"] .category-tab:hover) {
         color: #0f172a;
-        background: rgba(255, 255, 255, 0.6);
+        background: rgba(255, 255, 255, 0.95);
+        border-color: #94a3b8;
       }
 
       :global([data-theme="light"] .category-tab.active) {
         background: #ffffff;
-        color: #4338ca;
-        border: 1px solid rgba(99, 102, 241, 0.2);
+        color: #1e40af;
+        border: 1px solid #3b82f6;
         box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04), inset 0 1px 0 #ffffff;
+      }
+
+      :global([data-theme="light"]) .carousel-nav-btn {
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(203, 213, 225, 0.9);
+        color: #0f172a;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+      }
+      :global([data-theme="light"]) .carousel-nav-btn:hover:not(:disabled) {
+        background: #0284c7;
+        border-color: #0284c7;
+        color: #ffffff;
+      }
+      :global([data-theme="light"]) .carousel-indicator-pill {
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(203, 213, 225, 0.8);
+        color: #475569;
+      }
+      :global([data-theme="light"]) .metrics-carousel-track::-webkit-scrollbar-thumb {
+        background: rgba(203, 213, 225, 0.9);
+      }
+      :global([data-theme="light"]) .category-tab-badge {
+        background: rgba(15, 23, 42, 0.06);
+        color: #475569;
+      }
+      :global([data-theme="light"]) .category-tab.active .category-tab-badge {
+        background: rgba(30, 64, 175, 0.15);
+        color: #1e40af;
       }
 
       /* Metric Cards */
@@ -1510,8 +1617,8 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
 
       /* Category Titles */
       :global([data-theme="light"]) .category-section-title.cat-structure { color: #0284c7; font-weight: 700; }
-      :global([data-theme="light"]) .category-section-title.cat-prose     { color: #7c3aed; font-weight: 700; }
-      :global([data-theme="light"]) .category-section-title.cat-theme     { color: #db2777; font-weight: 700; }
+      :global([data-theme="light"]) .category-section-title.cat-prose     { color: #1e40af; font-weight: 700; }
+      :global([data-theme="light"]) .category-section-title.cat-theme     { color: #b45309; font-weight: 700; }
       :global([data-theme="light"]) .category-section-title.cat-pacing    { color: #059669; font-weight: 700; }
 
       /* Visualizer Chart Card Styles */
@@ -1941,15 +2048,94 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
             <div class="chart-header">
               <h2 class="chart-title">Kishōtenketsu Sentiment Arc</h2>
               <div class="chart-legend">
-                <span class="legend-item"><span class="legend-dot user"></span>Novel</span>
+                <span class="legend-item"><span class="legend-dot user"></span>Your Prose</span>
                 <span class="legend-item"><span class="legend-dot baseline" id="arcBaselineLegendDot"></span><span id="baselineLegendLabel">Web Novel</span></span>
               </div>
             </div>
             <p class="chart-subtitle">
-              Tracks emotional polarity across the 4 acts (Ki, Shō, Ten, Ketsu). Notice the "Tidy Resolution" spike.
+              Tracks emotional polarity across the 4 acts (Ki, Shō, Ten, Ketsu).
             </p>
             <svg id="arcChart" viewBox="0 0 600 420" preserveAspectRatio="xMidYMid meet"></svg>
-            <div class="act-labels" id="actLabels" style="display: none;"></div>
+
+            <!-- Narrative Arc Trajectory, Act Transitions & Continuous Valence Spectrum -->
+            <div id="arcBreakdownContainer" class="arc-breakdown-container">
+              <!-- Section 1: Narrative Trajectory Summary Card -->
+              <div class="arc-trajectory-summary-card">
+                <div class="arc-trajectory-header">
+                  <span class="arc-trajectory-title">Narrative Trajectory</span>
+                  <span class="arc-trajectory-badge" id="arcTrajectoryBadge">Dynamic Reversal Arc</span>
+                </div>
+                <p class="arc-trajectory-desc" id="arcTrajectoryDesc">
+                  Opening in tense low-valence territory, escalating across rising development, peaking at a pivotal dramatic twist, and resolving into an unresolved conclusion.
+                </p>
+              </div>
+
+              <!-- Section 2: 3-Stage Act Transition Deltas -->
+              <div class="arc-act-transitions-row">
+                <div class="transition-pill">
+                  <div class="transition-pill-header">
+                    <span class="transition-pill-label">
+                      Ki
+                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                      Shō
+                    </span>
+                    <span id="transDelta1" class="transition-delta neutral">+0.00</span>
+                  </div>
+                  <span id="transDesc1" class="transition-desc">Rising Action</span>
+                </div>
+
+                <div class="transition-pill">
+                  <div class="transition-pill-header">
+                    <span class="transition-pill-label">
+                      Shō
+                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                      Ten
+                    </span>
+                    <span id="transDelta2" class="transition-delta neutral">+0.00</span>
+                  </div>
+                  <span id="transDesc2" class="transition-desc">Climactic Turn</span>
+                </div>
+
+                <div class="transition-pill">
+                  <div class="transition-pill-header">
+                    <span class="transition-pill-label">
+                      Ten
+                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                      Ketsu
+                    </span>
+                    <span id="transDelta3" class="transition-delta neutral">+0.00</span>
+                  </div>
+                  <span id="transDesc3" class="transition-desc">Resolution</span>
+                </div>
+              </div>
+
+              <!-- Section 3: Continuous Valence Spectrum Scale -->
+              <div class="valence-spectrum-card">
+                <div class="valence-spectrum-header">
+                  <span class="valence-spectrum-title">Emotional Polarity &amp; Valence Scale</span>
+                  <span class="valence-spectrum-range">-1.0 to +1.0</span>
+                </div>
+                <div class="valence-spectrum-bar-wrap">
+                  <div class="valence-spectrum-bar"></div>
+                  <div class="valence-spectrum-ticks">
+                    <span>-1.0</span>
+                    <span>0.0</span>
+                    <span>+1.0</span>
+                  </div>
+                </div>
+                <div class="valence-legend-labels">
+                  <div class="valence-legend-col left">
+                    <span>High Stakes, Peril &amp; Tension</span>
+                  </div>
+                  <div class="valence-legend-col center">
+                    <span>Neutral Exposition &amp; Worldbuilding</span>
+                  </div>
+                  <div class="valence-legend-col right">
+                    <span>Triumph, Hope &amp; Catharsis</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Pacing Barcode (Full Width) -->
@@ -2056,7 +2242,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         });
       }
 
-      document.addEventListener("astro:page-load", () => {
+      function setupAnalyzePage() {
         const themeToggleBtn = document.getElementById("themeToggleBtn");
         if (themeToggleBtn) {
           themeToggleBtn.onclick = toggleTheme;
@@ -2195,7 +2381,14 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
           if (resultsContainer) resultsContainer.style.display = "flex";
           if (visualizationsContainer) visualizationsContainer.style.display = "flex";
         }
-      });
+      }
+
+      document.addEventListener("astro:page-load", setupAnalyzePage);
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", setupAnalyzePage);
+      } else {
+        setupAnalyzePage();
+      }
 
       window.addEventListener("themechange", () => {
         requestAnimationFrame(() => {
@@ -2269,59 +2462,56 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
       };
 
       function renderEnhancedMetricsDashboard(stats) {
+        const isLight = document.documentElement.getAttribute("data-theme") === "light";
         const keys = Object.keys(stats);
-        const langPrefix = keys.some(k => k.startsWith("en_")) ? "en_" :
-                           keys.some(k => k.startsWith("ja_")) ? "ja_" : "zh_";
+        const langPrefix = keys.some(k => k.startsWith("ja_")) ? "ja_" :
+                           keys.some(k => k.startsWith("zh_")) ? "zh_" : "en_";
 
         const normRadar = stats.normalized_radar || {};
         const wnRadar   = stats.baselines?.radar?.web_novel   || [];
         const clRadar   = stats.baselines?.radar?.classic_lit || [];
 
         // 1. Hero Summary Header
+        const archetypeLabel = stats.archetype_match?.closest_trope || stats.archetype?.closest_trope || stats.archetype || stats.genre || "Unknown";
+        const territoryLabel = stats.archetype_match?.territory || stats.archetype?.territory || stats.territory || "Web Novel";
+        const rawWordCount = stats[`${langPrefix}word_count`] || stats[`${langPrefix}char_count`] || stats.en_word_count || stats.ja_char_count || stats.word_count || stats.char_count;
+        const wordCount = rawWordCount !== undefined && rawWordCount !== null ? rawWordCount : 0;
+        const ttrVal = stats[`${langPrefix}ttr`] || stats.en_ttr || stats.ja_ttr || stats.ttr;
+
         const heroHtml = `
           <div class="metrics-hero">
             <div class="hero-chip">
               <span class="hero-chip-label">Archetype</span>
-              <span class="hero-chip-val" style="color: var(--color-accent);">${stats.archetype_match?.closest_trope || stats.archetype?.closest_trope || 'Unknown'}</span>
+              <span class="hero-chip-val" style="color: ${isLight ? '#2563eb' : '#60a5fa'};">${archetypeLabel}</span>
             </div>
             <div class="hero-chip">
               <span class="hero-chip-label">Territory</span>
-              <span class="hero-chip-val" style="color: var(--color-accent-cyan, #38bdf8);">${stats.archetype_match?.territory || stats.archetype?.territory || 'Web Novel'}</span>
+              <span class="hero-chip-val" style="color: #38bdf8;">${territoryLabel}</span>
             </div>
             <div class="hero-chip">
               <span class="hero-chip-label">Word Count</span>
-              <span class="hero-chip-val">${Math.round(stats[`${langPrefix}word_count`] || stats[`${langPrefix}char_count`] || stats.word_count || stats.char_count || 0).toLocaleString()}</span>
+              <span class="hero-chip-val">${wordCount > 0 ? Math.round(wordCount).toLocaleString() : '0'}</span>
             </div>
             <div class="hero-chip">
               <span class="hero-chip-label">Lexical Richness</span>
-              <span class="hero-chip-val" style="color: var(--color-accent-emerald, #34d399);">${(stats[`${langPrefix}ttr`] || stats.ttr || 0).toFixed(2)}</span>
+              <span class="hero-chip-val" style="color: #34d399;">${typeof ttrVal === "number" ? ttrVal.toFixed(2) : (ttrVal || 'N/A')}</span>
             </div>
           </div>
         `;
 
-        // 2. Filter Tabs
-        const tabsHtml = `
-          <div class="metrics-category-tabs">
-            <button class="category-tab active" data-cat="all">All Metrics</button>
-            <button class="category-tab" data-cat="structure">Structure</button>
-            <button class="category-tab" data-cat="prose">Prose & Style</button>
-            <button class="category-tab" data-cat="theme">Theme & Emotion</button>
-            <button class="category-tab" data-cat="pacing">Pacing & Narrative</button>
-          </div>
-        `;
-
-        // 3. Metric Sections Grouping
+        // 2. Metric Categories
         const categories = [
-          { id: "structure", title: "Structure & Volume", class: "cat-structure", barClass: "bar-fill-structure" },
-          { id: "prose", title: "Prose & Style", class: "cat-prose", barClass: "bar-fill-prose" },
-          { id: "theme", title: "Theme & Emotion", class: "cat-theme", barClass: "bar-fill-theme" },
-          { id: "pacing", title: "Pacing & Narrative", class: "cat-pacing", barClass: "bar-fill-pacing" }
+          { id: "structure", label: "Structure", title: "Structure & Volume", class: "cat-structure", barClass: "bar-fill-structure" },
+          { id: "prose", label: "Prose", title: "Prose & Style", class: "cat-prose", barClass: "bar-fill-prose" },
+          { id: "theme", label: "Theme", title: "Theme & Emotion", class: "cat-theme", barClass: "bar-fill-theme" },
+          { id: "pacing", label: "Pacing", title: "Pacing & Narrative", class: "cat-pacing", barClass: "bar-fill-pacing" }
         ];
 
-        let sectionsHtml = "";
+        let allCardsHtml = "";
+        let totalCardsCount = 0;
+        const catCounts = { structure: 0, prose: 0, theme: 0, pacing: 0 };
 
         categories.forEach(cat => {
-          let cardsInCatHtml = "";
           Object.keys(METRIC_METADATA).forEach(key => {
             const meta = METRIC_METADATA[key];
             if (meta.category !== cat.id) return;
@@ -2329,25 +2519,31 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
             const rawKey = `${langPrefix}${key}`;
             let rawVal = stats[rawKey] !== undefined ? stats[rawKey] : stats[key];
             if (rawVal === undefined || rawVal === null || (rawVal === 0 && key === "compound_sentiment")) {
-              rawVal = stats[`en_${key}`] ?? stats[`zh_${key}`] ?? stats[`ja_${key}`] ?? stats[key];
+              rawVal = stats[`en_${key}`] ?? stats[`ja_${key}`] ?? stats[`zh_${key}`] ?? stats[key];
             }
-            if (rawVal === null || rawVal === undefined) return;
+            if (rawVal === undefined || rawVal === null) return;
+
+            const normScore = normRadar[rawKey] !== undefined ? normRadar[rawKey] :
+                              normRadar[key] !== undefined ? normRadar[key] :
+                              normRadar[`en_${key}`] !== undefined ? normRadar[`en_${key}`] :
+                              normRadar[`ja_${key}`] !== undefined ? normRadar[`ja_${key}`] : 0.50;
+
+            catCounts[cat.id]++;
+            totalCardsCount++;
+            const cardIdx = totalCardsCount;
 
             let displayVal = meta.isPercent ? `${(rawVal * 100).toFixed(1)}%` :
                              meta.isInteger ? Math.round(rawVal).toLocaleString() :
                              typeof rawVal === 'number' ? (rawVal % 1 !== 0 ? rawVal.toFixed(2) : rawVal.toString()) : rawVal;
-
-            const normScore = normRadar[rawKey] !== undefined ? normRadar[rawKey] :
-                              normRadar[key] !== undefined ? normRadar[key] : 0.5;
 
             const pctWidth = Math.min(100, Math.max(0, Math.round(normScore * 100)));
 
             // Benchmark comparison chip
             let benchChipHtml = "";
             if (normScore >= 0.65) {
-              benchChipHtml = `<span class="benchmark-chip higher">High (+${Math.round((normScore - 0.5) * 100)}% vs Avg)</span>`;
+              benchChipHtml = `<span class="benchmark-chip higher">High (+${Math.round((normScore - 0.5) * 100)}%)</span>`;
             } else if (normScore <= 0.35) {
-              benchChipHtml = `<span class="benchmark-chip lower">Low (-${Math.round((0.5 - normScore) * 100)}% vs Avg)</span>`;
+              benchChipHtml = `<span class="benchmark-chip lower">Low (-${Math.round((0.5 - normScore) * 100)}%)</span>`;
             } else {
               benchChipHtml = `<span class="benchmark-chip neutral">Balanced</span>`;
             }
@@ -2368,7 +2564,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
                   const wnPct = Math.round(wnVal * 100);
                   baselineRowHtml += `
                     <span class="metric-baseline-item">
-                      <span class="metric-baseline-dot" style="background:#a78bfa;"></span>
+                      <span class="metric-baseline-dot" style="background:${isLight ? '#2563eb' : '#3b82f6'};"></span>
                       WN: ${wnPct}%
                     </span>`;
                 }
@@ -2384,13 +2580,14 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
               }
             }
 
-            cardsInCatHtml += `
-              <div class="metric-card" data-category="${cat.id}">
+            allCardsHtml += `
+              <div class="metric-card" data-category="${cat.id}" data-card-index="${cardIdx}">
                 <div class="metric-card-header">
-                  <span class="metric-card-label">${meta.label}</span>
+                  <span class="metric-card-cat-badge ${cat.class}">${cat.label}</span>
                   <span class="metric-info-icon" role="button" aria-label="${meta.tooltip}">ⓘ</span>
                   <div class="metric-tooltip-box">${meta.tooltip}</div>
                 </div>
+                <span class="metric-card-label" style="font-size: 0.78rem; font-weight: 600; color: var(--color-text); margin-top: 0.1rem;">${meta.label}</span>
                 <div class="metric-val-row">
                   <span class="metric-primary-val">${displayVal}</span>
                   ${benchChipHtml}
@@ -2402,26 +2599,126 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
               </div>
             `;
           });
-
-          if (cardsInCatHtml) {
-            sectionsHtml += `
-              <div class="metric-category-section" data-cat-section="${cat.id}">
-                <div class="category-section-title ${cat.class}">${cat.title}</div>
-                <div class="metric-card-grid">
-                  ${cardsInCatHtml}
-                </div>
-              </div>
-            `;
-          }
         });
+
+        // Category tabs with live counts and horizontal carousel controls
+        const tabsHtml = `
+          <div class="metrics-carousel-header">
+            <div class="metrics-category-tabs">
+              <button class="category-tab active" data-cat="all">All <span class="category-tab-badge">${totalCardsCount}</span></button>
+              <button class="category-tab" data-cat="structure">Structure <span class="category-tab-badge">${catCounts.structure}</span></button>
+              <button class="category-tab" data-cat="prose">Prose <span class="category-tab-badge">${catCounts.prose}</span></button>
+              <button class="category-tab" data-cat="theme">Theme <span class="category-tab-badge">${catCounts.theme}</span></button>
+              <button class="category-tab" data-cat="pacing">Pacing <span class="category-tab-badge">${catCounts.pacing}</span></button>
+            </div>
+            <div class="metrics-carousel-nav">
+              <button class="carousel-nav-btn" id="metricsCarouselPrev" aria-label="Scroll left" title="Scroll left">‹</button>
+              <span class="carousel-indicator-pill" id="metricsCarouselIndicator">1–3 of ${totalCardsCount}</span>
+              <button class="carousel-nav-btn" id="metricsCarouselNext" aria-label="Scroll right" title="Scroll right">›</button>
+            </div>
+          </div>
+        `;
 
         return `
           <div class="metrics-dashboard">
             ${heroHtml}
             ${tabsHtml}
-            ${sectionsHtml}
+            <div class="metrics-carousel-track-wrapper">
+              <div class="metrics-carousel-track" id="metricsCarouselTrack">
+                ${allCardsHtml}
+              </div>
+            </div>
           </div>
         `;
+      }
+
+      function attachDashboardEventListeners(container) {
+        if (!container) return;
+        const track = container.querySelector("#metricsCarouselTrack");
+        const prevBtn = container.querySelector("#metricsCarouselPrev");
+        const nextBtn = container.querySelector("#metricsCarouselNext");
+        const indicator = container.querySelector("#metricsCarouselIndicator");
+        const tabBtns = container.querySelectorAll(".category-tab");
+        const cards = container.querySelectorAll(".metric-card");
+        const totalCards = cards.length;
+
+        function updateCarouselState() {
+          if (!track || !indicator) return;
+          const scrollLeft = track.scrollLeft;
+          const colWidth = 224; // 215px + 9px gap
+          const visibleCols = Math.max(1, Math.floor((track.clientWidth + 10) / colWidth));
+          const firstCol = Math.max(0, Math.round(scrollLeft / colWidth));
+          const firstIdx = firstCol * 2;
+          const lastIdx = Math.min(totalCards, firstIdx + (visibleCols * 2));
+
+          indicator.innerText = `${firstIdx + 1}–${lastIdx} of ${totalCards}`;
+          if (prevBtn) prevBtn.disabled = (scrollLeft <= 5);
+          if (nextBtn) nextBtn.disabled = (scrollLeft + track.clientWidth >= track.scrollWidth - 5);
+
+          // Update active category tab based on current first visible card
+          const currentCard = cards[firstIdx];
+          if (currentCard) {
+            const currentCat = currentCard.getAttribute("data-category");
+            tabBtns.forEach(btn => {
+              const cat = btn.getAttribute("data-cat");
+              if (cat === currentCat || (firstIdx === 0 && cat === "all")) {
+                btn.classList.add("active");
+              } else {
+                btn.classList.remove("active");
+              }
+            });
+          }
+        }
+
+        if (track) {
+          track.addEventListener("scroll", updateCarouselState, { passive: true });
+          updateCarouselState();
+        }
+
+        if (prevBtn && track) {
+          prevBtn.addEventListener("click", () => {
+            track.scrollBy({ left: -track.clientWidth * 0.75, behavior: "smooth" });
+          });
+        }
+
+        if (nextBtn && track) {
+          nextBtn.addEventListener("click", () => {
+            track.scrollBy({ left: track.clientWidth * 0.75, behavior: "smooth" });
+          });
+        }
+
+        tabBtns.forEach(btn => {
+          btn.addEventListener("click", () => {
+            const targetCat = btn.getAttribute("data-cat");
+            tabBtns.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+
+            if (targetCat === "all") {
+              track.scrollTo({ left: 0, behavior: "smooth" });
+            } else {
+              const targetCard = container.querySelector(`.metric-card[data-category="${targetCat}"]`);
+              if (targetCard && track) {
+                track.scrollTo({ left: targetCard.offsetLeft - track.offsetLeft - 4, behavior: "smooth" });
+              }
+            }
+          });
+        });
+
+        // Attach info icon click handler for popovers
+        const infoIcons = container.querySelectorAll(".metric-info-icon");
+        infoIcons.forEach(icon => {
+          icon.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const tooltipBox = icon.nextElementSibling;
+            const isVisible = tooltipBox?.classList.contains("visible");
+            container.querySelectorAll(".metric-tooltip-box").forEach(box => box.classList.remove("visible"));
+            container.querySelectorAll(".metric-info-icon").forEach(i => i.classList.remove("active"));
+            if (!isVisible && tooltipBox) {
+              tooltipBox.classList.add("visible");
+              icon.classList.add("active");
+            }
+          });
+        });
       }
 
       function renderResults(data) {
@@ -2439,44 +2736,11 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         };
 
         resultsContainer.innerHTML = renderEnhancedMetricsDashboard(statsObj);
+        attachDashboardEventListeners(resultsContainer);
 
         if (window.innerWidth <= 768) {
           setTimeout(() => resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
         }
-
-        // Attach category tab filter event listener
-        const tabBtns = resultsContainer.querySelectorAll(".category-tab");
-        tabBtns.forEach(btn => {
-          btn.addEventListener("click", () => {
-            tabBtns.forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            const targetCat = btn.getAttribute("data-cat");
-            const sections = resultsContainer.querySelectorAll("[data-cat-section]");
-            sections.forEach(sec => {
-              if (targetCat === "all" || sec.getAttribute("data-cat-section") === targetCat) {
-                sec.style.display = "flex";
-              } else {
-                sec.style.display = "none";
-              }
-            });
-          });
-        });
-
-        // Attach info icon click popover event listener
-        const infoIcons = resultsContainer.querySelectorAll(".metric-info-icon");
-        infoIcons.forEach(icon => {
-          icon.addEventListener("click", (e) => {
-            e.stopPropagation();
-            const tooltipBox = icon.nextElementSibling;
-            const isVisible = tooltipBox?.classList.contains("visible");
-            resultsContainer.querySelectorAll(".metric-tooltip-box").forEach(box => box.classList.remove("visible"));
-            resultsContainer.querySelectorAll(".metric-info-icon").forEach(i => i.classList.remove("active"));
-            if (!isVisible && tooltipBox) {
-              tooltipBox.classList.add("visible");
-              icon.classList.add("active");
-            }
-          });
-        });
       }
 
       const RADAR_DIMS = [
@@ -2509,8 +2773,8 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         const isWeb = activeBaseline === "web_novel";
         const labelText = isWeb ? "Web Novel" : "Classic Lit";
         const dotColor = isWeb
-          ? (isLight ? "#7c3aed" : "#a78bfa")
-          : (isLight ? "#d97706" : "#fbbf24");
+          ? (isLight ? "#2563eb" : "#3b82f6")
+          : (isLight ? "#d97706" : "#f59e0b");
         
         const radarLbl = document.getElementById("radarBaselineLegendLabel");
         const arcLbl = document.getElementById("baselineLegendLabel");
@@ -2640,14 +2904,14 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
 
         const isWeb = baseline === "web_novel";
         const blColor = isWeb
-          ? (isLight ? "#7c3aed" : "#a78bfa")
-          : (isLight ? "#d97706" : "#fbbf24");
+          ? (isLight ? "#2563eb" : "#3b82f6")
+          : (isLight ? "#d97706" : "#f59e0b");
         const blRgb = isWeb
-          ? (isLight ? "124, 58, 237" : "167, 139, 250")
-          : (isLight ? "217, 119, 6" : "251, 191, 36");
+          ? (isLight ? "37, 99, 235" : "59, 130, 246")
+          : (isLight ? "217, 119, 6" : "245, 158, 11");
 
-        const userColor = isLight ? "#0284c7" : "#7dd3fc";
-        const userRgb   = isLight ? "2, 132, 199" : "125, 211, 252";
+        const userColor = isLight ? "#0284c7" : "#38bdf8";
+        const userRgb   = isLight ? "2, 132, 199" : "56, 189, 248";
 
         const blVals = (stats && stats.baselines && stats.baselines.radar && stats.baselines.radar[baseline])
           ? stats.baselines.radar[baseline]
@@ -2888,13 +3152,13 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
           : [0.0839, 0.0588, 0.1347, 0.1006];
         const isWeb   = baseline === "web_novel";
         const blColor = isWeb
-          ? (isLight ? "#7c3aed" : "#a78bfa")
-          : (isLight ? "#d97706" : "#fbbf24");
+          ? (isLight ? "#2563eb" : "#3b82f6")
+          : (isLight ? "#d97706" : "#f59e0b");
         const blRgb   = isWeb
-          ? (isLight ? "124, 58, 237" : "167, 139, 250")
-          : (isLight ? "217, 119, 6" : "251, 191, 36");
-        const userColor = isLight ? "#0284c7" : "#7dd3fc";
-        const userRgb   = isLight ? "2, 132, 199" : "125, 211, 252";
+          ? (isLight ? "37, 99, 235" : "59, 130, 246")
+          : (isLight ? "217, 119, 6" : "245, 158, 11");
+        const userColor = isLight ? "#0284c7" : "#38bdf8";
+        const userRgb   = isLight ? "2, 132, 199" : "56, 189, 248";
 
         const sentY = s => {
           const clamped = Math.max(-1.0, Math.min(1.0, s));
@@ -3017,9 +3281,10 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
           const lbl = document.createElementNS(ns, "text");
           lbl.setAttribute("x", String(axisX - 8));
           lbl.setAttribute("y", y + 3.5);
-          lbl.setAttribute("fill", isLight ? "#0369a1" : "rgba(255, 255, 255, 0.3)");
+          lbl.setAttribute("fill", isLight ? "#475569" : "rgba(255, 255, 255, 0.50)");
           lbl.setAttribute("font-size", "9");
           lbl.setAttribute("font-family", "Inter, sans-serif");
+          lbl.setAttribute("font-weight", "500");
           lbl.setAttribute("text-anchor", "end");
           lbl.textContent = val > 0 ? `+${val.toFixed(1)}` : val.toFixed(1);
           svg.appendChild(lbl);
@@ -3028,13 +3293,13 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         const yAxis = document.createElementNS(ns, "line");
         yAxis.setAttribute("x1", String(axisX)); yAxis.setAttribute("y1", String(PAD.top));
         yAxis.setAttribute("x2", String(axisX)); yAxis.setAttribute("y2", String(bottomY));
-        yAxis.setAttribute("stroke", isLight ? "rgba(2, 132, 199, 0.20)" : "rgba(255, 255, 255, 0.15)");
+        yAxis.setAttribute("stroke", isLight ? "#cbd5e1" : "rgba(255, 255, 255, 0.15)");
         svg.appendChild(yAxis);
 
         const xAxis = document.createElementNS(ns, "line");
         xAxis.setAttribute("x1", String(axisX)); xAxis.setAttribute("y1", String(bottomY));
         xAxis.setAttribute("x2", String(endX));  xAxis.setAttribute("y2", String(bottomY));
-        xAxis.setAttribute("stroke", isLight ? "rgba(2, 132, 199, 0.20)" : "rgba(255, 255, 255, 0.15)");
+        xAxis.setAttribute("stroke", isLight ? "#94a3b8" : "rgba(255, 255, 255, 0.20)");
         svg.appendChild(xAxis);
 
         ["Ki (Intro)", "Shō (Dev)", "Ten (Twist)", "Ketsu (Res)"].forEach((label, i) => {
@@ -3042,12 +3307,12 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
           const tick = document.createElementNS(ns, "line");
           tick.setAttribute("x1", lx); tick.setAttribute("y1", bottomY);
           tick.setAttribute("x2", lx); tick.setAttribute("y2", bottomY + 4);
-          tick.setAttribute("stroke", isLight ? "rgba(2, 132, 199, 0.15)" : "rgba(255, 255, 255, 0.07)");
+          tick.setAttribute("stroke", isLight ? "#cbd5e1" : "rgba(255, 255, 255, 0.12)");
           svg.appendChild(tick);
 
           const txt = document.createElementNS(ns, "text");
           txt.setAttribute("x", lx); txt.setAttribute("y", bottomY + 16);
-          txt.setAttribute("fill", isLight ? "#0369a1" : "rgba(255, 255, 255, 0.45)");
+          txt.setAttribute("fill", isLight ? "#1e293b" : "rgba(255, 255, 255, 0.70)");
           txt.setAttribute("font-size", "10"); txt.setAttribute("font-weight", "600");
           txt.setAttribute("font-family", "Inter, sans-serif");
           txt.setAttribute("text-anchor", "middle");
@@ -3103,16 +3368,72 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
           svg.appendChild(blDot);
         });
 
-        const actLabels = document.getElementById("actLabels");
-        if (actLabels) {
-          actLabels.innerHTML = "";
-          acts.forEach(a => {
-            const chip = document.createElement("div");
-            chip.className = "act-chip";
-            chip.innerHTML = `<span class="act-key">${a.act || ''}</span><span class="act-name">${a.label || ''}</span>`;
-            actLabels.appendChild(chip);
-          });
+        // Update 4-Phase Narrative Arc Breakdown
+        updateArcBreakdown(acts, blVals, baseline);
+      }
+
+      function updateArcBreakdown(acts, blVals, baseline) {
+        const rawVals = acts.map(a => typeof a === "number" ? a : (a?.sentiment ?? 0));
+        if (rawVals.length < 4) return;
+
+        const vKi = rawVals[0];
+        const vSho = rawVals[1];
+        const vTen = rawVals[2];
+        const vKetsu = rawVals[3];
+
+        const formatSent = v => (v > 0 ? `+${v.toFixed(2)}` : v.toFixed(2));
+        const formatDelta = d => (d > 0 ? `+${d.toFixed(2)}` : d.toFixed(2));
+        const getDeltaClass = d => (d > 0.05 ? "positive" : (d < -0.05 ? "negative" : "neutral"));
+
+        // Act Transition Deltas
+        const d1 = vSho - vKi;
+        const d2 = vTen - vSho;
+        const d3 = vKetsu - vTen;
+
+        const desc1 = d1 > 0.2 ? "Rising Friction" : (d1 < -0.2 ? "Descent into Crisis" : "Steady Development");
+        const desc2 = d2 > 0.2 ? "Uplifting Turning Point" : (d2 < -0.2 ? "Dramatic Climax Drop" : "Tension Shift");
+        const desc3 = d3 > 0.15 ? "Triumphant Uplift" : (d3 < -0.15 ? "Lingering Cliffhanger" : "Measured Resolution");
+
+        const updatePill = (deltaId, descId, deltaVal, descText) => {
+          const deltaEl = document.getElementById(deltaId);
+          const descEl = document.getElementById(descId);
+          if (deltaEl) {
+            deltaEl.textContent = formatDelta(deltaVal);
+            deltaEl.className = `transition-delta ${getDeltaClass(deltaVal)}`;
+          }
+          if (descEl) {
+            descEl.textContent = descText;
+          }
+        };
+
+        updatePill("transDelta1", "transDesc1", d1, desc1);
+        updatePill("transDelta2", "transDesc2", d2, desc2);
+        updatePill("transDelta3", "transDesc3", d3, desc3);
+
+        let badge = "Dynamic Reversal Arc";
+        let desc = "Opening with calculated atmospheric tension, escalating across development, peaking at a pivotal dramatic turn, and resolving into an unresolved conclusion.";
+
+        if (vTen > vKi && vTen > vSho && vKetsu < vTen) {
+          badge = "Dynamic Reversal Arc";
+          desc = `Begins in grounded exposition (${formatSent(vKi)}), builds rising momentum through development (${formatSent(vSho)}), reaches peak emotional intensity at the Ten twist (${formatSent(vTen)}), and descends into an impact-heavy resolution (${formatSent(vKetsu)}).`;
+        } else if (vKi < 0 && vSho > vKi && vTen > vSho && vKetsu > 0) {
+          badge = "Heroic Ascent Arc";
+          desc = `Opens from an adversarial low point (${formatSent(vKi)}), steadily climbing through character growth and climactic breakthroughs into a sustained positive resolution (${formatSent(vKetsu)}).`;
+        } else if (vKi > 0 && vKetsu < 0) {
+          badge = "Tragic Descent Arc";
+          desc = `Launches from optimistic stability (${formatSent(vKi)}) before descending through escalating complications into high-stakes dramatic consequence (${formatSent(vKetsu)}).`;
+        } else if (Math.abs(vTen - vSho) >= 0.35) {
+          badge = "High-Volatility Twist Arc";
+          desc = `Characterized by sharp emotional volatility between development (${formatSent(vSho)}) and the Ten inflection point (${formatSent(vTen)}), driving intense dramatic momentum.`;
+        } else {
+          badge = "Balanced Narrative Arc";
+          desc = `Maintains harmonious narrative equilibrium across all four acts, balancing descriptive exposition with steady emotional engagement.`;
         }
+
+        const badgeEl = document.getElementById("arcTrajectoryBadge");
+        const descEl = document.getElementById("arcTrajectoryDesc");
+        if (badgeEl) badgeEl.textContent = badge;
+        if (descEl) descEl.textContent = desc;
       }
 
       /* ── Rhythmic Pacing (Paragraph Barcode) ── */
@@ -3122,8 +3443,8 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
         const userPacing = stats.pacing || [];
         const isWeb = baseline === "web_novel";
         const baselineColor = isWeb
-          ? (isLight ? "linear-gradient(180deg, #a78bfa 0%, #7c3aed 100%)" : "linear-gradient(180deg, #c084fc 0%, #7c3aed 100%)")
-          : (isLight ? "linear-gradient(180deg, #fbbf24 0%, #d97706 100%)" : "linear-gradient(180deg, #fde68a 0%, #d97706 100%)");
+          ? (isLight ? "linear-gradient(180deg, #60a5fa 0%, #2563eb 100%)" : "linear-gradient(180deg, #93c5fd 0%, #3b82f6 100%)")
+          : (isLight ? "linear-gradient(180deg, #fbbf24 0%, #d97706 100%)" : "linear-gradient(180deg, #fde68a 0%, #f59e0b 100%)");
         const userColor = isLight
           ? "linear-gradient(180deg, #38bdf8 0%, #0284c7 100%)"
           : "linear-gradient(180deg, #7dd3fc 0%, #0284c7 100%)";
@@ -3274,13 +3595,13 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
               <div id="doppelganger-drawer-${m.id}" class="doppelganger-drawer" style="display: none;">
                 ${m.narrative_reasoning?.narrative_synthesis ? `
                   <div class="narrative-synthesis-box">
-                    <div class="synthesis-tag">📖 Narrative Synthesis</div>
+                    <div class="synthesis-tag"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 5px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Narrative Synthesis</div>
                     <p class="synthesis-text">"${m.narrative_reasoning.narrative_synthesis}"</p>
                   </div>
                 ` : ''}
 
                 ${m.narrative_reasoning?.pillars ? `
-                  <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #a78bfa; margin-bottom: 4px; margin-top: 12px;">
+                  <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: ${isLight ? '#2563eb' : '#60a5fa'}; margin-bottom: 4px; margin-top: 12px;">
                     4-Pillar Narrative Alignment (85% Ranking Weight)
                   </div>
                   <div class="pillars-grid">
@@ -3288,11 +3609,11 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
                       const p = m.narrative_reasoning.pillars[pKey];
                       if (!p) return '';
                       const meta = {
-                        catalyst: { icon: "⚡", title: "Premise & Inciting Catalyst", color: "linear-gradient(90deg, #818cf8, #a78bfa)" },
-                        setting: { icon: "🏰", title: "World Setting & Atmosphere", color: "linear-gradient(90deg, #38bdf8, #67e8f9)" },
-                        conflict: { icon: "⚔️", title: "Conflict Stakes & Tension", color: "linear-gradient(90deg, #f43f5e, #fb7185)" },
-                        style_cadence: { icon: "✍️", title: "Prose Voice & Cadence", color: "linear-gradient(90deg, #34d399, #6ee7b7)" }
-                      }[pKey] || { icon: "🔹", title: pKey, color: "#a78bfa" };
+                        catalyst: { title: "Premise & Inciting Catalyst", color: "linear-gradient(90deg, #3b82f6, #60a5fa)" },
+                        setting: { title: "World Setting & Atmosphere", color: "linear-gradient(90deg, #38bdf8, #67e8f9)" },
+                        conflict: { title: "Conflict Stakes & Tension", color: "linear-gradient(90deg, #f43f5e, #fb7185)" },
+                        style_cadence: { title: "Prose Voice & Cadence", color: "linear-gradient(90deg, #34d399, #6ee7b7)" }
+                      }[pKey] || { title: pKey, color: "#3b82f6" };
 
                       const scorePct = Math.round((p.score || 0) * 100);
                       const qVal = p.query_val || p.value || 'N/A';
@@ -3302,7 +3623,6 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
                         <div class="pillar-card">
                           <div class="pillar-card-header">
                             <div class="pillar-title-group">
-                              <span class="pillar-icon">${meta.icon}</span>
                               <strong>${p.name || meta.title}</strong>
                             </div>
                             <span class="pillar-score-badge">${scorePct}%</span>
@@ -3317,7 +3637,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
                               <span class="capsule-label">Your Prose</span>
                               <span class="capsule-value">${qVal}</span>
                             </div>
-                            <span class="pillar-arrow">➔</span>
+                            <span class="pillar-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
                             <div class="pillar-capsule" title="Matched Novel: ${cVal}">
                               <span class="capsule-label">Matched Novel</span>
                               <span class="capsule-value">${cVal}</span>
@@ -3331,7 +3651,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
                   </div>
                 ` : `
                   <div style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-                    <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #a78bfa; margin-bottom: 4px;">
+                    <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: ${isLight ? '#2563eb' : '#60a5fa'}; margin-bottom: 4px;">
                       Story & Thematic Anatomy (85% Ranking Weight)
                     </div>
                     <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 0.75rem; color: var(--color-muted);">
@@ -3346,7 +3666,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
 
                 ${m.narrative_reasoning?.shared_tropes?.length ? `
                   <div class="shared-tropes-section" style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-                    <span class="tropes-label" style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--color-muted); display: block; margin-bottom: 6px;">🏷️ Shared Tropes & Motifs:</span>
+                    <span class="tropes-label" style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--color-muted); display: block; margin-bottom: 6px;">Shared Tropes & Motifs:</span>
                     <div class="tropes-list" style="display: flex; flex-wrap: wrap; gap: 6px;">
                       ${m.narrative_reasoning.shared_tropes.map(t => `<span class="shared-trope-chip">${t}</span>`).join('')}
                     </div>
@@ -3369,7 +3689,7 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
                       const barColor = matchNum >= 90
                         ? (isLight ? '#0284c7' : '#38bdf8')
                         : matchNum >= 75
-                          ? (isLight ? '#7c3aed' : '#a78bfa')
+                          ? (isLight ? '#2563eb' : '#60a5fa')
                           : (isLight ? '#d97706' : '#fbbf24');
                       return `
                         <div class="metric-compare-row">
