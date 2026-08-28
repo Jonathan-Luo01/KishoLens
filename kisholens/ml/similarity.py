@@ -966,9 +966,9 @@ def _generate_narrative_synthesis(
         elif is_family_brother:
             return f"Your prose mirrors {c_name}'s protective domestic atmosphere, grounding high-society maneuvering in loyalty to loved ones."
         elif is_avoid_death:
-            return f"Your prose captures {c_name}'s suspenseful urgency, building tension around a protagonist calculating every move to avert impending doom."
+            return f"Your prose captures {c_name}'s suspenseful urgency, building tension around a protagonist calculating every move to outmaneuver impending doom."
         elif is_villainess:
-            return f"Your prose mirrors {c_name}'s high-society intrigue, building suspense around a protagonist maneuvering to outwit aristocratic ruin."
+            return f"Your prose mirrors {c_name}'s aristocratic intrigue, building suspense around a protagonist maneuvering to outwit high-society ruin."
         elif is_court_noble:
             return f"Your prose channels the tense courtly atmosphere of {c_name}, balancing hidden motives with calculating political dialogue."
         elif is_hunter_dungeon:
@@ -984,34 +984,32 @@ def _generate_narrative_synthesis(
     else:
         # Distinct contrasting insights between Q and Candidate C
         if is_slow_life:
-            return f"Both works embrace a grounded, character-driven pace, with {c_name} highlighting cozy frontier crafting and warm community bonds alongside subtle fantastical intrigue."
+            return f"Both narratives favor a grounded, character-driven pace, with {c_name} centering on cozy craftsmanship, everyday problem-solving, and warm community bonds."
         elif is_mystery:
-            return f"Sharing deliberate investigative tension, {c_name} sharpens the narrative stakes into a deductive puzzle of hidden motives and clandestine clues."
+            return f"While both narratives build suspense through hidden motives, {c_name} unfolds as a methodical deductive puzzle centered on keen observation and clandestine clues."
         elif is_family_brother:
-            return f"Sharing rich royal court politics, {c_name} shifts focus toward protective domestic intrigue, using concealed power to shield loved ones from factional rivals."
-        elif is_avoid_death:
-            return f"While both works feature noble reincarnation, {c_name} sharpens the tension into a race against mortality as the protagonist desperately outmaneuvers catastrophic death flags."
+            return f"While both narratives navigate royal court politics, {c_name} grounds its stakes in domestic loyalty, using hidden influence to shield loved ones from factional rivals."
+        elif is_avoid_death or is_villainess:
+            return f"While both stories center on rebirth within aristocratic high society, {c_name} inverts the premise into a race against mortality as the protagonist maneuvers to outwit political traps and rewrite a doomed fate."
         elif is_friend_mob or (is_game_world and is_reincarnat):
-            return f"Both works navigate complex political factions, with {c_name} exploring the story from a tactical supporting vantage to quietly alter the fate of key figures."
-        elif is_villainess:
-            return f"While both works explore aristocratic court maneuvering, {c_name} subverts noble destiny as the protagonist schemes against catastrophic social doom."
+            return f"While both stories involve high-stakes political intrigue, {c_name} shifts to a supporting vantage point, following a background protagonist quietly steering events to keep key allies alive."
         elif is_magic_academy:
-            return f"Both narratives thrive on elitist institutional hierarchies, with {c_name} transposing high-stakes political rivalry into competitive academic trials."
+            return f"Both stories explore institutional hierarchies and rivalries, with {c_name} channeling noble power struggles into competitive academic and magical trials."
         elif is_reincarnat and is_court_noble:
-            return f"Both stories immerse an otherworldly soul into perilous high-society nobility, pairing calculated political dominance with secret tactical advantages."
+            return f"Both narratives follow a reborn protagonist navigating the perils of aristocratic court society, pairing calculated diplomacy with carefully guarded advantages."
         elif is_hunter_dungeon:
             if is_underdog_rise:
-                return f"Both narratives follow concealed god-tier power, with {c_name} chronicling an underdog's rapid ascension through perilous dungeon raids."
+                return f"Both works deliver high-stakes supernatural progression, with {c_name} following an underdog's tactical ascent through perilous dungeon incursions."
             else:
                 return f"Both works leverage high-stakes supernatural progression, exploring lethal monster incursions and clandestine guild rivalries."
         elif is_cultivation:
-            return f"Sharing profound Eastern worldbuilding, {c_name} charts disciplined martial cultivation and fierce sect rivalries against formidable clan elders."
+            return f"Both works feature disciplined martial progression, with {c_name} highlighting grueling training bottlenecks, sect rivalries, and the path toward spiritual ascension."
         elif is_dark_horror:
-            return f"Both narratives evoke deep atmospheric suspense, with {c_name} plunging deeper into visceral psychological dread and treacherous supernatural forces."
+            return f"Both narratives build atmospheric dread, with {c_name} leaning into psychological tension, eerie suspense, and treacherous supernatural perils."
         elif is_romance_drama:
-            return f"Both stories weave intricate character dynamics, with {c_name} emphasizing delicate emotional vulnerability alongside societal expectations."
+            return f"Both stories emphasize delicate interpersonal dynamics, with {c_name} exploring emotional vulnerability and courtship amidst strict societal expectations."
         else:
-            return f"Both works establish distinct thematic momentum, immersing readers in vivid worldbuilding and deliberate character development."
+            return f"Both narratives share a strong sense of atmospheric worldbuilding and deliberate character agency as their protagonists confront escalating stakes."
 
 
 def _compute_4pillar_breakdown(

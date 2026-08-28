@@ -5027,15 +5027,8 @@ const publicApiUrl = import.meta.env.PUBLIC_API_URL || "";
 
             ${hasComparisons || m.narrative_reasoning ? `
               <div id="doppelganger-drawer-${m.id}" class="doppelganger-drawer" style="display: none;">
-                ${m.narrative_reasoning?.narrative_synthesis ? `
-                  <div class="narrative-synthesis-box">
-                    <div class="synthesis-tag"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 5px;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Narrative Synthesis</div>
-                    <p class="synthesis-text">"${m.narrative_reasoning.narrative_synthesis}"</p>
-                  </div>
-                ` : ''}
-
                 ${m.narrative_reasoning?.pillars ? `
-                  <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: ${isLight ? '#2563eb' : '#60a5fa'}; margin-bottom: 4px; margin-top: 12px;">
+                  <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: ${isLight ? '#2563eb' : '#60a5fa'}; margin-bottom: 6px; margin-top: 2px;">
                     4-Pillar Narrative Alignment (85% Ranking Weight)
                   </div>
                   <div class="pillars-grid">

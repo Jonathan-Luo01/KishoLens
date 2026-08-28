@@ -14,9 +14,9 @@ A computational stylometry and narrative similarity platform for web fiction and
 
 <br/>
 
-| Archetype Radar & Pacing Barcode | 4-Pillar Narrative Alignment Drawer |
+| Archetype Radar, Kishōtenketsu Arc & Pacing | 4-Pillar Narrative Alignment Matrix |
 |:---:|:---:|
-| <img src="docs/screenshots/radar-arc-pacing.png" width="100%" alt="Archetype Radar, Kishotenketsu Arc & Pacing Barcode" /> | <img src="docs/screenshots/doppelganger-narrative-matrix.png" width="100%" alt="4-Pillar Narrative Alignment Drawer" /> |
+| <img src="docs/screenshots/radar-arc-pacing.png" width="100%" alt="Archetype Radar, Kishōtenketsu Arc & Pacing Barcode" /> | <img src="docs/screenshots/doppelganger-narrative-matrix.png" width="100%" alt="4-Pillar Narrative Alignment Matrix" /> |
 
 <br/>
 
@@ -29,9 +29,9 @@ A computational stylometry and narrative similarity platform for web fiction and
 ## Key Features
 
 - **37-Metric Multi-Lingual Stylometry**: Native syntax parsing and lexical analysis across English (`spaCy`, `VADER`), Japanese (`SudachiPy`, `Oseti`), and Chinese (`spaCy`) covering sentence structure, dialogue density, vocabulary richness (TTR), and somatic sentiment.
-- **Explainable Similarity Engine (< 2ms)**: Vectorized NumPy search combining 384D semantic embeddings with 8D prose fingerprints, generating 4-pillar narrative alignments (*Catalyst, Setting, Conflict, Cadence*) and side-by-side metric diffs across 10,320 works.
-- **Interactive Visualizations**: 8-axis archetype radar charts with territory baseline overlays, 100-bar chapter pacing barcodes, and 4-phase *Kishōtenketsu* quantile sentiment arcs.
-- **Live Prose Analyzer & Library Explorer**: Real-time analysis of custom input prose alongside a searchable 10,320-novel library with multi-genre inclusion/exclusion filtering and session state persistence.
+- **4-Pillar Narrative Alignment Engine (< 2ms)**: Vectorized NumPy search combining 384D semantic embeddings with 8D prose fingerprints across 10,320 works, mapping 4 structural narrative pillars (*Premise & Catalyst, Setting & Atmosphere, Conflict Stakes, Prose Voice & Cadence*) alongside candidate-specific trope chips and side-by-side metric diffs.
+- **Kishōtenketsu Sentiment Trajectory & Valence Spectrum**: 4-phase quantile emotional sentiment curves with dynamic narrative trajectory classification (*Balanced Narrative Arc, Dramatic Crescendo, Lingering Cliffhanger*), 3-stage act transition deltas (`Ki ➔ Shō ➔ Ten ➔ Ketsu`), and a standardized continuous valence scale (-1.0 to +1.0).
+- **25+ Subgenre Literary Taxonomy & Multi-Filter Explorer**: Searchable 10,320-novel library with real-time inclusion (`Click`) and exclusion (`Double-Click`) filtering, territory baseline overlays (Web Novel vs. Classic Literature), 100-bar pacing barcodes, and session state persistence.
 
 ---
 
