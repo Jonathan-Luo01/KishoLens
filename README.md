@@ -1,145 +1,160 @@
 # KishoLens
 
-> **Stylistic Pacing & Prose Archetype Analytics Engine for Web Fiction & Classical Literature**
+A computational stylometry and narrative similarity platform for web fiction and classical literature. KishoLens analyzes sentence structure, dialogue cadence, vocabulary richness, and structural pacing across 10,000+ works in English, Japanese, and Chinese.
 
-KishoLens is a NLP and ML analytics engine designed for dissecting the structural, syntactic, and emotional DNA of fiction — sentence pacing, vocabulary diversity (TTR), dialogue rhythm, multi-lingual dependency tree depth, and 17 canonical prose archetypes across **2,800+ web novels and classical literature works**.
-
----
-
-## 🌟 Key Features
-
-- **📖 17 Canonical Prose Archetypes**: Zero-shot semantic genre classification powered by `sentence-transformers` (`all-MiniLM-L6-v2`), global mean centroid subtraction, and calibrated sigmoid confidence scoring.
-- **🏮 Kishōtenketsu 4-Act Sentiment Arcs**: Dynamic emotional polarity curve tracking across **Ki (起/Introduction)**, **Shō (承/Development)**, **Ten (転/Twist)**, and **Ketsu (結/Resolution)**.
-- **🌐 Tri-Language NLP Pipeline**: Native syntactic dependency tree parsing, POS tagging, and lexical density analysis for **English (spaCy)**, **Japanese (SudachiPy / Oseti)**, and **Chinese (spaCy / HanLP)**.
-- **📊 Interactive Visual Dashboard**:
-  - 8-Dimensional Archetype Radar Canvas with interactive spoke tooltips & baseline comparison (`Web Novel` vs `Classic Literature`).
-  - Rhythmic Pacing Barcodes displaying paragraph word-density variations.
-  - Categorized Metric Cards (Structure, Prose & Style, Theme & Emotion, Pacing) featuring percentile progress meters and benchmark chips (`+X% vs Avg`).
-- **🔍 Multi-Faceted Doppelgänger Search**: Cosine + L1 multi-vector similarity search identifying top stylistic twin novels across the 2,800+ novel database in **< 1 ms**.
+[Live Demo](https://kisholens.pages.dev)
 
 ---
 
-## 🛠️ Stack & Technology
+## Core Capabilities
 
-| Layer | Technology |
-|---|---|
-| **Frontend** | Astro static/SSR, Vanilla CSS design tokens, HTML5 Canvas & SVG |
-| **API Backend** | FastAPI, Uvicorn, Async context manager lifecycle |
-| **Tri-Language NLP** | `spaCy` (`en_core_web_sm`, `zh_core_web_sm`), `NLTK VADER`, `SudachiPy`, `Oseti` |
-| **Machine Learning** | `sentence-transformers` (`all-MiniLM-L6-v2`), `numpy`, `scipy` |
-| **Database & Cache** | SQLModel (SQLite), pre-computed JSON disk vector caches (`vector_cache.json`) |
-| **Package Managers** | Astral `uv` (Python), `npm` (Node.js) |
+### 1. Multi-Lingual Prose Stylometry (37 Metrics)
+Custom NLP tokenization pipelines extract 37 forensic literary dimensions across English (`spaCy`, `NLTK VADER`), Japanese (`SudachiPy`, `Oseti`), and Chinese (`spaCy`):
+- **Structure & Volume**: Word/character counts, sentence count, average sentence length, sentences per paragraph, syntactic dependency tree depth.
+- **Prose & Style**: Dialogue ratio, Type-Token Ratio (TTR / lexical richness), adjective/verb/particle distribution ratios, Kanji density.
+- **Theme & Emotion**: Compound sentiment polarity, thematic explicitness ratio, visceral/somatic sensory density, outside-world engagement score.
+- **Pacing & Narrative**: Linearity subversion score, temporal shift frequency, entity/subplot diversity, paragraph length variance.
+
+### 2. Explainable Similarity Engine ("Doppelgängers")
+Identifies stylistic and thematic twin works across the 10,320-novel database in **< 2ms**:
+- **5-Factor Similarity Model**: Combines 384D semantic embeddings (`all-MiniLM-L6-v2`), 8D stylometric fingerprint vectors, parent genre overlap (Jaccard), fine-grained tag overlap, and territory semantic similarity.
+- **NumPy Matrix Vectorization**: Full-corpus candidate screening vectorized with cosine dot products in memory.
+- **4-Pillar Narrative Alignment**: Side-by-side comparative breakdown across *Premise Catalyst*, *Setting Atmosphere*, *Conflict Stakes*, and *Prose Cadence*.
+- **Editorial Synthesis**: Dynamically generates concise editorial commentary explaining why works align.
+- **Forensic Delta Table**: Interactive drawer comparing input prose metrics directly against matched works with visual alignment bars.
+
+### 3. Interactive Visualization Suite
+- **8-Axis Archetype Radar**: HTML5 Canvas radar chart with interactive spoke tooltips, spoken metric explanations, and baseline toggles (*Web Novel* vs *Classic Literature*).
+- **Rhythmic Pacing Barcodes**: Visual chapter/paragraph density barcode displaying pacing tempo, scene velocity, and dialogue frequency variations.
+- **4-Phase Kishōtenketsu Sentiment Arcs**: Dynamic emotional polarity curves tracking narrative progression across **Ki** (起 / Introduction), **Shō** (承 / Development), **Ten** (転 / Twist), and **Ketsu** (結 / Resolution).
+- **Metric Cards Carousel**: Grouped by category with percentile progress meters and benchmark chips (`+X% vs Avg`).
+
+### 4. Interactive Prose Analyzer (`/analyze`)
+- Paste or type custom text in any supported language for instant NLP extraction, archetype prediction, and similarity matching.
+- Preset literary excerpt loader for testing classic literature, translated light novels, wuxia, and modern web serials.
+
+### 5. Library Explorer (`/library`)
+- Search and browse 10,320 indexed works across Royal Road, Syosetu, Project Gutenberg, ScribbleHub, and CNNovel.
+- Filter by Territory (*Web Novel* vs *Classic Literature*) and multi-tag inclusion/exclusion checkboxes.
+- State preservation across client router navigation via `sessionStorage`.
 
 ---
 
-## 🚀 Quick Start Guide
+## Architecture & Tech Stack
 
-### Prerequisites
+- **Frontend**: Astro 5, TypeScript, Vanilla CSS design tokens, HTML5 Canvas API (hosted on Cloudflare Pages)
+- **Backend API**: FastAPI, Uvicorn, Python 3.11+ (deployed on Google Cloud Run)
+- **NLP & Stylometry**: spaCy (`en_core_web_sm`, `zh_core_web_sm`), NLTK (VADER), SudachiPy, Oseti
+- **Embeddings & ML**: Sentence-Transformers (`all-MiniLM-L6-v2`), NumPy, SciPy
+- **Data Storage**: SQLite (`novel_stats.sqlite`), pre-computed JSON metadata, Cloudflare R2 object storage
+- **Package Management**: Astral `uv` (Python), `npm` (Node.js)
 
-- **Python**: $\ge 3.10$ (Python 3.13 or 3.14 supported)
-- **Node.js**: $\ge 18.0.0$
-- **Astral `uv`**: Installed (`curl -LsSf https://astral.sh/uv/install.sh | sh`)
+---
 
-### 1. Clone & Install Dependencies
+## Local Setup
+
+### Requirements
+- Python 3.10+ (with `uv` recommended)
+- Node.js 18+
+
+### 1. Installation
 
 ```bash
-# 1. Clone the repository
+# Clone the repository
 git clone https://github.com/Jonathan-Luo01/KishoLens.git
 cd KishoLens
 
-# 2. Install Python dependencies (with NLP extras)
+# Install Python dependencies and NLP models
 uv sync --extra nlp
-
-# 3. Download required spaCy models for English and Chinese NLP
 uv run python -m spacy download en_core_web_sm
 uv run python -m spacy download zh_core_web_sm
 
-# 4. Install Node dependencies for frontend
-npm install
+# Install frontend dependencies
 npm --prefix frontend install
 ```
 
-### 2. Run Local Development Servers
+### 2. Running Locally
 
-Run both the FastAPI backend and Astro frontend concurrently with a single command:
+Start both the backend and frontend concurrently:
 
 ```bash
 npm run dev
 ```
 
-Or launch each service individually in separate terminals:
+Or run them individually:
 
 ```bash
-# Terminal 1: Start FastAPI Backend (http://localhost:8000)
+# Backend (FastAPI on http://localhost:8000)
 uv run uvicorn kisholens.api.main:app --reload --port 8000
 
-# Terminal 2: Start Astro Frontend (http://localhost:4321)
+# Frontend (Astro on http://localhost:4321)
 npm --prefix frontend run dev
 ```
 
-Visit **`http://localhost:4321`** in your browser to launch the KishoLens dashboard!
-
 ---
 
-## 📡 REST API Documentation
+## API Reference
 
-The FastAPI backend exposes the following key endpoints on `http://localhost:8000`:
+The FastAPI service exposes the following core endpoints:
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/health` | Server health check and NLP model status |
-| `POST` | `/api/analyze` | Real-time analysis of pasted prose (returns 20+ features, archetype, 4-act arc, pacing barcode, and doppelgänger matches) |
-| `GET` | `/api/novels` | List database novels with search query, genre, and territory filters |
-| `GET` | `/api/novels/{id}/stats` | Pre-computed aggregated statistics & benchmark percentages for a specific novel |
-| `GET` | `/api/novels/{id}/arc` | 4-act Kishōtenketsu sentiment arc array for a specific novel |
+| `GET` | `/health` | Service health status and loaded database diagnostics |
+| `GET` | `/api/novels` | List indexed novels with genre, source, and territory filters |
+| `GET` | `/api/novels/{id}/stats` | Full 37-metric profile, radar vector, pacing array, and top matches |
+| `GET` | `/api/novels/{id}/arc` | 4-act Kishōtenketsu sentiment trajectory and quantile ranges |
+| `POST` | `/api/analyze` | Real-time analysis of custom input prose |
+| `GET` | `/api/db/stats` | Aggregated dataset counts and source distributions |
+| `POST` | `/api/pipeline/ingest` | Trigger background scraping & ETL pipeline for new novels |
+| `GET` | `/api/pipeline/jobs/{id}` | Ingestion job progress and completion status |
 
-### Sample API Request (`POST /api/analyze`)
+### Example: Analyze Custom Prose
 
 ```bash
 curl -X POST "http://localhost:8000/api/analyze" \
      -H "Content-Type: application/json" \
-     -d '{"text": "Inspector Holmes knelt by the corpse, examining the faint scent of bitter almonds clinging to the victim lips.", "lang": "auto"}'
+     -d '{
+       "text": "The wind howled across the stone fortress as Duke Jeffrey unsheathed his blade...",
+       "lang": "en"
+     }'
 ```
 
 ---
 
-## 🧪 Testing & Verification
-
-Run the full test suite to verify NLP feature extraction, semantic matchers, and API endpoints:
+## Testing
 
 ```bash
-# Run Python backend unit test suite (37 tests)
-uv run pytest tests/
+# Run backend test suite
+uv run pytest
 
-# Verify Astro static build compilation
+# Test frontend build
 npm --prefix frontend run build
 ```
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 KishoLens/
-├── kisholens/              # Python Backend Source
-│   ├── api/                # FastAPI application & REST routes (`main.py`)
-│   ├── ml/                 # NLP feature extraction, sentiment arcs, semantic match
-│   └── pipeline/           # Dataset ingestion pipelines & scrapers
-├── frontend/               # Astro Frontend Dashboard
-│   └── src/
-│       ├── pages/          # Astro pages (`index.astro`, `analyze.astro`, `library.astro`)
-│       └── styles/         # Global CSS tokens & themes (`global.css`)
-├── data/                   # Database & pre-computed disk caches
-│   ├── kisholens.db        # SQLite database (2,800+ novels)
-│   ├── stats_cache.json    # Pre-computed novel statistics cache
-│   └── vector_cache.json   # Pre-computed 8D feature vector cache
-├── tests/                  # PyTest suite (`test_api_semantic.py`, `test_similarity.py`, etc.)
-├── pyproject.toml          # Astral uv dependency manifest
-└── package.json            # Node.js dev scripts
+├── kisholens/              # Python backend package
+│   ├── api/                # FastAPI application and route handlers
+│   ├── ml/                 # Stylometric features, embeddings, similarity engine
+│   ├── pipeline/           # Ingestion, scrapers, and ETL scripts
+│   └── storage/            # Cloudflare R2 backup and storage utilities
+├── frontend/               # Astro frontend application
+│   ├── src/pages/          # Library explorer, prose analyzer, visualizer
+│   └── src/styles/         # Design tokens, theme styling (Dark / Light)
+├── data/                   # Precomputed SQLite databases and metadata
+│   ├── novel_stats.sqlite  # Compact precalculated stats for all 10,320 novels
+│   ├── novels_metadata.json# Index of titles, authors, genres, and chapter counts
+│   └── vector_cache.json   # 8D stylometric fingerprint vectors
+├── scripts/                # Ingestion and similarity recomputation scripts
+└── tests/                  # Backend pytest test suite
 ```
 
 ---
 
-## 🛡️ License & Dataset Policy
+## License & Dataset Notes
 
-Raw chapter texts from modern web fiction platforms are copyrighted by their respective authors and are **never committed to this repository**. All included database metrics, public domain Gutenberg texts, and model centroids are free for academic and non-commercial research use.
+Raw scraped text from web platforms is subject to copyright by respective authors and is excluded from the repository. All statistical metrics, Gutenberg public domain data, and embeddings are provided for non-commercial research and educational use.
